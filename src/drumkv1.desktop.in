@@ -1,0 +1,11 @@
+[Desktop Entry]
+Name=@PACKAGE_NAME@
+Version=1.0
+GenericName=MIDI
+Comment=drumkv1 is an old school drum-kit sampler
+Exec=@ac_prefix@/bin/drumkv1_jack
+Icon=drumkv1
+Categories=Audio;AudioVideo;Midi;X-Alsa;X-Jack;Qt;
+Terminal=false
+Type=Application
+X-SuSE-translate=true

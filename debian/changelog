@@ -1,0 +1,6 @@
+drumkv1 (0.0.0-0) unstable; urgency=low
+
+  * Initial debianization
+
+ -- Rui Nuno Capela <rncbc@rncbc.org>  Wed,  3 Oct 2012 12:00:00 +0000
+

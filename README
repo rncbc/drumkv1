@@ -1,0 +1,79 @@
+drumkv1 - an old-school drum-kit sampler
+----------------------------------------
+
+  an old-school drum-kit sampler synthesizer with stereo fx.
+
+features:
+
+  - pure stand-alone JACK client with JACK-session and both JACK MIDI
+    and ALSA MIDI input support;
+
+  - LV2 instrument plugin.
+    URI: http://drumkv1.sourceforge.net/lv2
+
+license:
+
+  drumkv1 is free, open-source software, distributed under the terms of
+  the GNU General Public License (GPL) version 2 or later.
+
+website:
+
+  http://drumkv1.sourceforge.net
+
+project page:
+
+  http://sourceforge.net/projects/drumkv1
+
+svn trunk:
+
+  http://svn.code.sf.net/p/drumkv1/code/trunk
+
+weblog:
+
+  http://www.rncbc.org
+
+
+requirements:
+
+  mandatory,
+
+  - Qt4 (core, gui, xml), C++ class library and tools for
+    crossplatform development and internationalization
+    http://qt-project.org/
+
+  - libsndfile, C library for reading and writing
+    files containing sampled sound
+    http://www.mega-nerd.com/libsndfile/
+
+  optional (opted-in at build time),
+
+  - JACK Audio Connection Kit
+    http://jackaudio.org/
+
+  - ALSA, Advanced Linux Sound Architecture
+    http://www.alsa-project.org/
+
+  - LV2, Audio Plugin Standard, the extensible successor of LADSPA
+    http://lv2plug.in/
+
+
+installation:
+
+  - unpack tarball as usual; in the extracted source directory
+
+    ./configure [--prefix=/usr/local]
+    make
+
+  - optionally, as root:
+
+    make install
+
+  - if checking out from svn, prepare configure script with
+
+    make -f Makefile.svn
+
+
+cheers && enjoy.
+--
+rncbc aka. Rui Nuno Capela
+rncbc@rncbc.org
