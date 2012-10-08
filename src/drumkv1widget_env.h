@@ -41,25 +41,22 @@ public:
 
 	// Parameter getters.
 	float attack() const;
-	float decay() const;
-	float sustain() const;
-	float release() const;
+	float decay1() const;
+	float decay2() const;
 
 public slots:
 
 	// Parameter setters.
 	void setAttack(float fAttack);
-	void setDecay(float fDecay);
-	void setSustain(float fSustain);
-	void setRelease(float fRelease);
+	void setDecay1(float fDecay1);
+	void setDecay2(float fDecay2);
 
 signals:
 
 	// Parameter change signals.
 	void attackChanged(float fAttack);
-	void decayChanged(float fDecay);
-	void sustainChanged(float fSustain);
-	void releaseChanged(float fRelease);
+	void decay1Changed(float fDecay1);
+	void decay2Changed(float fDecay2);
 
 protected:
 
@@ -81,9 +78,8 @@ private:
 
 	// Instance state.
 	float m_fAttack;
-	float m_fDecay;
-	float m_fSustain;
-	float m_fRelease;
+	float m_fDecay1;
+	float m_fDecay2;
 
 	// Draw state.
 	QPolygon m_poly;

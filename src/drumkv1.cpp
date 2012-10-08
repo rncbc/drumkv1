@@ -87,7 +87,7 @@ struct drumkv1_env
 {
 	// envelope stages
 
-	enum Stage { Attack = 0, Decay, Sustain, Release, Done };
+	enum Stage { Attack = 0, Decay1, Decay2, Done };
 
 	// per voice
 
@@ -127,21 +127,22 @@ struct drumkv1_env
 	void next(State *p)
 	{
 		if (p->stage == Attack) {
-			p->stage = Decay;
+			p->stage = Decay1;
 			p->level = 1.0f;
-			p->frames = int(*decay * *decay * max_frames);
+			p->frames = int(*decay1 * *decay1 * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
-			p->delta = (*sustain - 1.0f) / float(p->frames);
+			p->delta = -0.5f / float(p->frames);
 		}
-		else if (p->stage == Decay) {
-			p->running = false; // stay at this stage until note_off received
-			p->stage = Sustain;
-			p->level = *sustain;
-			p->frames = 0;
-			p->delta = 0.0f;
+		else if (p->stage == Decay1) {
+			p->stage = Decay2;
+			p->level = 0.5f;
+			p->frames = int(*decay2 * *decay2 * max_frames);
+			if (p->frames < min_frames) // prevent click on too fast decay
+				p->frames = min_frames;
+			p->delta = -0.5f / float(p->frames);
 		}
-		else if (p->stage == Release) {
+		else if (p->stage == Decay2) {
 			p->running = false;
 			p->stage = Done;
 			p->level = 0.0f;
@@ -163,8 +164,8 @@ struct drumkv1_env
 	void note_off(State *p)
 	{
 		p->running = true;
-		p->stage = Release;
-		p->frames = int(*release * *release * max_frames);
+		p->stage = Decay2;
+		p->frames = int(*decay2 * *decay2 * max_frames);
 		if (p->frames < min_frames) // prevent click on too fast release
 			p->frames = min_frames;
 		p->delta = -(p->level) / float(p->frames);
@@ -173,7 +174,7 @@ struct drumkv1_env
 	void note_off_fast(State *p)
 	{
 		p->running = true;
-		p->stage = Release;
+		p->stage = Decay2;
 		if (p->frames > min_frames) {
 			p->frames = min_frames;
 			p->delta = -(p->level) / float(p->frames);
@@ -183,9 +184,8 @@ struct drumkv1_env
 	// parameters
 
 	float *attack;
-	float *decay;
-	float *sustain;
-	float *release;
+	float *decay1;
+	float *decay2;
 
 	uint32_t min_frames;
 	uint32_t max_frames;
@@ -905,16 +905,14 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::GEN1_LOOP:      m_gen1.loop        = pfParam; break;
 	case drumkv1::GEN1_OCTAVE:    m_gen1.octave      = pfParam; break;
 	case drumkv1::GEN1_TUNING:    m_gen1.tuning      = pfParam; break;
-	case drumkv1::GEN1_GLIDE:     m_gen1.glide       = pfParam; break;
 	case drumkv1::DCF1_CUTOFF:    m_dcf1.cutoff      = pfParam; break;
 	case drumkv1::DCF1_RESO:      m_dcf1.reso        = pfParam; break;
 	case drumkv1::DCF1_TYPE:      m_dcf1.type        = pfParam; break;
 	case drumkv1::DCF1_SLOPE:     m_dcf1.slope       = pfParam; break;
 	case drumkv1::DCF1_ENVELOPE:  m_dcf1.envelope    = pfParam; break;
 	case drumkv1::DCF1_ATTACK:    m_dcf1.env.attack  = pfParam; break;
-	case drumkv1::DCF1_DECAY:     m_dcf1.env.decay   = pfParam; break;
-	case drumkv1::DCF1_SUSTAIN:   m_dcf1.env.sustain = pfParam; break;
-	case drumkv1::DCF1_RELEASE:   m_dcf1.env.release = pfParam; break;
+	case drumkv1::DCF1_DECAY1:    m_dcf1.env.decay1  = pfParam; break;
+	case drumkv1::DCF1_DECAY2:    m_dcf1.env.decay2  = pfParam; break;
 	case drumkv1::LFO1_SHAPE:     m_lfo1.shape       = pfParam; break;
 	case drumkv1::LFO1_WIDTH:     m_lfo1.width       = pfParam; break;
 	case drumkv1::LFO1_RATE:      m_lfo1.rate        = pfParam; break;
@@ -925,14 +923,12 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::LFO1_PANNING:   m_lfo1.panning     = pfParam; break;
 	case drumkv1::LFO1_VOLUME:    m_lfo1.volume      = pfParam; break;
 	case drumkv1::LFO1_ATTACK:    m_lfo1.env.attack  = pfParam; break;
-	case drumkv1::LFO1_DECAY:     m_lfo1.env.decay   = pfParam; break;
-	case drumkv1::LFO1_SUSTAIN:   m_lfo1.env.sustain = pfParam; break;
-	case drumkv1::LFO1_RELEASE:   m_lfo1.env.release = pfParam; break;
+	case drumkv1::LFO1_DECAY1:    m_lfo1.env.decay1  = pfParam; break;
+	case drumkv1::LFO1_DECAY2:    m_lfo1.env.decay2  = pfParam; break;
 	case drumkv1::DCA1_VOLUME:    m_dca1.volume      = pfParam; break;
 	case drumkv1::DCA1_ATTACK:    m_dca1.env.attack  = pfParam; break;
-	case drumkv1::DCA1_DECAY:     m_dca1.env.decay   = pfParam; break;
-	case drumkv1::DCA1_SUSTAIN:   m_dca1.env.sustain = pfParam; break;
-	case drumkv1::DCA1_RELEASE:   m_dca1.env.release = pfParam; break;
+	case drumkv1::DCA1_DECAY1:    m_dca1.env.decay1  = pfParam; break;
+	case drumkv1::DCA1_DECAY2:    m_dca1.env.decay2  = pfParam; break;
 	case drumkv1::DEF1_PITCHBEND: m_def1.pitchbend   = pfParam; break;
 	case drumkv1::DEF1_MODWHEEL:  m_def1.modwheel    = pfParam; break;
 	case drumkv1::DEF1_PRESSURE:  m_def1.pressure    = pfParam; break;
@@ -973,16 +969,14 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::GEN1_LOOP:      pfParam = m_gen1.loop;        break;
 	case drumkv1::GEN1_OCTAVE:    pfParam = m_gen1.octave;      break;
 	case drumkv1::GEN1_TUNING:    pfParam = m_gen1.tuning;      break;
-	case drumkv1::GEN1_GLIDE:     pfParam = m_gen1.glide;       break;
 	case drumkv1::DCF1_CUTOFF:    pfParam = m_dcf1.cutoff;      break;
 	case drumkv1::DCF1_RESO:      pfParam = m_dcf1.reso;        break;
 	case drumkv1::DCF1_TYPE:      pfParam = m_dcf1.type;        break;
 	case drumkv1::DCF1_SLOPE:     pfParam = m_dcf1.slope;       break;
 	case drumkv1::DCF1_ENVELOPE:  pfParam = m_dcf1.envelope;    break;
 	case drumkv1::DCF1_ATTACK:    pfParam = m_dcf1.env.attack;  break;
-	case drumkv1::DCF1_DECAY:     pfParam = m_dcf1.env.decay;   break;
-	case drumkv1::DCF1_SUSTAIN:   pfParam = m_dcf1.env.sustain; break;
-	case drumkv1::DCF1_RELEASE:   pfParam = m_dcf1.env.release; break;
+	case drumkv1::DCF1_DECAY1:    pfParam = m_dcf1.env.decay1;  break;
+	case drumkv1::DCF1_DECAY2:    pfParam = m_dcf1.env.decay2;  break;
 	case drumkv1::LFO1_SHAPE:     pfParam = m_lfo1.shape;       break;
 	case drumkv1::LFO1_WIDTH:     pfParam = m_lfo1.width;       break;
 	case drumkv1::LFO1_RATE:      pfParam = m_lfo1.rate;        break;
@@ -993,14 +987,12 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::LFO1_PANNING:   pfParam = m_lfo1.panning;     break;
 	case drumkv1::LFO1_VOLUME:    pfParam = m_lfo1.volume;      break;
 	case drumkv1::LFO1_ATTACK:    pfParam = m_lfo1.env.attack;  break;
-	case drumkv1::LFO1_DECAY:     pfParam = m_lfo1.env.decay;   break;
-	case drumkv1::LFO1_SUSTAIN:   pfParam = m_lfo1.env.sustain; break;
-	case drumkv1::LFO1_RELEASE:   pfParam = m_lfo1.env.release; break;
+	case drumkv1::LFO1_DECAY1:    pfParam = m_lfo1.env.decay1;  break;
+	case drumkv1::LFO1_DECAY2:    pfParam = m_lfo1.env.decay2;  break;
 	case drumkv1::DCA1_VOLUME:    pfParam = m_dca1.volume;      break;
 	case drumkv1::DCA1_ATTACK:    pfParam = m_dca1.env.attack;  break;
-	case drumkv1::DCA1_DECAY:     pfParam = m_dca1.env.decay;   break;
-	case drumkv1::DCA1_SUSTAIN:   pfParam = m_dca1.env.sustain; break;
-	case drumkv1::DCA1_RELEASE:   pfParam = m_dca1.env.release; break;
+	case drumkv1::DCA1_DECAY1:    pfParam = m_dca1.env.decay1;  break;
+	case drumkv1::DCA1_DECAY2:    pfParam = m_dca1.env.decay2;  break;
 	case drumkv1::DEF1_PITCHBEND: pfParam = m_def1.pitchbend;   break;
 	case drumkv1::DEF1_MODWHEEL:  pfParam = m_def1.modwheel;    break;
 	case drumkv1::DEF1_PRESSURE:  pfParam = m_def1.pressure;    break;
@@ -1108,7 +1100,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 	else if (status == 0x80 || (status == 0x90 && value == 0)) {
 		drumkv1_voice *pv = m_notes[key];
 		if (pv && pv->note >= 0) {
-			if (pv->dca1_env.stage != drumkv1_env::Release) {
+			if (pv->dca1_env.stage != drumkv1_env::Decay2) {
 				m_dca1.env.note_off(&pv->dca1_env);
 				m_dcf1.env.note_off(&pv->dcf1_env);
 				m_lfo1.env.note_off(&pv->lfo1_env);

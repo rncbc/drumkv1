@@ -26,14 +26,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>580</height>
+	<width>940</width>
+	<height>580</height>
    </rect>
   </property>
   <property name="minimumSize" >
    <size>
-    <width>1024</width>
-    <height>580</height>
+	<width>940</width>
+	<height>580</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -179,16 +179,6 @@
             </property>
            </spacer>
           </item>
-          <item>
-           <widget class="drumkv1widget_spin" name="Gen1GlideKnob">
-            <property name="toolTip">
-             <string>GEN1 Glide</string>
-            </property>
-            <property name="text">
-             <string>Glide</string>
-            </property>
-           </widget>
-          </item>
          </layout>
         </widget>
        </item>
@@ -279,32 +269,22 @@
              </widget>
             </item>
             <item>
-             <widget class="drumkv1widget_spin" name="Dcf1DecayKnob">
+			 <widget class="drumkv1widget_spin" name="Dcf1Decay1Knob">
               <property name="toolTip">
-               <string>DCF1 Decay</string>
+			   <string>DCF1 Decay 1</string>
               </property>
               <property name="text">
-               <string>Decay</string>
+			   <string>Decay 1</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="drumkv1widget_spin" name="Dcf1SustainKnob">
+			 <widget class="drumkv1widget_spin" name="Dcf1Decay2Knob">
               <property name="toolTip">
-               <string>DCF1 Sustain</string>
+			   <string>DCF1 Decay 2</string>
               </property>
               <property name="text">
-               <string>Sustain</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="drumkv1widget_spin" name="Dcf1ReleaseKnob">
-              <property name="toolTip">
-               <string>DCF1 Release</string>
-              </property>
-              <property name="text">
-               <string>Release</string>
+			   <string>Decay 2</string>
               </property>
              </widget>
             </item>
@@ -366,32 +346,22 @@
              </widget>
             </item>
             <item>
-             <widget class="drumkv1widget_spin" name="Lfo1DecayKnob">
+			 <widget class="drumkv1widget_spin" name="Lfo1Decay1Knob">
               <property name="toolTip">
-               <string>LFO1 Decay</string>
+			   <string>LFO1 Decay 1</string>
               </property>
               <property name="text">
-               <string>Decay</string>
+			   <string>Decay 1</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="drumkv1widget_spin" name="Lfo1SustainKnob">
+			 <widget class="drumkv1widget_spin" name="Lfo1Decay2Knob">
               <property name="toolTip">
-               <string>LFO1 Sustain</string>
+			   <string>LFO1 Decay 2</string>
               </property>
               <property name="text">
-               <string>Sustain</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="drumkv1widget_spin" name="Lfo1ReleaseKnob">
-              <property name="toolTip">
-               <string>LFO1 Release</string>
-              </property>
-              <property name="text">
-               <string>Release</string>
+			   <string>Decay 2</string>
               </property>
              </widget>
             </item>
@@ -547,32 +517,22 @@
            </widget>
           </item>
           <item>
-           <widget class="drumkv1widget_spin" name="Dca1DecayKnob">
+		   <widget class="drumkv1widget_spin" name="Dca1Decay1Knob">
             <property name="toolTip">
-             <string>DCA1 Decay</string>
+			 <string>DCA1 Decay 1</string>
             </property>
             <property name="text">
-             <string>Decay</string>
+			 <string>Decay 1</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="drumkv1widget_spin" name="Dca1SustainKnob">
+		   <widget class="drumkv1widget_spin" name="Dca1Decay2Knob">
             <property name="toolTip">
-             <string>DCA1 Sustain</string>
+			 <string>DCA1 Decay 2</string>
             </property>
             <property name="text">
-             <string>Sustain</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="drumkv1widget_spin" name="Dca1ReleaseKnob">
-            <property name="toolTip">
-             <string>DCA1 Release</string>
-            </property>
-            <property name="text">
-             <string>Release</string>
+			 <string>Decay 2</string>
             </property>
            </widget>
           </item>

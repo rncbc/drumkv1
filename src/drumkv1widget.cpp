@@ -43,16 +43,14 @@ struct {
 	{ "GEN1_LOOP",      0.0f },
 	{ "GEN1_OCTAVE",    0.0f },
 	{ "GEN1_TUNING",    0.0f },
-	{ "GEN1_GLIDE",     0.0f },
 	{ "DCF1_CUTOFF",    1.0f }, // 0.5f
 	{ "DCF1_RESO",      0.0f },
 	{ "DCF1_TYPE",      0.0f },
 	{ "DCF1_SLOPE",     0.0f },
 	{ "DCF1_ENVELOPE",  1.0f },
 	{ "DCF1_ATTACK",    0.0f },
-	{ "DCF1_DECAY",     0.2f },
-	{ "DCF1_SUSTAIN",   0.5f },
-	{ "DCF1_RELEASE",   0.5f },
+	{ "DCF1_DECAY1",    0.2f },
+	{ "DCF1_DECAY2",    0.5f },
 	{ "LFO1_SHAPE",     1.0f },
 	{ "LFO1_WIDTH",     1.0f },
 	{ "LFO1_RATE",      0.5f },
@@ -63,14 +61,12 @@ struct {
 	{ "LFO1_PANNING",   0.0f },
 	{ "LFO1_VOLUME",    0.0f },
 	{ "LFO1_ATTACK",    0.0f },
-	{ "LFO1_DECAY",     0.1f },
-	{ "LFO1_SUSTAIN",   1.0f },
-	{ "LFO1_RELEASE",   0.5f },
+	{ "LFO1_DECAY1",    0.2f },
+	{ "LFO1_DECAY2",    0.5f },
 	{ "DCA1_VOLUME",    0.5f },
 	{ "DCA1_ATTACK",    0.0f },
-	{ "DCA1_DECAY",     0.1f },
-	{ "DCA1_SUSTAIN",   1.0f },
-	{ "DCA1_RELEASE",   0.5f },	// 0.1f
+	{ "DCA1_DECAY1",    0.2f },
+	{ "DCA1_DECAY2",    0.5f },	// 0.1f
 	{ "DEF1_PITCHBEND", 0.2f },
 	{ "DEF1_MODWHEEL",  0.2f },
 	{ "DEF1_PRESSURE",  0.2f },
@@ -213,7 +209,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::GEN1_LOOP,   m_ui.Gen1LoopKnob);
 	setParamKnob(drumkv1::GEN1_OCTAVE, m_ui.Gen1OctaveKnob);
 	setParamKnob(drumkv1::GEN1_TUNING, m_ui.Gen1TuningKnob);
-	setParamKnob(drumkv1::GEN1_GLIDE,  m_ui.Gen1GlideKnob);
 
 	// DCF1
 	setParamKnob(drumkv1::DCF1_CUTOFF,   m_ui.Dcf1CutoffKnob);
@@ -222,9 +217,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::DCF1_SLOPE,    m_ui.Dcf1SlopeKnob);
 	setParamKnob(drumkv1::DCF1_ENVELOPE, m_ui.Dcf1EnvelopeKnob);
 	setParamKnob(drumkv1::DCF1_ATTACK,   m_ui.Dcf1AttackKnob);
-	setParamKnob(drumkv1::DCF1_DECAY,    m_ui.Dcf1DecayKnob);
-	setParamKnob(drumkv1::DCF1_SUSTAIN,  m_ui.Dcf1SustainKnob);
-	setParamKnob(drumkv1::DCF1_RELEASE,  m_ui.Dcf1ReleaseKnob);
+	setParamKnob(drumkv1::DCF1_DECAY1,   m_ui.Dcf1Decay1Knob);
+	setParamKnob(drumkv1::DCF1_DECAY2,   m_ui.Dcf1Decay2Knob);
 
 	QObject::connect(
 		m_ui.Dcf1Filt, SIGNAL(cutoffChanged(float)),
@@ -255,25 +249,18 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Dcf1Env, SLOT(setAttack(float)));
 
 	QObject::connect(
-		m_ui.Dcf1Env, SIGNAL(decayChanged(float)),
-		m_ui.Dcf1DecayKnob, SLOT(setValue(float)));
+		m_ui.Dcf1Env, SIGNAL(decay1Changed(float)),
+		m_ui.Dcf1Decay1Knob, SLOT(setValue(float)));
 	QObject::connect(
-		m_ui.Dcf1DecayKnob, SIGNAL(valueChanged(float)),
-		m_ui.Dcf1Env, SLOT(setDecay(float)));
+		m_ui.Dcf1Decay1Knob, SIGNAL(valueChanged(float)),
+		m_ui.Dcf1Env, SLOT(setDecay1(float)));
 
 	QObject::connect(
-		m_ui.Dcf1Env, SIGNAL(sustainChanged(float)),
-		m_ui.Dcf1SustainKnob, SLOT(setValue(float)));
+		m_ui.Dcf1Env, SIGNAL(decay2Changed(float)),
+		m_ui.Dcf1Decay2Knob, SLOT(setValue(float)));
 	QObject::connect(
-		m_ui.Dcf1SustainKnob, SIGNAL(valueChanged(float)),
-		m_ui.Dcf1Env, SLOT(setSustain(float)));
-
-	QObject::connect(
-		m_ui.Dcf1Env, SIGNAL(releaseChanged(float)),
-		m_ui.Dcf1ReleaseKnob, SLOT(setValue(float)));
-	QObject::connect(
-		m_ui.Dcf1ReleaseKnob, SIGNAL(valueChanged(float)),
-		m_ui.Dcf1Env, SLOT(setRelease(float)));
+		m_ui.Dcf1Decay2Knob, SIGNAL(valueChanged(float)),
+		m_ui.Dcf1Env, SLOT(setDecay2(float)));
 
 	// LFO1
 	setParamKnob(drumkv1::LFO1_SHAPE,   m_ui.Lfo1ShapeKnob);
@@ -286,9 +273,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::LFO1_PITCH,   m_ui.Lfo1PitchKnob);
 	setParamKnob(drumkv1::LFO1_SWEEP,   m_ui.Lfo1SweepKnob);
 	setParamKnob(drumkv1::LFO1_ATTACK,  m_ui.Lfo1AttackKnob);
-	setParamKnob(drumkv1::LFO1_DECAY,   m_ui.Lfo1DecayKnob);
-	setParamKnob(drumkv1::LFO1_SUSTAIN, m_ui.Lfo1SustainKnob);
-	setParamKnob(drumkv1::LFO1_RELEASE, m_ui.Lfo1ReleaseKnob);
+	setParamKnob(drumkv1::LFO1_DECAY1,  m_ui.Lfo1Decay1Knob);
+	setParamKnob(drumkv1::LFO1_DECAY2,  m_ui.Lfo1Decay2Knob);
 
 	QObject::connect(
 		m_ui.Lfo1ShapeKnob, SIGNAL(valueChanged(float)),
@@ -311,32 +297,24 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Lfo1Env, SLOT(setAttack(float)));
 
 	QObject::connect(
-		m_ui.Lfo1Env, SIGNAL(decayChanged(float)),
-		m_ui.Lfo1DecayKnob, SLOT(setValue(float)));
+		m_ui.Lfo1Env, SIGNAL(decay1Changed(float)),
+		m_ui.Lfo1Decay1Knob, SLOT(setValue(float)));
 	QObject::connect(
-		m_ui.Lfo1DecayKnob, SIGNAL(valueChanged(float)),
-		m_ui.Lfo1Env, SLOT(setDecay(float)));
+		m_ui.Lfo1Decay1Knob, SIGNAL(valueChanged(float)),
+		m_ui.Lfo1Env, SLOT(setDecay1(float)));
 
 	QObject::connect(
-		m_ui.Lfo1Env, SIGNAL(sustainChanged(float)),
-		m_ui.Lfo1SustainKnob, SLOT(setValue(float)));
+		m_ui.Lfo1Env, SIGNAL(decay2Changed(float)),
+		m_ui.Lfo1Decay2Knob, SLOT(setValue(float)));
 	QObject::connect(
-		m_ui.Lfo1SustainKnob, SIGNAL(valueChanged(float)),
-		m_ui.Lfo1Env, SLOT(setSustain(float)));
-
-	QObject::connect(
-		m_ui.Lfo1Env, SIGNAL(releaseChanged(float)),
-		m_ui.Lfo1ReleaseKnob, SLOT(setValue(float)));
-	QObject::connect(
-		m_ui.Lfo1ReleaseKnob, SIGNAL(valueChanged(float)),
-		m_ui.Lfo1Env, SLOT(setRelease(float)));
+		m_ui.Lfo1Decay2Knob, SIGNAL(valueChanged(float)),
+		m_ui.Lfo1Env, SLOT(setDecay2(float)));
 
 	// DCA1
-	setParamKnob(drumkv1::DCA1_VOLUME,  m_ui.Dca1VolumeKnob);
-	setParamKnob(drumkv1::DCA1_ATTACK,  m_ui.Dca1AttackKnob);
-	setParamKnob(drumkv1::DCA1_DECAY,   m_ui.Dca1DecayKnob);
-	setParamKnob(drumkv1::DCA1_SUSTAIN, m_ui.Dca1SustainKnob);
-	setParamKnob(drumkv1::DCA1_RELEASE, m_ui.Dca1ReleaseKnob);
+	setParamKnob(drumkv1::DCA1_VOLUME, m_ui.Dca1VolumeKnob);
+	setParamKnob(drumkv1::DCA1_ATTACK, m_ui.Dca1AttackKnob);
+	setParamKnob(drumkv1::DCA1_DECAY1, m_ui.Dca1Decay1Knob);
+	setParamKnob(drumkv1::DCA1_DECAY2, m_ui.Dca1Decay2Knob);
 
 	QObject::connect(
 		m_ui.Dca1Env, SIGNAL(attackChanged(float)),
@@ -346,25 +324,18 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Dca1Env, SLOT(setAttack(float)));
 
 	QObject::connect(
-		m_ui.Dca1Env, SIGNAL(decayChanged(float)),
-		m_ui.Dca1DecayKnob, SLOT(setValue(float)));
+		m_ui.Dca1Env, SIGNAL(decay1Changed(float)),
+		m_ui.Dca1Decay1Knob, SLOT(setValue(float)));
 	QObject::connect(
-		m_ui.Dca1DecayKnob, SIGNAL(valueChanged(float)),
-		m_ui.Dca1Env, SLOT(setDecay(float)));
+		m_ui.Dca1Decay1Knob, SIGNAL(valueChanged(float)),
+		m_ui.Dca1Env, SLOT(setDecay1(float)));
 
 	QObject::connect(
-		m_ui.Dca1Env, SIGNAL(sustainChanged(float)),
-		m_ui.Dca1SustainKnob, SLOT(setValue(float)));
+		m_ui.Dca1Env, SIGNAL(decay2Changed(float)),
+		m_ui.Dca1Decay2Knob, SLOT(setValue(float)));
 	QObject::connect(
-		m_ui.Dca1SustainKnob, SIGNAL(valueChanged(float)),
-		m_ui.Dca1Env, SLOT(setSustain(float)));
-
-	QObject::connect(
-		m_ui.Dca1Env, SIGNAL(releaseChanged(float)),
-		m_ui.Dca1ReleaseKnob, SLOT(setValue(float)));
-	QObject::connect(
-		m_ui.Dca1ReleaseKnob, SIGNAL(valueChanged(float)),
-		m_ui.Dca1Env, SLOT(setRelease(float)));
+		m_ui.Dca1Decay2Knob, SIGNAL(valueChanged(float)),
+		m_ui.Dca1Env, SLOT(setDecay2(float)));
 
 	// DEF1
 	setParamKnob(drumkv1::DEF1_PITCHBEND, m_ui.Def1PitchbendKnob);
