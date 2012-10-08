@@ -40,7 +40,6 @@ struct {
 } drumkv1_default_params[drumkv1::NUM_PARAMS] = {
 
 	{ "GEN1_SAMPLE",   60.0f }, // middle-C aka. C4 (60)
-	{ "GEN1_LOOP",      0.0f },
 	{ "GEN1_OCTAVE",    0.0f },
 	{ "GEN1_TUNING",    0.0f },
 	{ "DCF1_CUTOFF",    1.0f }, // 0.5f
@@ -149,8 +148,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	states << tr("Off");
 	states << tr("On");
 
-	m_ui.Gen1LoopKnob->insertItems(0, states);
-
 	m_ui.Dyn1CompressKnob->insertItems(0, states);
 	m_ui.Dyn1LimiterKnob->insertItems(0, states);
 
@@ -166,12 +163,12 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Gen1SampleKnob->setMaximum(127.0f);
 
 	// GEN octave limits.
-	m_ui.Gen1OctaveKnob->setMinimum(-4.0f);
-	m_ui.Gen1OctaveKnob->setMaximum(+4.0f);
+	m_ui.Gen1CoarseKnob->setMinimum(-4.0f);
+	m_ui.Gen1CoarseKnob->setMaximum(+4.0f);
 
 	// GEN tune limits.
-	m_ui.Gen1TuningKnob->setMinimum(-1.0f);
-	m_ui.Gen1TuningKnob->setMaximum(+1.0f);
+	m_ui.Gen1FineKnob->setMinimum(-1.0f);
+	m_ui.Gen1FineKnob->setMaximum(+1.0f);
 
 	// DCF volume (env.amount) limits.
 	m_ui.Dcf1EnvelopeKnob->setMinimum(-1.0f);
@@ -206,9 +203,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// GEN1
 	setParamKnob(drumkv1::GEN1_SAMPLE, m_ui.Gen1SampleKnob);
-	setParamKnob(drumkv1::GEN1_LOOP,   m_ui.Gen1LoopKnob);
-	setParamKnob(drumkv1::GEN1_OCTAVE, m_ui.Gen1OctaveKnob);
-	setParamKnob(drumkv1::GEN1_TUNING, m_ui.Gen1TuningKnob);
+	setParamKnob(drumkv1::GEN1_COARSE, m_ui.Gen1CoarseKnob);
+	setParamKnob(drumkv1::GEN1_FINE,   m_ui.Gen1FineKnob);
 
 	// DCF1
 	setParamKnob(drumkv1::DCF1_CUTOFF,   m_ui.Dcf1CutoffKnob);

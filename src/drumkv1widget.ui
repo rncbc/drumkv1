@@ -26,14 +26,14 @@
    <rect>
     <x>0</x>
     <y>0</y>
-	<width>940</width>
-	<height>580</height>
+    <width>940</width>
+    <height>580</height>
    </rect>
   </property>
   <property name="minimumSize" >
    <size>
-	<width>940</width>
-	<height>580</height>
+    <width>940</width>
+    <height>580</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -67,28 +67,28 @@
        </property>
       </spacer>
      </item>
-	 <item>
-	  <widget class="QMenuBar" name="MenuBar">
-	   <property name="sizePolicy">
-		<sizepolicy hsizetype="Minimum" vsizetype="Minimum">
-		 <horstretch>0</horstretch>
-		 <verstretch>0</verstretch>
-		</sizepolicy>
-	   </property>
-	   <property name="nativeMenuBar">
-		<bool>false</bool>
-	   </property>
-	   <widget class="QMenu" name="helpMenu">
-		<property name="title">
-		 <string>&amp;Help</string>
-		</property>
-		<addaction name="helpAboutAction"/>
-		<addaction name="helpAboutQtAction"/>
-	   </widget>
-	   <addaction name="helpMenu"/>
-	  </widget>
-	 </item>
-	</layout>
+     <item>
+      <widget class="QMenuBar" name="MenuBar">
+       <property name="sizePolicy">
+        <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+         <horstretch>0</horstretch>
+         <verstretch>0</verstretch>
+        </sizepolicy>
+       </property>
+       <property name="nativeMenuBar">
+        <bool>false</bool>
+       </property>
+       <widget class="QMenu" name="helpMenu">
+        <property name="title">
+         <string>&amp;Help</string>
+        </property>
+        <addaction name="helpAboutAction"/>
+        <addaction name="helpAboutQtAction"/>
+       </widget>
+       <addaction name="helpMenu"/>
+      </widget>
+     </item>
+    </layout>
    </item>
    <item>
     <widget class="QToolBox" name="ToolBox">
@@ -124,16 +124,6 @@
            </widget>
           </item>
           <item>
-           <widget class="drumkv1widget_combo" name="Gen1LoopKnob">
-            <property name="toolTip">
-             <string>GEN1 Loop</string>
-            </property>
-            <property name="text">
-             <string>Loop</string>
-            </property>
-           </widget>
-          </item>
-          <item>
            <spacer>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
@@ -147,37 +137,24 @@
            </spacer>
           </item>
           <item>
-           <widget class="drumkv1widget_spin" name="Gen1OctaveKnob">
+           <widget class="drumkv1widget_spin" name="Gen1CoarseKnob">
             <property name="toolTip">
-             <string>GEN1 Octave</string>
+             <string>GEN1 Coarse</string>
             </property>
             <property name="text">
-             <string>Octave</string>
+             <string>Coarse</string>
             </property>
            </widget>
           </item>
           <item>
-           <widget class="drumkv1widget_spin" name="Gen1TuningKnob">
+           <widget class="drumkv1widget_spin" name="Gen1FineKnob">
             <property name="toolTip">
-             <string>GEN1 Tuning</string>
+             <string>GEN1 Fine</string>
             </property>
             <property name="text">
-             <string>Tuning</string>
+             <string>Fine</string>
             </property>
            </widget>
-          </item>
-          <item>
-           <spacer>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeHint">
-             <size>
-              <width>8</width>
-              <height>8</height>
-             </size>
-            </property>
-           </spacer>
           </item>
          </layout>
         </widget>
@@ -269,22 +246,22 @@
              </widget>
             </item>
             <item>
-			 <widget class="drumkv1widget_spin" name="Dcf1Decay1Knob">
+             <widget class="drumkv1widget_spin" name="Dcf1Decay1Knob">
               <property name="toolTip">
-			   <string>DCF1 Decay 1</string>
+               <string>DCF1 Decay 1</string>
               </property>
               <property name="text">
-			   <string>Decay 1</string>
+               <string>Decay 1</string>
               </property>
              </widget>
             </item>
             <item>
-			 <widget class="drumkv1widget_spin" name="Dcf1Decay2Knob">
+             <widget class="drumkv1widget_spin" name="Dcf1Decay2Knob">
               <property name="toolTip">
-			   <string>DCF1 Decay 2</string>
+               <string>DCF1 Decay 2</string>
               </property>
               <property name="text">
-			   <string>Decay 2</string>
+               <string>Decay 2</string>
               </property>
              </widget>
             </item>
@@ -346,22 +323,22 @@
              </widget>
             </item>
             <item>
-			 <widget class="drumkv1widget_spin" name="Lfo1Decay1Knob">
+             <widget class="drumkv1widget_spin" name="Lfo1Decay1Knob">
               <property name="toolTip">
-			   <string>LFO1 Decay 1</string>
+               <string>LFO1 Decay 1</string>
               </property>
               <property name="text">
-			   <string>Decay 1</string>
+               <string>Decay 1</string>
               </property>
              </widget>
             </item>
             <item>
-			 <widget class="drumkv1widget_spin" name="Lfo1Decay2Knob">
+             <widget class="drumkv1widget_spin" name="Lfo1Decay2Knob">
               <property name="toolTip">
-			   <string>LFO1 Decay 2</string>
+               <string>LFO1 Decay 2</string>
               </property>
               <property name="text">
-			   <string>Decay 2</string>
+               <string>Decay 2</string>
               </property>
              </widget>
             </item>
@@ -517,22 +494,22 @@
            </widget>
           </item>
           <item>
-		   <widget class="drumkv1widget_spin" name="Dca1Decay1Knob">
+           <widget class="drumkv1widget_spin" name="Dca1Decay1Knob">
             <property name="toolTip">
-			 <string>DCA1 Decay 1</string>
+             <string>DCA1 Decay 1</string>
             </property>
             <property name="text">
-			 <string>Decay 1</string>
+             <string>Decay 1</string>
             </property>
            </widget>
           </item>
           <item>
-		   <widget class="drumkv1widget_spin" name="Dca1Decay2Knob">
+           <widget class="drumkv1widget_spin" name="Dca1Decay2Knob">
             <property name="toolTip">
-			 <string>DCA1 Decay 2</string>
+             <string>DCA1 Decay 2</string>
             </property>
             <property name="text">
-			 <string>Decay 2</string>
+             <string>Decay 2</string>
             </property>
            </widget>
           </item>
@@ -980,30 +957,30 @@
   </layout>
   <action name="helpAboutAction" >
    <property name="text" >
-	<string>&amp;About...</string>
+    <string>&amp;About...</string>
    </property>
    <property name="iconText" >
-	<string>About</string>
+    <string>About</string>
    </property>
    <property name="statusTip" >
-	<string>Show information about this application program</string>
+    <string>Show information about this application program</string>
    </property>
    <property name="shortcut" >
-	<string/>
+    <string/>
    </property>
   </action>
   <action name="helpAboutQtAction" >
    <property name="text" >
-	<string>About &amp;Qt...</string>
+    <string>About &amp;Qt...</string>
    </property>
    <property name="iconText" >
-	<string>About Qt</string>
+    <string>About Qt</string>
    </property>
    <property name="statusTip" >
-	<string>Show information about the Qt toolkit</string>
+    <string>Show information about the Qt toolkit</string>
    </property>
    <property name="shortcut" >
-	<string/>
+    <string/>
    </property>
   </action>
  </widget>

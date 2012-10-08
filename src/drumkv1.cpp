@@ -51,8 +51,8 @@ const float MAX_ENV_MSECS = 5000.0f;	// max 5 sec per stage
 
 const float DETUNE_SCALE  = 0.5f;
 const float PHASE_SCALE   = 0.5f;
-const float OCTAVE_SCALE  = 12.0f;
-const float TUNING_SCALE  = 1.0f;
+const float COARSE_SCALE  = 12.0f;
+const float FINE_SCALE    = 1.0f;
 const float SWEEP_SCALE   = 0.5f;
 
 const float LFO_FREQ_MIN  = 0.4f;
@@ -237,9 +237,8 @@ struct drumkv1_aux
 struct drumkv1_gen
 {
 	float *sample, sample0;
-	float *loop;
-	float *octave;
-	float *tuning;
+	float *coarse;
+	float *fine;
 };
 
 
@@ -857,9 +856,8 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 
 	switch (index) {
 	case drumkv1::GEN1_SAMPLE:    m_gen1.sample      = pfParam; break;
-	case drumkv1::GEN1_LOOP:      m_gen1.loop        = pfParam; break;
-	case drumkv1::GEN1_OCTAVE:    m_gen1.octave      = pfParam; break;
-	case drumkv1::GEN1_TUNING:    m_gen1.tuning      = pfParam; break;
+	case drumkv1::GEN1_COARSE:    m_gen1.coarse      = pfParam; break;
+	case drumkv1::GEN1_FINE:      m_gen1.fine        = pfParam; break;
 	case drumkv1::DCF1_CUTOFF:    m_dcf1.cutoff      = pfParam; break;
 	case drumkv1::DCF1_RESO:      m_dcf1.reso        = pfParam; break;
 	case drumkv1::DCF1_TYPE:      m_dcf1.type        = pfParam; break;
@@ -921,9 +919,8 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 
 	switch (index) {
 	case drumkv1::GEN1_SAMPLE:    pfParam = m_gen1.sample;      break;
-	case drumkv1::GEN1_LOOP:      pfParam = m_gen1.loop;        break;
-	case drumkv1::GEN1_OCTAVE:    pfParam = m_gen1.octave;      break;
-	case drumkv1::GEN1_TUNING:    pfParam = m_gen1.tuning;      break;
+	case drumkv1::GEN1_COARSE:    pfParam = m_gen1.coarse;      break;
+	case drumkv1::GEN1_FINE:      pfParam = m_gen1.fine;        break;
 	case drumkv1::DCF1_CUTOFF:    pfParam = m_dcf1.cutoff;      break;
 	case drumkv1::DCF1_RESO:      pfParam = m_dcf1.reso;        break;
 	case drumkv1::DCF1_TYPE:      pfParam = m_dcf1.type;        break;
@@ -1027,8 +1024,8 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			pv->gen1.start();
 			// frequencies
 			const float freq1 = float(key)
-				+ *m_gen1.octave * OCTAVE_SCALE
-				+ *m_gen1.tuning * TUNING_SCALE;
+				+ *m_gen1.coarse * COARSE_SCALE
+				+ *m_gen1.fine * FINE_SCALE;
 			pv->gen1_freq = note_freq(freq1);
 			// filters
 			const drumkv1_filter1::Type type1
@@ -1201,9 +1198,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		m_gen1.sample0  = *m_gen1.sample;
 		gen1_sample.reset(note_freq(m_gen1.sample0));
 	}
-
-	if (bool(int(*m_gen1.loop)) != gen1_sample.loop())
-		gen1_sample.setLoop(int(*m_gen1.loop));
 
 	if (int(*m_lfo1.shape) != int(lfo1_wave.shape()) || *m_lfo1.width != lfo1_wave.width())
 		lfo1_wave.reset(drumkv1_wave::Shape(*m_lfo1.shape), *m_lfo1.width);

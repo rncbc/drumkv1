@@ -57,9 +57,8 @@ public:
 	enum ParamIndex	 {
 
 		GEN1_SAMPLE = 0,
-		GEN1_LOOP,
-		GEN1_OCTAVE,
-		GEN1_TUNING,
+		GEN1_COARSE,
+		GEN1_FINE,
 		DCF1_CUTOFF,
 		DCF1_RESO,
 		DCF1_TYPE,
