@@ -240,7 +240,6 @@ struct drumkv1_gen
 	float *loop;
 	float *octave;
 	float *tuning;
-	float *glide;
 };
 
 
@@ -495,47 +494,6 @@ private:
 };
 
 
-// glide (portamento)
-
-struct drumkv1_glide
-{
-	drumkv1_glide(float& last) : m_last(last) { reset(); }
-
-	void reset( uint32_t frames = 0, float freq = 0.0f )
-	{
-		m_frames = frames;
-
-		if (m_frames > 0) {
-			m_freq = m_last - freq;
-			m_step = m_freq / float(m_frames);
-		} else {
-			m_freq = 0.0f;
-			m_step = 0.0f;
-		}
-
-		m_last = freq;
-	}
-
-	float tick()
-	{
-		if (m_frames > 0) {
-			m_freq -= m_step;
-			--m_frames;
-		}
-		return m_freq;
-	}
-
-private:
-
-	uint32_t m_frames;
-
-	float m_freq;
-	float m_step;
-
-	float& m_last;
-};
-
-
 // panning smoother (3 parameters)
 
 class drumkv1_pan : public drumkv1_ramp3
@@ -593,8 +551,6 @@ struct drumkv1_voice
 	drumkv1_env::State dca1_env;				// envelope states
 	drumkv1_env::State dcf1_env;
 	drumkv1_env::State lfo1_env;
-
-	drumkv1_glide gen1_glide;					// glides (portamento)
 
 	struct list_node
 	{
@@ -733,8 +689,7 @@ private:
 
 drumkv1_voice::drumkv1_voice ( drumkv1_impl *pImpl ) :
 	gen1(pImpl->gen1_sample),
-	lfo1(pImpl->lfo1_wave),
-	gen1_glide(pImpl->gen1_last)
+	lfo1(pImpl->lfo1_wave)
 {
 }
 
@@ -1088,10 +1043,6 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			m_dca1.env.start(&pv->dca1_env);
 			// lfos
 			pv->lfo1_sample = pv->lfo1.start();
-			// glides (portamentoa)
-			const float srate = float(m_iSampleRate);
-			float frames = uint32_t(*m_gen1.glide * *m_gen1.glide * srate);
-			pv->gen1_glide.reset(frames, pv->gen1_freq);
 			// allocated
 			m_notes[key] = pv;
 		}
@@ -1303,9 +1254,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float lfo1_env = pv->lfo1_env.value2(j);
 				const float lfo1 = pv->lfo1_sample * lfo1_env;
 
-				pv->gen1.next(pv->gen1_freq
-					* (pitchbend1 + modwheel1 * lfo1)
-					+ pv->gen1_glide.tick());
+				pv->gen1.next(pv->gen1_freq * (pitchbend1 + modwheel1 * lfo1));
 
 				const float gen1 = pv->gen1.value(k11);
 				const float gen2 = pv->gen1.value(k12);
