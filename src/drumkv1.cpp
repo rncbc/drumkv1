@@ -794,7 +794,7 @@ protected:
 	{
 		drumkv1_voice *pv = m_free_list.next;
 		if (pv) {
-			pv->elem = m_elem_list.next;	// TODO: alloc_elem()
+			pv->reset(m_elem_list.next);	// TODO: alloc_elem()
 			m_free_list.remove(pv);
 			m_play_list.append(pv);
 		}
@@ -805,7 +805,7 @@ protected:
 	{
 		m_play_list.remove(pv);
 		m_free_list.append(pv);
-		pv->elem = 0;
+		pv->reset(0);
 	}
 
 private:
