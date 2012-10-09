@@ -794,6 +794,7 @@ protected:
 	{
 		drumkv1_voice *pv = m_free_list.next;
 		if (pv) {
+			pv->elem = m_elem_list.next;	// TODO: alloc_elem()
 			m_free_list.remove(pv);
 			m_play_list.append(pv);
 		}
@@ -804,14 +805,13 @@ protected:
 	{
 		m_play_list.remove(pv);
 		m_free_list.append(pv);
+		pv->elem = 0;
 	}
 
 private:
 
 	uint16_t m_iChannels;
 	uint32_t m_iSampleRate;
-
-	drumkv1_elem *m_elem;
 
 	drumkv1_ctl m_ctl;
 	drumkv1_def m_def;
@@ -827,6 +827,8 @@ private:
 	drumkv1_list<drumkv1_voice> m_free_list;
 	drumkv1_list<drumkv1_voice> m_play_list;
 
+	drumkv1_list<drumkv1_elem>  m_elem_list;
+
 	drumkv1_ramp2 m_pre;
 
 	drumkv1_fx_chorus   m_chorus;
@@ -841,14 +843,14 @@ private:
 
 drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 {
-	// init element
-	m_elem = new drumkv1_elem(iSampleRate);
+	// init elements
+	m_elem_list.append(new drumkv1_elem(iSampleRate));
 
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
 
 	for (int i = 0; i < MAX_VOICES; ++i) {
-		m_voices[i] = new drumkv1_voice(m_elem);
+		m_voices[i] = new drumkv1_voice();
 		m_free_list.append(m_voices[i]);
 	}
 
@@ -900,7 +902,12 @@ drumkv1_impl::~drumkv1_impl (void)
 	setChannels(0);
 
 	// deallocate element
-	delete m_elem;
+	drumkv1_elem *elem = m_elem_list.next;
+	while (elem) {
+		m_elem_list.remove(elem);
+		delete elem;
+		elem = m_elem_list.next;
+	}
 }
 
 
@@ -957,19 +964,29 @@ void drumkv1_impl::setSampleFile ( const char *pszSampleFile )
 {
 	reset();
 
-	m_elem->setSampleFile(pszSampleFile);
+	drumkv1_elem *elem = m_elem_list.next;	// TODO: curr_elem()
+	if (elem)
+		elem->setSampleFile(pszSampleFile);
 }
 
 
 const char *drumkv1_impl::sampleFile (void) const
 {
-	return m_elem->sampleFile();
+	drumkv1_elem *elem = m_elem_list.next;	// TODO: curr_elem()
+	if (elem)
+		return elem->sampleFile();
+	else
+		return 0;
 }
 
 
 drumkv1_sample *drumkv1_impl::sample (void) const
 {
-	return &(m_elem->gen1_sample);
+	drumkv1_elem *elem = m_elem_list.next;	// TODO: curr_elem()
+	if (elem)
+		return &(elem->gen1_sample);
+	else
+		return 0;
 }
 
 
@@ -1006,7 +1023,8 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DYN1_COMPRESS:  m_dyn.compress  = pfParam; break;
 	case drumkv1::DYN1_LIMITER:   m_dyn.limiter   = pfParam; break;
 	default:
-		m_elem->setParamPort(index, pfParam);
+		drumkv1_elem *elem = m_elem_list.next;	// TODO: curr_elem()
+		if (elem) elem->setParamPort(index, pfParam);
 		break;
 	}
 }
@@ -1041,7 +1059,8 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DYN1_COMPRESS:  pfParam = m_dyn.compress;  break;
 	case drumkv1::DYN1_LIMITER:   pfParam = m_dyn.limiter;   break;
 	default:
-		pfParam = m_elem->paramPort(index);
+		drumkv1_elem *elem = m_elem_list.next;	// TODO: curr_elem()
+		if (elem) pfParam = elem->paramPort(index);
 		break;
 	}
 
@@ -1204,7 +1223,11 @@ void drumkv1_impl::allNotesOff (void)
 		pv = m_play_list.next;
 	}
 
-	m_elem->aux1.reset();
+	drumkv1_elem *elem = m_elem_list.next;
+	while (elem) {
+		elem->aux1.reset();
+		elem = elem->node.next;
+	}
 }
 
 
@@ -1212,11 +1235,15 @@ void drumkv1_impl::allNotesOff (void)
 
 void drumkv1_impl::reset (void)
 {
-	m_elem->vol1.reset(m_elem->out1.volume, m_elem->dca1.volume,
-		&m_ctl.volume, &m_elem->aux1.volume);
-	m_elem->pan1.reset(m_elem->out1.panning,
-		&m_ctl.panning, &m_elem->aux1.panning);
-	m_elem->wid1.reset(m_elem->out1.width);
+	drumkv1_elem *elem = m_elem_list.next;
+	while (elem) {
+		elem->vol1.reset(elem->out1.volume, elem->dca1.volume,
+			&m_ctl.volume, &elem->aux1.volume);
+		elem->pan1.reset(elem->out1.panning,
+			&m_ctl.panning, &elem->aux1.panning);
+		elem->wid1.reset(elem->out1.width);
+		elem = elem->node.next;
+	}
 
 	m_pre.reset(m_def.pressure, &m_ctl.pressure);
 
@@ -1255,20 +1282,22 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 	for (k = 0; k < m_iChannels; ++k)
 		::memcpy(outs[k], ins[k], nframes * sizeof(float));
 
-	if (m_elem->gen1.sample0 != *m_elem->gen1.sample) {
-		m_elem->gen1.sample0  = *m_elem->gen1.sample;
-		m_elem->gen1_sample.reset(note_freq(m_elem->gen1.sample0));
+	drumkv1_elem *elem = m_elem_list.next;
+	while (elem) {
+		if (elem->gen1.sample0 != *elem->gen1.sample) {
+			elem->gen1.sample0  = *elem->gen1.sample;
+			elem->gen1_sample.reset(note_freq(elem->gen1.sample0));
+		}
+		if (int(*elem->lfo1.shape) != int(elem->lfo1_wave.shape())
+			||  *elem->lfo1.width  !=     elem->lfo1_wave.width()) {
+			elem->lfo1_wave.reset(
+				drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
+		}
+		elem->wid1.process(nframes);
+		elem->pan1.process(nframes);
+		elem->vol1.process(nframes);
+		elem = elem->node.next;
 	}
-
-	if (int(*m_elem->lfo1.shape) != int(m_elem->lfo1_wave.shape())
-		||  *m_elem->lfo1.width  !=     m_elem->lfo1_wave.width()) {
-		m_elem->lfo1_wave.reset(
-			drumkv1_wave::Shape(*m_elem->lfo1.shape), *m_elem->lfo1.width);
-	}
-
-	m_elem->wid1.process(nframes);
-	m_elem->pan1.process(nframes);
-	m_elem->vol1.process(nframes);
 
 	m_pre.process(nframes);
 
@@ -1280,9 +1309,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 		drumkv1_voice *pv_next = pv->node.next;
 
-		drumkv1_elem *elem = pv->elem;
-
 		// controls
+		drumkv1_elem *elem = pv->elem;
 
 		const float lfo1_rate  = *elem->lfo1.rate * *elem->lfo1.rate;
 		const float lfo1_freq  = LFO_FREQ_MIN + lfo1_rate * (LFO_FREQ_MAX - LFO_FREQ_MIN);
