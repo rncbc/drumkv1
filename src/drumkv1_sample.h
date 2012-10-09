@@ -193,18 +193,26 @@ class drumkv1_generator
 public:
 
 	// ctor.
-	drumkv1_generator(const drumkv1_sample& sample)
-		: m_sample(sample), m_phase(0.0f), m_index(0), m_alpha(0.0f),
-			m_frame(0) {}
+	drumkv1_generator(drumkv1_sample *sample = 0) { reset(sample); }
 
-	// wave accessor.
-	const drumkv1_sample& sample() const
+	// wave and phase accessor.
+	void reset(drumkv1_sample *sample)
+	{
+		m_sample = sample;
+
+		m_phase = 0.0f;
+		m_index = 0;
+		m_alpha = 0.0f;
+		m_frame = 0;
+	}
+
+	drumkv1_sample *sample() const
 		{ return m_sample; }
 
 	// begin.
 	void start()
 	{
-		m_sample.start(m_phase, m_index, m_alpha);
+		m_sample->start(m_phase, m_index, m_alpha);
 
 		m_frame = 0;
 	}
@@ -212,7 +220,7 @@ public:
 	// iterate.
 	void next(float freq)
 	{
-		m_sample.next(m_phase, m_index, m_alpha, freq);
+		m_sample->next(m_phase, m_index, m_alpha, freq);
 
 		if (m_frame < m_index)
 			m_frame = m_index;
@@ -220,7 +228,7 @@ public:
 
 	// predicate.
 	bool isOver() const
-		{ return m_sample.isOver(m_frame); }
+		{ return m_sample->isOver(m_frame); }
 
 	// sample.
 	float value(uint16_t k) const
@@ -228,7 +236,7 @@ public:
 		if (isOver())
 			return 0.0f;
 
-		const float *frames = m_sample.frames(k);
+		const float *frames = m_sample->frames(k);
 
 		const float x0 = frames[m_index - 1];
 		const float x1 = frames[m_index];
@@ -246,7 +254,7 @@ public:
 
 private:
 
-	const drumkv1_sample& m_sample;
+	drumkv1_sample *m_sample;
 
 	float    m_phase;
 	uint32_t m_index;

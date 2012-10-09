@@ -564,37 +564,6 @@ struct drumkv1_list
 };
 
 
-// forward decl.
-class drumkv1_elem;
-class drumkv1_impl;
-
-
-// voice
-
-struct drumkv1_voice
-{
-	drumkv1_voice(drumkv1_elem *pElem);
-
-	drumkv1_generator  gen1;
-	drumkv1_oscillator lfo1;
-
-	int note;									// voice note
-	float vel;									// velocity to vol
-
-	float gen1_freq;							// frequency and phase
-
-	float lfo1_sample;
-
-	drumkv1_filter1 dcf11, dcf12, dcf13, dcf14;	// filters
-
-	drumkv1_env::State dca1_env;				// envelope states
-	drumkv1_env::State dcf1_env;
-	drumkv1_env::State lfo1_env;
-
-	drumkv1_list<drumkv1_voice> node;
-};
-
-
 // synth element
 
 class drumkv1_elem
@@ -626,98 +595,7 @@ public:
 };
 
 
-// synth engine implementation
-
-class drumkv1_impl
-{
-public:
-
-	drumkv1_impl(uint16_t iChannels, uint32_t iSampleRate);
-
-	~drumkv1_impl();
-
-	void setChannels(uint16_t iChannels);
-	uint16_t channels() const;
-
-	void setSampleRate(uint32_t iSampleRate);
-	uint32_t sampleRate() const;
-
-	void setSampleFile(const char *pszSampleFile);
-	const char *sampleFile() const;
-
-	drumkv1_sample *sample() const;
-
-	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
-	float *paramPort(drumkv1::ParamIndex index);
-
-	void process_midi(uint8_t *data, uint32_t size);
-	void process(float **ins, float **outs, uint32_t nframes);
-
-	void reset();
-
-protected:
-
-	void allSoundOff();
-	void allControllersOff();
-	void allNotesOff();
-
-	drumkv1_voice *alloc_voice ()
-	{
-		drumkv1_voice *pv = m_free_list.next;
-		if (pv) {
-			m_free_list.remove(pv);
-			m_play_list.append(pv);
-		}
-		return pv;
-	}
-
-	void free_voice ( drumkv1_voice *pv )
-	{
-		m_play_list.remove(pv);
-		m_free_list.append(pv);
-	}
-
-private:
-
-	uint16_t m_iChannels;
-	uint32_t m_iSampleRate;
-
-	drumkv1_elem *m_elem;
-
-	drumkv1_ctl m_ctl;
-	drumkv1_def m_def;
-	drumkv1_cho m_cho;
-	drumkv1_fla m_fla;
-	drumkv1_pha m_pha;
-	drumkv1_del m_del;
-	drumkv1_dyn m_dyn;
-
-	drumkv1_voice **m_voices;
-	drumkv1_voice  *m_notes[MAX_NOTES];
-
-	drumkv1_list<drumkv1_voice> m_free_list;
-	drumkv1_list<drumkv1_voice> m_play_list;
-
-	drumkv1_ramp2 m_pre;
-
-	drumkv1_fx_chorus   m_chorus;
-	drumkv1_fx_flanger *m_flanger;
-	drumkv1_fx_phaser  *m_phaser;
-	drumkv1_fx_delay   *m_delay;
-	drumkv1_fx_comp    *m_comp;
-};
-
-
-// voice constructor
-
-drumkv1_voice::drumkv1_voice ( drumkv1_elem *pElem ) :
-	gen1(pElem->gen1_sample),
-	lfo1(pElem->lfo1_wave)
-{
-}
-
-
-// element constructor
+// synth element constructor
 
 drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate )
 {
@@ -841,7 +719,125 @@ float *drumkv1_elem::paramPort ( drumkv1::ParamIndex index )
 }
 
 
-// constructor
+// voice
+
+struct drumkv1_voice
+{
+	drumkv1_voice(drumkv1_elem *pElem = 0) { reset(pElem); }
+
+	void reset(drumkv1_elem *pElem)
+	{
+		elem = pElem;
+
+		gen1.reset(pElem ? &pElem->gen1_sample : 0);
+		lfo1.reset(pElem ? &pElem->lfo1_wave : 0);
+	}
+
+	drumkv1_elem *elem;
+
+	drumkv1_generator  gen1;
+	drumkv1_oscillator lfo1;
+
+	int note;									// voice note
+	float vel;									// velocity to vol
+
+	float gen1_freq;							// frequency and phase
+
+	float lfo1_sample;
+
+	drumkv1_filter1 dcf11, dcf12, dcf13, dcf14;	// filters
+
+	drumkv1_env::State dca1_env;				// envelope states
+	drumkv1_env::State dcf1_env;
+	drumkv1_env::State lfo1_env;
+
+	drumkv1_list<drumkv1_voice> node;
+};
+
+
+// synth engine implementation
+
+class drumkv1_impl
+{
+public:
+
+	drumkv1_impl(uint16_t iChannels, uint32_t iSampleRate);
+
+	~drumkv1_impl();
+
+	void setChannels(uint16_t iChannels);
+	uint16_t channels() const;
+
+	void setSampleRate(uint32_t iSampleRate);
+	uint32_t sampleRate() const;
+
+	void setSampleFile(const char *pszSampleFile);
+	const char *sampleFile() const;
+
+	drumkv1_sample *sample() const;
+
+	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
+	float *paramPort(drumkv1::ParamIndex index);
+
+	void process_midi(uint8_t *data, uint32_t size);
+	void process(float **ins, float **outs, uint32_t nframes);
+
+	void reset();
+
+protected:
+
+	void allSoundOff();
+	void allControllersOff();
+	void allNotesOff();
+
+	drumkv1_voice *alloc_voice ()
+	{
+		drumkv1_voice *pv = m_free_list.next;
+		if (pv) {
+			m_free_list.remove(pv);
+			m_play_list.append(pv);
+		}
+		return pv;
+	}
+
+	void free_voice ( drumkv1_voice *pv )
+	{
+		m_play_list.remove(pv);
+		m_free_list.append(pv);
+	}
+
+private:
+
+	uint16_t m_iChannels;
+	uint32_t m_iSampleRate;
+
+	drumkv1_elem *m_elem;
+
+	drumkv1_ctl m_ctl;
+	drumkv1_def m_def;
+	drumkv1_cho m_cho;
+	drumkv1_fla m_fla;
+	drumkv1_pha m_pha;
+	drumkv1_del m_del;
+	drumkv1_dyn m_dyn;
+
+	drumkv1_voice **m_voices;
+	drumkv1_voice  *m_notes[MAX_NOTES];
+
+	drumkv1_list<drumkv1_voice> m_free_list;
+	drumkv1_list<drumkv1_voice> m_play_list;
+
+	drumkv1_ramp2 m_pre;
+
+	drumkv1_fx_chorus   m_chorus;
+	drumkv1_fx_flanger *m_flanger;
+	drumkv1_fx_phaser  *m_phaser;
+	drumkv1_fx_delay   *m_delay;
+	drumkv1_fx_comp    *m_comp;
+};
+
+
+// synth engine constructor
 
 drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 {

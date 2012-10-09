@@ -258,24 +258,28 @@ class drumkv1_oscillator
 public:
 
 	// ctor.
-	drumkv1_oscillator(const drumkv1_wave& wave)
-		: m_wave(wave), m_phase(0.0f) {}
+	drumkv1_oscillator(drumkv1_wave *wave = 0) { reset(wave); }
 
-	// wave accessor.
-	const drumkv1_wave& wave() const
+	// wave and phase accessors.
+	void reset(drumkv1_wave *wave)
+		{ m_wave = wave; m_phase = 0.0f; }
+
+	drumkv1_wave *wave() const
 		{ return m_wave; }
+	float phase() const
+		{ return m_phase; }
 
 	// begin.
 	float start(float pshift = 0.0f)
-		{ return m_wave.start(m_phase, pshift); }
+		{ return m_wave->start(m_phase, pshift); }
 
 	// iterate.
 	float sample(float freq)
-		{ return m_wave.sample(m_phase, freq); }
+		{ return m_wave->sample(m_phase, freq); }
 
 private:
 
-	const drumkv1_wave& m_wave;
+	drumkv1_wave *m_wave;
 
 	float m_phase;
 };
