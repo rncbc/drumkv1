@@ -1076,16 +1076,18 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 	if (status == 0x90 && value > 0) {
 		drumkv1_voice *pv = m_notes[key];
 		if (pv) {
+			drumkv1_elem *elem = pv->elem;
 			// retrigger fast release
-			m_elem->dcf1.env.note_off_fast(&pv->dcf1_env);
-			m_elem->lfo1.env.note_off_fast(&pv->lfo1_env);
-			m_elem->dca1.env.note_off_fast(&pv->dca1_env);
+			elem->dcf1.env.note_off_fast(&pv->dcf1_env);
+			elem->lfo1.env.note_off_fast(&pv->lfo1_env);
+			elem->dca1.env.note_off_fast(&pv->dca1_env);
 			pv->note = -1;
 			m_notes[key] = 0;
 		}
 		// find free voice
 		pv = alloc_voice();
 		if (pv) {
+			drumkv1_elem *elem = pv->elem;
 			// waveform
 			pv->note = key;
 			// velocity
@@ -1095,20 +1097,20 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			pv->gen1.start();
 			// frequencies
 			const float freq1 = float(key)
-				+ *m_elem->gen1.coarse * COARSE_SCALE
-				+ *m_elem->gen1.fine * FINE_SCALE;
+				+ *elem->gen1.coarse * COARSE_SCALE
+				+ *elem->gen1.fine * FINE_SCALE;
 			pv->gen1_freq = note_freq(freq1);
 			// filters
 			const drumkv1_filter1::Type type1
-				= drumkv1_filter1::Type(int(*m_elem->dcf1.type));
+				= drumkv1_filter1::Type(int(*elem->dcf1.type));
 			pv->dcf11.reset(type1);
 			pv->dcf12.reset(type1);
 			pv->dcf13.reset(type1);
 			pv->dcf14.reset(type1);
 			// envelopes
-			m_elem->dcf1.env.start(&pv->dcf1_env);
-			m_elem->lfo1.env.start(&pv->lfo1_env);
-			m_elem->dca1.env.start(&pv->dca1_env);
+			elem->dcf1.env.start(&pv->dcf1_env);
+			elem->lfo1.env.start(&pv->lfo1_env);
+			elem->dca1.env.start(&pv->dca1_env);
 			// lfos
 			pv->lfo1_sample = pv->lfo1.start();
 			// allocated
@@ -1120,9 +1122,10 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 		drumkv1_voice *pv = m_notes[key];
 		if (pv && pv->note >= 0) {
 			if (pv->dca1_env.stage != drumkv1_env::Decay2) {
-				m_elem->dca1.env.note_off(&pv->dca1_env);
-				m_elem->dcf1.env.note_off(&pv->dcf1_env);
-				m_elem->lfo1.env.note_off(&pv->lfo1_env);
+				drumkv1_elem *elem = pv->elem;
+				elem->dca1.env.note_off(&pv->dca1_env);
+				elem->dcf1.env.note_off(&pv->dcf1_env);
+				elem->lfo1.env.note_off(&pv->lfo1_env);
 			}
 		}
 	}
@@ -1252,19 +1255,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 	for (k = 0; k < m_iChannels; ++k)
 		::memcpy(outs[k], ins[k], nframes * sizeof(float));
 
-	// channel indexes
-
-	const uint16_t k11 = 0;
-	const uint16_t k12 = (m_elem->gen1_sample.channels() > 1 ? 1 : 0);
-
-	// controls
-
-	const float lfo1_rate  = *m_elem->lfo1.rate  * *m_elem->lfo1.rate;
-	const float lfo1_freq  = LFO_FREQ_MIN + lfo1_rate * (LFO_FREQ_MAX - LFO_FREQ_MIN);
-	const float lfo1_pitch = *m_elem->lfo1.pitch * *m_elem->lfo1.pitch;
-	const float modwheel1  = *m_def.modwheel * (lfo1_pitch + m_ctl.modwheel);
-	const float pitchbend1 = (1.0f + *m_def.pitchbend * m_ctl.pitchbend);
-
 	if (m_elem->gen1.sample0 != *m_elem->gen1.sample) {
 		m_elem->gen1.sample0  = *m_elem->gen1.sample;
 		m_elem->gen1_sample.reset(note_freq(m_elem->gen1.sample0));
@@ -1289,6 +1279,21 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 	while (pv) {
 
 		drumkv1_voice *pv_next = pv->node.next;
+
+		drumkv1_elem *elem = pv->elem;
+
+		// controls
+
+		const float lfo1_rate  = *elem->lfo1.rate * *elem->lfo1.rate;
+		const float lfo1_freq  = LFO_FREQ_MIN + lfo1_rate * (LFO_FREQ_MAX - LFO_FREQ_MIN);
+		const float lfo1_pitch = *elem->lfo1.pitch * *elem->lfo1.pitch;
+		const float modwheel1  = *m_def.modwheel * (lfo1_pitch + m_ctl.modwheel);
+		const float pitchbend1 = (1.0f + *m_def.pitchbend * m_ctl.pitchbend);
+
+		// channel indexes
+
+		const uint16_t k11 = 0;
+		const uint16_t k12 = (elem->gen1_sample.channels() > 1 ? 1 : 0);
 
 		// output buffers
 
@@ -1328,45 +1333,45 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float gen2 = pv->gen1.value(k12);
 
 				pv->lfo1_sample = pv->lfo1.sample(lfo1_freq
-					* (1.0f + SWEEP_SCALE * *m_elem->lfo1.sweep * lfo1_env));
+					* (1.0f + SWEEP_SCALE * *elem->lfo1.sweep * lfo1_env));
 
 				// filters
 
 				const float env1 = 0.5f * (1.0f + vel1
-					* *m_elem->dcf1.envelope * pv->dcf1_env.value2(j));
-				const float cutoff1 = drumkv1_sigmoid1(*m_elem->dcf1.cutoff
-					* env1 * (1.0f + *m_elem->lfo1.cutoff * lfo1));
-				const float reso1 = drumkv1_sigmoid1(*m_elem->dcf1.reso
-					* env1 * (1.0f + *m_elem->lfo1.reso * lfo1));
+					* *elem->dcf1.envelope * pv->dcf1_env.value2(j));
+				const float cutoff1 = drumkv1_sigmoid1(*elem->dcf1.cutoff
+					* env1 * (1.0f + *elem->lfo1.cutoff * lfo1));
+				const float reso1 = drumkv1_sigmoid1(*elem->dcf1.reso
+					* env1 * (1.0f + *elem->lfo1.reso * lfo1));
 
 				float dcf11 = pv->dcf11.output(gen1, cutoff1, reso1);
 				float dcf12 = pv->dcf12.output(gen2, cutoff1, reso1);
-				if (int(*m_elem->dcf1.slope) > 0) { // 24db/octave
+				if (int(*elem->dcf1.slope) > 0) { // 24db/octave
 					dcf11 = pv->dcf13.output(dcf11, cutoff1, reso1);
 					dcf12 = pv->dcf14.output(dcf12, cutoff1, reso1);
 				}
 
 				// volumes
 
-				const float wid1 = m_elem->wid1.value(j);
+				const float wid1 = elem->wid1.value(j);
 				const float mid1 = 0.5f * (dcf11 + dcf12);
 				const float sid1 = 0.5f * (dcf11 - dcf12);
-				const float vol1 = vel1 * m_elem->vol1.value(j)
+				const float vol1 = vel1 * elem->vol1.value(j)
 					* pv->dca1_env.value2(j);
 
 				// outputs
 
 				const float out1
-					= vol1 * (mid1 + sid1 * wid1) * m_elem->pan1.value(j, 0);
+					= vol1 * (mid1 + sid1 * wid1) * elem->pan1.value(j, 0);
 				const float out2
-					= vol1 * (mid1 - sid1 * wid1) * m_elem->pan1.value(j, 1);
+					= vol1 * (mid1 - sid1 * wid1) * elem->pan1.value(j, 1);
 
 				for (k = 0; k < m_iChannels; ++k)
 					*v_outs[k]++ += (k & 1 ? out2 : out1);
 
 				if (j == 0) {
-					m_elem->aux1.panning = lfo1 * *m_elem->lfo1.panning;
-					m_elem->aux1.volume  = lfo1 * *m_elem->lfo1.volume + 1.0f;
+					elem->aux1.panning = lfo1 * *elem->lfo1.panning;
+					elem->aux1.volume  = lfo1 * *elem->lfo1.volume + 1.0f;
 				}
 			}
 
@@ -1381,7 +1386,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				}
 				else pv->dca1_env.frames = 0;
 				if (pv->dca1_env.frames == 0)
-					m_elem->dca1.env.next(&pv->dca1_env);
+					elem->dca1.env.next(&pv->dca1_env);
 			}
 
 			if (pv->dca1_env.stage == drumkv1_env::Done || pv->gen1.isOver()) {
@@ -1397,7 +1402,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 					}
 					else pv->dcf1_env.frames = 0;
 					if (pv->dcf1_env.frames == 0)
-						m_elem->dcf1.env.next(&pv->dcf1_env);
+						elem->dcf1.env.next(&pv->dcf1_env);
 				}
 				if (pv->lfo1_env.running) {
 					if (pv->lfo1_env.frames >= ngen) {
@@ -1406,7 +1411,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 					}
 					else pv->lfo1_env.frames = 0;
 					if (pv->lfo1_env.frames == 0)
-						m_elem->lfo1.env.next(&pv->lfo1_env);
+						elem->lfo1.env.next(&pv->lfo1_env);
 				}
 			}
 		}
