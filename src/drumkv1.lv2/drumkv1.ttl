@@ -280,30 +280,6 @@
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 32 ;
-		lv2:symbol "DEF1_PITCHBEND" ;
-		lv2:name "DEF1 Pitchbend" ;
-		lv2:default 0.2 ;
-		lv2:minimum 0.0 ;
-		lv2:maximum 1.0 ;
-	], [
-		a lv2:InputPort, lv2:ControlPort ;
-		lv2:index 33 ;
-		lv2:symbol "DEF1_MODWHEEL" ;
-		lv2:name "DEF1 Modwheel" ;
-		lv2:default 0.2 ;
-		lv2:minimum 0.0 ;
-		lv2:maximum 1.0 ;
-	], [
-		a lv2:InputPort, lv2:ControlPort ;
-		lv2:index 34 ;
-		lv2:symbol "DEF1_PRESSURE" ;
-		lv2:name "DEF1 Pressure" ;
-		lv2:default 0.2 ;
-		lv2:minimum 0.0 ;
-		lv2:maximum 1.0 ;
-	], [
-		a lv2:InputPort, lv2:ControlPort ;
-		lv2:index 35 ;
 		lv2:symbol "OUT1_WIDTH" ;
 		lv2:name "OUT1 Stereo Width" ;
 		lv2:default 0.0 ;
@@ -311,7 +287,7 @@
 		lv2:maximum 1.0 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
-		lv2:index 36 ;
+		lv2:index 33 ;
 		lv2:symbol "OUT1_PANNING" ;
 		lv2:name "OUT1 Panning" ;
 		lv2:default 0.0 ;
@@ -319,10 +295,35 @@
 		lv2:maximum 1.0 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
-		lv2:index 37 ;
+		lv2:index 34 ;
 		lv2:symbol "OUT1_VOLUME" ;
 		lv2:name "OUT1 Volume" ;
 		lv2:default 0.5 ;
+		lv2:minimum 0.0 ;
+		lv2:maximum 1.0 ;
+	] ;
+	lv2:port [
+		a lv2:InputPort, lv2:ControlPort ;
+		lv2:index 35 ;
+		lv2:symbol "DEF1_PITCHBEND" ;
+		lv2:name "DEF1 Pitchbend" ;
+		lv2:default 0.2 ;
+		lv2:minimum 0.0 ;
+		lv2:maximum 1.0 ;
+	], [
+		a lv2:InputPort, lv2:ControlPort ;
+		lv2:index 36 ;
+		lv2:symbol "DEF1_MODWHEEL" ;
+		lv2:name "DEF1 Modwheel" ;
+		lv2:default 0.2 ;
+		lv2:minimum 0.0 ;
+		lv2:maximum 1.0 ;
+	], [
+		a lv2:InputPort, lv2:ControlPort ;
+		lv2:index 37 ;
+		lv2:symbol "DEF1_PRESSURE" ;
+		lv2:name "DEF1 Pressure" ;
+		lv2:default 0.2 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
 	] ;

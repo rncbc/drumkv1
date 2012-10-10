@@ -40,8 +40,8 @@ struct {
 } drumkv1_default_params[drumkv1::NUM_PARAMS] = {
 
 	{ "GEN1_SAMPLE",   60.0f }, // middle-C aka. C4 (60)
-	{ "GEN1_OCTAVE",    0.0f },
-	{ "GEN1_TUNING",    0.0f },
+	{ "GEN1_COARSE",    0.0f },
+	{ "GEN1_FINE",      0.0f },
 	{ "DCF1_CUTOFF",    1.0f }, // 0.5f
 	{ "DCF1_RESO",      0.0f },
 	{ "DCF1_TYPE",      0.0f },
@@ -66,12 +66,13 @@ struct {
 	{ "DCA1_ATTACK",    0.0f },
 	{ "DCA1_DECAY1",    0.2f },
 	{ "DCA1_DECAY2",    0.5f },	// 0.1f
-	{ "DEF1_PITCHBEND", 0.2f },
-	{ "DEF1_MODWHEEL",  0.2f },
-	{ "DEF1_PRESSURE",  0.2f },
 	{ "OUT1_WIDTH",     0.0f },
 	{ "OUT1_PANNING",   0.0f },
 	{ "OUT1_VOLUME",    0.5f },
+
+	{ "DEF1_PITCHBEND", 0.2f },
+	{ "DEF1_MODWHEEL",  0.2f },
+	{ "DEF1_PRESSURE",  0.2f },
 
 	{ "CHO1_WET",       0.0f },
 	{ "CHO1_DELAY",     0.5f },

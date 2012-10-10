@@ -628,7 +628,8 @@ void drumkv1_elem::setSampleFile ( const char *pszSampleFile )
 
 	if (pszSampleFile) {
 		gen1.sample0 = *gen1.sample;
-		gen1_sample.open(pszSampleFile, note_freq(gen1.sample0));
+		gen1_sample.open(pszSampleFile, 60.0f);
+	//	gen1_sample.open(pszSampleFile, note_freq(gen1.sample0));
 	}
 }
 
@@ -790,13 +791,17 @@ protected:
 	void allControllersOff();
 	void allNotesOff();
 
-	drumkv1_voice *alloc_voice ()
+	drumkv1_voice *alloc_voice ( int key )
 	{
-		drumkv1_voice *pv = m_free_list.next;
-		if (pv) {
-			pv->reset(m_elem_list.next);	// TODO: alloc_elem()
-			m_free_list.remove(pv);
-			m_play_list.append(pv);
+		drumkv1_voice *pv = 0;
+		drumkv1_elem *elem = m_elems[key];
+		if (elem) {
+			pv = m_free_list.next;
+			if (pv) {
+				pv->reset(elem);
+				m_free_list.remove(pv);
+				m_play_list.append(pv);
+			}
 		}
 		return pv;
 	}
@@ -823,6 +828,7 @@ private:
 
 	drumkv1_voice **m_voices;
 	drumkv1_voice  *m_notes[MAX_NOTES];
+	drumkv1_elem   *m_elems[MAX_NOTES];
 
 	drumkv1_list<drumkv1_voice> m_free_list;
 	drumkv1_list<drumkv1_voice> m_play_list;
@@ -854,8 +860,10 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 		m_free_list.append(m_voices[i]);
 	}
 
-	for (int note = 0; note < MAX_NOTES; ++note)
+	for (int note = 0; note < MAX_NOTES; ++note) {
 		m_notes[note] = 0;
+		m_elems[note] = m_elem_list.next; // TODO: <- 0;
+	}
 
 	// flangers none yet
 	m_flanger = 0;
@@ -901,7 +909,7 @@ drumkv1_impl::~drumkv1_impl (void)
 	// deallocate channels
 	setChannels(0);
 
-	// deallocate element
+	// deallocate elements
 	drumkv1_elem *elem = m_elem_list.next;
 	while (elem) {
 		m_elem_list.remove(elem);
@@ -1104,7 +1112,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			m_notes[key] = 0;
 		}
 		// find free voice
-		pv = alloc_voice();
+		pv = alloc_voice(key);
 		if (pv) {
 			drumkv1_elem *elem = pv->elem;
 			// waveform
@@ -1115,7 +1123,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			// generate
 			pv->gen1.start();
 			// frequencies
-			const float freq1 = float(key)
+			const float freq1 = 60.0f // float(key)
 				+ *elem->gen1.coarse * COARSE_SCALE
 				+ *elem->gen1.fine * FINE_SCALE;
 			pv->gen1_freq = note_freq(freq1);
