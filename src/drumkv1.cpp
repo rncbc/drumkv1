@@ -628,8 +628,7 @@ void drumkv1_elem::setSampleFile ( const char *pszSampleFile )
 
 	if (pszSampleFile) {
 		gen1.sample0 = *gen1.sample;
-		gen1_sample.open(pszSampleFile, 60.0f);
-	//	gen1_sample.open(pszSampleFile, note_freq(gen1.sample0));
+		gen1_sample.open(pszSampleFile, note_freq(gen1.sample0));
 	}
 }
 
@@ -643,36 +642,36 @@ const char *drumkv1_elem::sampleFile (void) const
 void drumkv1_elem::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 {
 	switch (index) {
-	case drumkv1::GEN1_SAMPLE:    gen1.sample      = pfParam; break;
-	case drumkv1::GEN1_COARSE:    gen1.coarse      = pfParam; break;
-	case drumkv1::GEN1_FINE:      gen1.fine        = pfParam; break;
-	case drumkv1::DCF1_CUTOFF:    dcf1.cutoff      = pfParam; break;
-	case drumkv1::DCF1_RESO:      dcf1.reso        = pfParam; break;
-	case drumkv1::DCF1_TYPE:      dcf1.type        = pfParam; break;
-	case drumkv1::DCF1_SLOPE:     dcf1.slope       = pfParam; break;
-	case drumkv1::DCF1_ENVELOPE:  dcf1.envelope    = pfParam; break;
-	case drumkv1::DCF1_ATTACK:    dcf1.env.attack  = pfParam; break;
-	case drumkv1::DCF1_DECAY1:    dcf1.env.decay1  = pfParam; break;
-	case drumkv1::DCF1_DECAY2:    dcf1.env.decay2  = pfParam; break;
-	case drumkv1::LFO1_SHAPE:     lfo1.shape       = pfParam; break;
-	case drumkv1::LFO1_WIDTH:     lfo1.width       = pfParam; break;
-	case drumkv1::LFO1_RATE:      lfo1.rate        = pfParam; break;
-	case drumkv1::LFO1_SWEEP:     lfo1.sweep       = pfParam; break;
-	case drumkv1::LFO1_PITCH:     lfo1.pitch       = pfParam; break;
-	case drumkv1::LFO1_CUTOFF:    lfo1.cutoff      = pfParam; break;
-	case drumkv1::LFO1_RESO:      lfo1.reso        = pfParam; break;
-	case drumkv1::LFO1_PANNING:   lfo1.panning     = pfParam; break;
-	case drumkv1::LFO1_VOLUME:    lfo1.volume      = pfParam; break;
-	case drumkv1::LFO1_ATTACK:    lfo1.env.attack  = pfParam; break;
-	case drumkv1::LFO1_DECAY1:    lfo1.env.decay1  = pfParam; break;
-	case drumkv1::LFO1_DECAY2:    lfo1.env.decay2  = pfParam; break;
-	case drumkv1::DCA1_VOLUME:    dca1.volume      = pfParam; break;
-	case drumkv1::DCA1_ATTACK:    dca1.env.attack  = pfParam; break;
-	case drumkv1::DCA1_DECAY1:    dca1.env.decay1  = pfParam; break;
-	case drumkv1::DCA1_DECAY2:    dca1.env.decay2  = pfParam; break;
-	case drumkv1::OUT1_WIDTH:     out1.width       = pfParam; break;
-	case drumkv1::OUT1_PANNING:   out1.panning     = pfParam; break;
-	case drumkv1::OUT1_VOLUME:    out1.volume      = pfParam; break;
+	case drumkv1::GEN1_SAMPLE:   gen1.sample      = pfParam; break;
+	case drumkv1::GEN1_COARSE:   gen1.coarse      = pfParam; break;
+	case drumkv1::GEN1_FINE:     gen1.fine        = pfParam; break;
+	case drumkv1::DCF1_CUTOFF:   dcf1.cutoff      = pfParam; break;
+	case drumkv1::DCF1_RESO:     dcf1.reso        = pfParam; break;
+	case drumkv1::DCF1_TYPE:     dcf1.type        = pfParam; break;
+	case drumkv1::DCF1_SLOPE:    dcf1.slope       = pfParam; break;
+	case drumkv1::DCF1_ENVELOPE: dcf1.envelope    = pfParam; break;
+	case drumkv1::DCF1_ATTACK:   dcf1.env.attack  = pfParam; break;
+	case drumkv1::DCF1_DECAY1:   dcf1.env.decay1  = pfParam; break;
+	case drumkv1::DCF1_DECAY2:   dcf1.env.decay2  = pfParam; break;
+	case drumkv1::LFO1_SHAPE:    lfo1.shape       = pfParam; break;
+	case drumkv1::LFO1_WIDTH:    lfo1.width       = pfParam; break;
+	case drumkv1::LFO1_RATE:     lfo1.rate        = pfParam; break;
+	case drumkv1::LFO1_SWEEP:    lfo1.sweep       = pfParam; break;
+	case drumkv1::LFO1_PITCH:    lfo1.pitch       = pfParam; break;
+	case drumkv1::LFO1_CUTOFF:   lfo1.cutoff      = pfParam; break;
+	case drumkv1::LFO1_RESO:     lfo1.reso        = pfParam; break;
+	case drumkv1::LFO1_PANNING:  lfo1.panning     = pfParam; break;
+	case drumkv1::LFO1_VOLUME:   lfo1.volume      = pfParam; break;
+	case drumkv1::LFO1_ATTACK:   lfo1.env.attack  = pfParam; break;
+	case drumkv1::LFO1_DECAY1:   lfo1.env.decay1  = pfParam; break;
+	case drumkv1::LFO1_DECAY2:   lfo1.env.decay2  = pfParam; break;
+	case drumkv1::DCA1_VOLUME:   dca1.volume      = pfParam; break;
+	case drumkv1::DCA1_ATTACK:   dca1.env.attack  = pfParam; break;
+	case drumkv1::DCA1_DECAY1:   dca1.env.decay1  = pfParam; break;
+	case drumkv1::DCA1_DECAY2:   dca1.env.decay2  = pfParam; break;
+	case drumkv1::OUT1_WIDTH:    out1.width       = pfParam; break;
+	case drumkv1::OUT1_PANNING:  out1.panning     = pfParam; break;
+	case drumkv1::OUT1_VOLUME:   out1.volume      = pfParam; break;
 	default: break;
 	}
 }
@@ -683,36 +682,36 @@ float *drumkv1_elem::paramPort ( drumkv1::ParamIndex index )
 	float *pfParam = 0;
 
 	switch (index) {
-	case drumkv1::GEN1_SAMPLE:    pfParam = gen1.sample;      break;
-	case drumkv1::GEN1_COARSE:    pfParam = gen1.coarse;      break;
-	case drumkv1::GEN1_FINE:      pfParam = gen1.fine;        break;
-	case drumkv1::DCF1_CUTOFF:    pfParam = dcf1.cutoff;      break;
-	case drumkv1::DCF1_RESO:      pfParam = dcf1.reso;        break;
-	case drumkv1::DCF1_TYPE:      pfParam = dcf1.type;        break;
-	case drumkv1::DCF1_SLOPE:     pfParam = dcf1.slope;       break;
-	case drumkv1::DCF1_ENVELOPE:  pfParam = dcf1.envelope;    break;
-	case drumkv1::DCF1_ATTACK:    pfParam = dcf1.env.attack;  break;
-	case drumkv1::DCF1_DECAY1:    pfParam = dcf1.env.decay1;  break;
-	case drumkv1::DCF1_DECAY2:    pfParam = dcf1.env.decay2;  break;
-	case drumkv1::LFO1_SHAPE:     pfParam = lfo1.shape;       break;
-	case drumkv1::LFO1_WIDTH:     pfParam = lfo1.width;       break;
-	case drumkv1::LFO1_RATE:      pfParam = lfo1.rate;        break;
-	case drumkv1::LFO1_SWEEP:     pfParam = lfo1.sweep;       break;
-	case drumkv1::LFO1_PITCH:     pfParam = lfo1.pitch;       break;
-	case drumkv1::LFO1_CUTOFF:    pfParam = lfo1.cutoff;      break;
-	case drumkv1::LFO1_RESO:      pfParam = lfo1.reso;        break;
-	case drumkv1::LFO1_PANNING:   pfParam = lfo1.panning;     break;
-	case drumkv1::LFO1_VOLUME:    pfParam = lfo1.volume;      break;
-	case drumkv1::LFO1_ATTACK:    pfParam = lfo1.env.attack;  break;
-	case drumkv1::LFO1_DECAY1:    pfParam = lfo1.env.decay1;  break;
-	case drumkv1::LFO1_DECAY2:    pfParam = lfo1.env.decay2;  break;
-	case drumkv1::DCA1_VOLUME:    pfParam = dca1.volume;      break;
-	case drumkv1::DCA1_ATTACK:    pfParam = dca1.env.attack;  break;
-	case drumkv1::DCA1_DECAY1:    pfParam = dca1.env.decay1;  break;
-	case drumkv1::DCA1_DECAY2:    pfParam = dca1.env.decay2;  break;
-	case drumkv1::OUT1_WIDTH:     pfParam = out1.width;       break;
-	case drumkv1::OUT1_PANNING:   pfParam = out1.panning;     break;
-	case drumkv1::OUT1_VOLUME:    pfParam = out1.volume;      break;
+	case drumkv1::GEN1_SAMPLE:   pfParam = gen1.sample;     break;
+	case drumkv1::GEN1_COARSE:   pfParam = gen1.coarse;     break;
+	case drumkv1::GEN1_FINE:     pfParam = gen1.fine;       break;
+	case drumkv1::DCF1_CUTOFF:   pfParam = dcf1.cutoff;     break;
+	case drumkv1::DCF1_RESO:     pfParam = dcf1.reso;       break;
+	case drumkv1::DCF1_TYPE:     pfParam = dcf1.type;       break;
+	case drumkv1::DCF1_SLOPE:    pfParam = dcf1.slope;      break;
+	case drumkv1::DCF1_ENVELOPE: pfParam = dcf1.envelope;   break;
+	case drumkv1::DCF1_ATTACK:   pfParam = dcf1.env.attack; break;
+	case drumkv1::DCF1_DECAY1:   pfParam = dcf1.env.decay1; break;
+	case drumkv1::DCF1_DECAY2:   pfParam = dcf1.env.decay2; break;
+	case drumkv1::LFO1_SHAPE:    pfParam = lfo1.shape;      break;
+	case drumkv1::LFO1_WIDTH:    pfParam = lfo1.width;      break;
+	case drumkv1::LFO1_RATE:     pfParam = lfo1.rate;       break;
+	case drumkv1::LFO1_SWEEP:    pfParam = lfo1.sweep;      break;
+	case drumkv1::LFO1_PITCH:    pfParam = lfo1.pitch;      break;
+	case drumkv1::LFO1_CUTOFF:   pfParam = lfo1.cutoff;     break;
+	case drumkv1::LFO1_RESO:     pfParam = lfo1.reso;       break;
+	case drumkv1::LFO1_PANNING:  pfParam = lfo1.panning;    break;
+	case drumkv1::LFO1_VOLUME:   pfParam = lfo1.volume;     break;
+	case drumkv1::LFO1_ATTACK:   pfParam = lfo1.env.attack; break;
+	case drumkv1::LFO1_DECAY1:   pfParam = lfo1.env.decay1; break;
+	case drumkv1::LFO1_DECAY2:   pfParam = lfo1.env.decay2; break;
+	case drumkv1::DCA1_VOLUME:   pfParam = dca1.volume;     break;
+	case drumkv1::DCA1_ATTACK:   pfParam = dca1.env.attack; break;
+	case drumkv1::DCA1_DECAY1:   pfParam = dca1.env.decay1; break;
+	case drumkv1::DCA1_DECAY2:   pfParam = dca1.env.decay2; break;
+	case drumkv1::OUT1_WIDTH:    pfParam = out1.width;      break;
+	case drumkv1::OUT1_PANNING:  pfParam = out1.panning;    break;
+	case drumkv1::OUT1_VOLUME:   pfParam = out1.volume;     break;
 	default: break;
 	}
 
@@ -1123,7 +1122,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			// generate
 			pv->gen1.start();
 			// frequencies
-			const float freq1 = 60.0f // float(key)
+			const float freq1 = float(key)
 				+ *elem->gen1.coarse * COARSE_SCALE
 				+ *elem->gen1.fine * FINE_SCALE;
 			pv->gen1_freq = note_freq(freq1);
@@ -1328,8 +1327,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 		// channel indexes
 
-		const uint16_t k11 = 0;
-		const uint16_t k12 = (elem->gen1_sample.channels() > 1 ? 1 : 0);
+		const uint16_t k1 = 0;
+		const uint16_t k2 = (elem->gen1_sample.channels() > 1 ? 1 : 0);
 
 		// output buffers
 
@@ -1365,8 +1364,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 				pv->gen1.next(pv->gen1_freq * (pitchbend1 + modwheel1 * lfo1));
 
-				const float gen1 = pv->gen1.value(k11);
-				const float gen2 = pv->gen1.value(k12);
+				const float gen1 = pv->gen1.value(k1);
+				const float gen2 = pv->gen1.value(k2);
 
 				pv->lfo1_sample = pv->lfo1.sample(lfo1_freq
 					* (1.0f + SWEEP_SCALE * *elem->lfo1.sweep * lfo1_env));
