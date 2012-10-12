@@ -731,6 +731,9 @@ public:
 	void setSampleRate(uint32_t iSampleRate);
 	uint32_t sampleRate() const;
 
+	void setCurrentElement(int key);
+	int currentElement() const;
+
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
 
@@ -789,6 +792,8 @@ private:
 	drumkv1_voice  *m_notes[MAX_NOTES];
 	drumkv1_elem   *m_elems[MAX_NOTES];
 
+	drumkv1_elem   *m_elem;
+
 	drumkv1_list<drumkv1_voice> m_free_list;
 	drumkv1_list<drumkv1_voice> m_play_list;
 
@@ -810,6 +815,7 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 {
 	// init elements
 	m_elem_list.append(new drumkv1_elem(iSampleRate));
+	m_elem = m_elem_list.next();	// TODO: <- 0;
 
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
@@ -821,7 +827,7 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 
 	for (int note = 0; note < MAX_NOTES; ++note) {
 		m_notes[note] = 0;
-		m_elems[note] = m_elem_list.next(); // TODO: <- 0;
+		m_elems[note] = m_elem;		// TODO: <- 0;
 	}
 
 	// flangers none yet
@@ -927,33 +933,35 @@ uint32_t drumkv1_impl::sampleRate (void) const
 }
 
 
+void drumkv1_impl::setCurrentElement ( int key )
+{
+	m_elem = m_elems[key];
+}
+
+
+int drumkv1_impl::currentElement (void) const
+{
+	return (m_elem ? int(m_elem->gen1.sample0) : -1);
+}
+
+
 void drumkv1_impl::setSampleFile ( const char *pszSampleFile )
 {
 	reset();
 
-	drumkv1_elem *elem = m_elem_list.next();	// TODO: curr_elem()
-	if (elem)
-		elem->setSampleFile(pszSampleFile);
+	if (m_elem) m_elem->setSampleFile(pszSampleFile);
 }
 
 
 const char *drumkv1_impl::sampleFile (void) const
 {
-	drumkv1_elem *elem = m_elem_list.next();	// TODO: curr_elem()
-	if (elem)
-		return elem->sampleFile();
-	else
-		return 0;
+	return (m_elem ? m_elem->sampleFile() : 0);
 }
 
 
 drumkv1_sample *drumkv1_impl::sample (void) const
 {
-	drumkv1_elem *elem = m_elem_list.next();	// TODO: curr_elem()
-	if (elem)
-		return &(elem->gen1_sample);
-	else
-		return 0;
+	return (m_elem ? &(m_elem->gen1_sample) : 0);
 }
 
 
@@ -990,8 +998,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DYN1_COMPRESS:  m_dyn.compress  = pfParam; break;
 	case drumkv1::DYN1_LIMITER:   m_dyn.limiter   = pfParam; break;
 	default:
-		drumkv1_elem *elem = m_elem_list.next();	// TODO: curr_elem()
-		if (elem) elem->setParamPort(index, pfParam);
+		if (m_elem) m_elem->setParamPort(index, pfParam);
 		break;
 	}
 }
@@ -1026,8 +1033,7 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DYN1_COMPRESS:  pfParam = m_dyn.compress;  break;
 	case drumkv1::DYN1_LIMITER:   pfParam = m_dyn.limiter;   break;
 	default:
-		drumkv1_elem *elem = m_elem_list.next();	// TODO: curr_elem()
-		if (elem) pfParam = elem->paramPort(index);
+		if (m_elem) pfParam = m_elem->paramPort(index);
 		break;
 	}
 
@@ -1484,6 +1490,18 @@ void drumkv1::setSampleRate ( uint32_t iSampleRate )
 uint32_t drumkv1::sampleRate (void) const
 {
 	return m_pImpl->sampleRate();
+}
+
+
+void drumkv1::setCurrentElement ( int key )
+{
+	m_pImpl->setCurrentElement(key);
+}
+
+
+int drumkv1::currentElement (void) const
+{
+	return m_pImpl->currentElement();
 }
 
 

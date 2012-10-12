@@ -49,6 +49,9 @@ public:
 	void setSampleRate(uint32_t iSampleRate);
 	uint32_t sampleRate() const;
 
+	void setCurrentElement(int key);
+	int currentElement() const;
+
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
 
