@@ -3,4 +3,9 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
+SVN TRUNK
+
+- Detached generic double-linked list class into its own header.
+
+
 0.0.0  2012-10-03  Initial change-log entry.

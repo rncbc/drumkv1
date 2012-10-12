@@ -14,6 +14,7 @@ HEADERS = \
 	drumkv1_sample.h \
 	drumkv1_wave.h \
 	drumkv1_ramp.h \
+	drumkv1_list.h \
 	drumkv1_fx.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \

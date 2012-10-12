@@ -9,6 +9,7 @@ headers = \
 	src/config.h \
 	src/$(name).h \
 	src/$(name)_fx.h \
+	src/$(name)_list.h \
 	src/$(name)_ramp.h \
 	src/$(name)_sample.h \
 	src/$(name)_wave.h \
