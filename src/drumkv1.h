@@ -49,7 +49,13 @@ public:
 	void setSampleRate(uint32_t iSampleRate);
 	uint32_t sampleRate() const;
 
-	void setCurrentElement(int key);
+	void addElement(int iKey, const char *pszName);
+	void removeElement(int iKey);
+
+	void setElementName(int iKey, const char *pszName);
+	const char *elementName(int iKey) const;
+
+	void setCurrentElement(int iKey);
 	int currentElement() const;
 
 	void setSampleFile(const char *pszSampleFile);
@@ -69,6 +75,7 @@ public:
 		DCF1_ENVELOPE,
 		DCF1_ATTACK,
 		DCF1_DECAY1,
+		DCF1_LEVEL2,
 		DCF1_DECAY2,
 		LFO1_SHAPE,
 		LFO1_WIDTH,
@@ -81,10 +88,12 @@ public:
 		LFO1_VOLUME,
 		LFO1_ATTACK,
 		LFO1_DECAY1,
+		LFO1_LEVEL2,
 		LFO1_DECAY2,
 		DCA1_VOLUME,
 		DCA1_ATTACK,
 		DCA1_DECAY1,
+		DCA1_LEVEL2,
 		DCA1_DECAY2,
 		OUT1_WIDTH,
 		OUT1_PANNING,

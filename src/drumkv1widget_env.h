@@ -42,6 +42,7 @@ public:
 	// Parameter getters.
 	float attack() const;
 	float decay1() const;
+	float level2() const;
 	float decay2() const;
 
 public slots:
@@ -49,6 +50,7 @@ public slots:
 	// Parameter setters.
 	void setAttack(float fAttack);
 	void setDecay1(float fDecay1);
+	void setLevel2(float fLevel2);
 	void setDecay2(float fDecay2);
 
 signals:
@@ -56,6 +58,7 @@ signals:
 	// Parameter change signals.
 	void attackChanged(float fAttack);
 	void decay1Changed(float fDecay1);
+	void level2Changed(float fLevel2);
 	void decay2Changed(float fDecay2);
 
 protected:
@@ -79,6 +82,7 @@ private:
 	// Instance state.
 	float m_fAttack;
 	float m_fDecay1;
+	float m_fLevel2;
 	float m_fDecay2;
 
 	// Draw state.

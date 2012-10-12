@@ -41,7 +41,7 @@ inline float safe_value ( float x )
 drumkv1widget_env::drumkv1widget_env (
 	QWidget *pParent, Qt::WindowFlags wflags )
 	: QFrame(pParent, wflags),
-		m_fAttack(0.0f), m_fDecay1(0.0f), m_fDecay2(0.0f),
+		m_fAttack(0.0f), m_fDecay1(0.0f), m_fLevel2(0.0f), m_fDecay2(0.0f),
 		m_poly(6), m_iDragNode(-1)
 {
 	setMouseTracking(true);
@@ -89,6 +89,21 @@ float drumkv1widget_env::decay1 (void) const
 }
 
 
+void drumkv1widget_env::setLevel2 ( float fLevel2 )
+{
+	if (::fabs(m_fLevel2 - fLevel2) > 0.001f) {
+		m_fLevel2 = safe_value(fLevel2);
+		update();
+		emit level2Changed(level2());
+	}
+}
+
+float drumkv1widget_env::level2 (void) const
+{
+	return m_fLevel2;
+}
+
+
 void drumkv1widget_env::setDecay2 ( float fDecay2 )
 {
 	if (::fabs(m_fDecay2 - fDecay2) > 0.001f) {
@@ -118,13 +133,13 @@ void drumkv1widget_env::paintEvent ( QPaintEvent *pPaintEvent )
 	int x2 = int(m_fDecay1 * float(w3)) + x1;
 	int x3 = int(m_fDecay2 * float(w3)) + x2;
 
-	int y3 = h >> 1;
+	int y2 = h - int(m_fLevel2 * float(h - 12)) - 6;
 
 	m_poly.putPoints(0, 6,
 		0,  h,
 		6,  h - 6,
 		x1, 6,
-		x2, y3,
+		x2, y2,
 		x3, h - 6,
 		x3, h);
 
@@ -156,9 +171,10 @@ void drumkv1widget_env::paintEvent ( QPaintEvent *pPaintEvent )
 #ifdef CONFIG_DEBUG_0
 	painter.drawText(QFrame::rect(),
 		Qt::AlignTop|Qt::AlignHCenter,
-		tr("A(%1) D1(%2) D2(%3)")
+		tr("A(%1) D1(%2) L2(%3) D2(%4)")
 		.arg(int(100.0f * attack()))
 		.arg(int(100.0f * decay1()))
+		.arg(int(100.0f * level2()))
 		.arg(int(100.0f * decay2())));
 #endif
 
@@ -182,7 +198,7 @@ int drumkv1widget_env::nodeIndex ( const QPoint& pos ) const
 		return 4; // Decay2
 
 	if (nodeRect(3).contains(pos))
-		return 3; // Decay1
+		return 3; // Decay1/Level2
 
 	if (nodeRect(2).contains(pos))
 		return 2; // Attack
@@ -193,20 +209,27 @@ int drumkv1widget_env::nodeIndex ( const QPoint& pos ) const
 
 void drumkv1widget_env::dragNode ( const QPoint& pos )
 {
-	int w3 = (width() - 12) / 3;
-	int x, dx = (pos.x() - m_posDrag.x());
+	int h  = height();
+	int w  = width();
 
-	if (dx) {
+	int w3 = (w - 12) / 3;
+
+	int x, dx = (pos.x() - m_posDrag.x());
+	int y, dy = (pos.y() - m_posDrag.y());
+
+	if (dx || dy) {
 		switch (m_iDragNode) {
 		case 2: // Attack
 			x = int(attack() * float(w3));
 			setAttack(float(x + dx) / float(w3));
 			break;
-		case 3: // Decay1
+		case 3: // Decay1/Level2
 			x = int(decay1() * float(w3));
 			setDecay1(float(x + dx) / float(w3));
+			y = int(level2() * float(h - 12));
+			setLevel2(float(y - dy) / float(h - 12));
 			break;
-		case 4: // Decay2
+		case 4: // Decay2/Level2
 			x = int(decay2() * float(w3));
 			setDecay2(float(x + dx) / float(w3));
 			break;
@@ -223,7 +246,17 @@ void drumkv1widget_env::mousePressEvent ( QMouseEvent *pMouseEvent )
 		const QPoint& pos = pMouseEvent->pos();
 		int iDragNode = nodeIndex(pos);
 		if (iDragNode >= 0) {
-			setCursor(Qt::SizeHorCursor);
+			switch (iDragNode) {
+			case 2: // Attack
+			case 4: // Decay2
+				setCursor(Qt::SizeHorCursor);
+				break;
+			case 3: // Decay1/Level2
+				setCursor(Qt::SizeAllCursor);
+				break;
+			default:
+				break;
+			}
 			m_iDragNode = iDragNode;
 			m_posDrag = pos;
 		}

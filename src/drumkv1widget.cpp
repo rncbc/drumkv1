@@ -49,6 +49,7 @@ struct {
 	{ "DCF1_ENVELOPE",  1.0f },
 	{ "DCF1_ATTACK",    0.0f },
 	{ "DCF1_DECAY1",    0.2f },
+	{ "DCF1_LEVEL2",    0.5f },
 	{ "DCF1_DECAY2",    0.5f },
 	{ "LFO1_SHAPE",     1.0f },
 	{ "LFO1_WIDTH",     1.0f },
@@ -61,10 +62,12 @@ struct {
 	{ "LFO1_VOLUME",    0.0f },
 	{ "LFO1_ATTACK",    0.0f },
 	{ "LFO1_DECAY1",    0.2f },
+	{ "LFO1_LEVEL2",    0.5f },
 	{ "LFO1_DECAY2",    0.5f },
 	{ "DCA1_VOLUME",    0.5f },
 	{ "DCA1_ATTACK",    0.0f },
 	{ "DCA1_DECAY1",    0.2f },
+	{ "DCA1_LEVEL2",    0.5f },
 	{ "DCA1_DECAY2",    0.5f },	// 0.1f
 	{ "OUT1_WIDTH",     0.0f },
 	{ "OUT1_PANNING",   0.0f },
@@ -215,6 +218,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::DCF1_ENVELOPE, m_ui.Dcf1EnvelopeKnob);
 	setParamKnob(drumkv1::DCF1_ATTACK,   m_ui.Dcf1AttackKnob);
 	setParamKnob(drumkv1::DCF1_DECAY1,   m_ui.Dcf1Decay1Knob);
+	setParamKnob(drumkv1::DCF1_LEVEL2,   m_ui.Dcf1Level2Knob);
 	setParamKnob(drumkv1::DCF1_DECAY2,   m_ui.Dcf1Decay2Knob);
 
 	QObject::connect(
@@ -253,6 +257,13 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Dcf1Env, SLOT(setDecay1(float)));
 
 	QObject::connect(
+		m_ui.Dcf1Env, SIGNAL(level2Changed(float)),
+		m_ui.Dcf1Level2Knob, SLOT(setValue(float)));
+	QObject::connect(
+		m_ui.Dcf1Level2Knob, SIGNAL(valueChanged(float)),
+		m_ui.Dcf1Env, SLOT(setLevel2(float)));
+
+	QObject::connect(
 		m_ui.Dcf1Env, SIGNAL(decay2Changed(float)),
 		m_ui.Dcf1Decay2Knob, SLOT(setValue(float)));
 	QObject::connect(
@@ -271,6 +282,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::LFO1_SWEEP,   m_ui.Lfo1SweepKnob);
 	setParamKnob(drumkv1::LFO1_ATTACK,  m_ui.Lfo1AttackKnob);
 	setParamKnob(drumkv1::LFO1_DECAY1,  m_ui.Lfo1Decay1Knob);
+	setParamKnob(drumkv1::LFO1_LEVEL2,  m_ui.Lfo1Level2Knob);
 	setParamKnob(drumkv1::LFO1_DECAY2,  m_ui.Lfo1Decay2Knob);
 
 	QObject::connect(
@@ -301,6 +313,13 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Lfo1Env, SLOT(setDecay1(float)));
 
 	QObject::connect(
+		m_ui.Lfo1Env, SIGNAL(level2Changed(float)),
+		m_ui.Lfo1Level2Knob, SLOT(setValue(float)));
+	QObject::connect(
+		m_ui.Lfo1Level2Knob, SIGNAL(valueChanged(float)),
+		m_ui.Lfo1Env, SLOT(setLevel2(float)));
+
+	QObject::connect(
 		m_ui.Lfo1Env, SIGNAL(decay2Changed(float)),
 		m_ui.Lfo1Decay2Knob, SLOT(setValue(float)));
 	QObject::connect(
@@ -311,6 +330,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::DCA1_VOLUME, m_ui.Dca1VolumeKnob);
 	setParamKnob(drumkv1::DCA1_ATTACK, m_ui.Dca1AttackKnob);
 	setParamKnob(drumkv1::DCA1_DECAY1, m_ui.Dca1Decay1Knob);
+	setParamKnob(drumkv1::DCA1_LEVEL2, m_ui.Dca1Level2Knob);
 	setParamKnob(drumkv1::DCA1_DECAY2, m_ui.Dca1Decay2Knob);
 
 	QObject::connect(
@@ -326,6 +346,13 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	QObject::connect(
 		m_ui.Dca1Decay1Knob, SIGNAL(valueChanged(float)),
 		m_ui.Dca1Env, SLOT(setDecay1(float)));
+
+	QObject::connect(
+		m_ui.Dca1Env, SIGNAL(level2Changed(float)),
+		m_ui.Dca1Level2Knob, SLOT(setValue(float)));
+	QObject::connect(
+		m_ui.Dca1Level2Knob, SIGNAL(valueChanged(float)),
+		m_ui.Dca1Env, SLOT(setLevel2(float)));
 
 	QObject::connect(
 		m_ui.Dca1Env, SIGNAL(decay2Changed(float)),

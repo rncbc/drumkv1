@@ -26,13 +26,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>940</width>
+	<width>1024</width>
     <height>580</height>
    </rect>
   </property>
   <property name="minimumSize" >
    <size>
-    <width>940</width>
+	<width>1024</width>
     <height>580</height>
    </size>
   </property>
@@ -256,6 +256,16 @@
              </widget>
             </item>
             <item>
+             <widget class="drumkv1widget_spin" name="Dcf1Level2Knob">
+              <property name="toolTip">
+               <string>DCF1 Level 2</string>
+              </property>
+              <property name="text">
+               <string>Level 2</string>
+              </property>
+             </widget>
+            </item>
+            <item>
              <widget class="drumkv1widget_spin" name="Dcf1Decay2Knob">
               <property name="toolTip">
                <string>DCF1 Decay 2</string>
@@ -329,6 +339,16 @@
               </property>
               <property name="text">
                <string>Decay 1</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="drumkv1widget_spin" name="Lfo1Level2Knob">
+              <property name="toolTip">
+               <string>LFO1 Level 2</string>
+              </property>
+              <property name="text">
+               <string>Level 2</string>
               </property>
              </widget>
             </item>
@@ -500,6 +520,16 @@
             </property>
             <property name="text">
              <string>Decay 1</string>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <widget class="drumkv1widget_spin" name="Dca1Level2Knob">
+            <property name="toolTip">
+             <string>DCA1 Level 2</string>
+            </property>
+            <property name="text">
+             <string>Level 2</string>
             </property>
            </widget>
           </item>

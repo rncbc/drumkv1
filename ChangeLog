@@ -5,6 +5,9 @@ ChangeLog
 
 SVN TRUNK
 
+- Classic ADSR replaced by custom one-shot drum-mode specific envelope
+  generators (Attack, Delay1, Level2, Delay2). (EXPERIMENTAL)
+
 - Detached generic double-linked list class into its own header.
 
 

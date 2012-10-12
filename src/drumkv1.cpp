@@ -134,11 +134,11 @@ struct drumkv1_env
 			p->frames = int(*decay1 * *decay1 * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
-			p->delta = -0.5f / float(p->frames);
+			p->delta = (*level2 - 1.0f) / float(p->frames);
 		}
 		else if (p->stage == Decay1) {
 			p->stage = Decay2;
-			p->level = 0.5f;
+			p->level = *level2;
 			p->frames = int(*decay2 * *decay2 * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
@@ -187,6 +187,7 @@ struct drumkv1_env
 
 	float *attack;
 	float *decay1;
+	float *level2;
 	float *decay2;
 
 	uint32_t min_frames;
@@ -536,11 +537,15 @@ public:
 
 	drumkv1_elem(uint32_t iSampleRate);
 
+	~drumkv1_elem();
+
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
 
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
 	float *paramPort(drumkv1::ParamIndex index);
+
+	const char    *name;
 
 	drumkv1_sample gen1_sample;
 	drumkv1_gen    gen1;
@@ -561,13 +566,17 @@ public:
 
 drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate )
 {
+	// element name
+	name = 0;
+
+	// element key (sample note)
 	gen1.sample0 = 0.0f;
 
-	// update element sample rate
+	// element sample rate
 	gen1_sample.setSampleRate(iSampleRate);
 	lfo1_wave.setSampleRate(iSampleRate);
 
-	// update envelope range times in frames
+	// element envelope range times in frames
 	const float srate_ms = 0.001f * float(iSampleRate);
 
 	const uint32_t min_frames = uint32_t(srate_ms * MIN_ENV_MSECS);
@@ -583,6 +592,16 @@ drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate )
 	dca1.env.max_frames = max_frames;
 }
 
+
+// synth element dtor.
+
+drumkv1_elem::~drumkv1_elem (void)
+{
+	if (name) ::free((char *) name);
+}
+
+
+// synth element methods.
 
 void drumkv1_elem::setSampleFile ( const char *pszSampleFile )
 {
@@ -731,7 +750,13 @@ public:
 	void setSampleRate(uint32_t iSampleRate);
 	uint32_t sampleRate() const;
 
-	void setCurrentElement(int key);
+	void addElement(int iKey, const char *pszName);
+	void removeElement(int iKey);
+
+	void setElementName(int iKey, const char *pszName);
+	const char *elementName(int iKey) const;
+
+	void setCurrentElement(int iKey);
 	int currentElement() const;
 
 	void setSampleFile(const char *pszSampleFile);
@@ -933,9 +958,57 @@ uint32_t drumkv1_impl::sampleRate (void) const
 }
 
 
-void drumkv1_impl::setCurrentElement ( int key )
+void drumkv1_impl::addElement ( int iKey, const char *pszName )
 {
-	m_elem = m_elems[key];
+	if (iKey >= 0 && iKey < MAX_NOTES) {
+		if (m_elems[iKey] == 0)
+			m_elems[iKey] = new drumkv1_elem(m_iSampleRate);
+	}
+
+	setElementName(iKey, pszName);
+}
+
+
+void drumkv1_impl::removeElement ( int iKey )
+{
+	allNotesOff();
+
+	drumkv1_elem *elem = 0;
+	if (iKey >= 0 && iKey < MAX_NOTES)
+		elem = m_elems[iKey];
+	if (elem) {
+		m_elems[iKey] = 0;
+		delete elem;
+	}
+}
+
+
+void drumkv1_impl::setElementName ( int iKey, const char *pszName )
+{
+	drumkv1_elem *elem = 0;
+	if (iKey >= 0 && iKey < MAX_NOTES)
+		elem = m_elems[iKey];
+	if (elem) {
+		if (elem->name)
+			::free((char *) elem->name);
+		elem->name = ::strdup(pszName);
+	}
+}
+
+
+const char *drumkv1_impl::elementName ( int iKey ) const
+{
+	drumkv1_elem *elem = 0;
+	if (iKey >= 0 && iKey < MAX_NOTES)
+		elem = m_elems[iKey];
+	return (elem ? elem->name : 0);
+}
+
+
+void drumkv1_impl::setCurrentElement ( int iKey )
+{
+	if (iKey >= 0 && iKey < MAX_NOTES)
+		m_elem = m_elems[iKey];
 }
 
 
@@ -1493,9 +1566,33 @@ uint32_t drumkv1::sampleRate (void) const
 }
 
 
-void drumkv1::setCurrentElement ( int key )
+void drumkv1::addElement ( int iKey, const char *pszName )
 {
-	m_pImpl->setCurrentElement(key);
+	m_pImpl->addElement(iKey, pszName);
+}
+
+
+void drumkv1::removeElement ( int iKey )
+{
+	m_pImpl->removeElement(iKey);
+}
+
+
+void drumkv1::setElementName ( int iKey, const char *pszName )
+{
+	m_pImpl->setElementName(iKey, pszName);
+}
+
+
+const char *drumkv1::elementName ( int iKey ) const
+{
+	return m_pImpl->elementName(iKey);
+}
+
+
+void drumkv1::setCurrentElement ( int iKey )
+{
+	m_pImpl->setCurrentElement(iKey);
 }
 
 
