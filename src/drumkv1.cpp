@@ -49,7 +49,7 @@ const uint16_t MAX_VOICES = 24;			// polyphony
 const uint8_t  MAX_NOTES  = 128;
 
 const float MIN_ENV_MSECS = 0.5f;		// min 0.5ms per stage
-const float MAX_ENV_MSECS = 5000.0f;	// max 5 sec per stage
+const float MAX_ENV_MSECS = 2000.0f;	// max 2 sec per stage
 
 const float DETUNE_SCALE  = 0.5f;
 const float PHASE_SCALE   = 0.5f;
@@ -142,7 +142,7 @@ struct drumkv1_env
 			p->frames = int(*decay2 * *decay2 * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
-			p->delta = -0.5f / float(p->frames);
+			p->delta = -(*level2) / float(p->frames);
 		}
 		else if (p->stage == Decay2) {
 			p->running = false;
@@ -633,6 +633,7 @@ void drumkv1_elem::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DCF1_ENVELOPE: dcf1.envelope    = pfParam; break;
 	case drumkv1::DCF1_ATTACK:   dcf1.env.attack  = pfParam; break;
 	case drumkv1::DCF1_DECAY1:   dcf1.env.decay1  = pfParam; break;
+	case drumkv1::DCF1_LEVEL2:   dcf1.env.level2  = pfParam; break;
 	case drumkv1::DCF1_DECAY2:   dcf1.env.decay2  = pfParam; break;
 	case drumkv1::LFO1_SHAPE:    lfo1.shape       = pfParam; break;
 	case drumkv1::LFO1_WIDTH:    lfo1.width       = pfParam; break;
@@ -645,10 +646,12 @@ void drumkv1_elem::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::LFO1_VOLUME:   lfo1.volume      = pfParam; break;
 	case drumkv1::LFO1_ATTACK:   lfo1.env.attack  = pfParam; break;
 	case drumkv1::LFO1_DECAY1:   lfo1.env.decay1  = pfParam; break;
+	case drumkv1::LFO1_LEVEL2:   lfo1.env.level2  = pfParam; break;
 	case drumkv1::LFO1_DECAY2:   lfo1.env.decay2  = pfParam; break;
 	case drumkv1::DCA1_VOLUME:   dca1.volume      = pfParam; break;
 	case drumkv1::DCA1_ATTACK:   dca1.env.attack  = pfParam; break;
 	case drumkv1::DCA1_DECAY1:   dca1.env.decay1  = pfParam; break;
+	case drumkv1::DCA1_LEVEL2:   dca1.env.level2  = pfParam; break;
 	case drumkv1::DCA1_DECAY2:   dca1.env.decay2  = pfParam; break;
 	case drumkv1::OUT1_WIDTH:    out1.width       = pfParam; break;
 	case drumkv1::OUT1_PANNING:  out1.panning     = pfParam; break;
@@ -673,6 +676,7 @@ float *drumkv1_elem::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DCF1_ENVELOPE: pfParam = dcf1.envelope;   break;
 	case drumkv1::DCF1_ATTACK:   pfParam = dcf1.env.attack; break;
 	case drumkv1::DCF1_DECAY1:   pfParam = dcf1.env.decay1; break;
+	case drumkv1::DCF1_LEVEL2:   pfParam = dcf1.env.level2; break;
 	case drumkv1::DCF1_DECAY2:   pfParam = dcf1.env.decay2; break;
 	case drumkv1::LFO1_SHAPE:    pfParam = lfo1.shape;      break;
 	case drumkv1::LFO1_WIDTH:    pfParam = lfo1.width;      break;
@@ -685,10 +689,12 @@ float *drumkv1_elem::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::LFO1_VOLUME:   pfParam = lfo1.volume;     break;
 	case drumkv1::LFO1_ATTACK:   pfParam = lfo1.env.attack; break;
 	case drumkv1::LFO1_DECAY1:   pfParam = lfo1.env.decay1; break;
+	case drumkv1::LFO1_LEVEL2:   pfParam = lfo1.env.level2; break;
 	case drumkv1::LFO1_DECAY2:   pfParam = lfo1.env.decay2; break;
 	case drumkv1::DCA1_VOLUME:   pfParam = dca1.volume;     break;
 	case drumkv1::DCA1_ATTACK:   pfParam = dca1.env.attack; break;
 	case drumkv1::DCA1_DECAY1:   pfParam = dca1.env.decay1; break;
+	case drumkv1::DCA1_LEVEL2:   pfParam = dca1.env.level2; break;
 	case drumkv1::DCA1_DECAY2:   pfParam = dca1.env.decay2; break;
 	case drumkv1::OUT1_WIDTH:    pfParam = out1.width;      break;
 	case drumkv1::OUT1_PANNING:  pfParam = out1.panning;    break;
