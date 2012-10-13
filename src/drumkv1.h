@@ -154,7 +154,8 @@ class drumkv1_element
 public:
 
 	drumkv1_element(drumkv1_elem *pElem);
-	drumkv1_element(const drumkv1_element& element);
+
+	~drumkv1_element();
 
 	void setName(const char *pszName);
 	const char *name() const;
@@ -170,6 +171,7 @@ public:
 private:
 
 	drumkv1_elem *m_pElem;
+	const char *m_pszName;
 };
 
 
