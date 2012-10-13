@@ -28,6 +28,8 @@
 
 // forward declarations
 class drumkv1_impl;
+class drumkv1_elem;
+class drumkv1_element;
 class drumkv1_sample;
 
 
@@ -49,14 +51,13 @@ public:
 	void setSampleRate(uint32_t iSampleRate);
 	uint32_t sampleRate() const;
 
-	void addElement(int iKey, const char *pszName);
+	void addElement(int iKey);
 	void removeElement(int iKey);
-
-	void setElementName(int iKey, const char *pszName);
-	const char *elementName(int iKey) const;
 
 	void setCurrentElement(int iKey);
 	int currentElement() const;
+
+	const drumkv1_element& element(int iKey);
 
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
@@ -99,9 +100,9 @@ public:
 		OUT1_PANNING,
 		OUT1_VOLUME,
 
-		ELEM_PARAMS,
+		NUM_ELEMENT_PARAMS,
 
-		DEF1_PITCHBEND = ELEM_PARAMS,
+		DEF1_PITCHBEND = NUM_ELEMENT_PARAMS,
 		DEF1_MODWHEEL,
 		DEF1_PRESSURE,
 
@@ -142,6 +143,34 @@ protected:
 private:
 
 	drumkv1_impl *m_pImpl;
+};
+
+
+//-------------------------------------------------------------------------
+// drumkv1_element - decl.
+//
+
+class drumkv1_element
+{
+public:
+
+	drumkv1_element(drumkv1_elem *pElem);
+	drumkv1_element(const drumkv1_element& element);
+
+	void setName(const char *pszName);
+	const char *name() const;
+
+	void setSampleFile(const char *pszSampleFile);
+	const char *sampleFile() const;
+
+	drumkv1_sample *sample() const;
+
+	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
+	float *paramPort(drumkv1::ParamIndex index);
+
+private:
+
+	drumkv1_elem *m_pElem;
 };
 
 

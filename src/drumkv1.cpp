@@ -528,10 +528,10 @@ inline float note_freq ( float note )
 	return (440.0f / 32.0f) * ::powf(2.0f, (note - 9.0f) / 12.0f);
 }
 
+
 // synth element
 
 class drumkv1_elem : public drumkv1_list<drumkv1_elem>
-
 {
 public:
 
@@ -756,11 +756,8 @@ public:
 	void setSampleRate(uint32_t iSampleRate);
 	uint32_t sampleRate() const;
 
-	void addElement(int iKey, const char *pszName);
+	void addElement(int iKey);
 	void removeElement(int iKey);
-
-	void setElementName(int iKey, const char *pszName);
-	const char *elementName(int iKey) const;
 
 	void setCurrentElement(int iKey);
 	int currentElement() const;
@@ -964,14 +961,12 @@ uint32_t drumkv1_impl::sampleRate (void) const
 }
 
 
-void drumkv1_impl::addElement ( int iKey, const char *pszName )
+void drumkv1_impl::addElement ( int iKey )
 {
 	if (iKey >= 0 && iKey < MAX_NOTES) {
 		if (m_elems[iKey] == 0)
 			m_elems[iKey] = new drumkv1_elem(m_iSampleRate);
 	}
-
-	setElementName(iKey, pszName);
 }
 
 
@@ -986,28 +981,6 @@ void drumkv1_impl::removeElement ( int iKey )
 		m_elems[iKey] = 0;
 		delete elem;
 	}
-}
-
-
-void drumkv1_impl::setElementName ( int iKey, const char *pszName )
-{
-	drumkv1_elem *elem = 0;
-	if (iKey >= 0 && iKey < MAX_NOTES)
-		elem = m_elems[iKey];
-	if (elem) {
-		if (elem->name)
-			::free((char *) elem->name);
-		elem->name = ::strdup(pszName);
-	}
-}
-
-
-const char *drumkv1_impl::elementName ( int iKey ) const
-{
-	drumkv1_elem *elem = 0;
-	if (iKey >= 0 && iKey < MAX_NOTES)
-		elem = m_elems[iKey];
-	return (elem ? elem->name : 0);
 }
 
 
@@ -1572,11 +1545,10 @@ uint32_t drumkv1::sampleRate (void) const
 }
 
 
-void drumkv1::addElement ( int iKey, const char *pszName )
+void drumkv1::addElement ( int iKey )
 {
-	m_pImpl->addElement(iKey, pszName);
+	m_pImpl->addElement(iKey);
 }
-
 
 void drumkv1::removeElement ( int iKey )
 {
@@ -1584,23 +1556,10 @@ void drumkv1::removeElement ( int iKey )
 }
 
 
-void drumkv1::setElementName ( int iKey, const char *pszName )
-{
-	m_pImpl->setElementName(iKey, pszName);
-}
-
-
-const char *drumkv1::elementName ( int iKey ) const
-{
-	return m_pImpl->elementName(iKey);
-}
-
-
 void drumkv1::setCurrentElement ( int iKey )
 {
 	m_pImpl->setCurrentElement(iKey);
 }
-
 
 int drumkv1::currentElement (void) const
 {
@@ -1612,7 +1571,6 @@ void drumkv1::setSampleFile ( const char *pszSampleFile )
 {
 	m_pImpl->setSampleFile(pszSampleFile);
 }
-
 
 const char *drumkv1::sampleFile (void) const
 {
@@ -1661,6 +1619,62 @@ void drumkv1::process ( float **ins, float **outs, uint32_t nframes )
 void drumkv1::reset (void)
 {
 	m_pImpl->reset();
+}
+
+
+//-------------------------------------------------------------------------
+// drumkv1_element - decl.
+//
+
+drumkv1_element::drumkv1_element ( drumkv1_elem *pElem )
+	: m_pElem(pElem)
+{
+}
+
+drumkv1_element::drumkv1_element ( const drumkv1_element& element )
+	: m_pElem(element.m_pElem)
+{
+}
+
+
+void drumkv1_element::setName ( const char *pszName )
+{
+	if (m_pElem->name)
+		::free((char *) m_pElem->name);
+	m_pElem->name = ::strdup(pszName);
+}
+
+const char *drumkv1_element::name (void) const
+{
+	return m_pElem->name;
+}
+
+
+void drumkv1_element::setSampleFile ( const char *pszSampleFile )
+{
+	if (m_pElem) m_pElem->setSampleFile(pszSampleFile);
+}
+
+const char *drumkv1_element::sampleFile (void) const
+{
+	return (m_pElem ? m_pElem->sampleFile() : 0);
+}
+
+
+drumkv1_sample *drumkv1_element::sample (void) const
+{
+	return (m_pElem ? &(m_pElem->gen1_sample) : 0);
+}
+
+
+void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
+{
+	if (m_pElem) m_pElem->setParamPort(index, pfParam);
+}
+
+float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
+{
+	return (m_pElem ? m_pElem->paramPort(index) : 0);
 }
 
 
