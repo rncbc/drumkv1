@@ -26,13 +26,13 @@
    <rect>
     <x>0</x>
     <y>0</y>
-	<width>1024</width>
+    <width>1024</width>
     <height>580</height>
    </rect>
   </property>
   <property name="minimumSize" >
    <size>
-	<width>1024</width>
+    <width>1024</width>
     <height>580</height>
    </size>
   </property>
@@ -66,6 +66,29 @@
         </size>
        </property>
       </spacer>
+     </item>
+	 <item>
+	  <widget class="QLabel" name="ElementTextLabel">
+	   <property name="text">
+		<string>Element:</string>
+	   </property>
+	  </widget>
+	 </item>
+	 <item>
+      <widget class="QComboBox" name="ElementComboBox">
+       <property name="minimumSize" >
+        <size>
+         <width>320</width>
+         <height>0</height>
+        </size>
+       </property>
+       <property name="toolTip">
+		<string>Drum Element</string>
+       </property>
+       <property name="editable">
+        <bool>true</bool>
+       </property>
+      </widget>
      </item>
      <item>
       <widget class="QMenuBar" name="MenuBar">

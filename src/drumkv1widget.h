@@ -88,6 +88,9 @@ protected:
 	// Preset init.
 	void initPreset();
 
+	// Reload all elements.
+	void refreshElement();
+
 	// Reset all param/knob default values.
 	void resetParamValues();
 	void resetParamKnobs();
