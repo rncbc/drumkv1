@@ -5,6 +5,8 @@ ChangeLog
 
 SVN TRUNK
 
+- Access to core engine instance has been slightly refactored.
+
 - Classic ADSR replaced by custom one-shot drum-mode specific envelope
   generators (Attack, Delay1, Level2, Delay2). (EXPERIMENTAL)
 

@@ -40,8 +40,8 @@ class drumkv1_alsa_thread
 {
 public:
 
-	drumkv1_alsa_thread(drumkv1_jack *sampl)
-		: m_sampl(sampl), m_running(false) {}
+	drumkv1_alsa_thread(drumkv1_jack *drumk)
+		: m_drumk(drumk), m_running(false) {}
 
 	~drumkv1_alsa_thread()
 		{ m_running = false; wait(); }
@@ -51,7 +51,7 @@ public:
 
 	void *run()
 	{
-		snd_seq_t *seq = m_sampl->alsa_seq();
+		snd_seq_t *seq = m_drumk->alsa_seq();
 		if (seq == NULL)
 			return NULL;
 
@@ -71,7 +71,7 @@ public:
 			while (poll_rc > 0) {
 				snd_seq_event_t *ev = NULL;
 				snd_seq_event_input(seq, &ev);
-				m_sampl->alsa_capture(ev);
+				m_drumk->alsa_capture(ev);
 			//	snd_seq_free_event(ev);
 				poll_rc = snd_seq_event_input_pending(seq, 0);
 			}
@@ -92,13 +92,11 @@ public:
 protected:
 
 	static void *run ( void *arg )
-	{
-		return static_cast<drumkv1_alsa_thread *> (arg)->run();
-	}
+		{ return static_cast<drumkv1_alsa_thread *> (arg)->run(); }
 
 private:
 
-	drumkv1_jack *m_sampl;
+	drumkv1_jack *m_drumk;
 
 	bool m_running;
 

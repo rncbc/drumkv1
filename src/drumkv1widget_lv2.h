@@ -48,7 +48,7 @@ class drumkv1widget_lv2 : public drumkv1widget
 public:
 
 	// Constructor.
-	drumkv1widget_lv2(drumkv1_lv2 *pSampl,
+	drumkv1widget_lv2(drumkv1_lv2 *pDrumk,
 		LV2UI_Controller controller, LV2UI_Write_Function write_function);
 
 	// Destructor.
@@ -60,27 +60,21 @@ public:
 
 protected slots:
 
-	// Sample clear slot.
-	void clearSample();
-
-	// Sample loader slot.
-	void loadSample(const QString& sFilename);
-
 	// Update notification slot.
 	void updateNotify();
 
 protected:
 
-	// Param methods.
-	void updateParam(drumkv1::ParamIndex index, float fValue) const;
+	// Synth engine accessor.
+	drumkv1 *instance() const;
 
-	// Sample filename retriever (crude experimental stuff III).
-	QString sampleFile() const;
+	// Param port method.
+	void updateParam(drumkv1::ParamIndex index, float fValue) const;
 
 private:
 
 	// Instance variables.
-	drumkv1_lv2 *m_pSampl;
+	drumkv1_lv2 *m_pDrumk;
 
 	LV2UI_Controller     m_controller;
 	LV2UI_Write_Function m_write_function;

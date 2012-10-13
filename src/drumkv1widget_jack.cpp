@@ -55,13 +55,13 @@ static void drumkv1widget_jack_session_event (
 //
 
 // Constructor.
-drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pSampl )
-	: drumkv1widget(), m_pSampl(pSampl)
+drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
+	: drumkv1widget(), m_pDrumk(pDrumk)
 {
 #ifdef CONFIG_JACK_SESSION
 	// JACK session event callback...
 	if (::jack_set_session_callback) {
-		::jack_set_session_callback(m_pSampl->client(),
+		::jack_set_session_callback(m_pDrumk->client(),
 			drumkv1widget_jack_session_event, this);
 		QObject::connect(this,
 			SIGNAL(sessionNotify(void *)),
@@ -73,14 +73,14 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pSampl )
 	initPreset();
 
 	// Activate client...
-	m_pSampl->activate();
+	m_pDrumk->activate();
 }
 
 
 // Destructor.
 drumkv1widget_jack::~drumkv1widget_jack (void)
 {
-	m_pSampl->deactivate();
+	m_pDrumk->deactivate();
 }
 
 
@@ -122,7 +122,7 @@ void drumkv1widget_jack::sessionEvent ( void *pvSessionArg )
 	const QByteArray aCmdLine = args.join(" ").toUtf8();
 	pJackSessionEvent->command_line = ::strdup(aCmdLine.constData());
 
-	jack_session_reply(m_pSampl->client(), pJackSessionEvent);
+	jack_session_reply(m_pDrumk->client(), pJackSessionEvent);
 	jack_session_event_free(pJackSessionEvent);
 
 	if (bQuit)
@@ -132,34 +132,10 @@ void drumkv1widget_jack::sessionEvent ( void *pvSessionArg )
 #endif	// CONFIG_JACK_SESSION
 
 
-// Sample reset slot.
-void drumkv1widget_jack::clearSample (void)
+// Synth engine accessor.
+drumkv1 *drumkv1widget_jack::instance (void) const
 {
-#ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget_jack::clearSample()");
-#endif
-	m_pSampl->setSampleFile(0);
-
-	updateSample(0);
-}
-
-
-// Sample loader slot.
-void drumkv1widget_jack::loadSample ( const QString& sFilename )
-{
-#ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget_jack::loadSample(\"%s\")", sFilename.toUtf8().constData());
-#endif
-	m_pSampl->setSampleFile(sFilename.toUtf8().constData());
-
-	updateSample(m_pSampl->sample());
-}
-
-
-// Sample filename retriever (crude experimental stuff III).
-QString drumkv1widget_jack::sampleFile (void) const
-{
-	return QString::fromUtf8(m_pSampl->sampleFile());
+	return m_pDrumk;
 }
 
 
@@ -167,7 +143,7 @@ QString drumkv1widget_jack::sampleFile (void) const
 void drumkv1widget_jack::updateParam (
 	drumkv1::ParamIndex index, float fValue ) const
 {
-	float *pParamPort = m_pSampl->paramPort(index);
+	float *pParamPort = m_pDrumk->paramPort(index);
 	if (pParamPort)
 		*pParamPort = fValue;
 }

@@ -40,7 +40,7 @@ class drumkv1widget_jack : public drumkv1widget
 public:
 
 	// Constructor.
-	drumkv1widget_jack(drumkv1_jack *pSampl);
+	drumkv1widget_jack(drumkv1_jack *pDrumk);
 
 	// Destructor.
 	~drumkv1widget_jack();
@@ -62,21 +62,13 @@ protected slots:
 
 #endif	// CONFIG_JACK_SESSION
 
-protected slots:
-
-	// Sample clear slot.
-	void clearSample();
-
-	// Sample loader slot.
-	void loadSample(const QString& sFilename);
-
 protected:
 
-	// Param methods.
-	void updateParam(drumkv1::ParamIndex index, float fValue) const;
+	// Synth engine accessor.
+	drumkv1 *instance() const;
 
-	// Sample filename retriever (crude experimental stuff III).
-	QString sampleFile() const;
+	// Param port method.
+	void updateParam(drumkv1::ParamIndex index, float fValue) const;
 
 	// Application close.
 	void closeEvent(QCloseEvent *pCloseEvent);
@@ -84,7 +76,7 @@ protected:
 private:
 
 	// Instance variables.
-	drumkv1_jack *m_pSampl;
+	drumkv1_jack *m_pDrumk;
 };
 
 

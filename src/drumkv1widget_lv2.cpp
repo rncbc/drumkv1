@@ -31,24 +31,24 @@
 //
 
 // Constructor.
-drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pSampl,
+drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	LV2UI_Controller controller, LV2UI_Write_Function write_function )
-	: drumkv1widget(), m_pSampl(pSampl)
+	: drumkv1widget(), m_pDrumk(pDrumk)
 {
 	m_controller = controller;
 	m_write_function = write_function;
 
 	// Update notifier setup.
 	m_pUpdateNotifier = new QSocketNotifier(
-		m_pSampl->update_fds(1), QSocketNotifier::Read, this);
+		m_pDrumk->update_fds(1), QSocketNotifier::Read, this);
 
 	QObject::connect(m_pUpdateNotifier,
 		SIGNAL(activated(int)),
 		SLOT(updateNotify()));
 
 	// Initial update, always...
-	if (m_pSampl->sampleFile())
-		updateSample(m_pSampl->sample());
+	if (m_pDrumk->sampleFile())
+		updateSample(m_pDrumk->sample());
 	else
 		initPreset();
 }
@@ -58,6 +58,13 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pSampl,
 drumkv1widget_lv2::~drumkv1widget_lv2 (void)
 {
 	delete m_pUpdateNotifier;
+}
+
+
+// Synth engine accessor.
+drumkv1 *drumkv1widget_lv2::instance (void) const
+{
+	return m_pDrumk;
 }
 
 
@@ -73,38 +80,7 @@ void drumkv1widget_lv2::port_event ( uint32_t port_index,
 }
 
 
-// Sample reset slot.
-void drumkv1widget_lv2::clearSample (void)
-{
-#ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget_lv2::clearSample()");
-#endif
-	m_pSampl->setSampleFile(0);
-
-	updateSample(0);
-}
-
-
-// Sample loader slot.
-void drumkv1widget_lv2::loadSample ( const QString& sFilename )
-{
-#ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget_lv2::loadSample(\"%s\")", sFilename.toUtf8().constData());
-#endif
-	m_pSampl->setSampleFile(sFilename.toUtf8().constData());
-
-	updateSample(m_pSampl->sample(), true);
-}
-
-
-// Sample filename retriever (crude experimental stuff III).
-QString drumkv1widget_lv2::sampleFile (void) const
-{
-	return QString::fromUtf8(m_pSampl->sampleFile());
-}
-
-
-// Param method.
+// Param port method.
 void drumkv1widget_lv2::updateParam (
 	drumkv1::ParamIndex index, float fValue ) const
 {
@@ -120,15 +96,15 @@ void drumkv1widget_lv2::updateNotify (void)
 	qDebug("drumkv1widget_lv2::updateNotify()");
 #endif
 
-	updateSample(m_pSampl->sample());
+	updateSample(m_pDrumk->sample());
 
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		const float *pfValue = m_pSampl->paramPort(index);
+		const float *pfValue = m_pDrumk->paramPort(index);
 		setParamValue(index, (pfValue ? *pfValue : 0.0f));
 	}
 
-	m_pSampl->update_reset();
+	m_pDrumk->update_reset();
 }
 
 

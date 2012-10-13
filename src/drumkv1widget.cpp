@@ -644,6 +644,47 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 }
 
 
+// Sample reset slot.
+void drumkv1widget::clearSample (void)
+{
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1widget::clearSample()");
+#endif
+
+	drumkv1 *pDrumk = instance();
+	if (pDrumk)
+		pDrumk->setSampleFile(0);
+
+	updateSample(0);
+}
+
+
+// Sample loader slot.
+void drumkv1widget::loadSample ( const QString& sFilename )
+{
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1widget::loadSample(\"%s\")", sFilename.toUtf8().constData());
+#endif
+
+	drumkv1 *pDrumk = instance();
+	if (pDrumk) {
+		pDrumk->setSampleFile(sFilename.toUtf8().constData());
+		updateSample(pDrumk->sample());
+	}
+}
+
+
+// Sample filename retriever (crude experimental stuff III).
+QString drumkv1widget::sampleFile (void) const
+{
+	drumkv1 *pDrumk = instance();
+	if (pDrumk)
+		return QString::fromUtf8(pDrumk->sampleFile());
+	else
+		return QString();
+}
+
+
 // Sample updater (crude experimental stuff II).
 void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 {
