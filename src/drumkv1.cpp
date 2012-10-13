@@ -759,13 +759,12 @@ public:
 	void setSampleRate(uint32_t iSampleRate);
 	uint32_t sampleRate() const;
 
-	void addElement(int iKey);
+	drumkv1_element *addElement(int iKey);
+	drumkv1_element *element(int iKey) const;
 	void removeElement(int iKey);
 
 	void setCurrentElement(int iKey);
 	int currentElement() const;
-
-	drumkv1_element *element(int iKey) const;
 
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
@@ -966,14 +965,22 @@ uint32_t drumkv1_impl::sampleRate (void) const
 }
 
 
-void drumkv1_impl::addElement ( int iKey )
+drumkv1_element *drumkv1_impl::addElement ( int iKey )
 {
 	if (iKey >= 0 && iKey < MAX_NOTES) {
 		if (m_elems[iKey] == 0)
 			m_elems[iKey] = new drumkv1_elem(m_iSampleRate);
 	}
+	return element(iKey);
 }
 
+drumkv1_element *drumkv1_impl::element ( int iKey ) const
+{
+	drumkv1_elem *elem = 0;
+	if (iKey >= 0 && iKey < MAX_NOTES)
+		elem = m_elems[iKey];
+	return (elem ? &(elem->element) : 0);
+}
 
 void drumkv1_impl::removeElement ( int iKey )
 {
@@ -999,15 +1006,6 @@ void drumkv1_impl::setCurrentElement ( int iKey )
 int drumkv1_impl::currentElement (void) const
 {
 	return (m_elem ? int(m_elem->gen1.sample0) : -1);
-}
-
-
-drumkv1_element *drumkv1_impl::element ( int iKey ) const
-{
-	drumkv1_elem *elem = 0;
-	if (iKey >= 0 && iKey < MAX_NOTES)
-		elem = m_elems[iKey];
-	return (elem ? &(elem->element) : 0);
 }
 
 
@@ -1559,9 +1557,14 @@ uint32_t drumkv1::sampleRate (void) const
 }
 
 
-void drumkv1::addElement ( int iKey )
+drumkv1_element *drumkv1::addElement ( int iKey )
 {
-	m_pImpl->addElement(iKey);
+	return m_pImpl->addElement(iKey);
+}
+
+drumkv1_element *drumkv1::element ( int iKey ) const
+{
+	return m_pImpl->element(iKey);
 }
 
 void drumkv1::removeElement ( int iKey )
@@ -1578,12 +1581,6 @@ void drumkv1::setCurrentElement ( int iKey )
 int drumkv1::currentElement (void) const
 {
 	return m_pImpl->currentElement();
-}
-
-
-drumkv1_element *drumkv1::element ( int iKey ) const
-{
-	return m_pImpl->element(iKey);
 }
 
 

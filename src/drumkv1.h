@@ -51,13 +51,12 @@ public:
 	void setSampleRate(uint32_t iSampleRate);
 	uint32_t sampleRate() const;
 
-	void addElement(int iKey);
+	drumkv1_element *addElement(int iKey);
+	drumkv1_element *element(int iKey) const;
 	void removeElement(int iKey);
 
 	void setCurrentElement(int iKey);
 	int currentElement() const;
-
-	drumkv1_element *element(int iKey) const;
 
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
