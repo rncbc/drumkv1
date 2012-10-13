@@ -57,7 +57,7 @@ public:
 	void setCurrentElement(int iKey);
 	int currentElement() const;
 
-	const drumkv1_element& element(int iKey);
+	drumkv1_element *element(int iKey) const;
 
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;

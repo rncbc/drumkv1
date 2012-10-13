@@ -539,6 +539,8 @@ public:
 
 	~drumkv1_elem();
 
+	drumkv1_element element;
+
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
 
@@ -565,6 +567,7 @@ public:
 // synth element constructor
 
 drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate )
+	: element(this)
 {
 	// element name
 	name = 0;
@@ -761,6 +764,8 @@ public:
 
 	void setCurrentElement(int iKey);
 	int currentElement() const;
+
+	drumkv1_element *element(int iKey) const;
 
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
@@ -994,6 +999,15 @@ void drumkv1_impl::setCurrentElement ( int iKey )
 int drumkv1_impl::currentElement (void) const
 {
 	return (m_elem ? int(m_elem->gen1.sample0) : -1);
+}
+
+
+drumkv1_element *drumkv1_impl::element ( int iKey ) const
+{
+	drumkv1_elem *elem = 0;
+	if (iKey >= 0 && iKey < MAX_NOTES)
+		elem = m_elems[iKey];
+	return (elem ? &(elem->element) : 0);
 }
 
 
@@ -1564,6 +1578,12 @@ void drumkv1::setCurrentElement ( int iKey )
 int drumkv1::currentElement (void) const
 {
 	return m_pImpl->currentElement();
+}
+
+
+drumkv1_element *drumkv1::element ( int iKey ) const
+{
+	return m_pImpl->element(iKey);
 }
 
 
