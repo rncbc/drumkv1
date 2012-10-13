@@ -1517,27 +1517,8 @@ void drumkv1::reset (void)
 //
 
 drumkv1_element::drumkv1_element ( drumkv1_elem *pElem )
-	: m_pElem(pElem), m_pszName(0)
+	: m_pElem(pElem)
 {
-}
-
-
-drumkv1_element::~drumkv1_element (void)
-{
-	if (m_pszName) ::free((char *) m_pszName);
-}
-
-
-void drumkv1_element::setName ( const char *pszName )
-{
-	if (m_pszName)
-		::free((char *) m_pszName);
-	m_pszName = ::strdup(pszName);
-}
-
-const char *drumkv1_element::name (void) const
-{
-	return m_pszName;
 }
 
 

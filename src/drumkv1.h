@@ -155,11 +155,6 @@ public:
 
 	drumkv1_element(drumkv1_elem *pElem);
 
-	~drumkv1_element();
-
-	void setName(const char *pszName);
-	const char *name() const;
-
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
 
@@ -171,7 +166,6 @@ public:
 private:
 
 	drumkv1_elem *m_pElem;
-	const char *m_pszName;
 };
 
 

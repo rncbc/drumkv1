@@ -425,9 +425,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(triggered(bool)),
 		SLOT(helpAboutQt()));
 
-	// Element list
-	refreshElement();
-
 	// Epilog.
 	QWidget::adjustSize();
 }
@@ -692,6 +689,8 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 
 	if (pSample && bDirty)
 		m_ui.Preset->dirtyPreset();
+
+	refreshElement();
 }
 
 
@@ -715,16 +714,29 @@ bool drumkv1widget::queryClose (void)
 void drumkv1widget::refreshElement (void)
 {
 	bool bBlockSignals = m_ui.ElementComboBox->blockSignals(true);
-
 	const int iOldKey = m_ui.ElementComboBox->currentIndex();
-	m_ui.ElementComboBox->clear();
-	QStringList items;
-	for (int iKey = 0; iKey < 128; ++iKey) {
-		items << QString("%1 - %2").arg(iKey + 1).arg('-');
-	}
-	m_ui.ElementComboBox->insertItems(0, items);
-	m_ui.ElementComboBox->setCurrentIndex(iOldKey);
 
+	m_ui.ElementComboBox->clear();
+
+	drumkv1 *pDrumk = instance();
+	if (pDrumk) {
+		QStringList items;
+		for (int iKey = 0; iKey < 128; ++iKey) {
+			QString sName('-');
+			drumkv1_element *element = pDrumk->element(iKey);
+			if (element) {
+				const char *pszSampleFile = element->sampleFile();
+				if (pszSampleFile)
+					sName = QFileInfo(pszSampleFile).completeBaseName();
+				else
+					sName = tr("(None)");
+			}
+			items << QString("%1 - %2").arg(iKey + 1).arg(sName);
+		}
+		m_ui.ElementComboBox->insertItems(0, items);
+	}
+
+	m_ui.ElementComboBox->setCurrentIndex(iOldKey);
 	m_ui.ElementComboBox->blockSignals(bBlockSignals);
 }
 
