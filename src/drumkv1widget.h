@@ -54,7 +54,7 @@ public:
 	drumkv1widget_knob *paramKnob(drumkv1::ParamIndex index) const;
 
 	// MIDI note/octave name helper.
-	static QString noteName(int note);
+	static QString noteName(int note, bool bDrums);
 
 	// Dirty close prompt,
 	bool queryClose();
@@ -80,7 +80,7 @@ protected slots:
 	void loadSample(const QString& sFilename);
 
 	// Element activation.
-	void activateElement(int iKey);
+	void activateElement();
 
 	// Menu actions.
 	void helpAbout();

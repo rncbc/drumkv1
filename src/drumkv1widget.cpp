@@ -115,12 +115,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// Start clean.
 	m_iUpdate = 0;
 
-	// Note names.
-	QStringList notes;
-	for (int note = 0; note < 128; ++note)
-		notes << noteName(note);
-
-	m_ui.Gen1SampleKnob->insertItems(0, notes);
+	m_ui.ElementList->header()->setResizeMode(QHeaderView::ResizeToContents);
 
 	// Wave shapes.
 	QStringList shapes;
@@ -162,10 +157,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Pha1WetKnob->setSpecialValueText(sOff);
 	m_ui.Del1WetKnob->setSpecialValueText(sOff);
 
-	// GEN note limits.
-	m_ui.Gen1SampleKnob->setMinimum(0.0f);
-	m_ui.Gen1SampleKnob->setMaximum(127.0f);
-
 	// GEN octave limits.
 	m_ui.Gen1CoarseKnob->setMinimum(-4.0f);
 	m_ui.Gen1CoarseKnob->setMaximum(+4.0f);
@@ -205,7 +196,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Del1BpmKnob->setMaximum(3.6f);
 
 	// GEN1
-	setParamKnob(drumkv1::GEN1_SAMPLE, m_ui.Gen1SampleKnob);
 	setParamKnob(drumkv1::GEN1_COARSE, m_ui.Gen1CoarseKnob);
 	setParamKnob(drumkv1::GEN1_FINE,   m_ui.Gen1FineKnob);
 
@@ -417,9 +407,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// Element selector
 	QObject::connect(
-		m_ui.ElementComboBox,
-		SIGNAL(activated(int)),
-		SLOT(activateElement(int)));
+		m_ui.ElementList,
+		SIGNAL(itemActivated(QTreeWidgetItem *, int)),
+		SLOT(activateElement()));
 
 	// Menu actions
 	QObject::connect(m_ui.helpAboutAction,
@@ -699,11 +689,98 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 
 
 // MIDI note/octave name helper (static).
-QString drumkv1widget::noteName ( int note )
+QString drumkv1widget::noteName ( int note, bool bDrums )
 {
-	static const char *notes[] =
-		{ "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
-	return QString("%1 %2").arg(notes[note % 12]).arg((note / 12) - 1);
+	static struct
+	{
+		unsigned char note;
+		const char *name;
+
+	} s_notes[] = {
+
+		// Diatonic note map...
+		{  0, QT_TR_NOOP("C")     },
+		{  1, QT_TR_NOOP("C#/Db") },
+		{  2, QT_TR_NOOP("D")     },
+		{  3, QT_TR_NOOP("D#/Eb") },
+		{  4, QT_TR_NOOP("E")     },
+		{  5, QT_TR_NOOP("F")     },
+		{  6, QT_TR_NOOP("F#/Gb") },
+		{  7, QT_TR_NOOP("G")     },
+		{  8, QT_TR_NOOP("G#/Ab") },
+		{  9, QT_TR_NOOP("A")     },
+		{ 10, QT_TR_NOOP("A#/Bb") },
+		{ 11, QT_TR_NOOP("B")     },
+
+		// GM Drum note map...
+		{ 35, QT_TR_NOOP("Acoustic Bass Drum") },
+		{ 36, QT_TR_NOOP("Bass Drum 1") },
+		{ 37, QT_TR_NOOP("Side Stick") },
+		{ 38, QT_TR_NOOP("Acoustic Snare") },
+		{ 39, QT_TR_NOOP("Hand Clap") },
+		{ 40, QT_TR_NOOP("Electric Snare") },
+		{ 41, QT_TR_NOOP("Low Floor Tom") },
+		{ 42, QT_TR_NOOP("Closed Hi-Hat") },
+		{ 43, QT_TR_NOOP("High Floor Tom") },
+		{ 44, QT_TR_NOOP("Pedal Hi-Hat") },
+		{ 45, QT_TR_NOOP("Low Tom") },
+		{ 46, QT_TR_NOOP("Open Hi-Hat") },
+		{ 47, QT_TR_NOOP("Low-Mid Tom") },
+		{ 48, QT_TR_NOOP("Hi-Mid Tom") },
+		{ 49, QT_TR_NOOP("Crash Cymbal 1") },
+		{ 50, QT_TR_NOOP("High Tom") },
+		{ 51, QT_TR_NOOP("Ride Cymbal 1") },
+		{ 52, QT_TR_NOOP("Chinese Cymbal") },
+		{ 53, QT_TR_NOOP("Ride Bell") },
+		{ 54, QT_TR_NOOP("Tambourine") },
+		{ 55, QT_TR_NOOP("Splash Cymbal") },
+		{ 56, QT_TR_NOOP("Cowbell") },
+		{ 57, QT_TR_NOOP("Crash Cymbal 2") },
+		{ 58, QT_TR_NOOP("Vibraslap") },
+		{ 59, QT_TR_NOOP("Ride Cymbal 2") },
+		{ 60, QT_TR_NOOP("Hi Bongo") },
+		{ 61, QT_TR_NOOP("Low Bongo") },
+		{ 62, QT_TR_NOOP("Mute Hi Conga") },
+		{ 63, QT_TR_NOOP("Open Hi Conga") },
+		{ 64, QT_TR_NOOP("Low Conga") },
+		{ 65, QT_TR_NOOP("High Timbale") },
+		{ 66, QT_TR_NOOP("Low Timbale") },
+		{ 67, QT_TR_NOOP("High Agogo") },
+		{ 68, QT_TR_NOOP("Low Agogo") },
+		{ 69, QT_TR_NOOP("Cabasa") },
+		{ 70, QT_TR_NOOP("Maracas") },
+		{ 71, QT_TR_NOOP("Short Whistle") },
+		{ 72, QT_TR_NOOP("Long Whistle") },
+		{ 73, QT_TR_NOOP("Short Guiro") },
+		{ 74, QT_TR_NOOP("Long Guiro") },
+		{ 75, QT_TR_NOOP("Claves") },
+		{ 76, QT_TR_NOOP("Hi Wood Block") },
+		{ 77, QT_TR_NOOP("Low Wood Block") },
+		{ 78, QT_TR_NOOP("Mute Cuica") },
+		{ 79, QT_TR_NOOP("Open Cuica") },
+		{ 80, QT_TR_NOOP("Mute Triangle") },
+		{ 81, QT_TR_NOOP("Open Triangle") },
+
+		{  0, NULL }
+	};
+
+	static QHash<int, QString> s_names;
+
+	if (bDrums) {
+		// Pre-load drum-names hash table...
+		if (s_names.isEmpty()) {
+			for (int i = 12; s_notes[i].name; ++i) {
+				s_names.insert(s_notes[i].note,
+					QObject::tr(s_notes[i].name, "noteName"));
+			}
+		}
+		// Check whether the drum note exists...
+		QHash<int, QString>::ConstIterator iter = s_names.constFind(note);
+		if (iter != s_names.constEnd())
+			return iter.value();
+	}
+
+	return QString("%1 %2").arg(s_notes[note % 12].name).arg((note / 12) - 1);
 }
 
 
@@ -717,44 +794,54 @@ bool drumkv1widget::queryClose (void)
 // Reload all elements.
 void drumkv1widget::refreshElement (void)
 {
-	bool bBlockSignals = m_ui.ElementComboBox->blockSignals(true);
+	bool bBlockSignals = m_ui.ElementList->blockSignals(true);
 
-	m_ui.ElementComboBox->clear();
+	m_ui.ElementList->clear();
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
-		QStringList items;
-		const QString sItem("%1 - %2");
-		for (int iKey = 0; iKey < 128; ++iKey) {
-			QString sName('-');
-			drumkv1_element *element = pDrumk->element(iKey);
+		QTreeWidgetItem *pItem = NULL;
+		const QString sNote("%1 - %2");
+		for (int note = 0; note < 128; ++note) {
+			pItem = new QTreeWidgetItem(m_ui.ElementList, pItem);
+			pItem->setText(0, sNote.arg(note).arg(noteName(note, true)));
+			QString sSample('-');
+			drumkv1_element *element = pDrumk->element(note);
 			if (element) {
 				const char *pszSampleFile = element->sampleFile();
 				if (pszSampleFile)
-					sName = QFileInfo(pszSampleFile).completeBaseName();
+					sSample = QFileInfo(pszSampleFile).completeBaseName();
 				else
-					sName = tr("(None)");
+					sSample = tr("(None)");
 			}
-			items << sItem.arg(iKey).arg(sName);
+			pItem->setText(1, sSample);
 		}
-		m_ui.ElementComboBox->insertItems(0, items);
-		m_ui.ElementComboBox->setCurrentIndex(pDrumk->currentElement());
+		m_ui.ElementList->setCurrentItem(
+			m_ui.ElementList->topLevelItem((pDrumk->currentElement())));
 	}
 
-	m_ui.ElementComboBox->blockSignals(bBlockSignals);
+	m_ui.ElementList->blockSignals(bBlockSignals);
 }
 
 
 // Element activation.
-void drumkv1widget::activateElement ( int iKey )
+void drumkv1widget::activateElement (void)
 {
+	QTreeWidgetItem *pItem = m_ui.ElementList->currentItem();
+	if (pItem == NULL)
+		return;
+
+	int note = m_ui.ElementList->indexOfTopLevelItem(pItem);
+	if (note < 0)
+		return;
+
 	bool bAddElement = false;
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
-		drumkv1_element *element = pDrumk->element(iKey);
+		drumkv1_element *element = pDrumk->element(note);
 		if (element == 0) {
-			element = pDrumk->addElement(iKey);
+			element = pDrumk->addElement(note);
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				float fValue = drumkv1_default_params[i].value;
@@ -762,7 +849,7 @@ void drumkv1widget::activateElement ( int iKey )
 			}
 			bAddElement = true;
 		}
-		pDrumk->setCurrentElement(iKey);
+		pDrumk->setCurrentElement(note);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			setParamValue(index, element->paramValue(index));
@@ -771,8 +858,8 @@ void drumkv1widget::activateElement ( int iKey )
 
 	if (bAddElement)
 		m_ui.Gen1Sample->openSample();
-	else
-		updateSample(pDrumk ? pDrumk->sample() : 0);
+
+	updateSample(pDrumk ? pDrumk->sample() : 0);
 }
 
 

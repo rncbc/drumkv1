@@ -67,26 +67,6 @@
        </property>
       </spacer>
      </item>
-	 <item>
-	  <widget class="QLabel" name="ElementTextLabel">
-	   <property name="text">
-		<string>Element:</string>
-	   </property>
-	  </widget>
-	 </item>
-	 <item>
-      <widget class="QComboBox" name="ElementComboBox">
-       <property name="minimumSize" >
-        <size>
-         <width>320</width>
-         <height>0</height>
-        </size>
-       </property>
-       <property name="toolTip">
-		<string>Drum Element</string>
-       </property>
-      </widget>
-     </item>
      <item>
       <widget class="QMenuBar" name="MenuBar">
        <property name="sizePolicy">
@@ -120,7 +100,42 @@
        <string>Sampler 1</string>
       </attribute>
       <layout class="QGridLayout">
-       <item row="0" column="0" colspan="12">
+       <item row="0" column="0" colspan="4">
+        <widget class="QTreeWidget" name="ElementList" >
+         <property name="maximumSize" >
+          <size>
+           <width>320</width>
+           <height>120</height>
+          </size>
+         </property>
+         <property name="toolTip">
+          <string>Element</string>
+         </property>
+         <property name="alternatingRowColors" >
+          <bool>true</bool>
+         </property>
+         <property name="rootIsDecorated" >
+          <bool>false</bool>
+         </property>
+         <property name="uniformRowHeights" >
+          <bool>true</bool>
+         </property>
+         <property name="itemsExpandable" >
+          <bool>false</bool>
+         </property>
+         <column>
+          <property name="text" >
+          <string>Element</string>
+          </property>
+         </column>
+         <column>
+          <property name="text" >
+           <string>Sample</string>
+          </property>
+         </column>
+        </widget>
+       </item>
+       <item row="0" column="4" colspan="8">
         <widget class="QGroupBox" name="Gen1GroupBox">
          <property name="title">
           <string>GEN1</string>
@@ -130,16 +145,6 @@
            <widget class="drumkv1widget_sample" name="Gen1Sample">
             <property name="toolTip">
              <string>GEN1 Sample</string>
-            </property>
-           </widget>
-          </item>
-          <item>
-           <widget class="drumkv1widget_combo" name="Gen1SampleKnob">
-            <property name="toolTip">
-             <string>GEN1 Sample</string>
-            </property>
-            <property name="text">
-             <string>Sample</string>
             </property>
            </widget>
           </item>
