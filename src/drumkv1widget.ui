@@ -95,9 +95,9 @@
      <property name="currentIndex" >
       <number>0</number>
      </property>
-     <widget class="QWidget" name="Sampler1Page">
+	 <widget class="QWidget" name="Drumkit1Page">
       <attribute name="label">
-       <string>Sampler 1</string>
+	   <string>Drum Kit 1</string>
       </attribute>
       <layout class="QGridLayout">
        <item row="0" column="0" colspan="4">

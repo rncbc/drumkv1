@@ -740,10 +740,10 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 		m_elems[note] = 0;
 	}
 
-	// init default element...
-	m_elem_list.append(new drumkv1_elem(iSampleRate, 60));
+	// init default element (36=Bass Drum 1)
+	m_elem_list.append(new drumkv1_elem(iSampleRate, 36));
 	m_elem = m_elem_list.next();
-	m_elems[60] = m_elem;
+	m_elems[36] = m_elem;
 
 	// flangers none yet
 	m_flanger = 0;

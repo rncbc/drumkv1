@@ -140,7 +140,7 @@ void drumkv1widget_sample::resizeEvent ( QResizeEvent * )
 // Mouse interaction.
 void drumkv1widget_sample::mouseDoubleClickEvent ( QMouseEvent */*pMouseEvent*/ )
 {
-	openSample();
+	openSample(m_sName);
 }
 
 
@@ -177,7 +177,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 
 
 // Browse for a new sample.
-void drumkv1widget_sample::openSample (void)
+void drumkv1widget_sample::openSample ( const QString& sName )
 {
 	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
 	if (pConfig == NULL)
@@ -208,7 +208,7 @@ void drumkv1widget_sample::openSample (void)
 		s_filters.append(sFilterMask.arg(tr("All files")).arg("*.*"));
 	}
 
-	const QString& sTitle  = tr("Open Sample") + " - " DRUMKV1_TITLE;
+	const QString& sTitle  = tr("Open Sample [%1]").arg(sName) + " - " DRUMKV1_TITLE;
 	const QString& sFilter = s_filters.join(";;");
 #if 1//QT_VERSION < 0x040400
 	sFilename = QFileDialog::getOpenFileName(parentWidget(),

@@ -408,8 +408,12 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// Element selector
 	QObject::connect(
 		m_ui.ElementList,
-		SIGNAL(itemActivated(QTreeWidgetItem *, int)),
+		SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
 		SLOT(activateElement()));
+	QObject::connect(
+		m_ui.ElementList,
+		SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
+		SLOT(doubleClickElement()));
 
 	// Menu actions
 	QObject::connect(m_ui.helpAboutAction,
@@ -516,7 +520,7 @@ void drumkv1widget::newPreset (void)
 	resetParamKnobs();
 	resetParamValues();
 
-	m_ui.Gen1Sample->openSample();
+	m_ui.Gen1Sample->openSample(currentNoteName());
 }
 
 
@@ -679,6 +683,7 @@ QString drumkv1widget::sampleFile (void) const
 // Sample updater (crude experimental stuff II).
 void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 {
+	m_ui.Gen1Sample->setSampleName(currentNoteName());
 	m_ui.Gen1Sample->setSample(pSample);
 
 	if (pSample && bDirty)
@@ -688,8 +693,16 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 }
 
 
+// MIDI note/octave name helper (current).
+QString drumkv1widget::currentNoteName (void) const
+{
+	drumkv1 *pDrumk = instance();
+	return (pDrumk ? noteName(pDrumk->currentElement()) : tr("(None)"));
+}
+
+
 // MIDI note/octave name helper (static).
-QString drumkv1widget::noteName ( int note, bool bDrums )
+QString drumkv1widget::noteName ( int note )
 {
 	static struct
 	{
@@ -766,19 +779,17 @@ QString drumkv1widget::noteName ( int note, bool bDrums )
 
 	static QHash<int, QString> s_names;
 
-	if (bDrums) {
-		// Pre-load drum-names hash table...
-		if (s_names.isEmpty()) {
-			for (int i = 12; s_notes[i].name; ++i) {
-				s_names.insert(s_notes[i].note,
-					QObject::tr(s_notes[i].name, "noteName"));
-			}
+	// Pre-load drum-names hash table...
+	if (s_names.isEmpty()) {
+		for (int i = 12; s_notes[i].name; ++i) {
+			s_names.insert(s_notes[i].note,
+				QObject::tr(s_notes[i].name, "noteName"));
 		}
-		// Check whether the drum note exists...
-		QHash<int, QString>::ConstIterator iter = s_names.constFind(note);
-		if (iter != s_names.constEnd())
-			return iter.value();
 	}
+	// Check whether the drum note exists...
+	QHash<int, QString>::ConstIterator iter = s_names.constFind(note);
+	if (iter != s_names.constEnd())
+		return iter.value();
 
 	return QString("%1 %2").arg(s_notes[note % 12].name).arg((note / 12) - 1);
 }
@@ -804,7 +815,7 @@ void drumkv1widget::refreshElement (void)
 		const QString sNote("%1 - %2");
 		for (int note = 0; note < 128; ++note) {
 			pItem = new QTreeWidgetItem(m_ui.ElementList, pItem);
-			pItem->setText(0, sNote.arg(note).arg(noteName(note, true)));
+			pItem->setText(0, sNote.arg(note).arg(noteName(note)));
 			QString sSample('-');
 			drumkv1_element *element = pDrumk->element(note);
 			if (element) {
@@ -825,7 +836,7 @@ void drumkv1widget::refreshElement (void)
 
 
 // Element activation.
-void drumkv1widget::activateElement (void)
+void drumkv1widget::activateElement ( bool bOpenSample )
 {
 	QTreeWidgetItem *pItem = m_ui.ElementList->currentItem();
 	if (pItem == NULL)
@@ -834,8 +845,6 @@ void drumkv1widget::activateElement (void)
 	int note = m_ui.ElementList->indexOfTopLevelItem(pItem);
 	if (note < 0)
 		return;
-
-	bool bAddElement = false;
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
@@ -847,7 +856,7 @@ void drumkv1widget::activateElement (void)
 				float fValue = drumkv1_default_params[i].value;
 				element->setParamValue(index, fValue);
 			}
-			bAddElement = true;
+			bOpenSample = true;
 		}
 		pDrumk->setCurrentElement(note);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -856,10 +865,17 @@ void drumkv1widget::activateElement (void)
 		}
 	}
 
-	if (bAddElement)
-		m_ui.Gen1Sample->openSample();
+	if (bOpenSample)
+		m_ui.Gen1Sample->openSample(currentNoteName());
 
 	updateSample(pDrumk ? pDrumk->sample() : 0);
+}
+
+
+// Element sample loader.
+void drumkv1widget::doubleClickElement (void)
+{
+	activateElement(true);
 }
 
 

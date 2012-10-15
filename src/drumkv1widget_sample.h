@@ -47,6 +47,11 @@ public:
 	void setSample(drumkv1_sample *pSample);
 	drumkv1_sample *sample() const;
 
+	void setSampleName(const QString& sName)
+		{ m_sName = sName; }
+	const QString& sampleName() const
+		{ return m_sName; }
+
 signals:
 
 	// Load new sample file.
@@ -55,7 +60,7 @@ signals:
 public slots:
 
 	// Browse for a new sample.
-	void openSample();
+	void openSample(const QString& sName);
 
 	// Effective sample slot.
 	void loadSample(drumkv1_sample *pSample);
@@ -77,6 +82,7 @@ private:
 	drumkv1_sample *m_pSample;
 	unsigned short m_iChannels;
 	QPolygon **m_ppPolyg;
+	QString m_sName;
 };
 
 #endif	// __drumkv1widget_sample_h
