@@ -39,17 +39,17 @@ struct {
 
 } drumkv1_default_params[drumkv1::NUM_PARAMS] = {
 
-	{ "GEN1_SAMPLE",   60.0f }, // middle-C aka. C4 (60)
+	{ "GEN1_SAMPLE",   36.0f }, // Bass Drum 1 (GM) aka. C2 (36)
 	{ "GEN1_COARSE",    0.0f },
 	{ "GEN1_FINE",      0.0f },
-	{ "DCF1_CUTOFF",    1.0f }, // 0.5f
+	{ "DCF1_CUTOFF",    0.5f },
 	{ "DCF1_RESO",      0.0f },
 	{ "DCF1_TYPE",      0.0f },
 	{ "DCF1_SLOPE",     0.0f },
 	{ "DCF1_ENVELOPE",  1.0f },
 	{ "DCF1_ATTACK",    0.0f },
-	{ "DCF1_DECAY1",    0.2f },
-	{ "DCF1_LEVEL2",    0.5f },
+	{ "DCF1_DECAY1",    0.5f },
+	{ "DCF1_LEVEL2",    0.2f },
 	{ "DCF1_DECAY2",    0.5f },
 	{ "LFO1_SHAPE",     1.0f },
 	{ "LFO1_WIDTH",     1.0f },
@@ -61,14 +61,14 @@ struct {
 	{ "LFO1_PANNING",   0.0f },
 	{ "LFO1_VOLUME",    0.0f },
 	{ "LFO1_ATTACK",    0.0f },
-	{ "LFO1_DECAY1",    0.2f },
-	{ "LFO1_LEVEL2",    0.5f },
+	{ "LFO1_DECAY1",    0.5f },
+	{ "LFO1_LEVEL2",    0.2f },
 	{ "LFO1_DECAY2",    0.5f },
 	{ "DCA1_VOLUME",    0.5f },
 	{ "DCA1_ATTACK",    0.0f },
-	{ "DCA1_DECAY1",    0.2f },
-	{ "DCA1_LEVEL2",    0.5f },
-	{ "DCA1_DECAY2",    0.5f },	// 0.1f
+	{ "DCA1_DECAY1",    0.5f },
+	{ "DCA1_LEVEL2",    0.2f },
+	{ "DCA1_DECAY2",    0.5f },
 	{ "OUT1_WIDTH",     0.0f },
 	{ "OUT1_PANNING",   0.0f },
 	{ "OUT1_VOLUME",    0.5f },
