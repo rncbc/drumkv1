@@ -134,15 +134,15 @@ struct drumkv1_env
 			p->frames = int(*decay1 * *decay1 * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
-			p->delta = (*level2 - 1.0f) / float(p->frames);
+			p->delta = (*level2 * *level2 - 1.0f) / float(p->frames);
 		}
 		else if (p->stage == Decay1) {
 			p->stage = Decay2;
-			p->level = *level2;
+			p->level = *level2 * *level2;
 			p->frames = int(*decay2 * *decay2 * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
-			p->delta = -(*level2) / float(p->frames);
+			p->delta = -(*level2 * *level2) / float(p->frames);
 		}
 		else if (p->stage == Decay2) {
 			p->running = false;
@@ -535,7 +535,7 @@ class drumkv1_elem : public drumkv1_list<drumkv1_elem>
 {
 public:
 
-	drumkv1_elem(uint32_t iSampleRate);
+	drumkv1_elem(uint32_t iSampleRate, int key);
 
 	drumkv1_element element;
 
@@ -551,16 +551,22 @@ public:
 	drumkv1_ramp1  wid1;
 	drumkv1_pan    pan1;
 	drumkv1_ramp4  vol1;
+
+	float params[drumkv1::NUM_ELEMENT_PARAMS];
 };
 
 
 // synth element
 
-drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate )
+drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate, int key )
 	: element(this)
 {
+	// element parameter value set
+	for (int i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
+		params[i] = 0.0f;
+
 	// element key (sample note)
-	gen1.sample0 = 0.0f;
+	gen1.sample0 = float(key);
 
 	// element sample rate
 	gen1_sample.setSampleRate(iSampleRate);
@@ -633,11 +639,11 @@ public:
 	void setSampleRate(uint32_t iSampleRate);
 	uint32_t sampleRate() const;
 
-	drumkv1_element *addElement(int iKey);
-	drumkv1_element *element(int iKey) const;
-	void removeElement(int iKey);
+	drumkv1_element *addElement(int key);
+	drumkv1_element *element(int key) const;
+	void removeElement(int key);
 
-	void setCurrentElement(int iKey);
+	void setCurrentElement(int key);
 	int currentElement() const;
 
 	void setSampleFile(const char *pszSampleFile);
@@ -658,6 +664,8 @@ protected:
 	void allSoundOff();
 	void allControllersOff();
 	void allNotesOff();
+
+	void resetElement(drumkv1_elem *elem);
 
 	drumkv1_voice *alloc_voice ( int key )
 	{
@@ -719,10 +727,6 @@ private:
 
 drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 {
-	// init elements
-	m_elem_list.append(new drumkv1_elem(iSampleRate));
-	m_elem = m_elem_list.next();	// TODO: <- 0;
-
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
 
@@ -733,8 +737,13 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 
 	for (int note = 0; note < MAX_NOTES; ++note) {
 		m_notes[note] = 0;
-		m_elems[note] = m_elem;		// TODO: <- 0;
+		m_elems[note] = 0;
 	}
+
+	// init default element...
+	m_elem_list.append(new drumkv1_elem(iSampleRate, 60));
+	m_elem = m_elem_list.next();
+	m_elems[60] = m_elem;
 
 	// flangers none yet
 	m_flanger = 0;
@@ -839,41 +848,76 @@ uint32_t drumkv1_impl::sampleRate (void) const
 }
 
 
-drumkv1_element *drumkv1_impl::addElement ( int iKey )
+drumkv1_element *drumkv1_impl::addElement ( int key )
 {
-	if (iKey >= 0 && iKey < MAX_NOTES) {
-		if (m_elems[iKey] == 0)
-			m_elems[iKey] = new drumkv1_elem(m_iSampleRate);
+	if (key >= 0 && key < MAX_NOTES) {
+		if (m_elems[key] == 0)
+			m_elems[key] = new drumkv1_elem(m_iSampleRate, key);
 	}
-	return element(iKey);
+	return element(key);
 }
 
-drumkv1_element *drumkv1_impl::element ( int iKey ) const
+
+drumkv1_element *drumkv1_impl::element ( int key ) const
 {
 	drumkv1_elem *elem = 0;
-	if (iKey >= 0 && iKey < MAX_NOTES)
-		elem = m_elems[iKey];
+	if (key >= 0 && key < MAX_NOTES)
+		elem = m_elems[key];
 	return (elem ? &(elem->element) : 0);
 }
 
-void drumkv1_impl::removeElement ( int iKey )
+
+void drumkv1_impl::removeElement ( int key )
 {
 	allNotesOff();
 
 	drumkv1_elem *elem = 0;
-	if (iKey >= 0 && iKey < MAX_NOTES)
-		elem = m_elems[iKey];
+	if (key >= 0 && key < MAX_NOTES)
+		elem = m_elems[key];
 	if (elem) {
-		m_elems[iKey] = 0;
+		m_elems[key] = 0;
 		delete elem;
 	}
 }
 
 
-void drumkv1_impl::setCurrentElement ( int iKey )
+void drumkv1_impl::setCurrentElement ( int key )
 {
-	if (iKey >= 0 && iKey < MAX_NOTES)
-		m_elem = m_elems[iKey];
+	if (key >= 0 && key < MAX_NOTES) {
+		float *apfParams[drumkv1::NUM_ELEMENT_PARAMS];
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
+			apfParams[i] = 0;
+		// swap old element parameter port values
+		drumkv1_elem *elem = m_elem;
+		if (elem) {
+			drumkv1_element *element = &(elem->element);
+			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				float *pfParam = element->paramPort(index);
+				if (pfParam) {
+					apfParams[i] = pfParam;
+					elem->params[i] = *pfParam;
+					element->setParamPort(index, &(elem->params[i]));
+				}
+			}
+		}
+		// swap new element parameter port values
+		elem = m_elems[key];
+		if (elem) {
+			drumkv1_element *element = &(elem->element);
+			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				float *pfParam = apfParams[i];
+				if (pfParam) {
+					*pfParam = elem->params[i];
+					element->setParamPort(index, pfParam);
+				}
+			}
+		}
+		// set new current element
+		resetElement(elem);
+		m_elem = elem;
+	}
 }
 
 
@@ -1141,19 +1185,25 @@ void drumkv1_impl::allNotesOff (void)
 }
 
 
-// all reset clear
+// element reset
 
-void drumkv1_impl::reset (void)
+void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 {
-	drumkv1_elem *elem = m_elem_list.next();
-	while (elem) {
+	if (elem) {
 		elem->vol1.reset(elem->out1.volume, elem->dca1.volume,
 			&m_ctl.volume, &elem->aux1.volume);
 		elem->pan1.reset(elem->out1.panning,
 			&m_ctl.panning, &elem->aux1.panning);
 		elem->wid1.reset(elem->out1.width);
-		elem = elem->next();
 	}
+}
+
+
+// all reset clear
+
+void drumkv1_impl::reset (void)
+{
+	resetElement(m_elem);
 
 	m_pre.reset(m_def.pressure, &m_ctl.pressure);
 
@@ -1194,10 +1244,12 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 	drumkv1_elem *elem = m_elem_list.next();
 	while (elem) {
+	#if 0
 		if (elem->gen1.sample0 != *elem->gen1.sample) {
 			elem->gen1.sample0  = *elem->gen1.sample;
 			elem->gen1_sample.reset(note_freq(elem->gen1.sample0));
 		}
+	#endif
 		if (int(*elem->lfo1.shape) != int(elem->lfo1_wave.shape())
 			||  *elem->lfo1.width  !=     elem->lfo1_wave.width()) {
 			elem->lfo1_wave.reset(
@@ -1430,25 +1482,25 @@ uint32_t drumkv1::sampleRate (void) const
 }
 
 
-drumkv1_element *drumkv1::addElement ( int iKey )
+drumkv1_element *drumkv1::addElement ( int key )
 {
-	return m_pImpl->addElement(iKey);
+	return m_pImpl->addElement(key);
 }
 
-drumkv1_element *drumkv1::element ( int iKey ) const
+drumkv1_element *drumkv1::element ( int key ) const
 {
-	return m_pImpl->element(iKey);
+	return m_pImpl->element(key);
 }
 
-void drumkv1::removeElement ( int iKey )
+void drumkv1::removeElement ( int key )
 {
-	m_pImpl->removeElement(iKey);
+	m_pImpl->removeElement(key);
 }
 
 
-void drumkv1::setCurrentElement ( int iKey )
+void drumkv1::setCurrentElement ( int key )
 {
-	m_pImpl->setCurrentElement(iKey);
+	m_pImpl->setCurrentElement(key);
 }
 
 int drumkv1::currentElement (void) const
@@ -1527,7 +1579,9 @@ void drumkv1_element::setSampleFile ( const char *pszSampleFile )
 	if (m_pElem) {
 		m_pElem->gen1_sample.close();
 		if (pszSampleFile) {
+		#if 0
 			m_pElem->gen1.sample0 = *(m_pElem->gen1.sample);
+		#endif
 			m_pElem->gen1_sample.open(pszSampleFile,
 				note_freq(m_pElem->gen1.sample0));
 		}
@@ -1636,6 +1690,22 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	}
 
 	return pfParam;
+}
+
+
+void drumkv1_element::setParamValue ( drumkv1::ParamIndex index, float fValue )
+{
+	if (index < drumkv1::NUM_ELEMENT_PARAMS)
+		m_pElem->params[index] = fValue;
+}
+
+
+float drumkv1_element::paramValue ( drumkv1::ParamIndex index )
+{
+	if (index < drumkv1::NUM_ELEMENT_PARAMS)
+		return m_pElem->params[index];
+	else
+		return 0.0f;
 }
 
 

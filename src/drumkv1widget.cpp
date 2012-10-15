@@ -204,7 +204,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Del1BpmKnob->setMinimum(0.0f);
 	m_ui.Del1BpmKnob->setMaximum(3.6f);
 
-
 	// GEN1
 	setParamKnob(drumkv1::GEN1_SAMPLE, m_ui.Gen1SampleKnob);
 	setParamKnob(drumkv1::GEN1_COARSE, m_ui.Gen1CoarseKnob);
@@ -416,6 +415,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(savePresetFile(const QString&)),
 		SLOT(savePreset(const QString&)));
 
+	// Element selector
+	QObject::connect(
+		m_ui.ElementComboBox,
+		SIGNAL(activated(int)),
+		SLOT(activateElement(int)));
 
 	// Menu actions
 	QObject::connect(m_ui.helpAboutAction,
@@ -714,13 +718,13 @@ bool drumkv1widget::queryClose (void)
 void drumkv1widget::refreshElement (void)
 {
 	bool bBlockSignals = m_ui.ElementComboBox->blockSignals(true);
-	const int iOldKey = m_ui.ElementComboBox->currentIndex();
 
 	m_ui.ElementComboBox->clear();
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
 		QStringList items;
+		const QString sItem("%1 - %2");
 		for (int iKey = 0; iKey < 128; ++iKey) {
 			QString sName('-');
 			drumkv1_element *element = pDrumk->element(iKey);
@@ -731,13 +735,44 @@ void drumkv1widget::refreshElement (void)
 				else
 					sName = tr("(None)");
 			}
-			items << QString("%1 - %2").arg(iKey + 1).arg(sName);
+			items << sItem.arg(iKey).arg(sName);
 		}
 		m_ui.ElementComboBox->insertItems(0, items);
+		m_ui.ElementComboBox->setCurrentIndex(pDrumk->currentElement());
 	}
 
-	m_ui.ElementComboBox->setCurrentIndex(iOldKey);
 	m_ui.ElementComboBox->blockSignals(bBlockSignals);
+}
+
+
+// Element activation.
+void drumkv1widget::activateElement ( int iKey )
+{
+	bool bAddElement = false;
+
+	drumkv1 *pDrumk = instance();
+	if (pDrumk) {
+		drumkv1_element *element = pDrumk->element(iKey);
+		if (element == 0) {
+			element = pDrumk->addElement(iKey);
+			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				float fValue = drumkv1_default_params[i].value;
+				element->setParamValue(index, fValue);
+			}
+			bAddElement = true;
+		}
+		pDrumk->setCurrentElement(iKey);
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			setParamValue(index, element->paramValue(index));
+		}
+	}
+
+	if (bAddElement)
+		m_ui.Gen1Sample->openSample();
+	else
+		updateSample(pDrumk ? pDrumk->sample() : 0);
 }
 
 

@@ -51,11 +51,11 @@ public:
 	void setSampleRate(uint32_t iSampleRate);
 	uint32_t sampleRate() const;
 
-	drumkv1_element *addElement(int iKey);
-	drumkv1_element *element(int iKey) const;
-	void removeElement(int iKey);
+	drumkv1_element *addElement(int key);
+	drumkv1_element *element(int key) const;
+	void removeElement(int key);
 
-	void setCurrentElement(int iKey);
+	void setCurrentElement(int key);
 	int currentElement() const;
 
 	void setSampleFile(const char *pszSampleFile);
@@ -162,6 +162,9 @@ public:
 
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
 	float *paramPort(drumkv1::ParamIndex index);
+
+	void setParamValue(drumkv1::ParamIndex index, float fValue);
+	float paramValue(drumkv1::ParamIndex index);
 
 private:
 

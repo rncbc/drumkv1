@@ -79,6 +79,9 @@ protected slots:
 	// Sample loader slot.
 	void loadSample(const QString& sFilename);
 
+	// Element activation.
+	void activateElement(int iKey);
+
 	// Menu actions.
 	void helpAbout();
 	void helpAboutQt();
