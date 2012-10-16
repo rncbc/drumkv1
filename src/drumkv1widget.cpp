@@ -686,6 +686,8 @@ void drumkv1widget::loadElements ( const QDomElement& eElements )
 		}
 	}
 
+	pDrumk->reset();
+
 	refreshElements();
 }
 
@@ -949,26 +951,26 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
 		drumkv1_element *element = pDrumk->element(note);
-		if (element == 0) {
+		if (element == NULL) {
 			element = pDrumk->addElement(note);
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				float fValue = drumkv1_default_params[i].value;
 				element->setParamValue(index, fValue);
 			}
-			bOpenSample = true;
 		}
 		pDrumk->setCurrentElement(note);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			setParamValue(index, element->paramValue(index));
 		}
+		bOpenSample = (element->sampleFile() == NULL);
 	}
 
 	if (bOpenSample)
 		m_ui.Gen1Sample->openSample(currentNoteName());
 
-	updateSample(pDrumk ? pDrumk->sample() : 0);
+	updateSample(pDrumk ? pDrumk->sample() : NULL);
 }
 
 

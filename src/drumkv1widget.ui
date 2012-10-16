@@ -111,7 +111,10 @@
          <property name="toolTip">
           <string>Element</string>
          </property>
-         <property name="alternatingRowColors" >
+		 <property name="allColumnsShowFocus" >
+		  <bool>true</bool>
+		 </property>
+		 <property name="alternatingRowColors" >
           <bool>true</bool>
          </property>
          <property name="rootIsDecorated" >

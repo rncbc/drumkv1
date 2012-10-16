@@ -168,6 +168,8 @@ public:
 	void setParamValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index);
 
+	void reset();
+
 private:
 
 	drumkv1_elem *m_pElem;

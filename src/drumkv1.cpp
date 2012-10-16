@@ -712,6 +712,8 @@ private:
 
 	drumkv1_elem   *m_elem;
 
+	float *m_params[drumkv1::NUM_ELEMENT_PARAMS];
+
 	drumkv1_list<drumkv1_voice> m_free_list;
 	drumkv1_list<drumkv1_voice> m_play_list;
 
@@ -763,8 +765,12 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 	// init default element (eg. 36=Bass Drum 1)
 	clearElements();
 
-	// parameters
-	for (int i = 0; i < int(drumkv1::NUM_PARAMS); ++i)
+	// element parameter ports (default)
+	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
+		m_params[i] = 0;
+
+	// parameter ports
+	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
 		setParamPort(drumkv1::ParamIndex(i));
 
 	// reset all voices
@@ -849,6 +855,7 @@ drumkv1_element *drumkv1_impl::addElement ( int key )
 		if (m_elems[key] == 0)
 			m_elems[key] = new drumkv1_elem(m_iSampleRate, key);
 	}
+
 	return element(key);
 }
 
@@ -879,9 +886,6 @@ void drumkv1_impl::removeElement ( int key )
 void drumkv1_impl::setCurrentElement ( int key )
 {
 	if (key >= 0 && key < MAX_NOTES) {
-		float *apfParams[drumkv1::NUM_ELEMENT_PARAMS];
-		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
-			apfParams[i] = 0;
 		// swap old element parameter port values
 		drumkv1_elem *elem = m_elem;
 		if (elem) {
@@ -890,7 +894,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				float *pfParam = element->paramPort(index);
 				if (pfParam) {
-					apfParams[i] = pfParam;
+					m_params[i] = pfParam;
 					elem->params[i] = *pfParam;
 					element->setParamPort(index, &(elem->params[i]));
 				}
@@ -902,7 +906,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 			drumkv1_element *element = &(elem->element);
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-				float *pfParam = apfParams[i];
+				float *pfParam = m_params[i];
 				if (pfParam) {
 					*pfParam = elem->params[i];
 					element->setParamPort(index, pfParam);
@@ -1000,7 +1004,10 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DYN1_COMPRESS:  m_dyn.compress  = pfParam; break;
 	case drumkv1::DYN1_LIMITER:   m_dyn.limiter   = pfParam; break;
 	default:
-		if (m_elem) m_elem->element.setParamPort(index, pfParam);
+		if (m_elem)
+			m_elem->element.setParamPort(index, pfParam);
+		else
+			m_params[index] = pfParam;
 		break;
 	}
 }
@@ -1008,7 +1015,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 
 float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 {
-	float *pfParam= 0;
+	float *pfParam = 0;
 
 	switch (index) {
 	case drumkv1::DEF1_PITCHBEND: pfParam = m_def.pitchbend; break;
@@ -1035,7 +1042,10 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DYN1_COMPRESS:  pfParam = m_dyn.compress;  break;
 	case drumkv1::DYN1_LIMITER:   pfParam = m_dyn.limiter;   break;
 	default:
-		if (m_elem) pfParam = m_elem->element.paramPort(index);
+		if (m_elem)
+			pfParam = m_elem->element.paramPort(index);
+		else
+			pfParam = m_params[index];
 		break;
 	}
 
@@ -1224,8 +1234,11 @@ void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 
 void drumkv1_impl::reset (void)
 {
-	resetElement(m_elem);
+	// reset all elements
+	for (int note = 0; note < MAX_NOTES; ++note)
+		resetElement(m_elems[note]);
 
+	// pressure state
 	m_pre.reset(m_def.pressure, &m_ctl.pressure);
 
 	// flangers
