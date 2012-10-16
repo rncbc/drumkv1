@@ -522,7 +522,7 @@ void drumkv1widget::newPreset (void)
 	resetParamKnobs();
 	resetParamValues();
 
-	m_ui.Gen1Sample->openSample(currentNoteName());
+//	m_ui.Gen1Sample->openSample(currentNoteName());
 }
 
 
@@ -753,7 +753,7 @@ void drumkv1widget::loadSample ( const QString& sFilename )
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
 		pDrumk->setSampleFile(sFilename.toUtf8().constData());
-		updateSample(pDrumk->sample());
+		updateSample(pDrumk->sample(), true);
 	}
 }
 
@@ -772,7 +772,9 @@ QString drumkv1widget::sampleFile (void) const
 // Sample updater (crude experimental stuff II).
 void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 {
-	m_ui.Gen1Sample->setSampleName(currentNoteName());
+	if (pSample)
+		m_ui.Gen1Sample->setSampleName(currentNoteName());
+
 	m_ui.Gen1Sample->setSample(pSample);
 
 	if (pSample && bDirty)
@@ -795,7 +797,7 @@ QString drumkv1widget::noteName ( int note )
 {
 	static struct
 	{
-		unsigned char note;
+		int note;
 		const char *name;
 
 	} s_notes[] = {

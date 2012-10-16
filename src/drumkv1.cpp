@@ -568,6 +568,8 @@ drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate, int key )
 	// element key (sample note)
 	gen1.sample0 = float(key);
 
+	params[drumkv1::GEN1_SAMPLE] = gen1.sample0;
+
 	// element sample rate
 	gen1_sample.setSampleRate(iSampleRate);
 	lfo1_wave.setSampleRate(iSampleRate);
@@ -646,7 +648,7 @@ public:
 	void setCurrentElement(int key);
 	int currentElement() const;
 
-	void clearElements(bool bInit);
+	void clearElements();
 
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
@@ -737,10 +739,8 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 		m_free_list.append(m_voices[i]);
 	}
 
-	for (int note = 0; note < MAX_NOTES; ++note) {
+	for (int note = 0; note < MAX_NOTES; ++note)
 		m_notes[note] = 0;
-		m_elems[note] = 0;
-	}
 
 	// flangers none yet
 	m_flanger = 0;
@@ -760,8 +760,8 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 	// set default sample rate
 	setSampleRate(iSampleRate);
 
-	// init default element (36=Bass Drum 1)
-	clearElements(true);
+	// init default element (eg. 36=Bass Drum 1)
+	clearElements();
 
 	// parameters
 	for (int i = 0; i < int(drumkv1::NUM_PARAMS); ++i)
@@ -790,7 +790,7 @@ drumkv1_impl::~drumkv1_impl (void)
 	setChannels(0);
 
 	// deallocate elements
-	clearElements(false);
+	clearElements();
 }
 
 
@@ -922,8 +922,15 @@ int drumkv1_impl::currentElement (void) const
 }
 
 
-void drumkv1_impl::clearElements ( bool bInit )
+void drumkv1_impl::clearElements (void)
 {
+	// reset element map
+	for (int note = 0; note < MAX_NOTES; ++note)
+		m_elems[note] = 0;
+
+	// reset current element
+	m_elem = 0;
+
 	// deallocate elements
 	drumkv1_elem *elem = m_elem_list.next();
 	while (elem) {
@@ -932,12 +939,12 @@ void drumkv1_impl::clearElements ( bool bInit )
 		elem = m_elem_list.next();
 	}
 
-	// init default element (36=Bass Drum 1)
-	if (bInit) {
-		m_elem_list.append(new drumkv1_elem(m_iSampleRate, 36));
-		m_elem = m_elem_list.next();
-		m_elems[36] = m_elem;
-	}
+#if 0
+	// init default element (eg. 36=Bass Drum 1)
+	m_elem_list.append(new drumkv1_elem(m_iSampleRate, 36));
+	m_elem = m_elem_list.next();
+	m_elems[36] = m_elem;
+#endif
 }
 
 
@@ -1525,7 +1532,7 @@ int drumkv1::currentElement (void) const
 
 void drumkv1::clearElements (void)
 {
-	m_pImpl->clearElements(true);
+	m_pImpl->clearElements();
 }
 
 
@@ -1591,6 +1598,10 @@ void drumkv1::reset (void)
 drumkv1_element::drumkv1_element ( drumkv1_elem *pElem )
 	: m_pElem(pElem)
 {
+	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		setParamPort(index, &(m_pElem->params[i]));
+	}
 }
 
 
