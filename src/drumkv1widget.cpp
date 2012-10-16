@@ -515,6 +515,8 @@ void drumkv1widget::newPreset (void)
 	qDebug("drumkv1widget::newPreset()");
 #endif
 
+	clearElements();
+
 	clearSample();
 
 	resetParamKnobs();
@@ -541,6 +543,8 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 			s_hash.insert(drumkv1_default_params[i].name, drumkv1::ParamIndex(i));
 	}
 
+	clearElements();
+
 	clearSample();
 
 	resetParamValues();
@@ -558,18 +562,8 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 				QDomElement eChild = nChild.toElement();
 				if (eChild.isNull())
 					continue;
-				if (eChild.tagName() == "samples") {
-					for (QDomNode nSample = eChild.firstChild();
-							!nSample.isNull();
-								nSample = nSample.nextSibling()) {
-						QDomElement eSample = nSample.toElement();
-						if (eSample.isNull())
-							continue;
-						if (eSample.tagName() == "sample") {
-						//	int index = eSample.attribute("index").toInt();
-							loadSample(eSample.text());
-						}
-					}
+				if (eChild.tagName() == "elements") {
+					loadElements(eChild);
 				}
 				else
 				if (eChild.tagName() == "params") {
@@ -606,18 +600,15 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 #ifdef CONFIG_DEBUG
 	qDebug("drumkv1widget::savePreset(\"%s\")", sFilename.toUtf8().constData());
 #endif
+
 	QDomDocument doc(DRUMKV1_TITLE);
 	QDomElement ePreset = doc.createElement("preset");
 	ePreset.setAttribute("name", QFileInfo(sFilename).completeBaseName());
 	ePreset.setAttribute("version", DRUMKV1_VERSION);
 
-	QDomElement eSamples = doc.createElement("samples");
-	QDomElement eSample = doc.createElement("sample");
-	eSample.setAttribute("index", 0);
-	eSample.setAttribute("name", "GEN1_SAMPLE");
-	eSample.appendChild(doc.createTextNode(sampleFile()));
-	eSamples.appendChild(eSample);
-	ePreset.appendChild(eSamples);
+	QDomElement eElements = doc.createElement("elements");
+	saveElements(doc, eElements);
+	ePreset.appendChild(eElements);
 
 	QDomElement eParams = doc.createElement("params");
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
@@ -635,6 +626,104 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		QTextStream(&file) << doc.toString();
 		file.close();
+	}
+}
+
+
+// Element serialization methods.
+void drumkv1widget::loadElements ( const QDomElement& eElements )
+{
+	drumkv1 *pDrumk = instance();
+	if (pDrumk == NULL)
+		return;
+
+	static QHash<QString, drumkv1::ParamIndex> s_hash;
+	if (s_hash.isEmpty()) {
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
+			s_hash.insert(drumkv1_default_params[i].name, drumkv1::ParamIndex(i));
+	}
+
+	for (QDomNode nElement = eElements.firstChild();
+			!nElement.isNull();
+				nElement = nElement.nextSibling()) {
+		QDomElement eElement = nElement.toElement();
+		if (eElement.isNull())
+			continue;
+		if (eElement.tagName() == "element") {
+			int note = eElement.attribute("index").toInt();
+			drumkv1_element *element = pDrumk->addElement(note);
+			for (QDomNode nChild = eElement.firstChild();
+					!nChild.isNull();
+						nChild = nChild.nextSibling()) {
+				QDomElement eChild = nChild.toElement();
+				if (eChild.isNull())
+					continue;
+				if (eChild.tagName() == "sample") {
+				//	int index = eSample.attribute("index").toInt();
+					const QString& sFilename = eChild.text();
+					element->setSampleFile(sFilename.toUtf8().constData());
+				}
+				else
+				if (eChild.tagName() == "params") {
+					for (QDomNode nParam = eChild.firstChild();
+							!nParam.isNull();
+								nParam = nParam.nextSibling()) {
+						QDomElement eParam = nParam.toElement();
+						if (eParam.isNull())
+							continue;
+						if (eParam.tagName() == "param") {
+							drumkv1::ParamIndex index = drumkv1::ParamIndex(
+								eParam.attribute("index").toULong());
+							const QString& sName = eParam.attribute("name");
+							if (!sName.isEmpty() && s_hash.contains(sName))
+								index = s_hash.value(sName);
+							float fValue = eParam.text().toFloat();
+							element->setParamValue(index, fValue);
+						}
+					}
+				}
+			}
+		}
+	}
+
+	refreshElements();
+}
+
+
+void drumkv1widget::saveElements ( QDomDocument& doc, QDomElement& eElements )
+{
+	drumkv1 *pDrumk = instance();
+	if (pDrumk == NULL)
+		return;
+
+	for (int note = 0; note < 128; ++note) {
+		drumkv1_element *element = pDrumk->element(note);
+		if (element == NULL)
+			continue;
+		const char *pszSampleFile = element->sampleFile();
+		if (pszSampleFile == NULL)
+			continue;
+		QDomElement eElement = doc.createElement("element");
+		eElement.setAttribute("index", QString::number(note));
+		eElement.setAttribute("name", noteName(note));
+		QDomElement eSample = doc.createElement("sample");
+		eSample.setAttribute("index", 0);
+		eSample.setAttribute("name", "GEN1_SAMPLE");
+		eSample.appendChild(doc.createTextNode(pszSampleFile));
+		eElement.appendChild(eSample);
+		QDomElement eParams = doc.createElement("params");
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+			QDomElement eParam = doc.createElement("param");
+			eParam.setAttribute("index", QString::number(i));
+			eParam.setAttribute("name", drumkv1_default_params[i].name);
+			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			float *pfParam = element->paramPort(index);
+			eParam.appendChild(doc.createTextNode(QString::number(
+				pfParam ? *pfParam : element->paramValue(index))));
+			eParams.appendChild(eParam);
+		}
+		eElement.appendChild(eParams);
+		eElements.appendChild(eElement);
 	}
 }
 
@@ -689,7 +778,7 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 	if (pSample && bDirty)
 		m_ui.Preset->dirtyPreset();
 
-	refreshElement();
+	refreshElements();
 }
 
 
@@ -803,7 +892,7 @@ bool drumkv1widget::queryClose (void)
 
 
 // Reload all elements.
-void drumkv1widget::refreshElement (void)
+void drumkv1widget::refreshElements (void)
 {
 	bool bBlockSignals = m_ui.ElementList->blockSignals(true);
 
@@ -832,6 +921,15 @@ void drumkv1widget::refreshElement (void)
 	}
 
 	m_ui.ElementList->blockSignals(bBlockSignals);
+}
+
+
+// All element clear.
+void drumkv1widget::clearElements (void)
+{
+	drumkv1 *pDrumk = instance();
+	if (pDrumk)
+		pDrumk->clearElements();
 }
 
 

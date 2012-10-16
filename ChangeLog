@@ -5,6 +5,8 @@ ChangeLog
 
 SVN TRUNK
 
+- Preset load/save is now functional. (EXPERIMENTAL)
+
 - Access to core engine instance has been slightly refactored.
 
 - Classic ADSR replaced by custom one-shot drum-mode specific envelope

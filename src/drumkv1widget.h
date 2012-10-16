@@ -30,6 +30,9 @@
 
 #include <QHash>
 
+// forward decl.
+class QDomElement;
+class QDomDocument;
 
 
 //-------------------------------------------------------------------------
@@ -66,6 +69,10 @@ public slots:
 	void loadPreset(const QString& sFilename);
 	void savePreset(const QString& sFilename);
 
+	// Element serialization methods.
+	void loadElements(const QDomElement& eElements);
+	void saveElements(QDomDocument& doc, QDomElement& eElements);
+
 protected slots:
 
 	// Preset clear.
@@ -79,6 +86,9 @@ protected slots:
 
 	// Sample loader slot.
 	void loadSample(const QString& sFilename);
+
+	// All element clear.
+	void clearElements();
 
 	// Element activation.
 	void activateElement(bool bOpenSample = false);
@@ -99,7 +109,7 @@ protected:
 	void initPreset();
 
 	// Reload all elements.
-	void refreshElement();
+	void refreshElements();
 
 	// Reset all param/knob default values.
 	void resetParamValues();

@@ -646,6 +646,8 @@ public:
 	void setCurrentElement(int key);
 	int currentElement() const;
 
+	void clearElements(bool bInit);
+
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
 
@@ -740,11 +742,6 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 		m_elems[note] = 0;
 	}
 
-	// init default element (36=Bass Drum 1)
-	m_elem_list.append(new drumkv1_elem(iSampleRate, 36));
-	m_elem = m_elem_list.next();
-	m_elems[36] = m_elem;
-
 	// flangers none yet
 	m_flanger = 0;
 
@@ -760,12 +757,15 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 	// number of channels
 	setChannels(iChannels);
 
+	// set default sample rate
+	setSampleRate(iSampleRate);
+
+	// init default element (36=Bass Drum 1)
+	clearElements(true);
+
 	// parameters
 	for (int i = 0; i < int(drumkv1::NUM_PARAMS); ++i)
 		setParamPort(drumkv1::ParamIndex(i));
-
-	// set default sample rate
-	setSampleRate(iSampleRate);
 
 	// reset all voices
 	allControllersOff();
@@ -790,12 +790,7 @@ drumkv1_impl::~drumkv1_impl (void)
 	setChannels(0);
 
 	// deallocate elements
-	drumkv1_elem *elem = m_elem_list.next();
-	while (elem) {
-		m_elem_list.remove(elem);
-		delete elem;
-		elem = m_elem_list.next();
-	}
+	clearElements(false);
 }
 
 
@@ -924,6 +919,25 @@ void drumkv1_impl::setCurrentElement ( int key )
 int drumkv1_impl::currentElement (void) const
 {
 	return (m_elem ? int(m_elem->gen1.sample0) : -1);
+}
+
+
+void drumkv1_impl::clearElements ( bool bInit )
+{
+	// deallocate elements
+	drumkv1_elem *elem = m_elem_list.next();
+	while (elem) {
+		m_elem_list.remove(elem);
+		delete elem;
+		elem = m_elem_list.next();
+	}
+
+	// init default element (36=Bass Drum 1)
+	if (bInit) {
+		m_elem_list.append(new drumkv1_elem(m_iSampleRate, 36));
+		m_elem = m_elem_list.next();
+		m_elems[36] = m_elem;
+	}
 }
 
 
@@ -1506,6 +1520,12 @@ void drumkv1::setCurrentElement ( int key )
 int drumkv1::currentElement (void) const
 {
 	return m_pImpl->currentElement();
+}
+
+
+void drumkv1::clearElements (void)
+{
+	m_pImpl->clearElements(true);
 }
 
 

@@ -58,6 +58,8 @@ public:
 	void setCurrentElement(int key);
 	int currentElement() const;
 
+	void clearElements();
+
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
 
