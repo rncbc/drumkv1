@@ -5,7 +5,7 @@ ChangeLog
 
 SVN TRUNK
 
-- LV2 state retrieve/save methods almost complete. (UNTESTED)
+- LV2 state chunk retrieve/save implementation complete. (EXPERIMENTAL)
 
 - Current element selection and stabilization. (EXPERIMENTAL)
 

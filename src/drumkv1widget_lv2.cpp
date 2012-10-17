@@ -47,10 +47,7 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 		SLOT(updateNotify()));
 
 	// Initial update, always...
-	if (m_pDrumk->sampleFile())
-		updateSample(m_pDrumk->sample());
-	else
-		initPreset();
+	refreshElements();
 }
 
 

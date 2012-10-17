@@ -851,12 +851,16 @@ uint32_t drumkv1_impl::sampleRate (void) const
 
 drumkv1_element *drumkv1_impl::addElement ( int key )
 {
+	drumkv1_elem *elem = 0;
 	if (key >= 0 && key < MAX_NOTES) {
-		if (m_elems[key] == 0)
-			m_elems[key] = new drumkv1_elem(m_iSampleRate, key);
+		elem = m_elems[key];
+		if (elem == 0) {
+			elem = new drumkv1_elem(m_iSampleRate, key);
+			m_elem_list.append(elem);
+			m_elems[key] = elem;
+		}
 	}
-
-	return element(key);
+	return (elem ? &(elem->element) : 0);
 }
 
 
@@ -877,6 +881,7 @@ void drumkv1_impl::removeElement ( int key )
 	if (key >= 0 && key < MAX_NOTES)
 		elem = m_elems[key];
 	if (elem) {
+		m_elem_list.remove(elem);
 		m_elems[key] = 0;
 		delete elem;
 	}

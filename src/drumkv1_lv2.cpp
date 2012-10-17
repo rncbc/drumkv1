@@ -251,7 +251,7 @@ static LV2_State_Status drumkv1_lv2_state_save ( LV2_Handle instance,
 	if (key == 0)
 		return LV2_STATE_ERR_NO_PROPERTY;
 
-	uint32_t type = pPlugin->urid_map(LV2_ATOM__String);
+	uint32_t type = pPlugin->urid_map(LV2_ATOM__Chunk);
 	if (type == 0)
 		return LV2_STATE_ERR_BAD_TYPE;
 
@@ -262,12 +262,12 @@ static LV2_State_Status drumkv1_lv2_state_save ( LV2_Handle instance,
 
 	QDomDocument doc(DRUMKV1_TITLE);
 	QDomElement eElements = doc.createElement("elements");
-	drumkv1widget::saveElements(pPlugin, doc, eElements);
+	drumkv1widget::saveElements(pPlugin, doc, eElements, mapPath);
 	doc.appendChild(eElements);
 
 	const QByteArray data(doc.toByteArray());
 	const char *value = data.constData();
-	size_t size = data.size() + 1;
+	size_t size = data.size();
 
 	return (*store)(handle, key, value, size, type, flags);
 }
@@ -285,8 +285,8 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 	if (key == 0)
 		return LV2_STATE_ERR_NO_PROPERTY;
 
-	uint32_t string_type = pPlugin->urid_map(LV2_ATOM__String);
-	if (string_type == 0)
+	uint32_t chunk_type = pPlugin->urid_map(LV2_ATOM__Chunk);
+	if (chunk_type == 0)
 		return LV2_STATE_ERR_BAD_TYPE;
 
 	size_t size = 0;
@@ -299,7 +299,7 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 	if (size < 2)
 		return LV2_STATE_ERR_UNKNOWN;
 
-	if (type != string_type)
+	if (type != chunk_type)
 		return LV2_STATE_ERR_BAD_TYPE;
 
 	if ((flags & (LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE)) == 0)
