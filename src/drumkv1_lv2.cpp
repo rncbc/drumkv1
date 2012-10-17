@@ -64,7 +64,7 @@ public:
 					m_map_path->handle, sAbstractPath.toUtf8().constData());
 			if (pszAbsolutePath) {
 				sAbsolutePath = pszAbsolutePath;
-				::free((void *) pszAbsolutePath;
+				::free((void *) pszAbsolutePath);
 			}
 		}
 		return sAbsolutePath;
@@ -79,7 +79,7 @@ public:
 					m_map_path->handle, sAbsolutePath.toUtf8().constData());
 			if (pszAbstractPath) {
 				sAbstractPath = pszAbstractPath;
-				::free((void *) pszAbstractPath;
+				::free((void *) pszAbstractPath);
 			}
 		}
 		return sAbstractPath;
@@ -262,7 +262,7 @@ static LV2_State_Status drumkv1_lv2_state_save ( LV2_Handle instance,
 
 	QDomDocument doc(DRUMKV1_TITLE);
 	QDomElement eElements = doc.createElement("elements");
-	drumkv1widget::saveElements(pPlugin, eElements, eElements);
+	drumkv1widget::saveElements(pPlugin, doc, eElements);
 	doc.appendChild(eElements);
 
 	const QByteArray data(doc.toByteArray());
@@ -311,7 +311,7 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 	drumkv1_lv2_map_path mapPath(features);
 
 	QDomDocument doc(DRUMKV1_TITLE);
-	if (doc.setContent(QByteArray(value, size)) {
+	if (doc.setContent(QByteArray(value, size))) {
 		QDomElement eElements = doc.documentElement();
 		if (eElements.tagName() == "elements")
 			drumkv1widget::loadElements(pPlugin, eElements, mapPath);
