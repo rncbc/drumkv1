@@ -5,6 +5,8 @@ ChangeLog
 
 SVN TRUNK
 
+- LV2 state retrieve/save methods almost complete. (UNTESTED)
+
 - Current element selection and stabilization. (EXPERIMENTAL)
 
 - Preset load/save is now fully functional. (EXPERIMENTAL)

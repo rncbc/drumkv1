@@ -34,6 +34,62 @@
 #include <sys/types.h>
 #include <sys/socket.h>
 
+#include <QDomDocument>
+
+//-------------------------------------------------------------------------
+// drumkv1_lv2_map_path - abstract/absolute path functors.
+//
+
+class drumkv1_lv2_map_path : public drumkv1_map_path
+{
+public:
+
+	drumkv1_lv2_map_path(const LV2_Feature *const *features)
+		: m_map_path(NULL)
+	{
+		for (int i = 0; features && features[i]; ++i) {
+			if (::strcmp(features[i]->URI, LV2_STATE__mapPath) == 0) {
+				m_map_path = (LV2_State_Map_Path *) features[i]->data;
+				break;
+			}
+		}
+	}
+
+	QString absolutePath(const QString& sAbstractPath) const
+	{
+		QString sAbsolutePath(sAbstractPath);
+		if (m_map_path) {
+			const char *pszAbsolutePath
+				= m_map_path->absolute_path(
+					m_map_path->handle, sAbstractPath.toUtf8().constData());
+			if (pszAbsolutePath) {
+				sAbsolutePath = pszAbsolutePath;
+				::free((void *) pszAbsolutePath;
+			}
+		}
+		return sAbsolutePath;
+	}
+	
+	QString abstractPath(const QString& sAbsolutePath) const
+	{
+		QString sAbstractPath(sAbsolutePath);
+		if (m_map_path) {
+			const char *pszAbstractPath
+				= m_map_path->abstract_path(
+					m_map_path->handle, sAbsolutePath.toUtf8().constData());
+			if (pszAbstractPath) {
+				sAbstractPath = pszAbstractPath;
+				::free((void *) pszAbstractPath;
+			}
+		}
+		return sAbstractPath;
+	}
+
+private:
+
+	LV2_State_Map_Path *m_map_path;		
+};
+
 
 //-------------------------------------------------------------------------
 // drumkv1_lv2 - impl.
@@ -191,42 +247,29 @@ static LV2_State_Status drumkv1_lv2_state_save ( LV2_Handle instance,
 	if (pPlugin == NULL)
 		return LV2_STATE_ERR_UNKNOWN;
 
-	LV2_State_Map_Path *map_path = NULL;
-	for (int i = 0; features && features[i]; ++i) {
-		if (::strcmp(features[i]->URI, LV2_STATE__mapPath) == 0) {
-			map_path = (LV2_State_Map_Path *) features[i]->data;
-			break;
-		}
-	}
-
-	uint32_t key = pPlugin->urid_map(DRUMKV1_LV2_PREFIX "GEN1_SAMPLE");
+	uint32_t key = pPlugin->urid_map(DRUMKV1_LV2_PREFIX "state");
 	if (key == 0)
 		return LV2_STATE_ERR_NO_PROPERTY;
 
-	uint32_t type = pPlugin->urid_map(
-		map_path ? LV2_ATOM__Path : LV2_ATOM__String);
+	uint32_t type = pPlugin->urid_map(LV2_ATOM__String);
 	if (type == 0)
 		return LV2_STATE_ERR_BAD_TYPE;
 
-	if (!map_path && (flags & (LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE)) == 0)
+	if ((flags & (LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE)) == 0)
 		return LV2_STATE_ERR_BAD_FLAGS;
 
-	const char *value = pPlugin->sampleFile();
+	drumkv1_lv2_map_path mapPath(features);
 
-	if (value && map_path)
-		value = (*map_path->abstract_path)(map_path->handle, value);
+	QDomDocument doc(DRUMKV1_TITLE);
+	QDomElement eElements = doc.createElement("elements");
+	drumkv1widget::saveElements(pPlugin, eElements, eElements);
+	doc.appendChild(eElements);
 
-	if (value == NULL)
-		return LV2_STATE_ERR_UNKNOWN;
+	const QByteArray data(doc.toByteArray());
+	const char *value = data.constData();
+	size_t size = data.size() + 1;
 
-	size_t size = ::strlen(value) + 1;
-
-	LV2_State_Status result = (*store)(handle, key, value, size, type, flags);
-
-	if (map_path)
-		::free((void *) value);
-
-	return result;
+	return (*store)(handle, key, value, size, type, flags);
 }
 
 
@@ -238,24 +281,12 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 	if (pPlugin == NULL)
 		return LV2_STATE_ERR_UNKNOWN;
 
-	LV2_State_Map_Path *map_path = NULL;
-	for (int i = 0; features && features[i]; ++i) {
-		if (::strcmp(features[i]->URI, LV2_STATE__mapPath) == 0) {
-			map_path = (LV2_State_Map_Path *) features[i]->data;
-			break;
-		}
-	}
-
-	uint32_t key = pPlugin->urid_map(DRUMKV1_LV2_PREFIX "GEN1_SAMPLE");
+	uint32_t key = pPlugin->urid_map(DRUMKV1_LV2_PREFIX "state");
 	if (key == 0)
 		return LV2_STATE_ERR_NO_PROPERTY;
 
 	uint32_t string_type = pPlugin->urid_map(LV2_ATOM__String);
 	if (string_type == 0)
-		return LV2_STATE_ERR_BAD_TYPE;
-
-	uint32_t path_type = pPlugin->urid_map(LV2_ATOM__Path);
-	if (path_type == 0)
 		return LV2_STATE_ERR_BAD_TYPE;
 
 	size_t size = 0;
@@ -268,23 +299,23 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 	if (size < 2)
 		return LV2_STATE_ERR_UNKNOWN;
 
-	if (type != string_type && type != path_type)
+	if (type != string_type)
 		return LV2_STATE_ERR_BAD_TYPE;
 
-	if (!map_path && (flags & (LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE)) == 0)
+	if ((flags & (LV2_STATE_IS_POD | LV2_STATE_IS_PORTABLE)) == 0)
 		return LV2_STATE_ERR_BAD_FLAGS;
-
-	if (value && map_path)
-		value = (*map_path->absolute_path)(map_path->handle, value);
 
 	if (value == NULL)
 		return LV2_STATE_ERR_UNKNOWN;
 
-	pPlugin->setSampleFile((const char *) value);
-	pPlugin->update_notify();
+	drumkv1_lv2_map_path mapPath(features);
 
-	if (map_path)
-		::free((void *) value);
+	QDomDocument doc(DRUMKV1_TITLE);
+	if (doc.setContent(QByteArray(value, size)) {
+		QDomElement eElements = doc.documentElement();
+		if (eElements.tagName() == "elements")
+			drumkv1widget::loadElements(pPlugin, eElements, mapPath);
+	}
 
 	return LV2_STATE_SUCCESS;
 }

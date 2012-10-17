@@ -36,6 +36,20 @@ class QDomDocument;
 
 
 //-------------------------------------------------------------------------
+// drumkv1_map_path - abstract/absolute path functors.
+
+class drumkv1_map_path
+{
+public:
+
+	virtual QString absolutePath(const QString& sAbstractPath) const
+		{ return sAbstractPath; }
+	virtual QString abstractPath(const QString& sAbsolutePath) const
+		{ return sAbsolutePath; }
+};
+
+
+//-------------------------------------------------------------------------
 // drumkv1widget - decl.
 //
 
@@ -67,15 +81,19 @@ public:
 	static QString noteName(int note);
 	static QString completeNoteName(int note);
 
+	// Element serialization methods.
+	static void loadElements(drumkv1 *pDrumk,
+		const QDomElement& eElements,
+		const drumkv1_map_path& mapPath = drumkv1_map_path());
+	static void saveElements(drumkv1 *pDrumk,
+		QDomDocument& doc, QDomElement& eElements,
+		const drumkv1_map_path& mapPath = drumkv1_map_path());
+
 public slots:
 
 	// Preset file I/O.
 	void loadPreset(const QString& sFilename);
 	void savePreset(const QString& sFilename);
-
-	// Element serialization methods.
-	void loadElements(const QDomElement& eElements);
-	void saveElements(QDomDocument& doc, QDomElement& eElements);
 
 protected slots:
 

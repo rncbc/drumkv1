@@ -564,7 +564,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 				if (eChild.isNull())
 					continue;
 				if (eChild.tagName() == "elements") {
-					loadElements(eChild);
+					loadElements(instance(), eChild);
 				}
 				else
 				if (eChild.tagName() == "params") {
@@ -593,6 +593,8 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 	file.close();
 
 	m_ui.Preset->setPreset(QFileInfo(sFilename).completeBaseName());
+
+	refreshElements();
 }
 
 
@@ -608,7 +610,7 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 	ePreset.setAttribute("version", DRUMKV1_VERSION);
 
 	QDomElement eElements = doc.createElement("elements");
-	saveElements(doc, eElements);
+	saveElements(instance(), doc, eElements);
 	ePreset.appendChild(eElements);
 
 	QDomElement eParams = doc.createElement("params");
@@ -632,9 +634,10 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 
 
 // Element serialization methods.
-void drumkv1widget::loadElements ( const QDomElement& eElements )
+void drumkv1widget::loadElements (
+	drumkv1 *pDrumk, const QDomElement& eElements,
+	const drumkv1_map_path& mapPath )
 {
-	drumkv1 *pDrumk = instance();
 	if (pDrumk == NULL)
 		return;
 
@@ -662,7 +665,8 @@ void drumkv1widget::loadElements ( const QDomElement& eElements )
 				if (eChild.tagName() == "sample") {
 				//	int index = eSample.attribute("index").toInt();
 					const QString& sFilename = eChild.text();
-					element->setSampleFile(sFilename.toUtf8().constData());
+					element->setSampleFile(
+						mapPath.absolutePath(sFilename).toUtf8().constData());
 				}
 				else
 				if (eChild.tagName() == "params") {
@@ -688,14 +692,13 @@ void drumkv1widget::loadElements ( const QDomElement& eElements )
 	}
 
 	pDrumk->reset();
-
-	refreshElements();
 }
 
 
-void drumkv1widget::saveElements ( QDomDocument& doc, QDomElement& eElements )
+void drumkv1widget::saveElements (
+	drumkv1 *pDrumk, QDomDocument& doc, QDomElement& eElements,
+	const drumkv1_map_path& mapPath )
 {
-	drumkv1 *pDrumk = instance();
 	if (pDrumk == NULL)
 		return;
 
@@ -712,7 +715,8 @@ void drumkv1widget::saveElements ( QDomDocument& doc, QDomElement& eElements )
 		QDomElement eSample = doc.createElement("sample");
 		eSample.setAttribute("index", 0);
 		eSample.setAttribute("name", "GEN1_SAMPLE");
-		eSample.appendChild(doc.createTextNode(pszSampleFile));
+		eSample.appendChild(doc.createTextNode(
+			mapPath.abstractPath(pszSampleFile)));
 		eElement.appendChild(eSample);
 		QDomElement eParams = doc.createElement("params");
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
