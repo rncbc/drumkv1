@@ -5,7 +5,9 @@ ChangeLog
 
 SVN TRUNK
 
-- Preset load/save is now functional. (EXPERIMENTAL)
+- Current element selection and stabilization. (EXPERIMENTAL)
+
+- Preset load/save is now fully functional. (EXPERIMENTAL)
 
 - Access to core engine instance has been slightly refactored.
 

@@ -1235,8 +1235,11 @@ void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 void drumkv1_impl::reset (void)
 {
 	// reset all elements
-	for (int note = 0; note < MAX_NOTES; ++note)
-		resetElement(m_elems[note]);
+	drumkv1_elem *elem = m_elem_list.next();
+	while (elem) {
+		resetElement(elem);
+		elem = elem->next();
+	}
 
 	// pressure state
 	m_pre.reset(m_def.pressure, &m_ctl.pressure);

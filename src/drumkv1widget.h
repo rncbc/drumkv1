@@ -56,12 +56,16 @@ public:
 	void setParamKnob(drumkv1::ParamIndex index, drumkv1widget_knob *pKnob);
 	drumkv1widget_knob *paramKnob(drumkv1::ParamIndex index) const;
 
-	// Dirty close prompt,
+	// Dirty close prompt.
 	bool queryClose();
 
-	// MIDI note/octave name helpers.
+	// Current selected note helpers.
+	int currentNote() const;
 	QString currentNoteName() const;
+
+	// MIDI note/octave name helpers.
 	static QString noteName(int note);
+	static QString completeNoteName(int note);
 
 public slots:
 

@@ -522,6 +522,7 @@ void drumkv1widget::newPreset (void)
 	resetParamKnobs();
 	resetParamValues();
 
+	refreshElements();
 //	m_ui.Gen1Sample->openSample(currentNoteName());
 }
 
@@ -739,9 +740,9 @@ void drumkv1widget::clearSample (void)
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk)
-		pDrumk->setSampleFile(0);
+		pDrumk->setSampleFile(NULL);
 
-	updateSample(0);
+	updateSample(NULL);
 }
 
 
@@ -753,10 +754,32 @@ void drumkv1widget::loadSample ( const QString& sFilename )
 #endif
 
 	drumkv1 *pDrumk = instance();
-	if (pDrumk) {
-		pDrumk->setSampleFile(sFilename.toUtf8().constData());
-		updateSample(pDrumk->sample(), true);
+	if (pDrumk == NULL)
+		return;
+
+	int note = currentNote();
+	if (note < 0)
+		return;
+
+	drumkv1_element *element = pDrumk->element(note);
+	if (element == NULL) {
+		element = pDrumk->addElement(note);
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			float fValue = drumkv1_default_params[i].value;
+			element->setParamValue(index, fValue);
+		}
+		pDrumk->setCurrentElement(note);
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			setParamValue(index, element->paramValue(index));
+		}
 	}
+
+	pDrumk->setSampleFile(sFilename.toUtf8().constData());
+	updateSample(pDrumk->sample(), true);
+
+	refreshElements();
 }
 
 
@@ -774,27 +797,33 @@ QString drumkv1widget::sampleFile (void) const
 // Sample updater (crude experimental stuff II).
 void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 {
-	if (pSample)
-		m_ui.Gen1Sample->setSampleName(currentNoteName());
-
+	m_ui.Gen1Sample->setSampleName(currentNoteName());
 	m_ui.Gen1Sample->setSample(pSample);
 
 	if (pSample && bDirty)
 		m_ui.Preset->dirtyPreset();
-
-	refreshElements();
 }
 
 
-// MIDI note/octave name helper (current).
+// Current selected note helpers.
+int drumkv1widget::currentNote (void) const
+{
+	QTreeWidgetItem *pItem = m_ui.ElementList->currentItem();
+	if (pItem == NULL)
+		return -1;
+
+	return m_ui.ElementList->indexOfTopLevelItem(pItem);
+}
+
+
 QString drumkv1widget::currentNoteName (void) const
 {
-	drumkv1 *pDrumk = instance();
-	return (pDrumk ? noteName(pDrumk->currentElement()) : tr("(None)"));
+	int note = currentNote();
+	return (note < 0 ? tr("(None)") : completeNoteName(note));
 }
 
 
-// MIDI note/octave name helper (static).
+// MIDI note/octave name helpers (current).
 QString drumkv1widget::noteName ( int note )
 {
 	static struct
@@ -887,6 +916,11 @@ QString drumkv1widget::noteName ( int note )
 	return QString("%1 %2").arg(s_notes[note % 12].name).arg((note / 12) - 1);
 }
 
+QString drumkv1widget::completeNoteName ( int note )
+{
+	return QString("%1 - %2").arg(note).arg(noteName(note));
+}
+
 
 // Dirty close prompt,
 bool drumkv1widget::queryClose (void)
@@ -899,16 +933,19 @@ bool drumkv1widget::queryClose (void)
 void drumkv1widget::refreshElements (void)
 {
 	bool bBlockSignals = m_ui.ElementList->blockSignals(true);
+	int iTopLevelItem = currentNote();
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1widget::refreshElements(%d)", iTopLevelItem);
+#endif
 
 	m_ui.ElementList->clear();
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
 		QTreeWidgetItem *pItem = NULL;
-		const QString sNote("%1 - %2");
 		for (int note = 0; note < 128; ++note) {
 			pItem = new QTreeWidgetItem(m_ui.ElementList, pItem);
-			pItem->setText(0, sNote.arg(note).arg(noteName(note)));
+			pItem->setText(0, completeNoteName(note));
 			QString sSample('-');
 			drumkv1_element *element = pDrumk->element(note);
 			if (element) {
@@ -920,10 +957,13 @@ void drumkv1widget::refreshElements (void)
 			}
 			pItem->setText(1, sSample);
 		}
-		m_ui.ElementList->setCurrentItem(
-			m_ui.ElementList->topLevelItem((pDrumk->currentElement())));
 	}
 
+	if (iTopLevelItem < 0) iTopLevelItem = 36; // Bass Drum 1 (default)
+	m_ui.Gen1Sample->setSampleName(completeNoteName(iTopLevelItem));
+
+	m_ui.ElementList->setCurrentItem(
+		m_ui.ElementList->topLevelItem(iTopLevelItem));
 	m_ui.ElementList->blockSignals(bBlockSignals);
 }
 
@@ -940,37 +980,41 @@ void drumkv1widget::clearElements (void)
 // Element activation.
 void drumkv1widget::activateElement ( bool bOpenSample )
 {
-	QTreeWidgetItem *pItem = m_ui.ElementList->currentItem();
-	if (pItem == NULL)
-		return;
-
-	int note = m_ui.ElementList->indexOfTopLevelItem(pItem);
+	int note = currentNote();
 	if (note < 0)
 		return;
 
 	drumkv1 *pDrumk = instance();
-	if (pDrumk) {
-		drumkv1_element *element = pDrumk->element(note);
-		if (element == NULL) {
-			element = pDrumk->addElement(note);
-			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-				float fValue = drumkv1_default_params[i].value;
-				element->setParamValue(index, fValue);
-			}
+	if (pDrumk == NULL)
+		return;
+
+	drumkv1_element *element = pDrumk->element(note);
+	if (element == NULL && bOpenSample) {
+		element = pDrumk->addElement(note);
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			float fValue = drumkv1_default_params[i].value;
+			element->setParamValue(index, fValue);
 		}
-		pDrumk->setCurrentElement(note);
+	}
+
+	pDrumk->setCurrentElement(note);
+
+	if (element) {
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			setParamValue(index, element->paramValue(index));
 		}
-		bOpenSample = (element->sampleFile() == NULL);
+		updateSample(pDrumk->sample());
+		refreshElements();
+	} else {
+		updateSample(NULL);
+		resetParamKnobs();
+		resetParamValues();
 	}
 
 	if (bOpenSample)
-		m_ui.Gen1Sample->openSample(currentNoteName());
-
-	updateSample(pDrumk ? pDrumk->sample() : NULL);
+		m_ui.Gen1Sample->openSample(completeNoteName(note));
 }
 
 

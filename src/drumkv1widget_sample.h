@@ -48,7 +48,7 @@ public:
 	drumkv1_sample *sample() const;
 
 	void setSampleName(const QString& sName)
-		{ m_sName = sName; }
+	{ m_sName = sName; updateToolTip(); }
 	const QString& sampleName() const
 		{ return m_sName; }
 
@@ -75,6 +75,9 @@ protected:
 
 	// Draw canvas.
 	void paintEvent(QPaintEvent *);
+
+	// Update tool-tip.
+	void updateToolTip();
 
 private:
 

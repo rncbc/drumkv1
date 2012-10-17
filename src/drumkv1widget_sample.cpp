@@ -109,18 +109,7 @@ void drumkv1widget_sample::setSample ( drumkv1_sample *pSample )
 		}
 	}
 
-	QString sToolTip;
-	const char *pszSampleFile = (m_pSample ? m_pSample->filename() : 0);
-	if (pszSampleFile) {
-		sToolTip += tr("%1\n%2 frames, %3 channels, %4 Hz\n")
-			.arg(QFileInfo(pszSampleFile).completeBaseName())
-			.arg(m_pSample->length())
-			.arg(m_pSample->channels())
-			.arg(m_pSample->rate());
-	}
-	sToolTip += tr("(double-click to load new sample...)");
-	setToolTip(sToolTip);
-
+	updateToolTip();
 	update();
 }
 
@@ -235,6 +224,24 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 void drumkv1widget_sample::loadSample ( drumkv1_sample *pSample )
 {
 	setSample(pSample);
+}
+
+
+void drumkv1widget_sample::updateToolTip (void)
+{
+	QString sToolTip;
+	sToolTip += '[' + m_sName + ']';
+	sToolTip += '\n';
+	const char *pszSampleFile = (m_pSample ? m_pSample->filename() : 0);
+	if (pszSampleFile) {
+		sToolTip += tr("%1\n%2 frames, %3 channels, %4 Hz\n")
+			.arg(QFileInfo(pszSampleFile).completeBaseName())
+			.arg(m_pSample->length())
+			.arg(m_pSample->channels())
+			.arg(m_pSample->rate());
+	}
+	sToolTip += tr("(double-click to load new sample...)");
+	setToolTip(sToolTip);
 }
 
 
