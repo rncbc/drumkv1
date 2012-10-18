@@ -5,6 +5,8 @@ ChangeLog
 
 SVN TRUNK
 
+- Reimplemented mouse-wheel stepping on combo-dial knob widgets.
+
 - LV2 state chunk retrieve/save implementation complete. (EXPERIMENTAL)
 
 - Current element selection and stabilization. (EXPERIMENTAL)

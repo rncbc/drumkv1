@@ -323,4 +323,13 @@ void drumkv1widget_combo::comboBoxValueChanged ( int iComboValue )
 }
 
 
+// Reimplemented mouse-wheel stepping.
+void drumkv1widget_combo::wheelEvent ( QWheelEvent *pWheelEvent )
+{
+	int delta = (pWheelEvent->delta() / 60);
+	if (delta)
+		setValue(value() + float(delta));
+}
+
+
 // end of drumkv1widget_knob.cpp

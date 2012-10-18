@@ -523,7 +523,7 @@ void drumkv1widget::newPreset (void)
 	resetParamValues();
 
 	refreshElements();
-//	m_ui.Gen1Sample->openSample(currentNoteName());
+	activateElement();
 }
 
 
@@ -540,7 +540,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 
 	static QHash<QString, drumkv1::ParamIndex> s_hash;
 	if (s_hash.isEmpty()) {
-		for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
+		for (uint32_t i = drumkv1::NUM_ELEMENT_PARAMS; i < drumkv1::NUM_PARAMS; ++i)
 			s_hash.insert(drumkv1_default_params[i].name, drumkv1::ParamIndex(i));
 	}
 
@@ -595,6 +595,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 	m_ui.Preset->setPreset(QFileInfo(sFilename).completeBaseName());
 
 	refreshElements();
+	activateElement();
 }
 
 
@@ -614,7 +615,7 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 	ePreset.appendChild(eElements);
 
 	QDomElement eParams = doc.createElement("params");
-	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
+	for (uint32_t i = drumkv1::NUM_ELEMENT_PARAMS; i < drumkv1::NUM_PARAMS; ++i) {
 		QDomElement eParam = doc.createElement("param");
 		eParam.setAttribute("index", QString::number(i));
 		eParam.setAttribute("name", drumkv1_default_params[i].name);
@@ -990,6 +991,9 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk == NULL)
+		return;
+
+	if (note == pDrumk->currentElement())
 		return;
 
 	drumkv1_element *element = pDrumk->element(note);

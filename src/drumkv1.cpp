@@ -897,6 +897,8 @@ void drumkv1_impl::setCurrentElement ( int key )
 			drumkv1_element *element = &(elem->element);
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				if (index == drumkv1::GEN1_SAMPLE)
+					continue;
 				float *pfParam = element->paramPort(index);
 				if (pfParam) {
 					m_params[i] = pfParam;
@@ -911,6 +913,8 @@ void drumkv1_impl::setCurrentElement ( int key )
 			drumkv1_element *element = &(elem->element);
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				if (index == drumkv1::GEN1_SAMPLE)
+					continue;
 				float *pfParam = m_params[i];
 				if (pfParam) {
 					*pfParam = elem->params[i];
@@ -1659,7 +1663,7 @@ void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 		return;
 
 	switch (index) {
-	case drumkv1::GEN1_SAMPLE:   m_pElem->gen1.sample      = pfParam; break;
+//	case drumkv1::GEN1_SAMPLE:   m_pElem->gen1.sample      = pfParam; break;
 	case drumkv1::GEN1_COARSE:   m_pElem->gen1.coarse      = pfParam; break;
 	case drumkv1::GEN1_FINE:     m_pElem->gen1.fine        = pfParam; break;
 	case drumkv1::DCF1_CUTOFF:   m_pElem->dcf1.cutoff      = pfParam; break;
@@ -1705,7 +1709,7 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	float *pfParam = 0;
 
 	switch (index) {
-	case drumkv1::GEN1_SAMPLE:   pfParam = m_pElem->gen1.sample;     break;
+//	case drumkv1::GEN1_SAMPLE:   pfParam = m_pElem->gen1.sample;     break;
 	case drumkv1::GEN1_COARSE:   pfParam = m_pElem->gen1.coarse;     break;
 	case drumkv1::GEN1_FINE:     pfParam = m_pElem->gen1.fine;       break;
 	case drumkv1::DCF1_CUTOFF:   pfParam = m_pElem->dcf1.cutoff;     break;
@@ -1747,7 +1751,7 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 
 void drumkv1_element::setParamValue ( drumkv1::ParamIndex index, float fValue )
 {
-	if (index < drumkv1::NUM_ELEMENT_PARAMS)
+	if (index < drumkv1::NUM_ELEMENT_PARAMS && index != drumkv1::GEN1_SAMPLE)
 		m_pElem->params[index] = fValue;
 }
 
