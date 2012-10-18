@@ -1008,6 +1008,8 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 
 	pDrumk->setCurrentElement(note);
 
+	resetParamKnobs();
+
 	if (element) {
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
@@ -1017,7 +1019,6 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 		refreshElements();
 	} else {
 		updateSample(NULL);
-		resetParamKnobs();
 		resetParamValues();
 	}
 
