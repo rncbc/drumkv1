@@ -1105,6 +1105,7 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 		element = pDrumk->element(pDrumk->currentElement());
 
 	pAction = menu.addAction(
+		QIcon(":/images/fileOpen.png"),
 		tr("Open Sample..."), this, SLOT(openSample()));
 	pAction->setEnabled(pDrumk != NULL);
 	menu.addSeparator();
