@@ -5,18 +5,21 @@ ChangeLog
 
 SVN TRUNK
 
+- Added some command line options to the stand-alone JACK client
+  program (--help and --version information).
+
 - Reimplemented mouse-wheel stepping on combo-dial knob widgets.
 
 - LV2 state chunk retrieve/save implementation complete. (EXPERIMENTAL)
 
-- Current element selection and stabilization. (EXPERIMENTAL)
+- Current element selection and stabilization.
 
-- Preset load/save is now fully functional. (EXPERIMENTAL)
+- Preset load/save is now fully functional.
 
 - Access to core engine instance has been slightly refactored.
 
 - Classic ADSR replaced by custom one-shot drum-mode specific envelope
-  generators (Attack, Delay1, Level2, Delay2). (EXPERIMENTAL)
+  generators (Attack, Delay1, Level2, Delay2).
 
 - Detached generic double-linked list class into its own header.
 
