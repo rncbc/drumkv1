@@ -415,6 +415,17 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
 		SLOT(doubleClickElement()));
 
+	// Common context menu...
+	m_ui.ElementList->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_ui.Gen1Sample->setContextMenuPolicy(Qt::CustomContextMenu);
+
+	QObject::connect(m_ui.ElementList,
+		SIGNAL(customContextMenuRequested(const QPoint&)),
+		SLOT(contextMenuRequest(const QPoint&)));
+	QObject::connect(m_ui.Gen1Sample,
+		SIGNAL(customContextMenuRequested(const QPoint&)),
+		SLOT(contextMenuRequest(const QPoint&)));
+
 	// Menu actions
 	QObject::connect(m_ui.helpAboutAction,
 		SIGNAL(triggered(bool)),
@@ -524,6 +535,13 @@ void drumkv1widget::newPreset (void)
 
 	refreshElements();
 	activateElement();
+}
+
+
+// Sample openner.
+void drumkv1widget::openSample (void)
+{
+	m_ui.Gen1Sample->openSample(currentNoteName());
 }
 
 
@@ -1033,6 +1051,21 @@ void drumkv1widget::doubleClickElement (void)
 }
 
 
+// Element deactivation.
+void drumkv1widget::resetElement (void)
+{
+	clearSample();
+
+	drumkv1 *pDrumk = instance();
+	if (pDrumk) {
+		pDrumk->removeElement(pDrumk->currentElement());
+		m_ui.Preset->dirtyPreset();
+	}
+
+	refreshElements();
+}
+
+
 // (En|Dis)able/ all param/knobs.
 void drumkv1widget::activateParamKnobs ( bool bEnabled )
 {
@@ -1053,6 +1086,38 @@ void drumkv1widget::activateParamKnobsGroupBox ( QGroupBox *pGroupBox, bool bEna
 	QListIterator<QWidget *> iter(children);
 	while (iter.hasNext())
 		iter.next()->setEnabled(bEnabled);
+}
+
+
+// Common context menu.
+void drumkv1widget::contextMenuRequest ( const QPoint& pos )
+{
+	QWidget *pSender = static_cast<QWidget *> (sender());
+	if (pSender == NULL)
+		return;
+
+	QMenu menu(this);
+	QAction *pAction;
+
+	drumkv1 *pDrumk = instance();
+	drumkv1_element *element = NULL;
+	if (pDrumk)
+		element = pDrumk->element(pDrumk->currentElement());
+
+	pAction = menu.addAction(
+		tr("Open Sample..."), this, SLOT(openSample()));
+	pAction->setEnabled(pDrumk != NULL);
+	menu.addSeparator();
+	pAction = menu.addAction(
+		tr("Reset"), this, SLOT(resetElement()));
+	pAction->setEnabled(element != NULL);
+
+	QAbstractScrollArea *pAbstractScrollArea
+		= dynamic_cast<QAbstractScrollArea *> (pSender);
+	if (pAbstractScrollArea)
+		pSender = pAbstractScrollArea->viewport();
+
+	menu.exec(pSender->mapToGlobal(pos));
 }
 
 

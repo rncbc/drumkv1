@@ -881,6 +881,8 @@ void drumkv1_impl::removeElement ( int key )
 	if (key >= 0 && key < MAX_NOTES)
 		elem = m_elems[key];
 	if (elem) {
+		if (m_elem == elem)
+			m_elem = 0;
 		m_elem_list.remove(elem);
 		m_elems[key] = 0;
 		delete elem;

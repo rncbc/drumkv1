@@ -106,6 +106,9 @@ protected slots:
 	// Sample clear slot.
 	void clearSample();
 
+	// Sample openner.
+	void openSample();
+
 	// Sample loader slot.
 	void loadSample(const QString& sFilename);
 
@@ -117,6 +120,12 @@ protected slots:
 
 	// Element sample loader.
 	void doubleClickElement();
+
+	// Element deactivation.
+	void resetElement(void);
+
+	// Common context menu.
+	void contextMenuRequest(const QPoint& pos);
 
 	// Menu actions.
 	void helpAbout();
