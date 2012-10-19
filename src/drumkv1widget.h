@@ -137,6 +137,10 @@ protected:
 	void resetParamValues();
 	void resetParamKnobs();
 
+	// (En|Dis)able/ all param/knobs.
+	void activateParamKnobs(bool bEnabled);
+	void activateParamKnobsGroupBox(QGroupBox *pGroupBox, bool bEnable);
+
 	// Sample filename retriever.
 	QString sampleFile() const;
 

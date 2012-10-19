@@ -779,6 +779,7 @@ void drumkv1widget::loadSample ( const QString& sFilename )
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			setParamValue(index, element->paramValue(index));
 		}
+		activateParamKnobs(true);
 	}
 
 	pDrumk->setSampleFile(sFilename.toUtf8().constData());
@@ -993,9 +994,6 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 	if (pDrumk == NULL)
 		return;
 
-	if (note == pDrumk->currentElement())
-		return;
-
 	drumkv1_element *element = pDrumk->element(note);
 	if (element == NULL && bOpenSample) {
 		element = pDrumk->addElement(note);
@@ -1005,6 +1003,9 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 			element->setParamValue(index, fValue);
 		}
 	}
+	else
+	if (note == pDrumk->currentElement())
+		return;
 
 	pDrumk->setCurrentElement(note);
 
@@ -1022,6 +1023,8 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 		resetParamValues();
 	}
 
+	activateParamKnobs(element != NULL);
+
 	if (bOpenSample)
 		m_ui.Gen1Sample->openSample(completeNoteName(note));
 }
@@ -1031,6 +1034,29 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 void drumkv1widget::doubleClickElement (void)
 {
 	activateElement(true);
+}
+
+
+// (En|Dis)able/ all param/knobs.
+void drumkv1widget::activateParamKnobs ( bool bEnabled )
+{
+	activateParamKnobsGroupBox(m_ui.Gen1GroupBox, bEnabled);
+	activateParamKnobsGroupBox(m_ui.Dcf1GroupBox, bEnabled);
+	activateParamKnobsGroupBox(m_ui.Lfo1GroupBox, bEnabled);
+	activateParamKnobsGroupBox(m_ui.Dca1GroupBox, bEnabled);
+	activateParamKnobsGroupBox(m_ui.Out1GroupBox, bEnabled);
+
+	m_ui.Gen1Sample->setEnabled(true);
+}
+
+
+void drumkv1widget::activateParamKnobsGroupBox ( QGroupBox *pGroupBox, bool bEnabled )
+{
+	const QList<QWidget *>& children
+		= pGroupBox->findChildren<QWidget *> ();
+	QListIterator<QWidget *> iter(children);
+	while (iter.hasNext())
+		iter.next()->setEnabled(bEnabled);
 }
 
 

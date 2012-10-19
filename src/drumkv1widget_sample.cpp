@@ -143,7 +143,8 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 
 	const QPalette& pal = palette();
 	const bool bDark = (pal.window().color().value() < 0x7f);
-	const QColor& rgbLite = (bDark ? Qt::darkYellow : Qt::yellow);
+	const QColor& rgbLite = (isEnabled()
+		? (bDark ? Qt::darkYellow : Qt::yellow) : pal.mid().color());
 
 	painter.fillRect(0, 0, w, h, pal.dark().color());
 
