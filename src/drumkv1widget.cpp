@@ -1003,27 +1003,23 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 			element->setParamValue(index, fValue);
 		}
 	}
-	else
-	if (note == pDrumk->currentElement())
-		return;
 
-	pDrumk->setCurrentElement(note);
-
-	resetParamKnobs();
-
-	if (element) {
-		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-			setParamValue(index, element->paramValue(index));
+	if (note != pDrumk->currentElement()) {
+		pDrumk->setCurrentElement(note);
+		resetParamKnobs();
+		if (element) {
+			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				setParamValue(index, element->paramValue(index));
+			}
+			updateSample(pDrumk->sample());
+			refreshElements();
+		} else {
+			updateSample(NULL);
+			resetParamValues();
 		}
-		updateSample(pDrumk->sample());
-		refreshElements();
-	} else {
-		updateSample(NULL);
-		resetParamValues();
+		activateParamKnobs(element != NULL);
 	}
-
-	activateParamKnobs(element != NULL);
 
 	if (bOpenSample)
 		m_ui.Gen1Sample->openSample(completeNoteName(note));

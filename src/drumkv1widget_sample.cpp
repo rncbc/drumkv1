@@ -138,15 +138,19 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 {
 	QPainter painter(this);
 
-	const int h = height();
-	const int w = width();
+	const QRect& rect = QWidget::rect();
+	const int h = rect.height();
+	const int w = rect.width();
 
 	const QPalette& pal = palette();
 	const bool bDark = (pal.window().color().value() < 0x7f);
 	const QColor& rgbLite = (isEnabled()
 		? (bDark ? Qt::darkYellow : Qt::yellow) : pal.mid().color());
 
-	painter.fillRect(0, 0, w, h, pal.dark().color());
+	painter.fillRect(rect, pal.dark().color());
+
+	painter.setPen(pal.midlight().color());
+	painter.drawText(rect.adjusted(2, 0, -2, -0), Qt::AlignLeft, m_sName);
 
 	if (m_pSample && m_ppPolyg) {
 		painter.setRenderHint(QPainter::Antialiasing, true);
@@ -158,6 +162,9 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		for (unsigned short k = 0; k < m_iChannels; ++k)
 			painter.drawPolygon(*m_ppPolyg[k]);
 		painter.setRenderHint(QPainter::Antialiasing, false);
+	} else {
+		painter.drawText(rect, Qt::AlignCenter,
+			tr("(double-click to load new sample...)"));
 	}
 
 	painter.end();
@@ -232,16 +239,15 @@ void drumkv1widget_sample::updateToolTip (void)
 {
 	QString sToolTip;
 	sToolTip += '[' + m_sName + ']';
-	sToolTip += '\n';
 	const char *pszSampleFile = (m_pSample ? m_pSample->filename() : 0);
 	if (pszSampleFile) {
-		sToolTip += tr("%1\n%2 frames, %3 channels, %4 Hz\n")
+		sToolTip += '\n';
+		sToolTip += tr("%1\n%2 frames, %3 channels, %4 Hz")
 			.arg(QFileInfo(pszSampleFile).completeBaseName())
 			.arg(m_pSample->length())
 			.arg(m_pSample->channels())
 			.arg(m_pSample->rate());
 	}
-	sToolTip += tr("(double-click to load new sample...)");
 	setToolTip(sToolTip);
 }
 

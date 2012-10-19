@@ -124,16 +124,17 @@ void drumkv1widget_env::paintEvent ( QPaintEvent *pPaintEvent )
 {
 	QPainter painter(this);
 
-	int h  = height();
-	int w  = width();
+	const QRect& rect = QWidget::rect();
+	const int h  = rect.height();
+	const int w  = rect.width();
 
-	int w3 = (w - 12) / 3;
+	const int w3 = (w - 12) / 3;
 
-	int x1 = int(m_fAttack * float(w3)) + 6;
-	int x2 = int(m_fDecay1 * float(w3)) + x1;
-	int x3 = int(m_fDecay2 * float(w3)) + x2;
+	const int x1 = int(m_fAttack * float(w3)) + 6;
+	const int x2 = int(m_fDecay1 * float(w3)) + x1;
+	const int x3 = int(m_fDecay2 * float(w3)) + x2;
 
-	int y2 = h - int(m_fLevel2 * float(h - 12)) - 6;
+	const int y2 = h - int(m_fLevel2 * float(h - 12)) - 6;
 
 	m_poly.putPoints(0, 6,
 		0,  h,
@@ -151,7 +152,7 @@ void drumkv1widget_env::paintEvent ( QPaintEvent *pPaintEvent )
 	const QColor& rgbLite = (isEnabled()
 		? (bDark ? Qt::darkYellow : Qt::yellow) : pal.mid().color());
 
-	painter.fillRect(0, 0, w, h, pal.dark().color());
+	painter.fillRect(rect, pal.dark().color());
 
 	painter.setPen(bDark ? Qt::gray : Qt::darkGray);
 

@@ -165,11 +165,46 @@ void drumkv1widget_jack::closeEvent ( QCloseEvent *pCloseEvent )
 //-------------------------------------------------------------------------
 // main
 
+#include <QTextStream>
+
+static bool parse_args ( const QStringList& args )
+{
+	QTextStream out(stderr);
+
+	QStringListIterator iter(args);
+	while (iter.hasNext()) {
+		const QString& sArg = iter.next();
+		if (sArg == "-h" || sArg == "--help") {
+			out << QObject::tr(
+				"Usage: %1 [options] [preset-file]\n\n"
+				DRUMKV1_TITLE " - " DRUMKV1_SUBTITLE "\n\n"
+				"Options:\n\n"
+				"  -h, --help\n\tShow help about command line options\n\n"
+				"  -v, --version\n\tShow version information\n\n")
+				.arg(args.at(0));
+			return false;
+		}
+		else
+		if (sArg == "-v" || sArg == "-V" || sArg == "--version") {
+			out << QObject::tr("Qt: %1\n").arg(qVersion());
+			out << QObject::tr(DRUMKV1_TITLE ": %1\n").arg(DRUMKV1_VERSION);
+			return false;
+		}
+	}
+
+	return true;
+}
+
+
 int main( int argc, char *argv[] )
 {
 	Q_INIT_RESOURCE(drumkv1);
 
 	QApplication app(argc, argv);
+	if (!parse_args(app.arguments())) {
+		app.quit();
+		return 1;
+	}
 
 	drumkv1_jack sampl;
 	drumkv1widget_jack w(&sampl);
