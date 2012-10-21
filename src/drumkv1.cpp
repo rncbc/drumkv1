@@ -928,6 +928,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 		resetElement(elem);
 		m_elem = elem;
 	}
+	else m_elem = 0;
 }
 
 
