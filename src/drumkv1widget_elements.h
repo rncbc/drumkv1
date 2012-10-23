@@ -22,60 +22,14 @@
 #ifndef __drumkv1widget_elements_h
 #define __drumkv1widget_elements_h
 
-#include <QAbstractItemModel>
-#include <QItemDelegate>
 #include <QTreeView>
 
 
 // Forwards.
+class drumkv1widget_elements_model;
+
 class drumkv1_element;
 class drumkv1;
-
-
-//----------------------------------------------------------------------------
-// drumkv1widget_elements_model -- List model.
-
-class drumkv1widget_elements_model : public QAbstractItemModel
-{
-	Q_OBJECT
-
-public:
-
-	// Constructor.
-	drumkv1widget_elements_model(drumkv1 *pDrumk, QObject *pParent = 0);
-
-	// Concretizers (virtual).
-	int rowCount(const QModelIndex& parent = QModelIndex()) const;
-	int columnCount(const QModelIndex& parent = QModelIndex()) const;
-
-	QVariant headerData(int section, Qt::Orientation orient, int role) const;
-	QVariant data(const QModelIndex& index, int role) const;
-
-	QModelIndex index(int row, int column,
-		const QModelIndex& parent = QModelIndex()) const;
-
-	QModelIndex parent(const QModelIndex&) const;
-
-	drumkv1 *instance() const;
-
-	void reset();
-
-protected:
-
-	// Specifics.
-	drumkv1_element *elementFromIndex(const QModelIndex& index) const;
-
-	QString itemDisplay(const QModelIndex& index) const;
-	QString itemToolTip(const QModelIndex& index) const;
-
-	int columnAlignment(int column) const;
-
-private:
-
-	// Model variables.
-	QStringList m_headers;
-	drumkv1    *m_pDrumk;
-};
 
 
 //----------------------------------------------------------------------------

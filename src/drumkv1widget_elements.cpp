@@ -25,12 +25,57 @@
 
 #include "drumkv1.h"
 
+#include <QAbstractItemModel>
+
 #include <QHeaderView>
 #include <QFileInfo>
 
 
 //----------------------------------------------------------------------------
 // drumkv1widget_elements_model -- List model.
+
+class drumkv1widget_elements_model : public QAbstractItemModel
+{
+public:
+
+	// Constructor.
+	drumkv1widget_elements_model(drumkv1 *pDrumk, QObject *pParent = NULL);
+
+	// Concretizers (virtual).
+	int rowCount(const QModelIndex& parent = QModelIndex()) const;
+	int columnCount(const QModelIndex& parent = QModelIndex()) const;
+
+	QVariant headerData(int section, Qt::Orientation orient, int role) const;
+	QVariant data(const QModelIndex& index, int role) const;
+
+	QModelIndex index(int row, int column,
+		const QModelIndex& parent = QModelIndex()) const;
+
+	QModelIndex parent(const QModelIndex&) const;
+
+	void reset();
+
+	// Accessor specific.
+	drumkv1 *instance() const;
+
+protected:
+
+	// Other specifics
+	drumkv1_element *elementFromIndex(const QModelIndex& index) const;
+
+	QString itemDisplay(const QModelIndex& index) const;
+	QString itemToolTip(const QModelIndex& index) const;
+
+	int columnAlignment(int column) const;
+
+private:
+
+	// Model variables.
+	QStringList m_headers;
+
+	drumkv1 *m_pDrumk;
+};
+
 
 // Constructor.
 drumkv1widget_elements_model::drumkv1widget_elements_model (
