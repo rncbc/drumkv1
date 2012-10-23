@@ -1633,6 +1633,12 @@ drumkv1_element::drumkv1_element ( drumkv1_elem *pElem )
 }
 
 
+int drumkv1_element::note (void) const
+{
+	return (m_pElem ? int(m_pElem->gen1.sample0) : -1);
+}
+
+
 void drumkv1_element::setSampleFile ( const char *pszSampleFile )
 {
 	if (m_pElem) {

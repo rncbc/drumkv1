@@ -115,8 +115,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// Start clean.
 	m_iUpdate = 0;
 
-	m_ui.ElementList->header()->setResizeMode(QHeaderView::ResizeToContents);
-
 	// Wave shapes.
 	QStringList shapes;
 	shapes << tr("Pulse");
@@ -389,6 +387,14 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::DYN1_LIMITER,  m_ui.Dyn1LimiterKnob);
 
 
+	// Element selectors...
+	QObject::connect(m_ui.Elements,
+		SIGNAL(activated(int)),
+		SLOT(activateElement()));
+	QObject::connect(m_ui.Elements,
+		SIGNAL(doubleClicked(int)),
+		SLOT(doubleClickElement()));
+
 	// Sample management...
 	QObject::connect(m_ui.Gen1Sample,
 		SIGNAL(loadSampleFile(const QString&)),
@@ -405,21 +411,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(savePresetFile(const QString&)),
 		SLOT(savePreset(const QString&)));
 
-	// Element selector
-	QObject::connect(
-		m_ui.ElementList,
-		SIGNAL(currentItemChanged(QTreeWidgetItem *, QTreeWidgetItem *)),
-		SLOT(activateElement()));
-	QObject::connect(
-		m_ui.ElementList,
-		SIGNAL(itemDoubleClicked(QTreeWidgetItem *, int)),
-		SLOT(doubleClickElement()));
-
 	// Common context menu...
-	m_ui.ElementList->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_ui.Elements->setContextMenuPolicy(Qt::CustomContextMenu);
 	m_ui.Gen1Sample->setContextMenuPolicy(Qt::CustomContextMenu);
 
-	QObject::connect(m_ui.ElementList,
+	QObject::connect(m_ui.Elements,
 		SIGNAL(customContextMenuRequested(const QPoint&)),
 		SLOT(contextMenuRequest(const QPoint&)));
 	QObject::connect(m_ui.Gen1Sample,
@@ -832,11 +828,7 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 // Current selected note helpers.
 int drumkv1widget::currentNote (void) const
 {
-	QTreeWidgetItem *pItem = m_ui.ElementList->currentItem();
-	if (pItem == NULL)
-		return -1;
-
-	return m_ui.ElementList->indexOfTopLevelItem(pItem);
+	return m_ui.Elements->currentIndex().row();
 }
 
 
@@ -956,39 +948,24 @@ bool drumkv1widget::queryClose (void)
 // Reload all elements.
 void drumkv1widget::refreshElements (void)
 {
-	bool bBlockSignals = m_ui.ElementList->blockSignals(true);
-	int iTopLevelItem = currentNote();
+	bool bBlockSignals = m_ui.Elements->blockSignals(true);
+
+	if (m_ui.Elements->instance() == NULL)
+		m_ui.Elements->setInstance(instance());
+
+	int iCurrentNote = currentNote();
 #ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget::refreshElements(%d)", iTopLevelItem);
+	qDebug("drumkv1widget::refreshElements(%d)", iCurrentNote);
 #endif
 
-	m_ui.ElementList->clear();
+	m_ui.Elements->refresh();
 
-	drumkv1 *pDrumk = instance();
-	if (pDrumk) {
-		QTreeWidgetItem *pItem = NULL;
-		for (int note = 0; note < 128; ++note) {
-			pItem = new QTreeWidgetItem(m_ui.ElementList, pItem);
-			pItem->setText(0, completeNoteName(note));
-			QString sSample('-');
-			drumkv1_element *element = pDrumk->element(note);
-			if (element) {
-				const char *pszSampleFile = element->sampleFile();
-				if (pszSampleFile)
-					sSample = QFileInfo(pszSampleFile).completeBaseName();
-				else
-					sSample = tr("(None)");
-			}
-			pItem->setText(1, sSample);
-		}
-	}
+	if (iCurrentNote < 0) iCurrentNote = 36; // Bass Drum 1 (default)
+	m_ui.Gen1Sample->setSampleName(completeNoteName(iCurrentNote));
 
-	if (iTopLevelItem < 0) iTopLevelItem = 36; // Bass Drum 1 (default)
-	m_ui.Gen1Sample->setSampleName(completeNoteName(iTopLevelItem));
-
-	m_ui.ElementList->setCurrentItem(
-		m_ui.ElementList->topLevelItem(iTopLevelItem));
-	m_ui.ElementList->blockSignals(bBlockSignals);
+	m_ui.Elements->setCurrentIndex(
+		m_ui.Elements->model()->index(iCurrentNote, 0));
+	m_ui.Elements->blockSignals(bBlockSignals);
 }
 
 

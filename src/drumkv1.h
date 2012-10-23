@@ -157,6 +157,8 @@ public:
 
 	drumkv1_element(drumkv1_elem *pElem);
 
+	int note() const;
+
 	void setSampleFile(const char *pszSampleFile);
 	const char *sampleFile() const;
 

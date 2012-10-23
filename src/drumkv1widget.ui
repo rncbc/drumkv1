@@ -101,41 +101,13 @@
       </attribute>
       <layout class="QGridLayout">
        <item row="0" column="0" colspan="4">
-        <widget class="QTreeWidget" name="ElementList" >
+		<widget class="drumkv1widget_elements" name="Elements" >
          <property name="maximumSize" >
           <size>
            <width>320</width>
            <height>120</height>
           </size>
          </property>
-         <property name="toolTip">
-          <string>Element</string>
-         </property>
-		 <property name="allColumnsShowFocus" >
-		  <bool>true</bool>
-		 </property>
-		 <property name="alternatingRowColors" >
-          <bool>true</bool>
-         </property>
-         <property name="rootIsDecorated" >
-          <bool>false</bool>
-         </property>
-         <property name="uniformRowHeights" >
-          <bool>true</bool>
-         </property>
-         <property name="itemsExpandable" >
-          <bool>false</bool>
-         </property>
-         <column>
-          <property name="text" >
-          <string>Element</string>
-          </property>
-         </column>
-         <column>
-          <property name="text" >
-           <string>Sample</string>
-          </property>
-         </column>
         </widget>
        </item>
        <item row="0" column="4" colspan="8">
@@ -1074,6 +1046,12 @@
    <class>drumkv1widget_wave</class>
    <extends>QFrame</extends>
    <header>drumkv1widget_wave.h</header>
+   <container>1</container>
+  </customwidget>
+  <customwidget>
+   <class>drumkv1widget_elements</class>
+   <extends>QTreeView</extends>
+   <header>drumkv1widget_elements.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>
