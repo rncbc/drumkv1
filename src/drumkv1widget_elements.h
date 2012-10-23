@@ -28,8 +28,8 @@
 
 
 // Forwards.
-class drumkv1;
 class drumkv1_element;
+class drumkv1;
 
 
 //----------------------------------------------------------------------------
@@ -66,8 +66,6 @@ public:
 
 protected:
 
-	drumkv1_element *elementAt(int i) const;
-
 	QString itemDisplay(const QModelIndex& index) const;
 	QString itemToolTip(const QModelIndex& index) const;
 
@@ -100,19 +98,25 @@ public:
 	void setInstance(drumkv1 *pDrumk);
 	drumkv1 *instance() const;
 
+	// Current element accessors.
+	void setCurrentIndex(int i);
+	int currentIndex() const;
+
 	// Refreshener.
 	void refresh();
 
 signals:
 
-	void activated(int);
-	void doubleClicked(int);
+	void itemActivated(int);
+	void itemClicked(int);
+	void itemDoubleClicked(int);
 
 protected slots:
 
 	// Internal slot handlers.
-	void currentRowChangedSlot(const QModelIndex&, const QModelIndex&);
-	void doubleClickedSlot(const QModelIndex&);
+	void currentRowChanged(const QModelIndex&, const QModelIndex&);
+	void clicked(const QModelIndex&);
+	void doubleClicked(const QModelIndex&);
 
 private:
 

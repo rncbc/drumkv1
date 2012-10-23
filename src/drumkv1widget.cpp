@@ -389,10 +389,10 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// Element selectors...
 	QObject::connect(m_ui.Elements,
-		SIGNAL(activated(int)),
+		SIGNAL(itemActivated(int)),
 		SLOT(activateElement()));
 	QObject::connect(m_ui.Elements,
-		SIGNAL(doubleClicked(int)),
+		SIGNAL(itemDoubleClicked(int)),
 		SLOT(doubleClickElement()));
 
 	// Sample management...
@@ -828,7 +828,7 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 // Current selected note helpers.
 int drumkv1widget::currentNote (void) const
 {
-	return m_ui.Elements->currentIndex().row();
+	return m_ui.Elements->currentIndex();
 }
 
 
@@ -961,10 +961,9 @@ void drumkv1widget::refreshElements (void)
 	m_ui.Elements->refresh();
 
 	if (iCurrentNote < 0) iCurrentNote = 36; // Bass Drum 1 (default)
+	m_ui.Elements->setCurrentIndex(iCurrentNote);
 	m_ui.Gen1Sample->setSampleName(completeNoteName(iCurrentNote));
 
-	m_ui.Elements->setCurrentIndex(
-		m_ui.Elements->model()->index(iCurrentNote, 0));
 	m_ui.Elements->blockSignals(bBlockSignals);
 }
 

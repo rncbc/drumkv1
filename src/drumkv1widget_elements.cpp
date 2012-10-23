@@ -99,19 +99,13 @@ QModelIndex drumkv1widget_elements_model::index (
 	int row, int column, const QModelIndex& /*parent*/) const
 {
 //	qDebug("index(%d, %d)", row, column);
-	return createIndex(row, column, elementAt(row));
+	return createIndex(row, column, (m_pDrumk ? m_pDrumk->element(row) : NULL));
 }
 
 
 QModelIndex drumkv1widget_elements_model::parent ( const QModelIndex& ) const
 {
 	return QModelIndex();
-}
-
-
-drumkv1_element *drumkv1widget_elements_model::elementAt ( int i ) const
-{
-	return (m_pDrumk ? m_pDrumk->element(i) : NULL);
 }
 
 
@@ -231,10 +225,13 @@ void drumkv1widget_elements::setInstance ( drumkv1 *pDrumk )
 	// Element selectors
 	QObject::connect(QTreeView::selectionModel(),
 		SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)),
-		SLOT(currentRowChangedSlot(const QModelIndex&, const QModelIndex&)));
+		SLOT(currentRowChanged(const QModelIndex&, const QModelIndex&)));
+	QObject::connect(this,
+		SIGNAL(clicked(const QModelIndex&)),
+		SLOT(clicked(const QModelIndex&)));
 	QObject::connect(this,
 		SIGNAL(doubleClicked(const QModelIndex&)),
-		SLOT(doubleClickedSlot(const QModelIndex&)));
+		SLOT(doubleClicked(const QModelIndex&)));
 }
 
 
@@ -244,17 +241,35 @@ drumkv1 *drumkv1widget_elements::instance (void) const
 }
 
 
-// Internal slot handlers.
-void drumkv1widget_elements::currentRowChangedSlot (
-	const QModelIndex& current, const QModelIndex& /*previous*/ )
+// Current element accessors.
+void drumkv1widget_elements::setCurrentIndex ( int i )
 {
-	emit activated(current.row());
+	QTreeView::setCurrentIndex(m_pModel->index(i, 0));
+}
+
+int drumkv1widget_elements::currentIndex (void) const
+{
+	return QTreeView::currentIndex().row();
 }
 
 
-void drumkv1widget_elements::doubleClickedSlot ( const QModelIndex& index )
+// Internal slot handlers.
+void drumkv1widget_elements::currentRowChanged (
+	const QModelIndex& current, const QModelIndex& /*previous*/ )
 {
-	emit doubleClicked(index.row());
+	emit itemActivated(current.row());
+}
+
+
+void drumkv1widget_elements::clicked ( const QModelIndex& index )
+{
+	emit itemClicked(index.row());
+}
+
+
+void drumkv1widget_elements::doubleClicked ( const QModelIndex& index )
+{
+	emit itemDoubleClicked(index.row());
 }
 
 
