@@ -56,15 +56,14 @@ public:
 
 	QModelIndex parent(const QModelIndex&) const;
 
-	// Specifics.
-	drumkv1_element *elementOfIndex(const QModelIndex& index) const;
-	QModelIndex indexOfElement(drumkv1_element *element) const;
-
 	drumkv1 *instance() const;
 
 	void reset();
 
 protected:
+
+	// Specifics.
+	drumkv1_element *elementFromIndex(const QModelIndex& index) const;
 
 	QString itemDisplay(const QModelIndex& index) const;
 	QString itemToolTip(const QModelIndex& index) const;
@@ -99,7 +98,7 @@ public:
 	drumkv1 *instance() const;
 
 	// Current element accessors.
-	void setCurrentIndex(int i);
+	void setCurrentIndex(int row);
 	int currentIndex() const;
 
 	// Refreshener.
@@ -108,14 +107,12 @@ public:
 signals:
 
 	void itemActivated(int);
-	void itemClicked(int);
 	void itemDoubleClicked(int);
 
 protected slots:
 
 	// Internal slot handlers.
 	void currentRowChanged(const QModelIndex&, const QModelIndex&);
-	void clicked(const QModelIndex&);
 	void doubleClicked(const QModelIndex&);
 
 private:

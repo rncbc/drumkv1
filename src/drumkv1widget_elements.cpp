@@ -62,7 +62,6 @@ int drumkv1widget_elements_model::columnCount (
 QVariant drumkv1widget_elements_model::headerData (
 	int section, Qt::Orientation orient, int role ) const
 {
-//	qDebug("headerData(%d, %d, %d)", section, int(orient), int(role));
 	if (orient == Qt::Horizontal) {
 		switch (role) {
 		case Qt::DisplayRole:
@@ -80,7 +79,6 @@ QVariant drumkv1widget_elements_model::headerData (
 QVariant drumkv1widget_elements_model::data (
 	const QModelIndex& index, int role ) const
 {
-//	qDebug("data(%d, %d, %d)", index.row(), index.column(), int(role));
 	switch (role) {
 	case Qt::DisplayRole:
 		return itemDisplay(index);
@@ -98,7 +96,6 @@ QVariant drumkv1widget_elements_model::data (
 QModelIndex drumkv1widget_elements_model::index (
 	int row, int column, const QModelIndex& /*parent*/) const
 {
-//	qDebug("index(%d, %d)", row, column);
 	return createIndex(row, column, (m_pDrumk ? m_pDrumk->element(row) : NULL));
 }
 
@@ -109,20 +106,10 @@ QModelIndex drumkv1widget_elements_model::parent ( const QModelIndex& ) const
 }
 
 
-drumkv1_element *drumkv1widget_elements_model::elementOfIndex (
+drumkv1_element *drumkv1widget_elements_model::elementFromIndex (
 	const QModelIndex& index ) const
 {
 	return static_cast<drumkv1_element *> (index.internalPointer());
-}
-
-
-QModelIndex drumkv1widget_elements_model::indexOfElement (
-	drumkv1_element *element ) const
-{
-	if (element && element->note() >= 0)
-		return createIndex(element->note(), 0, element);
-	else
-		return QModelIndex();
 }
 
 
@@ -147,7 +134,7 @@ QString drumkv1widget_elements_model::itemDisplay (
 	case 0: // Element.
 		return drumkv1widget::completeNoteName(index.row());
 	case 1: // Sample.
-		drumkv1_element *element = elementOfIndex(index);
+		drumkv1_element *element = elementFromIndex(index);
 		if (element) {
 			const char *pszSampleFile = element->sampleFile();
 			if (pszSampleFile)
@@ -164,7 +151,7 @@ QString drumkv1widget_elements_model::itemToolTip (
 	const QModelIndex& index ) const
 {
 	QString sToolTip = '[' + drumkv1widget::completeNoteName(index.row()) + ']';
-	drumkv1_element *element = elementOfIndex(index);
+	drumkv1_element *element = elementFromIndex(index);
 	if (element) {
 		const char *pszSampleFile = element->sampleFile();
 		if (pszSampleFile) {
@@ -227,9 +214,6 @@ void drumkv1widget_elements::setInstance ( drumkv1 *pDrumk )
 		SIGNAL(currentRowChanged(const QModelIndex&, const QModelIndex&)),
 		SLOT(currentRowChanged(const QModelIndex&, const QModelIndex&)));
 	QObject::connect(this,
-		SIGNAL(clicked(const QModelIndex&)),
-		SLOT(clicked(const QModelIndex&)));
-	QObject::connect(this,
 		SIGNAL(doubleClicked(const QModelIndex&)),
 		SLOT(doubleClicked(const QModelIndex&)));
 }
@@ -242,9 +226,9 @@ drumkv1 *drumkv1widget_elements::instance (void) const
 
 
 // Current element accessors.
-void drumkv1widget_elements::setCurrentIndex ( int i )
+void drumkv1widget_elements::setCurrentIndex ( int row )
 {
-	QTreeView::setCurrentIndex(m_pModel->index(i, 0));
+	QTreeView::setCurrentIndex(m_pModel->index(row, 0));
 }
 
 int drumkv1widget_elements::currentIndex (void) const
@@ -258,12 +242,6 @@ void drumkv1widget_elements::currentRowChanged (
 	const QModelIndex& current, const QModelIndex& /*previous*/ )
 {
 	emit itemActivated(current.row());
-}
-
-
-void drumkv1widget_elements::clicked ( const QModelIndex& index )
-{
-	emit itemClicked(index.row());
 }
 
 
