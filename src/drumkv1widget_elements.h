@@ -28,7 +28,6 @@
 // Forwards.
 class drumkv1widget_elements_model;
 
-class drumkv1_element;
 class drumkv1;
 
 
@@ -60,6 +59,7 @@ public:
 
 signals:
 
+	// Emitted signals.
 	void itemActivated(int);
 	void itemDoubleClicked(int);
 

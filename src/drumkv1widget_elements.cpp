@@ -26,7 +26,6 @@
 #include "drumkv1.h"
 
 #include <QAbstractItemModel>
-
 #include <QHeaderView>
 #include <QFileInfo>
 
@@ -173,7 +172,6 @@ void drumkv1widget_elements_model::reset (void)
 QString drumkv1widget_elements_model::itemDisplay (
 	const QModelIndex& index ) const
 {
-//	qDebug("itemDisplay(%d, %d)", index.row(), index.column());
 	const QString sDash('-');
 	switch (index.column()) {
 	case 0: // Element.
