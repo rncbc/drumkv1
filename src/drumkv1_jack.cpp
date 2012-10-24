@@ -209,7 +209,7 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 }
 
 
-void drumkv1_jack::open(void)
+void drumkv1_jack::open (void)
 {
 	// open client
 	m_client = ::jack_client_open("drumkv1", JackNullOption, NULL);
@@ -222,7 +222,7 @@ void drumkv1_jack::open(void)
 
 	// set sample rate
 	drumkv1::setSampleRate(jack_get_sample_rate(m_client));
-	drumkv1::reset();
+//	drumkv1::reset();
 
 	// register audio ports & buffers
 	uint16_t nchannels = channels();
@@ -280,6 +280,8 @@ void drumkv1_jack::open(void)
 
 void drumkv1_jack::activate (void)
 {
+	drumkv1::reset();
+
 	if (m_client) ::jack_activate(m_client);
 }
 
