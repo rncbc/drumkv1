@@ -42,7 +42,7 @@ struct {
 	{ "GEN1_SAMPLE",   36.0f }, // Bass Drum 1 (GM) aka. C2 (36)
 	{ "GEN1_COARSE",    0.0f },
 	{ "GEN1_FINE",      0.0f },
-	{ "DCF1_CUTOFF",    0.5f },
+	{ "DCF1_CUTOFF",    1.0f }, // 0.5f
 	{ "DCF1_RESO",      0.0f },
 	{ "DCF1_TYPE",      0.0f },
 	{ "DCF1_SLOPE",     0.0f },
