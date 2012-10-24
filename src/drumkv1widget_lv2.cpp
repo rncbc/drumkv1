@@ -47,8 +47,6 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 		SLOT(updateNotify()));
 
 	// Initial update, always...
-	pDrumk->setCurrentElement(-1);
-
 	refreshElements();
 	activateElement();
 }

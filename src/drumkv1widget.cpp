@@ -954,6 +954,7 @@ void drumkv1widget::refreshElements (void)
 		m_ui.Elements->setInstance(instance());
 
 	int iCurrentNote = currentNote();
+
 #ifdef CONFIG_DEBUG
 	qDebug("drumkv1widget::refreshElements(%d)", iCurrentNote);
 #endif
@@ -980,17 +981,21 @@ void drumkv1widget::clearElements (void)
 // Element activation.
 void drumkv1widget::activateElement ( bool bOpenSample )
 {
-	int note = currentNote();
-	if (note < 0)
+	int iCurrentNote = currentNote();
+	if (iCurrentNote < 0)
 		return;
+
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1widget::activateElement(%d)", iCurrentNote);
+#endif
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk == NULL)
 		return;
 
-	drumkv1_element *element = pDrumk->element(note);
+	drumkv1_element *element = pDrumk->element(iCurrentNote);
 	if (element == NULL && bOpenSample) {
-		element = pDrumk->addElement(note);
+		element = pDrumk->addElement(iCurrentNote);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			float fValue = drumkv1_default_params[i].value;
@@ -998,25 +1003,26 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 		}
 	}
 
-	if (note != pDrumk->currentElement()) {
-		pDrumk->setCurrentElement(note);
-		resetParamKnobs();
-		if (element) {
-			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-				setParamValue(index, element->paramValue(index));
-			}
-			updateSample(pDrumk->sample());
-			refreshElements();
-		} else {
-			updateSample(NULL);
-			resetParamValues();
+	pDrumk->setCurrentElement(iCurrentNote);
+
+	resetParamKnobs();
+
+	if (element) {
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			setParamValue(index, element->paramValue(index));
 		}
-		activateParamKnobs(element != NULL);
+		updateSample(pDrumk->sample());
+		refreshElements();
+	} else {
+		updateSample(NULL);
+		resetParamValues();
 	}
 
+	activateParamKnobs(element != NULL);
+
 	if (bOpenSample)
-		m_ui.Gen1Sample->openSample(completeNoteName(note));
+		m_ui.Gen1Sample->openSample(completeNoteName(iCurrentNote));
 }
 
 
@@ -1039,6 +1045,7 @@ void drumkv1widget::resetElement (void)
 	}
 
 	refreshElements();
+	activateElement();
 }
 
 
