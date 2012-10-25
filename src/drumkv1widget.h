@@ -143,8 +143,8 @@ protected:
 	void refreshElements();
 
 	// Reset all param/knob default values.
-	void resetParamValues();
-	void resetParamKnobs();
+	void resetParamValues(uint32_t nparams);
+	void resetParamKnobs(uint32_t nparams);
 
 	// (En|Dis)able/ all param/knobs.
 	void activateParamKnobs(bool bEnabled);

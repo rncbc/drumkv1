@@ -294,6 +294,7 @@ struct drumkv1_def
 	float *pitchbend;
 	float *modwheel;
 	float *pressure;
+	float *noteoff;
 };
 
 
@@ -994,6 +995,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DEF1_PITCHBEND: m_def.pitchbend = pfParam; break;
 	case drumkv1::DEF1_MODWHEEL:  m_def.modwheel  = pfParam; break;
 	case drumkv1::DEF1_PRESSURE:  m_def.pressure  = pfParam; break;
+	case drumkv1::DEF1_NOTEOFF:   m_def.noteoff   = pfParam; break;
 	case drumkv1::CHO1_WET:       m_cho.wet       = pfParam; break;
 	case drumkv1::CHO1_DELAY:     m_cho.delay     = pfParam; break;
 	case drumkv1::CHO1_FEEDB:     m_cho.feedb     = pfParam; break;
@@ -1032,6 +1034,7 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DEF1_PITCHBEND: pfParam = m_def.pitchbend; break;
 	case drumkv1::DEF1_MODWHEEL:  pfParam = m_def.modwheel;  break;
 	case drumkv1::DEF1_PRESSURE:  pfParam = m_def.pressure;  break;
+	case drumkv1::DEF1_NOTEOFF:   pfParam = m_def.noteoff;   break;
 	case drumkv1::CHO1_WET:       pfParam = m_cho.wet;       break;
 	case drumkv1::CHO1_DELAY:     pfParam = m_cho.delay;	 break;
 	case drumkv1::CHO1_FEEDB:     pfParam = m_cho.feedb;     break;
@@ -1134,13 +1137,15 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 	}
 	// note off
 	else if (status == 0x80 || (status == 0x90 && value == 0)) {
-		drumkv1_voice *pv = m_notes[key];
-		if (pv && pv->note >= 0) {
-			if (pv->dca1_env.stage != drumkv1_env::Decay2) {
-				drumkv1_elem *elem = pv->elem;
-				elem->dca1.env.note_off(&pv->dca1_env);
-				elem->dcf1.env.note_off(&pv->dcf1_env);
-				elem->lfo1.env.note_off(&pv->lfo1_env);
+		if (int(*m_def.noteoff) > 0) {
+			drumkv1_voice *pv = m_notes[key];
+			if (pv && pv->note >= 0) {
+				if (pv->dca1_env.stage != drumkv1_env::Decay2) {
+					drumkv1_elem *elem = pv->elem;
+					elem->dca1.env.note_off(&pv->dca1_env);
+					elem->dcf1.env.note_off(&pv->dcf1_env);
+					elem->lfo1.env.note_off(&pv->lfo1_env);
+				}
 			}
 		}
 	}

@@ -5,6 +5,8 @@ ChangeLog
 
 SVN TRUNK
 
+- MIDI Note-off event enablement parameter introduced.
+
 - Slight minor fix on fast-release re-triggering.
 
 - Element list and sample widget context menu's now a reality.

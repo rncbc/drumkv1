@@ -582,7 +582,17 @@
             </property>
            </widget>
           </item>
-         </layout>
+		  <item>
+		   <widget class="drumkv1widget_combo" name="Def1NoteoffKnob">
+			<property name="toolTip">
+			 <string>DEF1 Note Off</string>
+			</property>
+			<property name="text">
+			 <string>Note Off</string>
+			</property>
+		   </widget>
+		  </item>
+		 </layout>
         </widget>
        </item>
        <item row="3" column="9" colspan="3">

@@ -76,6 +76,7 @@ struct {
 	{ "DEF1_PITCHBEND", 0.2f },
 	{ "DEF1_MODWHEEL",  0.2f },
 	{ "DEF1_PRESSURE",  0.2f },
+	{ "DEF1_NOTEOFF",   1.0f },
 
 	{ "CHO1_WET",       0.0f },
 	{ "CHO1_DELAY",     0.5f },
@@ -139,6 +140,13 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	slopes << tr("24dB/oct");
 
 	m_ui.Dcf1SlopeKnob->insertItems(0, slopes);
+
+	// Noteoff modes.
+	QStringList modes;
+	modes << tr("Disabled");
+	modes << tr("Enabled");
+
+	m_ui.Def1NoteoffKnob->insertItems(0, modes);
 
 	// Dynamic states.
 	QStringList states;
@@ -352,6 +360,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::DEF1_PITCHBEND, m_ui.Def1PitchbendKnob);
 	setParamKnob(drumkv1::DEF1_MODWHEEL,  m_ui.Def1ModwheelKnob);
 	setParamKnob(drumkv1::DEF1_PRESSURE,  m_ui.Def1PressureKnob);
+	setParamKnob(drumkv1::DEF1_NOTEOFF,   m_ui.Def1NoteoffKnob);
 
 	// OUT1
 	setParamKnob(drumkv1::OUT1_WIDTH,   m_ui.Out1WidthKnob);
@@ -486,9 +495,9 @@ void drumkv1widget::paramChanged ( float fValue )
 
 
 // Reset all param default values.
-void drumkv1widget::resetParamValues (void)
+void drumkv1widget::resetParamValues ( uint32_t nparams )
 {
-	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
+	for (uint32_t i = 0; i < nparams; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		float fValue = drumkv1_default_params[i].value;
 		setParamValue(index, fValue);
@@ -498,9 +507,9 @@ void drumkv1widget::resetParamValues (void)
 
 
 // Reset all knob default values.
-void drumkv1widget::resetParamKnobs (void)
+void drumkv1widget::resetParamKnobs ( uint32_t nparams )
 {
-	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
+	for (uint32_t i = 0; i < nparams; ++i) {
 		drumkv1widget_knob *pKnob = paramKnob(drumkv1::ParamIndex(i));
 		if (pKnob)
 			pKnob->resetDefaultValue();
@@ -526,8 +535,8 @@ void drumkv1widget::newPreset (void)
 
 	clearSample();
 
-	resetParamKnobs();
-	resetParamValues();
+	resetParamKnobs(drumkv1::NUM_PARAMS);
+	resetParamValues(drumkv1::NUM_PARAMS);
 
 	refreshElements();
 	activateElement();
@@ -562,8 +571,8 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 
 	clearSample();
 
-	resetParamValues();
-	resetParamKnobs();
+	resetParamValues(drumkv1::NUM_PARAMS);
+	resetParamKnobs(drumkv1::NUM_PARAMS);
 
 	QDomDocument doc(DRUMKV1_TITLE);
 	if (doc.setContent(&file)) {
@@ -1005,7 +1014,7 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 
 	pDrumk->setCurrentElement(iCurrentNote);
 
-	resetParamKnobs();
+	resetParamKnobs(drumkv1::NUM_ELEMENT_PARAMS);
 
 	if (element) {
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -1016,7 +1025,7 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 		refreshElements();
 	} else {
 		updateSample(NULL);
-		resetParamValues();
+		resetParamValues(drumkv1::NUM_ELEMENT_PARAMS);
 	}
 
 	activateParamKnobs(element != NULL);
