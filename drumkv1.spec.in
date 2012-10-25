@@ -1,6 +1,6 @@
 %define name    @PACKAGE_TARNAME@
 %define version @PACKAGE_VERSION@
-%define release 0
+%define release 1
 
 %define _prefix	@ac_prefix@
 
@@ -56,5 +56,7 @@ BuildRequires:	lv2-devel
 %{_bindir}/%{name}_jack
 
 %changelog
+* Thu Oct 25 2012 Rui Nuno Capela <rncbc@users.sourceforge.net> 0.1.0-1
+- First public release.
 * Wed Oct  3 2012 Rui Nuno Capela <rncbc@users.sourceforge.net> 0.0.0-0
 - Created initial drumkv1.spec
