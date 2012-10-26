@@ -419,6 +419,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	QObject::connect(m_ui.Preset,
 		SIGNAL(savePresetFile(const QString&)),
 		SLOT(savePreset(const QString&)));
+	QObject::connect(m_ui.Preset,
+		SIGNAL(resetPresetFile()),
+		SLOT(resetParams()));
 
 	// Common context menu...
 	m_ui.Elements->setContextMenuPolicy(Qt::CustomContextMenu);
@@ -494,6 +497,21 @@ void drumkv1widget::paramChanged ( float fValue )
 }
 
 
+// Reset all param knobs to default values.
+void drumkv1widget::resetParams (void)
+{
+	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
+		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		float fValue = drumkv1_default_params[i].value;
+		drumkv1widget_knob *pKnob = paramKnob(index);
+		if (pKnob)
+			fValue = pKnob->defaultValue();
+		setParamValue(index, fValue);
+		updateParam(index, fValue);
+	}
+}
+
+
 // Reset all param default values.
 void drumkv1widget::resetParamValues ( uint32_t nparams )
 {
@@ -533,20 +551,13 @@ void drumkv1widget::newPreset (void)
 
 	clearElements();
 
-	clearSample();
+	clearSampleFile();
 
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 	resetParamValues(drumkv1::NUM_PARAMS);
 
 	refreshElements();
 	activateElement();
-}
-
-
-// Sample openner.
-void drumkv1widget::openSample (void)
-{
-	m_ui.Gen1Sample->openSample(currentNoteName());
 }
 
 
@@ -569,7 +580,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 
 	clearElements();
 
-	clearSample();
+	clearSampleFile();
 
 	resetParamValues(drumkv1::NUM_PARAMS);
 	resetParamKnobs(drumkv1::NUM_PARAMS);
@@ -762,8 +773,33 @@ void drumkv1widget::saveElements (
 // Sample reset slot.
 void drumkv1widget::clearSample (void)
 {
+	clearSampleFile();
+
+	m_ui.Preset->dirtyPreset();
+}
+
+
+// Sample file loader slot.
+void drumkv1widget::loadSample ( const QString& sFilename )
+{
+	loadSampleFile(sFilename);
+
+	m_ui.Preset->dirtyPreset();
+}
+
+
+// Sample openner.
+void drumkv1widget::openSample (void)
+{
+	m_ui.Gen1Sample->openSample(currentNoteName());
+}
+
+
+// Sample file reset.
+void drumkv1widget::clearSampleFile (void)
+{
 #ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget::clearSample()");
+	qDebug("drumkv1widget::clearSampleFile()");
 #endif
 
 	drumkv1 *pDrumk = instance();
@@ -774,11 +810,11 @@ void drumkv1widget::clearSample (void)
 }
 
 
-// Sample loader slot.
-void drumkv1widget::loadSample ( const QString& sFilename )
+// Sample file loader.
+void drumkv1widget::loadSampleFile ( const QString& sFilename )
 {
 #ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget::loadSample(\"%s\")", sFilename.toUtf8().constData());
+	qDebug("drumkv1widget::loadSampleFile(\"%s\")", sFilename.toUtf8().constData());
 #endif
 
 	drumkv1 *pDrumk = instance();
@@ -1045,7 +1081,7 @@ void drumkv1widget::doubleClickElement (void)
 // Element deactivation.
 void drumkv1widget::resetElement (void)
 {
-	clearSample();
+	clearSampleFile();
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {

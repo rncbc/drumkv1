@@ -3,9 +3,16 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
+SVN TRUNK
+
+- Reset (all values to preset defaults) button has been added.
+
+
 0.1.0  2012-10-25  First public release.
 
 - MIDI Note-off event enablement parameter introduced.
+
+- Reset (all values to preset defaults) button has been added.
 
 - Slight minor fix on fast-release re-triggering.
 

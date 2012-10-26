@@ -127,6 +127,9 @@ protected slots:
 	// Common context menu.
 	void contextMenuRequest(const QPoint& pos);
 
+	// Reset param knobs to default value.
+	void resetParams();
+
 	// Menu actions.
 	void helpAbout();
 	void helpAboutQt();
@@ -149,6 +152,12 @@ protected:
 	// (En|Dis)able/ all param/knobs.
 	void activateParamKnobs(bool bEnabled);
 	void activateParamKnobsGroupBox(QGroupBox *pGroupBox, bool bEnable);
+
+	// Sample file clearance.
+	void clearSampleFile();
+
+	// Sample loader slot.
+	void loadSampleFile(const QString& sFilename);
 
 	// Sample filename retriever.
 	QString sampleFile() const;

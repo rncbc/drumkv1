@@ -95,13 +95,13 @@
      <property name="currentIndex" >
       <number>0</number>
      </property>
-	 <widget class="QWidget" name="Drumkit1Page">
+     <widget class="QWidget" name="Drumkit1Page">
       <attribute name="label">
-	   <string>Drum Kit 1</string>
+       <string>Drum Kit 1</string>
       </attribute>
       <layout class="QGridLayout">
        <item row="0" column="0" colspan="4">
-		<widget class="drumkv1widget_elements" name="Elements" >
+        <widget class="drumkv1widget_elements" name="Elements" >
          <property name="maximumSize" >
           <size>
            <width>320</width>
@@ -582,17 +582,17 @@
             </property>
            </widget>
           </item>
-		  <item>
-		   <widget class="drumkv1widget_combo" name="Def1NoteoffKnob">
-			<property name="toolTip">
-			 <string>DEF1 Note Off</string>
-			</property>
-			<property name="text">
-			 <string>Note Off</string>
-			</property>
-		   </widget>
-		  </item>
-		 </layout>
+          <item>
+           <widget class="drumkv1widget_combo" name="Def1NoteoffKnob">
+            <property name="toolTip">
+             <string>DEF1 Note Off</string>
+            </property>
+            <property name="text">
+             <string>Note Off</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
         </widget>
        </item>
        <item row="3" column="9" colspan="3">
