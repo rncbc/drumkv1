@@ -76,7 +76,7 @@ struct {
 	{ "DEF1_PITCHBEND", 0.2f },
 	{ "DEF1_MODWHEEL",  0.2f },
 	{ "DEF1_PRESSURE",  0.2f },
-	{ "DEF1_VELOCITY",  0.5f },
+	{ "DEF1_VELOCITY",  0.2f },
 	{ "DEF1_NOTEOFF",   1.0f },
 
 	{ "CHO1_WET",       0.0f },
