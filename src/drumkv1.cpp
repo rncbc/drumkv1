@@ -83,6 +83,18 @@ inline float drumkv1_sigmoid1 ( const float x, const float t = 0.01f )
 }
 
 
+// velocity hard-split curve
+
+inline float drumkv1_velocity ( float x, float p = 0.5f )
+{
+	const float q = 2.0f * p;
+	if (q > 1.0f)
+		return (2.0f - q) * x + q - 1.0f;
+	else
+		return q * x;
+}
+
+
 // envelope
 
 struct drumkv1_env
@@ -294,6 +306,7 @@ struct drumkv1_def
 	float *pitchbend;
 	float *modwheel;
 	float *pressure;
+	float *velocity;
 	float *noteoff;
 };
 
@@ -995,6 +1008,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DEF1_PITCHBEND: m_def.pitchbend = pfParam; break;
 	case drumkv1::DEF1_MODWHEEL:  m_def.modwheel  = pfParam; break;
 	case drumkv1::DEF1_PRESSURE:  m_def.pressure  = pfParam; break;
+	case drumkv1::DEF1_VELOCITY:  m_def.velocity  = pfParam; break;
 	case drumkv1::DEF1_NOTEOFF:   m_def.noteoff   = pfParam; break;
 	case drumkv1::CHO1_WET:       m_cho.wet       = pfParam; break;
 	case drumkv1::CHO1_DELAY:     m_cho.delay     = pfParam; break;
@@ -1034,6 +1048,7 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DEF1_PITCHBEND: pfParam = m_def.pitchbend; break;
 	case drumkv1::DEF1_MODWHEEL:  pfParam = m_def.modwheel;  break;
 	case drumkv1::DEF1_PRESSURE:  pfParam = m_def.pressure;  break;
+	case drumkv1::DEF1_VELOCITY:  pfParam = m_def.velocity;  break;
 	case drumkv1::DEF1_NOTEOFF:   pfParam = m_def.noteoff;   break;
 	case drumkv1::CHO1_WET:       pfParam = m_cho.wet;       break;
 	case drumkv1::CHO1_DELAY:     pfParam = m_cho.delay;	 break;
@@ -1109,8 +1124,9 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			// waveform
 			pv->note = key;
 			// velocity
-			pv->vel = float(value) / 127.0f;
-			pv->vel *= pv->vel; // quadratic velocity law
+			const float vel = float(value) / 127.0f;
+			pv->vel  = drumkv1_velocity(vel, *m_def.velocity);
+			pv->vel *= pv->vel;	// quadratic velocity law
 			// generate
 			pv->gen1.start();
 			// frequencies

@@ -76,6 +76,7 @@ struct {
 	{ "DEF1_PITCHBEND", 0.2f },
 	{ "DEF1_MODWHEEL",  0.2f },
 	{ "DEF1_PRESSURE",  0.2f },
+	{ "DEF1_VELOCITY",  0.5f },
 	{ "DEF1_NOTEOFF",   1.0f },
 
 	{ "CHO1_WET",       0.0f },
@@ -360,6 +361,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::DEF1_PITCHBEND, m_ui.Def1PitchbendKnob);
 	setParamKnob(drumkv1::DEF1_MODWHEEL,  m_ui.Def1ModwheelKnob);
 	setParamKnob(drumkv1::DEF1_PRESSURE,  m_ui.Def1PressureKnob);
+	setParamKnob(drumkv1::DEF1_VELOCITY,  m_ui.Def1VelocityKnob);
 	setParamKnob(drumkv1::DEF1_NOTEOFF,   m_ui.Def1NoteoffKnob);
 
 	// OUT1
