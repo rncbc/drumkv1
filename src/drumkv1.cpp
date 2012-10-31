@@ -1125,8 +1125,8 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			pv->note = key;
 			// velocity
 			const float vel = float(value) / 127.0f;
-			pv->vel  = drumkv1_velocity(vel, *m_def.velocity);
-			pv->vel *= pv->vel;	// quadratic velocity law
+			// quadratic velocity law
+			pv->vel  = drumkv1_velocity(vel * vel, *m_def.velocity);
 			// generate
 			pv->gen1.start();
 			// frequencies
