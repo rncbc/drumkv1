@@ -197,9 +197,16 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 			const QString sName = QString(sffinfo.name)
 				.replace('/', '-') // Replace some illegal characters.
 				.remove('(').remove(')');
-			const QString sExt = sExtMask.arg(sffinfo.extension);
-			s_filters.append(sFilterMask.arg(sName).arg(sExt));
+			const QString sExtension(sffinfo.extension);
+			QString sExt = sExtMask.arg(sExtension);
+			QString sExts = sExt;
 			exts.append(sExt);
+			if (sExtension.length() > 3) {
+				sExt = sExtMask.arg(sExtension.left(3));
+				sExts += ' ' + sExt;
+				exts.append(sExt);
+			}
+			s_filters.append(sFilterMask.arg(sName).arg(sExts));
 		}
 		s_filters.prepend(sFilterMask.arg(tr("Audio files")).arg(exts.join(" ")));
 		s_filters.append(sFilterMask.arg(tr("All files")).arg("*.*"));
