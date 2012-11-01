@@ -26,6 +26,7 @@
 #include <QFileInfo>
 
 #include <QMessageBox>
+#include <QDir>
 
 
 //-------------------------------------------------------------------------
@@ -587,12 +588,15 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 	resetParamValues(drumkv1::NUM_PARAMS);
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 
+	const QFileInfo fi(sFilename);
+	const QDir currentDir(QDir::current());
+	QDir::setCurrent(fi.absolutePath());
+
 	QDomDocument doc(DRUMKV1_TITLE);
 	if (doc.setContent(&file)) {
 		QDomElement ePreset = doc.documentElement();
 		if (ePreset.tagName() == "preset"
-			&& ePreset.attribute("name")
-				== QFileInfo(sFilename).completeBaseName()) {
+			&& ePreset.attribute("name") == fi.completeBaseName()) {
 			for (QDomNode nChild = ePreset.firstChild();
 					!nChild.isNull();
 						nChild = nChild.nextSibling()) {
@@ -628,7 +632,9 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 
 	file.close();
 
-	m_ui.Preset->setPreset(QFileInfo(sFilename).completeBaseName());
+	m_ui.Preset->setPreset(fi.completeBaseName());
+
+	QDir::setCurrent(currentDir.absolutePath());
 
 	refreshElements();
 	activateElement();
