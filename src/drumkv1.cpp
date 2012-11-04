@@ -77,7 +77,7 @@ inline float drumkv1_sigmoid0 ( const float x, const float t )
 	return (x < t0 ? t0 : (x > t1 ? t1 : x * (1.5f - 0.5f * x * x)));
 }
 
-inline float drumkv1_sigmoid1 ( const float x, const float t = 0.01f )
+inline float drumkv1_sigmoid1 ( const float x, const float t = 0.001f )
 {
 	return 0.5f * (1.0f + drumkv1_sigmoid0(2.0f * x - 1.0f, t));
 }
