@@ -188,7 +188,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 			}
 			lv2_event_increment(&iter);
 		}
-		m_event_buffer = NULL;
+	//	m_event_buffer = NULL;
 	}
 
 	process(ins, outs, nframes - ndelta);
