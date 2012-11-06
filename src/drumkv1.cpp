@@ -438,7 +438,7 @@ private:
 };
 
 
-// (second kind of) filter
+// (Stilson/Smith Moog 24dB/oct) filter
 
 class drumkv1_filter2
 {
@@ -465,17 +465,17 @@ public:
 		m_q = 1.0f - cutoff;
 		m_p = cutoff + 0.8f * cutoff * m_q;
 		m_f = m_p + m_p - 1.0f;
-		m_q = 0.89f * reso * (1.0f + 0.5f * m_q * (1.0f - m_q + 5.6f * m_q * m_q));
+		m_q = reso * (1.0f + 0.5f * m_q * (1.0f - m_q + 5.6f * m_q * m_q));
 
-		input -= m_q * m_b4;
+		input -= m_q * m_b4;	// feedback
 
-		m_t1 = m_b1;
-		m_b1 = (input + m_b0) * m_p - m_b1 * m_f;
-		m_t2 = m_b2;
-		m_b2 = (m_b1 + m_t1) * m_p - m_b2 * m_f;
-		m_t1 = m_b3;
-		m_b3 = (m_b2 + m_t2) * m_p - m_b3 * m_f;
+		m_t1 = m_b1; m_b1 = (input + m_b0) * m_p - m_b1 * m_f;
+		m_t2 = m_b2; m_b2 = (m_b1 + m_t1) * m_p - m_b2 * m_f;
+		m_t1 = m_b3; m_b3 = (m_b2 + m_t2) * m_p - m_b3 * m_f;
+
 		m_b4 = (m_b3 + m_t1) * m_p - m_b4 * m_f;
+		m_b4 = m_b4 - m_b4 * m_b4 * m_b4 * 0.166667f;	// clipping
+
 		m_b0 = input;
 
 		switch (m_type) {
@@ -622,7 +622,8 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 
 	float lfo1_sample;
 
-	drumkv1_filter1 dcf11, dcf12, dcf13, dcf14;	// filters
+	drumkv1_filter1 dcf11, dcf12;				// filters
+	drumkv1_filter2 dcf13, dcf14;
 
 	drumkv1_env::State dca1_env;				// envelope states
 	drumkv1_env::State dcf1_env;
@@ -1127,12 +1128,11 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				+ *elem->gen1.fine * FINE_SCALE;
 			pv->gen1_freq = note_freq(freq1);
 			// filters
-			const drumkv1_filter1::Type type1
-				= drumkv1_filter1::Type(int(*elem->dcf1.type));
-			pv->dcf11.reset(type1);
-			pv->dcf12.reset(type1);
-			pv->dcf13.reset(type1);
-			pv->dcf14.reset(type1);
+			const int type1 = int(*elem->dcf1.type);
+			pv->dcf11.reset(drumkv1_filter1::Type(type1));
+			pv->dcf12.reset(drumkv1_filter1::Type(type1));
+			pv->dcf13.reset(drumkv1_filter2::Type(type1));
+			pv->dcf14.reset(drumkv1_filter2::Type(type1));
 			// envelopes
 			elem->dcf1.env.start(&pv->dcf1_env);
 			elem->lfo1.env.start(&pv->lfo1_env);
@@ -1380,8 +1380,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 				pv->gen1.next(pv->gen1_freq * (pitchbend1 + modwheel1 * lfo1));
 
-				const float gen1 = pv->gen1.value(k1);
-				const float gen2 = pv->gen1.value(k2);
+				float gen1 = pv->gen1.value(k1);
+				float gen2 = pv->gen1.value(k2);
 
 				pv->lfo1_sample = pv->lfo1.sample(lfo1_freq
 					* (1.0f + SWEEP_SCALE * *elem->lfo1.sweep * lfo1_env));
@@ -1395,18 +1395,19 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float reso1 = drumkv1_sigmoid1(*elem->dcf1.reso
 					* env1 * (1.0f + *elem->lfo1.reso * lfo1));
 
-				float dcf11 = pv->dcf11.output(gen1, cutoff1, reso1);
-				float dcf12 = pv->dcf12.output(gen2, cutoff1, reso1);
 				if (int(*elem->dcf1.slope) > 0) { // 24db/octave
-					dcf11 = pv->dcf13.output(dcf11, cutoff1, reso1);
-					dcf12 = pv->dcf14.output(dcf12, cutoff1, reso1);
+					gen1 = pv->dcf13.output(gen1, cutoff1, reso1);
+					gen2 = pv->dcf14.output(gen2, cutoff1, reso1);
+				} else {
+					gen1 = pv->dcf11.output(gen1, cutoff1, reso1);
+					gen2 = pv->dcf12.output(gen2, cutoff1, reso1);
 				}
 
 				// volumes
 
 				const float wid1 = elem->wid1.value(j);
-				const float mid1 = 0.5f * (dcf11 + dcf12);
-				const float sid1 = 0.5f * (dcf11 - dcf12);
+				const float mid1 = 0.5f * (gen1 + gen2);
+				const float sid1 = 0.5f * (gen1 - gen2);
 				const float vol1 = vel1 * elem->vol1.value(j)
 					* pv->dca1_env.value2(j);
 

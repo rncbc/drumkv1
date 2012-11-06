@@ -5,44 +5,30 @@ ChangeLog
 
 SVN TRUNK
 
+- Moog-like 24dB/oct resonant filter slight modification.
 - Increased polyphony baseline from 24 to 32 voices.
-
 - Prepared for relative paths from preset file references.
-
 - Audio files browser filter support for the old but everlasting
   8.3 filename formats.
-
 - Velocity sensitivity configuration control has been added.
-
 - Reset (all values to preset defaults) button has been added.
 
 
 0.1.0  2012-10-25  First public release.
 
 - MIDI Note-off event enablement parameter introduced.
-
 - Reset (all values to preset defaults) button has been added.
-
 - Slight minor fix on fast-release re-triggering.
-
 - Element list and sample widget context menu's now a reality.
-
 - Added some command line options to the stand-alone JACK client
   program (--help and --version information).
-
 - Reimplemented mouse-wheel stepping on combo-dial knob widgets.
-
 - LV2 state chunk retrieve/save implementation complete.
-
 - Current element selection and stabilization.
-
 - Preset load/save is now fully functional.
-
 - Access to core engine instance has been slightly refactored.
-
-- Classic ADSR replaced by custom one-shot drum-mode specific envelope
-  generators (Attack, Delay1, Level2, Delay2).
-
+- Classic ADSR replaced by custom one-shot drum-mode specific
+  envelope generators (Attack, Delay1, Level2, Delay2).
 - Detached generic double-linked list class into its own header.
 
 
