@@ -548,10 +548,13 @@ void drumkv1widget::swapParams ( bool bOn )
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
-		for (int note = 0; note < 128; ++note) {
-			drumkv1_element *element = pDrumk->element(note);
-			if (element)
-				element->resetParams(true);
+		pDrumk->resetParams();
+		drumkv1_element *element = pDrumk->element(pDrumk->currentElement());
+		if (element) {
+			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				m_params_ab[index] = element->paramValue(index);
+			}
 		}
 	}
 

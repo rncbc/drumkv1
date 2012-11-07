@@ -669,6 +669,7 @@ public:
 	void process_midi(uint8_t *data, uint32_t size);
 	void process(float **ins, float **outs, uint32_t nframes);
 
+	void resetParams();
 	void reset();
 
 protected:
@@ -1256,6 +1257,18 @@ void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 }
 
 
+// reset/swap all elements params A/B
+
+void drumkv1_impl::resetParams (void)
+{
+	drumkv1_elem *elem = m_elem_list.next();
+	while (elem) {
+		elem->element.resetParams(true);
+		elem = elem->next();
+	}
+}
+
+
 // all reset clear
 
 void drumkv1_impl::reset (void)
@@ -1264,7 +1277,7 @@ void drumkv1_impl::reset (void)
 	drumkv1_elem *elem = m_elem_list.next();
 	while (elem) {
 		resetElement(elem);
-		elem->element.resetParams();
+		elem->element.resetParams(false);
 		elem = elem->next();
 	}
 
@@ -1624,6 +1637,14 @@ void drumkv1::process_midi ( uint8_t *data, uint32_t size )
 void drumkv1::process ( float **ins, float **outs, uint32_t nframes )
 {
 	m_pImpl->process(ins, outs, nframes);
+}
+
+
+// reset/swap all element params A/B
+
+void drumkv1::resetParams (void)
+{
+	m_pImpl->resetParams();
 }
 
 

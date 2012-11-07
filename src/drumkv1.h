@@ -136,6 +136,7 @@ public:
 	void setParamPort(ParamIndex index, float *pfParam);
 	float *paramPort(ParamIndex index) const;
 
+	void resetParams();
 	void reset();
 
 protected:
