@@ -122,6 +122,12 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// Start clean.
 	m_iUpdate = 0;
 
+	// Swappable params A/B group.
+	QButtonGroup *pSwapParamsABGroup = new QButtonGroup(this);
+	pSwapParamsABGroup->addButton(m_ui.SwapParamsAButton);
+	pSwapParamsABGroup->addButton(m_ui.SwapParamsBButton);
+	pSwapParamsABGroup->setExclusive(true);
+
 	// Wave shapes.
 	QStringList shapes;
 	shapes << tr("Pulse");
@@ -443,8 +449,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 
 	// Swap params A/B
-	QObject::connect(m_ui.SwapParamsButton,
-		SIGNAL(toggled(bool)),
+	QObject::connect(pSwapParamsABGroup,
+		SIGNAL(buttonClicked(int)),
 		SLOT(swapParams()));
 
 
@@ -514,7 +520,7 @@ void drumkv1widget::paramChanged ( float fValue )
 // Reset all param knobs to default values.
 void drumkv1widget::resetParams (void)
 {
-	resetSwapParams();
+	m_ui.SwapParamsAButton->setChecked(true);
 
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
@@ -532,7 +538,7 @@ void drumkv1widget::resetParams (void)
 // Swap params A/B.
 void drumkv1widget::swapParams (void)
 {
-	resetParamKnobs(drumkv1::NUM_PARAMS);
+//	resetParamKnobs(drumkv1::NUM_PARAMS);
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
@@ -554,13 +560,15 @@ void drumkv1widget::swapParams (void)
 			m_params_ab[index] = fOldValue;
 		}
 	}
+
+	m_ui.Preset->dirtyPreset();
 }
  
  
 // Reset all param default values.
 void drumkv1widget::resetParamValues ( uint32_t nparams )
 {
-	resetSwapParams();
+	m_ui.SwapParamsAButton->setChecked(true);
 
 	for (uint32_t i = 0; i < nparams; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
@@ -580,15 +588,6 @@ void drumkv1widget::resetParamKnobs ( uint32_t nparams )
 		if (pKnob)
 			pKnob->resetDefaultValue();
 	}
-}
-
-
-// Reset swap params A/B button toggle state.
-void drumkv1widget::resetSwapParams (void)
-{
-	bool bSwapBlock = m_ui.SwapParamsButton->blockSignals(true);
-	m_ui.SwapParamsButton->setChecked(false);
-	m_ui.SwapParamsButton->blockSignals(bSwapBlock);
 }
 
 

@@ -152,9 +152,6 @@ protected:
 	void resetParamValues(uint32_t nparams);
 	void resetParamKnobs(uint32_t nparams);
 
- 	// Reset swap params A/B button state.
- 	void resetSwapParams();
-
 	// (En|Dis)able/ all param/knobs.
 	void activateParamKnobs(bool bEnabled);
 	void activateParamKnobsGroupBox(QGroupBox *pGroupBox, bool bEnable);
