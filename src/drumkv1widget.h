@@ -130,6 +130,9 @@ protected slots:
 	// Reset param knobs to default value.
 	void resetParams();
 
+	// Swap params A/B.
+	void swapParams();
+
 	// Menu actions.
 	void helpAbout();
 	void helpAboutQt();
@@ -148,6 +151,9 @@ protected:
 	// Reset all param/knob default values.
 	void resetParamValues(uint32_t nparams);
 	void resetParamKnobs(uint32_t nparams);
+
+ 	// Reset swap params A/B button state.
+ 	void resetSwapParams();
 
 	// (En|Dis)able/ all param/knobs.
 	void activateParamKnobs(bool bEnabled);
@@ -177,6 +183,8 @@ private:
 
 	QHash<drumkv1::ParamIndex, drumkv1widget_knob *> m_paramKnobs;
 	QHash<drumkv1widget_knob *, drumkv1::ParamIndex> m_knobParams;
+
+	float m_params_ab[drumkv1::NUM_PARAMS];
 
 	int m_iUpdate;
 };
