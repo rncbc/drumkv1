@@ -172,7 +172,7 @@ public:
 	void setParamValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index);
 
-	void reset();
+	void resetParams(bool bSwap = false);
 
 private:
 

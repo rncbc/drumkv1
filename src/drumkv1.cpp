@@ -558,6 +558,7 @@ public:
 	drumkv1_ramp4  vol1;
 
 	float params[drumkv1::NUM_ELEMENT_PARAMS];
+	float params_ab[drumkv1::NUM_ELEMENT_PARAMS];
 };
 
 
@@ -568,12 +569,13 @@ drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate, int key )
 {
 	// element parameter value set
 	for (int i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
-		params[i] = 0.0f;
+		params[i] = params_ab[i] = 0.0f;
 
 	// element key (sample note)
 	gen1.sample0 = float(key);
 
 	params[drumkv1::GEN1_SAMPLE] = gen1.sample0;
+	params_ab[drumkv1::GEN1_SAMPLE] = gen1.sample0;
 
 	// element sample rate
 	gen1_sample.setSampleRate(iSampleRate);
@@ -1262,6 +1264,7 @@ void drumkv1_impl::reset (void)
 	drumkv1_elem *elem = m_elem_list.next();
 	while (elem) {
 		resetElement(elem);
+		elem->element.resetParams();
 		elem = elem->next();
 	}
 
@@ -1784,6 +1787,19 @@ float drumkv1_element::paramValue ( drumkv1::ParamIndex index )
 		return m_pElem->params[index];
 	else
 		return 0.0f;
+}
+
+
+void drumkv1_element::resetParams ( bool bSwap )
+{
+	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		const float	fOldValue = m_pElem->params[index];
+		const float fNewValue = m_pElem->params_ab[index];
+		m_pElem->params_ab[index] = fOldValue;
+		if (bSwap)
+			m_pElem->params[index] = fNewValue;
+	}
 }
 
 

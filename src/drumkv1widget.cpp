@@ -534,6 +534,15 @@ void drumkv1widget::swapParams (void)
 {
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 
+	drumkv1 *pDrumk = instance();
+	if (pDrumk) {
+		for (int note = 0; note < 128; ++note) {
+			drumkv1_element *element = pDrumk->element(note);
+			if (element)
+				element->resetParams(true);
+		}
+	}
+
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		drumkv1widget_knob *pKnob = paramKnob(index);
