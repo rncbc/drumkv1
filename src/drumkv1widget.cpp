@@ -123,10 +123,10 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_iUpdate = 0;
 
 	// Swappable params A/B group.
-	QButtonGroup *pSwapParamsABGroup = new QButtonGroup(this);
-	pSwapParamsABGroup->addButton(m_ui.SwapParamsAButton);
-	pSwapParamsABGroup->addButton(m_ui.SwapParamsBButton);
-	pSwapParamsABGroup->setExclusive(true);
+	QButtonGroup *pSwapParamsGroup = new QButtonGroup(this);
+	pSwapParamsGroup->addButton(m_ui.SwapParamsAButton);
+	pSwapParamsGroup->addButton(m_ui.SwapParamsBButton);
+	pSwapParamsGroup->setExclusive(true);
 
 	// Wave shapes.
 	QStringList shapes;
@@ -449,9 +449,12 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 
 	// Swap params A/B
-	QObject::connect(pSwapParamsABGroup,
-		SIGNAL(buttonClicked(int)),
-		SLOT(swapParams()));
+	QObject::connect(m_ui.SwapParamsAButton,
+		SIGNAL(toggled(bool)),
+		SLOT(swapParams(bool)));
+	QObject::connect(m_ui.SwapParamsBButton,
+		SIGNAL(toggled(bool)),
+		SLOT(swapParams(bool)));
 
 
 	// Menu actions
@@ -536,8 +539,11 @@ void drumkv1widget::resetParams (void)
 
 
 // Swap params A/B.
-void drumkv1widget::swapParams (void)
+void drumkv1widget::swapParams ( bool bOn )
 {
+	if (!bOn)
+		return;
+
 //	resetParamKnobs(drumkv1::NUM_PARAMS);
 
 	drumkv1 *pDrumk = instance();
