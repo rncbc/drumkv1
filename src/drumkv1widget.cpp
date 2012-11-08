@@ -41,6 +41,7 @@ struct {
 } drumkv1_default_params[drumkv1::NUM_PARAMS] = {
 
 	{ "GEN1_SAMPLE",   36.0f }, // Bass Drum 1 (GM) aka. C2 (36)
+	{ "GEN1_GROUP",     0.0f },
 	{ "GEN1_COARSE",    0.0f },
 	{ "GEN1_FINE",      0.0f },
 	{ "DCF1_CUTOFF",    1.0f }, // 0.5f
@@ -175,6 +176,10 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Pha1WetKnob->setSpecialValueText(sOff);
 	m_ui.Del1WetKnob->setSpecialValueText(sOff);
 
+	// GEN group limits. [0=off, 1..128]
+	m_ui.Gen1GroupKnob->setSpecialValueText(sOff);
+	m_ui.Gen1GroupKnob->setMaximum(1.28f);
+
 	// GEN octave limits.
 	m_ui.Gen1CoarseKnob->setMinimum(-4.0f);
 	m_ui.Gen1CoarseKnob->setMaximum(+4.0f);
@@ -214,6 +219,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Del1BpmKnob->setMaximum(3.6f);
 
 	// GEN1
+	setParamKnob(drumkv1::GEN1_GROUP,  m_ui.Gen1GroupKnob);
 	setParamKnob(drumkv1::GEN1_COARSE, m_ui.Gen1CoarseKnob);
 	setParamKnob(drumkv1::GEN1_FINE,   m_ui.Gen1FineKnob);
 

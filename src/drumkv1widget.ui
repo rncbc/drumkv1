@@ -149,7 +149,17 @@
             </property>
            </widget>
           </item>
-          <item>
+		  <item>
+		   <widget class="drumkv1widget_spin" name="Gen1GroupKnob">
+			<property name="toolTip">
+			 <string>GEN1 Group</string>
+			</property>
+			<property name="text">
+			 <string>Group</string>
+			</property>
+		   </widget>
+		  </item>
+		  <item>
            <spacer>
             <property name="orientation">
              <enum>Qt::Horizontal</enum>

@@ -68,6 +68,7 @@ public:
 	enum ParamIndex	 {
 
 		GEN1_SAMPLE = 0,
+		GEN1_GROUP,
 		GEN1_COARSE,
 		GEN1_FINE,
 		DCF1_CUTOFF,

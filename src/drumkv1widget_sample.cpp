@@ -40,7 +40,7 @@ drumkv1widget_sample::drumkv1widget_sample (
 	: QFrame(pParent, wflags), m_pSample(0), m_iChannels(0), m_ppPolyg(0)
 {
 //	setMouseTracking(true);
-	setMinimumSize(QSize(520, 80));
+	setMinimumSize(QSize(480, 80));
 
 	QFrame::setFrameShape(QFrame::Panel);
 	QFrame::setFrameShadow(QFrame::Sunken);

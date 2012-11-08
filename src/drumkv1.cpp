@@ -47,6 +47,7 @@
 
 const uint16_t MAX_VOICES = 32;			// polyphony
 const uint8_t  MAX_NOTES  = 128;
+const uint8_t  MAX_GROUP  = 128;
 
 const float MIN_ENV_MSECS = 2.0f;		// min 2msec per stage
 const float MAX_ENV_MSECS = 2000.0f;	// max 2 sec per stage
@@ -243,6 +244,7 @@ struct drumkv1_aux
 struct drumkv1_gen
 {
 	float *sample, sample0;
+	float *group;
 	float *coarse;
 	float *fine;
 };
@@ -618,6 +620,7 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 	drumkv1_oscillator lfo1;
 
 	int note;									// voice note
+	int group;									// voice group
 	float vel;									// velocity to vol
 
 	float gen1_freq;							// frequency and phase
@@ -717,6 +720,7 @@ private:
 
 	drumkv1_voice **m_voices;
 	drumkv1_voice  *m_notes[MAX_NOTES];
+	drumkv1_voice  *m_group[MAX_GROUP];
 	drumkv1_elem   *m_elems[MAX_NOTES];
 
 	drumkv1_elem   *m_elem;
@@ -752,6 +756,9 @@ drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
 
 	for (int note = 0; note < MAX_NOTES; ++note)
 		m_notes[note] = 0;
+
+	for (int group = 0; group < MAX_GROUP; ++group)
+		m_group[group] = 0;
 
 	// flangers none yet
 	m_flanger = 0;
@@ -1144,6 +1151,21 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			pv->lfo1_sample = pv->lfo1.start();
 			// allocated
 			m_notes[key] = pv;
+			// group management
+			pv->group = int(*elem->gen1.group) - 1;
+			if (pv->group >= 0) {
+				drumkv1_voice *pv_group = m_group[pv->group];
+				if (pv_group && pv_group->note >= 0 && pv_group->note != key) {
+					drumkv1_elem *elem_group = pv_group->elem;
+					// retrigger fast release
+					elem_group->dcf1.env.note_off_fast(&pv_group->dcf1_env);
+					elem_group->lfo1.env.note_off_fast(&pv_group->lfo1_env);
+					elem_group->dca1.env.note_off_fast(&pv_group->dca1_env);
+					m_notes[pv_group->note] = 0;
+					pv_group->note = -1;
+				}
+				m_group[pv->group] = pv;
+			}
 		}
 	}
 	// note off
@@ -1231,6 +1253,8 @@ void drumkv1_impl::allNotesOff (void)
 	while (pv) {
 		if (pv->note >= 0)
 			m_notes[pv->note] = 0;
+		if (pv->group >= 0)
+			m_group[pv->group] = 0;
 		free_voice(pv);
 		pv = m_play_list.next();
 	}
@@ -1460,6 +1484,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			if (pv->dca1_env.stage == drumkv1_env::Done || pv->gen1.isOver()) {
 				if (pv->note >= 0)
 					m_notes[pv->note] = 0;
+				if (pv->group >= 0 && m_group[pv->group] == pv)
+					m_group[pv->group] = 0;
 				free_voice(pv);
 				nblock = 0;
 			} else {
@@ -1710,6 +1736,7 @@ void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 
 	switch (index) {
 //	case drumkv1::GEN1_SAMPLE:   m_pElem->gen1.sample      = pfParam; break;
+	case drumkv1::GEN1_GROUP:    m_pElem->gen1.group       = pfParam; break;
 	case drumkv1::GEN1_COARSE:   m_pElem->gen1.coarse      = pfParam; break;
 	case drumkv1::GEN1_FINE:     m_pElem->gen1.fine        = pfParam; break;
 	case drumkv1::DCF1_CUTOFF:   m_pElem->dcf1.cutoff      = pfParam; break;
@@ -1756,6 +1783,7 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 
 	switch (index) {
 //	case drumkv1::GEN1_SAMPLE:   pfParam = m_pElem->gen1.sample;     break;
+	case drumkv1::GEN1_GROUP:    pfParam = m_pElem->gen1.group;      break;
 	case drumkv1::GEN1_COARSE:   pfParam = m_pElem->gen1.coarse;     break;
 	case drumkv1::GEN1_FINE:     pfParam = m_pElem->gen1.fine;       break;
 	case drumkv1::DCF1_CUTOFF:   pfParam = m_pElem->dcf1.cutoff;     break;
