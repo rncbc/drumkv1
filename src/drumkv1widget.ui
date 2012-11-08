@@ -27,13 +27,13 @@
     <x>0</x>
     <y>0</y>
     <width>1024</width>
-    <height>580</height>
+	<height>560</height>
    </rect>
   </property>
   <property name="minimumSize" >
    <size>
     <width>1024</width>
-    <height>580</height>
+	<height>560</height>
    </size>
   </property>
   <property name="windowTitle">
@@ -126,17 +126,10 @@
        <string>Drum Kit 1</string>
       </attribute>
       <layout class="QGridLayout">
-       <item row="0" column="0" colspan="4">
-        <widget class="drumkv1widget_elements" name="Elements" >
-         <property name="maximumSize" >
-          <size>
-           <width>320</width>
-           <height>120</height>
-          </size>
-         </property>
-        </widget>
+	   <item row="0" column="0" colspan="4">
+		<widget class="drumkv1widget_elements" name="Elements" />
        </item>
-       <item row="0" column="4" colspan="8">
+	   <item row="0" column="4" colspan="8">
         <widget class="QGroupBox" name="Gen1GroupBox">
          <property name="title">
           <string>GEN1</string>

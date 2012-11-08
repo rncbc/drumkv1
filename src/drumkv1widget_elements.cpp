@@ -247,6 +247,8 @@ void drumkv1widget_elements::setInstance ( drumkv1 *pDrumk )
 	QTreeView::setAllColumnsShowFocus(true);
 	QTreeView::setAlternatingRowColors(true);
 
+	QTreeView::setMaximumSize(QSize(360, 120));
+
 	QHeaderView *pHeader = QTreeView::header();
 	pHeader->setResizeMode(QHeaderView::ResizeToContents);
 //	pHeader->setDefaultAlignment(Qt::AlignLeft);
