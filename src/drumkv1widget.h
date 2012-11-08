@@ -148,6 +148,9 @@ protected:
 	// Reload all elements.
 	void refreshElements();
 
+	// Reset swap params A/B group.
+	void resetSwapParams();
+
 	// Reset all param/knob default values.
 	void resetParamValues(uint32_t nparams);
 	void resetParamKnobs(uint32_t nparams);

@@ -529,7 +529,7 @@ void drumkv1widget::paramChanged ( float fValue )
 // Reset all param knobs to default values.
 void drumkv1widget::resetParams (void)
 {
-	m_ui.SwapParamsAButton->setChecked(true);
+	resetSwapParams();
 
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
@@ -547,15 +547,29 @@ void drumkv1widget::resetParams (void)
 // Swap params A/B.
 void drumkv1widget::swapParams ( bool bOn )
 {
-	if (!bOn)
+	if (m_iUpdate > 0 || !bOn)
 		return;
 
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1widget::swapParams(%d)", int(bOn));
+#endif
 //	resetParamKnobs(drumkv1::NUM_PARAMS);
 
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
-		pDrumk->resetParams();
+		// Save current element param values...
 		drumkv1_element *element = pDrumk->element(pDrumk->currentElement());
+		if (element) {
+			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				drumkv1widget_knob *pKnob = paramKnob(index);
+				if (pKnob)
+					element->setParamValue(index, pKnob->value());
+			}
+		}
+		// Swap all element params A/B...
+		pDrumk->resetParams();
+		// Retrieve current element param values...
 		if (element) {
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
@@ -578,12 +592,21 @@ void drumkv1widget::swapParams ( bool bOn )
 
 	m_ui.Preset->dirtyPreset();
 }
+
  
- 
+// Reset swap params A/B group.
+void drumkv1widget::resetSwapParams (void)
+{
+	++m_iUpdate;
+	m_ui.SwapParamsAButton->setChecked(true);
+	--m_iUpdate;
+}
+
+
 // Reset all param default values.
 void drumkv1widget::resetParamValues ( uint32_t nparams )
 {
-	m_ui.SwapParamsAButton->setChecked(true);
+	resetSwapParams();
 
 	for (uint32_t i = 0; i < nparams; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
