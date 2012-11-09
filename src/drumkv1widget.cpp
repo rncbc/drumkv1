@@ -564,12 +564,14 @@ void drumkv1widget::swapParams ( bool bOn )
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				drumkv1widget_knob *pKnob = paramKnob(index);
-				if (pKnob)
+				if (pKnob) {
+					pKnob->setDefaultValue(element->paramValue(index, 0));
 					element->setParamValue(index, pKnob->value());
+				}
 			}
 		}
 		// Swap all element params A/B...
-		pDrumk->resetParams();
+		pDrumk->resetParamValues(true);
 		// Retrieve current element param values...
 		if (element) {
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -650,6 +652,10 @@ void drumkv1widget::newPreset (void)
 
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 	resetParamValues(drumkv1::NUM_PARAMS);
+
+	drumkv1 *pDrumk = instance();
+	if (pDrumk)
+		pDrumk->reset();
 
 	refreshElements();
 	activateElement();
@@ -1145,6 +1151,7 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			float fValue = drumkv1_default_params[i].value;
+			element->setParamValue(index, fValue, 0);
 			element->setParamValue(index, fValue);
 		}
 	}
@@ -1156,6 +1163,9 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 	if (element) {
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			drumkv1widget_knob *pKnob = paramKnob(index);
+			if (pKnob)
+				pKnob->setDefaultValue(element->paramValue(index, 0));
 			setParamValue(index, element->paramValue(index));
 		}
 		updateSample(pDrumk->sample());

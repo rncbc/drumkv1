@@ -137,7 +137,7 @@ public:
 	void setParamPort(ParamIndex index, float *pfParam);
 	float *paramPort(ParamIndex index) const;
 
-	void resetParams();
+	void resetParamValues(bool bSwap);
 	void reset();
 
 protected:
@@ -171,10 +171,10 @@ public:
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
 	float *paramPort(drumkv1::ParamIndex index);
 
-	void setParamValue(drumkv1::ParamIndex index, float fValue);
-	float paramValue(drumkv1::ParamIndex index);
+	void setParamValue(drumkv1::ParamIndex index, float fValue, int pset = 1);
+	float paramValue(drumkv1::ParamIndex index, int pset = 1);
 
-	void resetParams(bool bSwap = false);
+	void resetParamValues(bool bSwap);
 
 private:
 

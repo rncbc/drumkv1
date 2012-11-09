@@ -559,8 +559,7 @@ public:
 	drumkv1_pan    pan1;
 	drumkv1_ramp4  vol1;
 
-	float params[drumkv1::NUM_ELEMENT_PARAMS];
-	float params_ab[drumkv1::NUM_ELEMENT_PARAMS];
+	float params[3][drumkv1::NUM_ELEMENT_PARAMS];
 };
 
 
@@ -571,13 +570,14 @@ drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate, int key )
 {
 	// element parameter value set
 	for (int i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
-		params[i] = params_ab[i] = 0.0f;
+		for (int j = 0; j < 3; ++j)	params[j][i] = 0.0f;
 
 	// element key (sample note)
 	gen1.sample0 = float(key);
 
-	params[drumkv1::GEN1_SAMPLE] = gen1.sample0;
-	params_ab[drumkv1::GEN1_SAMPLE] = gen1.sample0;
+	params[0][drumkv1::GEN1_SAMPLE] = gen1.sample0;
+	params[1][drumkv1::GEN1_SAMPLE] = gen1.sample0;
+	params[2][drumkv1::GEN1_SAMPLE] = gen1.sample0;
 
 	// element sample rate
 	gen1_sample.setSampleRate(iSampleRate);
@@ -672,7 +672,7 @@ public:
 	void process_midi(uint8_t *data, uint32_t size);
 	void process(float **ins, float **outs, uint32_t nframes);
 
-	void resetParams();
+	void resetParamValues(bool bSwap);
 	void reset();
 
 protected:
@@ -920,8 +920,8 @@ void drumkv1_impl::setCurrentElement ( int key )
 				float *pfParam = element->paramPort(index);
 				if (pfParam) {
 					m_params[i] = pfParam;
-					elem->params[i] = *pfParam;
-					element->setParamPort(index, &(elem->params[i]));
+					elem->params[1][i] = *pfParam;
+					element->setParamPort(index, &(elem->params[1][i]));
 				}
 			}
 		}
@@ -935,7 +935,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 					continue;
 				float *pfParam = m_params[i];
 				if (pfParam) {
-					*pfParam = elem->params[i];
+					*pfParam = elem->params[1][i];
 					element->setParamPort(index, pfParam);
 				}
 			}
@@ -1283,11 +1283,11 @@ void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 
 // reset/swap all elements params A/B
 
-void drumkv1_impl::resetParams (void)
+void drumkv1_impl::resetParamValues ( bool bSwap )
 {
 	drumkv1_elem *elem = m_elem_list.next();
 	while (elem) {
-		elem->element.resetParams(true);
+		elem->element.resetParamValues(bSwap);
 		elem = elem->next();
 	}
 }
@@ -1301,7 +1301,7 @@ void drumkv1_impl::reset (void)
 	drumkv1_elem *elem = m_elem_list.next();
 	while (elem) {
 		resetElement(elem);
-		elem->element.resetParams(false);
+		elem->element.resetParamValues(false);
 		elem = elem->next();
 	}
 
@@ -1668,9 +1668,9 @@ void drumkv1::process ( float **ins, float **outs, uint32_t nframes )
 
 // reset/swap all element params A/B
 
-void drumkv1::resetParams (void)
+void drumkv1::resetParamValues ( bool bSwap )
 {
-	m_pImpl->resetParams();
+	m_pImpl->resetParamValues(bSwap);
 }
 
 
@@ -1691,7 +1691,7 @@ drumkv1_element::drumkv1_element ( drumkv1_elem *pElem )
 {
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		setParamPort(index, &(m_pElem->params[i]));
+		setParamPort(index, &(m_pElem->params[1][i]));
 	}
 }
 
@@ -1823,31 +1823,34 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 }
 
 
-void drumkv1_element::setParamValue ( drumkv1::ParamIndex index, float fValue )
+void drumkv1_element::setParamValue (
+	drumkv1::ParamIndex index, float fValue, int pset )
 {
 	if (index < drumkv1::NUM_ELEMENT_PARAMS && index != drumkv1::GEN1_SAMPLE)
-		m_pElem->params[index] = fValue;
+		m_pElem->params[pset][index] = fValue;
 }
 
 
-float drumkv1_element::paramValue ( drumkv1::ParamIndex index )
+float drumkv1_element::paramValue ( drumkv1::ParamIndex index, int pset )
 {
 	if (index < drumkv1::NUM_ELEMENT_PARAMS)
-		return m_pElem->params[index];
+		return m_pElem->params[pset][index];
 	else
 		return 0.0f;
 }
 
 
-void drumkv1_element::resetParams ( bool bSwap )
+void drumkv1_element::resetParamValues ( bool bSwap )
 {
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		const float	fOldValue = m_pElem->params[index];
-		const float fNewValue = m_pElem->params_ab[index];
-		m_pElem->params_ab[index] = fOldValue;
+		const float	fOldValue = m_pElem->params[1][index];
+		const float fNewValue = m_pElem->params[2][index];
+		m_pElem->params[2][index] = fOldValue;
 		if (bSwap)
-			m_pElem->params[index] = fNewValue;
+			m_pElem->params[1][index] = fNewValue;
+		else
+			m_pElem->params[0][index] = fOldValue;
 	}
 }
 
