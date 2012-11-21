@@ -1253,7 +1253,7 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 	pAction->setEnabled(element != NULL);
 
 	QAbstractScrollArea *pAbstractScrollArea
-		= dynamic_cast<QAbstractScrollArea *> (pSender);
+		= qobject_cast<QAbstractScrollArea *> (pSender);
 	if (pAbstractScrollArea)
 		pSender = pAbstractScrollArea->viewport();
 
