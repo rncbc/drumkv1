@@ -1,6 +1,6 @@
 %define name    @PACKAGE_TARNAME@
 %define version @PACKAGE_VERSION@
-%define release 1
+%define release 2
 
 %define _prefix	@ac_prefix@
 
@@ -56,6 +56,8 @@ BuildRequires:	lv2-devel
 %{_bindir}/%{name}_jack
 
 %changelog
+* Thu Nov 22 2012 Rui Nuno Capela <rncbc@users.sourceforge.net> 0.2.0-2
+- Second public release.
 * Thu Oct 25 2012 Rui Nuno Capela <rncbc@users.sourceforge.net> 0.1.0-1
 - First public release.
 * Wed Oct  3 2012 Rui Nuno Capela <rncbc@users.sourceforge.net> 0.0.0-0
