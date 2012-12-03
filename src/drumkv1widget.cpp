@@ -640,6 +640,13 @@ void drumkv1widget::initPreset (void)
 
 
 // Preset clear.
+void drumkv1widget::clearPreset (void)
+{
+	m_ui.Preset->clearPreset();
+}
+
+
+// Preset renewal.
 void drumkv1widget::newPreset (void)
 {
 #ifdef CONFIG_DEBUG
