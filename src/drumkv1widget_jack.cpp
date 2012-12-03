@@ -70,7 +70,7 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 #endif
 
 	// Initialize preset stuff...
-	initPreset();
+	// initPreset();
 
 	// Activate client...
 	m_pDrumk->activate();
@@ -210,6 +210,8 @@ int main ( int argc, char *argv[] )
 	drumkv1widget_jack w(&sampl);
 	if (argc > 1)
 		w.loadPreset(argv[1]);
+	else
+		w.initPreset();
 	w.show();
 
 	return app.exec();

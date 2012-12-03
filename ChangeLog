@@ -3,6 +3,11 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
+SVN TRUNK
+
+- JACK stand-alone: preset loader initialization fix.
+
+
 0.2.0  2012-11-22  Second public release.
 
 - Exclusive element sounding group setting added (eg. hi-hats).

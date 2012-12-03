@@ -70,6 +70,9 @@ public:
 	void setParamKnob(drumkv1::ParamIndex index, drumkv1widget_knob *pKnob);
 	drumkv1widget_knob *paramKnob(drumkv1::ParamIndex index) const;
 
+	// Preset init.
+	void initPreset();
+
 	// Dirty close prompt.
 	bool queryClose();
 
@@ -141,9 +144,6 @@ protected:
 
 	// Synth engine accessor.
 	virtual drumkv1 *instance() const = 0;
-
-	// Preset init.
-	void initPreset();
 
 	// Reload all elements.
 	void refreshElements();
