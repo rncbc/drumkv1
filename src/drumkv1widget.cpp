@@ -472,8 +472,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(triggered(bool)),
 		SLOT(helpAboutQt()));
 
+
 	// Epilog.
-	QWidget::adjustSize();
+	// QWidget::adjustSize();
 }
 
 

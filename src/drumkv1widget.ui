@@ -26,21 +26,15 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1024</width>
-    <height>540</height>
+    <width>960</width>
+    <height>480</height>
    </rect>
-  </property>
-  <property name="minimumSize" >
-   <size>
-    <width>1024</width>
-    <height>540</height>
-   </size>
   </property>
   <property name="windowTitle">
    <string>drumkv1</string>
   </property>
   <property name="windowIcon" >
-   <iconset resource="synthv1.qrc" >:/images/drumkv1.png</iconset>
+   <iconset resource="drumkv1.qrc" >:/images/drumkv1.png</iconset>
   </property>
   <layout class="QVBoxLayout" >
    <property name="margin" >
@@ -117,13 +111,13 @@
     </layout>
    </item>
    <item>
-    <widget class="QToolBox" name="ToolBox">
+    <widget class="QTabWidget" name="TabWidget">
      <property name="currentIndex" >
       <number>0</number>
      </property>
      <widget class="QWidget" name="Drumkit1Page">
-      <attribute name="label">
-       <string>Drum Kit 1</string>
+      <attribute name="title">
+       <string>Drum Kit</string>
       </attribute>
       <layout class="QGridLayout">
        <item row="0" column="0" colspan="4">
@@ -132,7 +126,7 @@
        <item row="0" column="4" colspan="8">
         <widget class="QGroupBox" name="Gen1GroupBox">
          <property name="title">
-          <string>GEN1</string>
+          <string>GEN</string>
          </property>
          <layout class="QHBoxLayout">
           <item>
@@ -191,7 +185,7 @@
        <item row="1" column="0" rowspan="2" colspan="5">
         <widget class="QGroupBox" name="Dcf1GroupBox">
          <property name="title">
-          <string>DCF1</string>
+          <string>DCF</string>
          </property>
          <layout class="QVBoxLayout">
           <item>
@@ -312,7 +306,7 @@
        <item row="1" column="5" rowspan="2" colspan="7">
         <widget class="QGroupBox" name="Lfo1GroupBox">
          <property name="title">
-          <string>LFO1</string>
+          <string>LFO</string>
          </property>
          <layout class="QVBoxLayout">
           <item>
@@ -512,7 +506,7 @@
        <item row="3" column="0" colspan="5">
         <widget class="QGroupBox" name="Dca1GroupBox">
          <property name="title">
-          <string>DCA1</string>
+          <string>DCA</string>
          </property>
          <layout class="QHBoxLayout">
           <item>
@@ -578,7 +572,7 @@
        <item row="3" column="5" colspan="4">
         <widget class="QGroupBox" name="Def1GroupBox">
          <property name="title">
-          <string>DEF1</string>
+          <string>DEF</string>
          </property>
          <layout class="QHBoxLayout">
           <item>
@@ -637,7 +631,7 @@
        <item row="3" column="9" colspan="3">
         <widget class="QGroupBox" name="Out1GroupBox">
          <property name="title">
-          <string>OUT1</string>
+          <string>OUT</string>
          </property>
          <layout class="QHBoxLayout">
           <item>
@@ -694,7 +688,7 @@
          <property name="sizeHint">
           <size>
            <width>8</width>
-           <height>8</height>
+           <height>4</height>
           </size>
          </property>
         </spacer>
@@ -702,7 +696,7 @@
       </layout>
      </widget>
      <widget class="QWidget" name="EffectsPage">
-      <attribute name="label">
+      <attribute name="title">
        <string>Effects</string>
       </attribute>
       <layout class="QGridLayout">
