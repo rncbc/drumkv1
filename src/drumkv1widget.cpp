@@ -1222,8 +1222,11 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 
 	activateParamKnobs(element != NULL);
 
+	const QString& sElementName = completeNoteName(iCurrentNote);
+	m_ui.StatusBar->showMessage(tr("Element: %1").arg(sElementName), 5000);
+
 	if (bOpenSample)
-		m_ui.Gen1Sample->openSample(completeNoteName(iCurrentNote));
+		m_ui.Gen1Sample->openSample(sElementName);
 }
 
 
