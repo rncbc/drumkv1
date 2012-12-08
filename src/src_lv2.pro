@@ -24,6 +24,7 @@ HEADERS = \
 	drumkv1widget_wave.h \
 	drumkv1widget_knob.h \
 	drumkv1widget_preset.h \
+	drumkv1widget_status.h \
 	drumkv1widget_config.h \
 	drumkv1widget_elements.h \
 	drumkv1widget_lv2.h
@@ -38,6 +39,7 @@ SOURCES = \
 	drumkv1widget_wave.cpp \
 	drumkv1widget_knob.cpp \
 	drumkv1widget_preset.cpp \
+	drumkv1widget_status.cpp \
 	drumkv1widget_config.cpp \
 	drumkv1widget_elements.cpp \
 	drumkv1widget_lv2.cpp
