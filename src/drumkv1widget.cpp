@@ -483,6 +483,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// QWidget::adjustSize();
 
 	m_ui.StatusBar->showMessage(tr("Ready"), 5000);
+	m_ui.StatusBar->setModified(false);
 }
 
 
@@ -531,14 +532,11 @@ void drumkv1widget::paramChanged ( float fValue )
 	drumkv1widget_knob *pKnob = qobject_cast<drumkv1widget_knob *> (sender());
 	if (pKnob) {
 		updateParam(m_knobParams.value(pKnob), fValue);
-		QGroupBox *pGroupBox = qobject_cast<QGroupBox *> (pKnob->parentWidget());
-		if (pGroupBox) {
-			m_ui.StatusBar->showMessage(QString("%1 - %2 %3: %4")
-				.arg(m_ui.StackedWidget->currentWidget()->windowTitle())
-				.arg(pGroupBox->title())
-				.arg(pKnob->text())
-				.arg(pKnob->valueText()), 5000);
-		}
+		m_ui.StatusBar->showMessage(QString("%1 / %2: %3")
+			.arg(m_ui.StackedWidget->currentWidget()->windowTitle())
+			.arg(pKnob->toolTip())
+			.arg(pKnob->valueText()), 5000);
+		m_ui.StatusBar->setModified(true);
 	}
 
 	m_ui.Preset->dirtyPreset();
@@ -561,7 +559,7 @@ void drumkv1widget::resetParams (void)
 		m_params_ab[index] = fValue;
 	}
 
-	m_ui.StatusBar->showMessage(tr("Reset"), 5000);
+	m_ui.StatusBar->showMessage(tr("Reset preset"), 5000);
 }
 
 
@@ -617,6 +615,8 @@ void drumkv1widget::swapParams ( bool bOn )
 
 	const bool bSwapA = m_ui.SwapParamsAButton->isChecked();
 	m_ui.StatusBar->showMessage(tr("Swap %1").arg(bSwapA ? 'A' : 'B'), 5000);
+	m_ui.StatusBar->setModified(true);
+
 }
 
  
@@ -691,6 +691,7 @@ void drumkv1widget::newPreset (void)
 	activateElement();
 
 	m_ui.StatusBar->showMessage(tr("New preset"), 5000);
+	m_ui.StatusBar->setModified(false);
 }
 
 
@@ -766,6 +767,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 	const QString& sPreset = fi.completeBaseName();
 	m_ui.Preset->setPreset(sPreset);
 	m_ui.StatusBar->showMessage(tr("Load preset: %1").arg(sPreset), 5000);
+	m_ui.StatusBar->setModified(false);
 
 	QDir::setCurrent(currentDir.absolutePath());
 
@@ -919,6 +921,9 @@ void drumkv1widget::clearSample (void)
 {
 	clearSampleFile();
 
+	m_ui.StatusBar->showMessage(tr("Clear sample"), 5000);
+	m_ui.StatusBar->setModified(true);
+
 	m_ui.Preset->dirtyPreset();
 }
 
@@ -927,6 +932,9 @@ void drumkv1widget::clearSample (void)
 void drumkv1widget::loadSample ( const QString& sFilename )
 {
 	loadSampleFile(sFilename);
+
+	m_ui.StatusBar->showMessage(tr("Load sample: %1").arg(sFilename), 5000);
+	m_ui.StatusBar->setModified(true);
 
 	m_ui.Preset->dirtyPreset();
 }
