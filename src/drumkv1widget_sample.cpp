@@ -42,9 +42,9 @@ drumkv1widget_sample::drumkv1widget_sample (
 	QWidget *pParent, Qt::WindowFlags wflags )
 	: QFrame(pParent, wflags), m_pSample(0), m_iChannels(0), m_ppPolyg(0)
 {
-	setMouseTracking(true);
-	setFocusPolicy(Qt::ClickFocus);
-	setMinimumSize(QSize(460, 80));
+	QFrame::setMouseTracking(true);
+	QFrame::setFocusPolicy(Qt::ClickFocus);
+	QFrame::setMinimumSize(QSize(460, 80));
 
 	QFrame::setFrameShape(QFrame::Panel);
 	QFrame::setFrameShadow(QFrame::Sunken);
@@ -196,7 +196,7 @@ void drumkv1widget_sample::mousePressEvent ( QMouseEvent *pMouseEvent )
 				m_dragState = DragStart;
 				m_posDrag = pMouseEvent->pos();
 			} else {
-				const int w = QWidget::width();
+				const int w = QFrame::width();
 				const uint32_t nframes = m_pSample->length();
 				if (nframes > 0) {
 					m_iDragStartX = (m_iLoopStart * w) / nframes;
@@ -218,7 +218,7 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 	switch (m_dragState) {
 	case DragNone: {
 		if (m_bLoop && m_pSample) {
-			const int w = QWidget::width();
+			const int w = QFrame::width();
 			const uint32_t nframes = m_pSample->length();
 			if (nframes > 0) {
 				const int x1 = (m_iLoopStart * w) / nframes;
@@ -287,7 +287,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 
 	switch (m_dragState) {
 	case DragSelect: {
-		const int w = QWidget::width();
+		const int w = QFrame::width();
 		if (m_pSample && w > 0) {
 			const uint32_t nframes = m_pSample->length();
 			m_iLoopStart = (m_iDragStartX * nframes) / w;
@@ -298,7 +298,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 		break;
 	}
 	case DragLoopStart: {
-		const int w = QWidget::width();
+		const int w = QFrame::width();
 		if (m_pSample && w > 0) {
 			const uint32_t nframes = m_pSample->length();
 			m_iLoopStart = (m_iDragStartX * nframes) / w;
@@ -308,7 +308,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 		break;
 	}
 	case DragLoopEnd: {
-		const int w = QWidget::width();
+		const int w = QFrame::width();
 		if (m_pSample && w > 0) {
 			const uint32_t nframes = m_pSample->length();
 			m_iLoopEnd = (m_iDragEndX * nframes) / w;
@@ -364,7 +364,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 {
 	QPainter painter(this);
 
-	const QRect& rect = QWidget::rect();
+	const QRect& rect = QFrame::rect();
 	const int h = rect.height();
 	const int w = rect.width();
 
