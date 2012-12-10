@@ -1000,17 +1000,6 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 }
 
 
-// Sample filename retriever (crude experimental stuff III).
-QString drumkv1widget::sampleFile (void) const
-{
-	drumkv1 *pDrumk = instance();
-	if (pDrumk)
-		return QString::fromUtf8(pDrumk->sampleFile());
-	else
-		return QString();
-}
-
-
 // Sample updater (crude experimental stuff II).
 void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 {
