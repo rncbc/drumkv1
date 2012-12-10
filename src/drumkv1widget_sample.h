@@ -24,6 +24,8 @@
 
 #include <QFrame>
 
+#include <stdint.h>
+
 
 // Forward decl.
 class drumkv1_sample;
@@ -47,15 +49,23 @@ public:
 	void setSample(drumkv1_sample *pSample);
 	drumkv1_sample *sample() const;
 
-	void setSampleName(const QString& sName)
-	{ m_sName = sName; updateToolTip(); }
-	const QString& sampleName() const
-		{ return m_sName; }
+	void setSampleName(const QString& sName);
+	const QString& sampleName() const;
+
+	void setLoop(bool bLoop);
+	bool isLoop() const;
+
+	// Loop point getters.
+	uint32_t loopStart() const;
+	uint32_t loopEnd() const;
 
 signals:
 
 	// Load new sample file.
 	void loadSampleFile(const QString&);
+
+	// Loop range changed.
+	void loopChanged();
 
 public slots:
 
@@ -65,16 +75,30 @@ public slots:
 	// Effective sample slot.
 	void loadSample(drumkv1_sample *pSample);
 
+	// Loop point setters.
+	void setLoopStart(uint32_t iLoopStart);
+	void setLoopEnd(uint32_t iLoopEnd);
+
 protected:
 
 	// Widget resize handler.
 	void resizeEvent(QResizeEvent *);
 
-	// Mouse interaction.
-	void mouseDoubleClickEvent(QMouseEvent *pMouseEvent);
-
 	// Draw canvas.
 	void paintEvent(QPaintEvent *);
+
+	// Mouse interaction.
+	void mousePressEvent(QMouseEvent *pMouseEvent);
+	void mouseMoveEvent(QMouseEvent *pMouseEvent);
+	void mouseReleaseEvent(QMouseEvent *pMouseEvent);
+
+	void mouseDoubleClickEvent(QMouseEvent *pMouseEvent);
+
+	// Trap for escape key.
+	void keyPressEvent(QKeyEvent *pKeyEvent);
+
+	// Reset drag/select state.
+	void resetDragState();
 
 	// Update tool-tip.
 	void updateToolTip();
@@ -85,7 +109,24 @@ private:
 	drumkv1_sample *m_pSample;
 	unsigned short m_iChannels;
 	QPolygon **m_ppPolyg;
+
 	QString m_sName;
+
+	// Drag state.
+	enum DragState {
+		DragNone = 0, DragStart, DragSelect,
+		DragLoopStart, DragLoopEnd,
+	} m_dragState, m_dragCursor;
+
+	QPoint m_posDrag;
+
+	int m_iDragStartX;
+	int m_iDragEndX;
+
+	// Loop state.
+	bool     m_bLoop;
+	uint32_t m_iLoopStart;
+	uint32_t m_iLoopEnd;
 };
 
 #endif	// __drumkv1widget_sample_h
