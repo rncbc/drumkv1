@@ -411,9 +411,9 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 			}
 			const QColor& rgbHigh = pal.highlight().color();
 			QLinearGradient grad1(0, 0, w2, h);
-			painter.setPen(rgbHigh);
+			painter.setPen(pal.highlight().color());
 			grad1.setColorAt(0.0f, pal.dark().color());
-			grad1.setColorAt(1.0f, rgbHigh);
+			grad1.setColorAt(1.0f, rgbLite);
 			painter.fillRect(x1, 0, x2 - x1, h, grad1);
 			painter.drawLine(x1, 0, x1, h);
 			painter.drawLine(x2, 0, x2, h);

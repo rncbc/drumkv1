@@ -844,7 +844,7 @@ void drumkv1widget::loadElements (
 				if (eChild.isNull())
 					continue;
 				if (eChild.tagName() == "sample") {
-				//	int index = eSample.attribute("index").toInt();
+				//	int index = eChild.attribute("index").toInt();
 					const QString& sFilename = eChild.text();
 					element->setSampleFile(
 						mapPath.absolutePath(sFilename).toUtf8().constData());
