@@ -415,7 +415,6 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 					x2 = (m_iLoopEnd   * w) / nframes;
 				}
 			}
-			const QColor& rgbHigh = pal.highlight().color();
 			QLinearGradient grad1(0, 0, w2, h);
 			painter.setPen(pal.highlight().color());
 			grad1.setColorAt(0.0f, pal.dark().color());
