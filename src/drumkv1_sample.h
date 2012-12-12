@@ -56,7 +56,6 @@ public:
 		{ return m_srate; }
 
 	// loop mode.
-	// loop mode.
 	void setLoop ( bool loop )
 	{
 		m_loop = loop;
@@ -276,8 +275,7 @@ public:
 		m_index  = 1;
 		m_alpha  = 0.0f;
 		m_frame  = 0;
-
-		m_loop = m_sample->isLoop();
+		m_loop   = false;
 	}
 
 	// reset loop.
