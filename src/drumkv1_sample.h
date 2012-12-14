@@ -42,8 +42,7 @@ public:
 	drumkv1_sample(float srate = 44100.0f)
 		: m_srate(srate), m_filename(0), m_nchannels(0),
 			m_rate0(0.0f), m_freq0(1.0f), m_ratio(0.0f),
-			m_nframes(0), m_pframes(0), m_loop(false),
-			m_loop_start(0), m_loop_end(0) {}
+			m_nframes(0), m_pframes(0) {}
 
 	// dtor.
 	~drumkv1_sample()
@@ -54,46 +53,6 @@ public:
 		{ m_srate = srate; }
 	float sampleRate() const
 		{ return m_srate; }
-
-	// loop mode.
-	void setLoop ( bool loop )
-	{
-		m_loop = loop;
-
-		if (m_loop && m_loop_start >= m_loop_end) {
-			m_loop_start = 0;
-			m_loop_end = m_nframes;
-		}
-	}
-	bool isLoop() const
-		{ return m_loop && (m_loop_start < m_loop_end); }
-
-	// loop range.
-	void setLoopRange ( uint32_t start, uint32_t end )
-	{
-		if (start > m_nframes)
-			start = m_nframes;
-
-		if (end > m_nframes)
-			end = m_nframes;
-
-		if (start < end) {
-			m_loop_start = start;
-			m_loop_end   = end;
-		} else {
-			m_loop_start = 0;
-			m_loop_end   = 0;
-		}
-	}
-
-	uint32_t loopStart (void) const
-		{ return m_loop_start; }
-	uint32_t loopEnd (void) const
-		{ return m_loop_end; }
-
-	// zero-crossing adjusted loop range.
-	void setLoopRangeEx(uint32_t start, uint32_t end)
-		{ setLoopRange(zero_crossing(start), zero_crossing(end)); }
 
 	// init.
 	bool open(const char *filename, float freq0 = 1.0f)
@@ -137,7 +96,6 @@ public:
 
 		reset(freq0);
 
-		setLoop(m_loop);
 		return true;
 	}
 
@@ -160,8 +118,6 @@ public:
 			::free(m_filename);
 			m_filename = 0;
 		}
-
-		setLoopRange(0, 0);
 	}
 
 	// accessors.
@@ -240,9 +196,6 @@ private:
 	float    m_ratio;
 	uint32_t m_nframes;
 	float  **m_pframes;
-	bool     m_loop;
-	float    m_loop_start;
-	float    m_loop_end;
 };
 
 
@@ -265,37 +218,17 @@ public:
 	{
 		m_sample = sample;
 
-		m_phase  = 1.0f;
-		m_phase1 = 0.0f;
-		m_phase2 = 0.0f;
-		m_index  = 1;
-		m_alpha  = 0.0f;
-		m_frame  = 0;
-		m_loop   = false;
-	}
-
-	// reset loop.
-	void setLoop(bool loop)
-	{
-		m_loop = loop;
-
-		if (m_loop) {
-			m_phase1 = float(m_sample->loopEnd() - m_sample->loopStart());
-			m_phase2 = float(m_sample->loopEnd());
-		} else {
-			m_phase1 = m_phase2 = float(m_sample->length());
-		}
+		start();
 	}
 
 	// begin.
 	void start(void)
 	{
-		m_phase = 1.0f;
-		m_index = 1;
-		m_alpha = 0.0f;
-		m_frame = 0;
-
-		setLoop(m_sample->isLoop());
+		m_phase  = 1.0f;
+		m_phase1 = float(m_sample ? m_sample->length() : 0.0f);
+		m_index  = 1;
+		m_alpha  = 0.0f;
+		m_frame  = 0;
 	}
 
 	// iterate.
@@ -305,7 +238,7 @@ public:
 		m_alpha  = m_phase - float(m_index);
 		m_phase += freq * m_sample->ratio();
 
-		if (m_phase >= m_phase2) {
+		if (m_phase >= m_phase1) {
 			m_phase -= m_phase1;
 			if (m_phase < 1.0f)
 				m_phase = 1.0f;
@@ -339,7 +272,7 @@ public:
 
 	// predicate.
 	bool isOver() const
-		{ return !m_loop && m_sample->isOver(m_frame); }
+		{ return m_sample->isOver(m_frame); }
 
 private:
 
@@ -348,11 +281,9 @@ private:
 
 	float    m_phase;
 	float    m_phase1;
-	float    m_phase2;
 	uint32_t m_index;
 	float    m_alpha;
 	uint32_t m_frame;
-	bool     m_loop;
 };
 
 

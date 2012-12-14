@@ -1179,7 +1179,6 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 					elem->dca1.env.note_off(&pv->dca1_env);
 					elem->dcf1.env.note_off(&pv->dcf1_env);
 					elem->lfo1.env.note_off(&pv->lfo1_env);
-					pv->gen1.setLoop(false);
 				}
 			}
 		}
