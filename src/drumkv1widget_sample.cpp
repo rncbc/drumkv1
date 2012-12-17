@@ -313,6 +313,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 			m_iLoopStart = (m_iDragStartX * nframes) / w;
 			m_iLoopEnd   = (m_iDragEndX   * nframes) / w;
 			emit loopRangeChanged();
+			updateToolTip();
 			update();
 		}
 		break;
@@ -323,6 +324,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 			const uint32_t nframes = m_pSample->length();
 			m_iLoopStart = (m_iDragStartX * nframes) / w;
 			emit loopRangeChanged();
+			updateToolTip();
 			update();
 		}
 		break;
@@ -333,6 +335,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 			const uint32_t nframes = m_pSample->length();
 			m_iLoopEnd = (m_iDragEndX * nframes) / w;
 			emit loopRangeChanged();
+			updateToolTip();
 			update();
 		}
 		break;
