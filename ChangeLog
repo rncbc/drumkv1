@@ -3,7 +3,7 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
-SVN TRUNK
+0.3.0  2012-12-21  Third coming release.
 
 - Dropped all SSE dummy build optimization flags as they were
   making more harm than real good, performance wise.
