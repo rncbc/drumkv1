@@ -255,10 +255,12 @@ void drumkv1widget_elements::setInstance ( drumkv1 *pDrumk )
 	QTreeView::setMaximumSize(QSize(360, 120));
 
 	QHeaderView *pHeader = QTreeView::header();
-#if QT_VERSION < 0x050000
+	//	pHeader->setDefaultAlignment(Qt::AlignLeft);
+#if QT_VERSION >= 0x050000
+	pHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
+#else
 	pHeader->setResizeMode(QHeaderView::ResizeToContents);
 #endif
-//	pHeader->setDefaultAlignment(Qt::AlignLeft);
 	pHeader->setStretchLastSection(true);
 
 	// Element selectors
