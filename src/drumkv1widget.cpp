@@ -1,7 +1,7 @@
 // drumkv1widget.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2013, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -98,7 +98,7 @@ struct {
 	{ "DEL1_WET",       0.0f },
 	{ "DEL1_DELAY",     0.5f },
 	{ "DEL1_FEEDB",     0.5f },
-	{ "DEL1_BPM",       1.8f },
+	{ "DEL1_BPM",     180.0f },
 	{ "DYN1_COMPRESS",  0.0f },
 	{ "DYN1_LIMIT",     1.0f }
 };
@@ -220,8 +220,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Out1PanningKnob->setMaximum(+1.0f);
 
 	// Effects (delay BPM)
-	m_ui.Del1BpmKnob->setMinimum(0.0f);
-	m_ui.Del1BpmKnob->setMaximum(3.6f);
+	m_ui.Del1BpmKnob->setScale(1.0f);
+	m_ui.Del1BpmKnob->setMinimum(3.6f);
+	m_ui.Del1BpmKnob->setMaximum(360.0f);
 
 	// GEN1
 	setParamKnob(drumkv1::GEN1_GROUP,  m_ui.Gen1GroupKnob);
@@ -752,6 +753,10 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 							if (!sName.isEmpty() && s_hash.contains(sName))
 								index = s_hash.value(sName);
 							float fValue = eParam.text().toFloat();
+						//--legacy support < 0.3.0.4 -- begin
+							if (index == drumkv1::DEL1_BPM && fValue < 3.6f)
+								fValue *= 100.0f;
+						//--legacy support < 0.3.0.4 -- end.
 							setParamValue(index, fValue);
 							updateParam(index, fValue);
 							m_params_ab[index] = fValue;

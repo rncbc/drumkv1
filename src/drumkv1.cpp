@@ -1298,6 +1298,11 @@ void drumkv1_impl::resetParamValues ( bool bSwap )
 
 void drumkv1_impl::reset (void)
 {
+//--legacy support < 0.3.0.4 -- begin
+	if (*m_del.bpm < 3.6f)
+		*m_del.bpm *= 100.0f;
+//--legacy support < 0.3.0.4 -- end.
+
 	// reset all elements
 	drumkv1_elem *elem = m_elem_list.next();
 	while (elem) {
@@ -1533,7 +1538,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			*m_pha.rate, *m_pha.feedb, *m_pha.depth, *m_pha.daft * float(k));
 		// delay
 		m_delay[k].process(in, nframes, *m_del.wet,
-			*m_del.delay, *m_del.feedb, *m_del.bpm * 100.0f);
+			*m_del.delay, *m_del.feedb, *m_del.bpm);
 		// compressor
 		if (int(*m_dyn.compress) > 0)
 			m_comp[k].process(in, nframes);
