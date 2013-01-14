@@ -72,10 +72,14 @@ inline float drumkv1_tanhf ( const float x )
 
 // sigmoids
 
-inline float drumkv1_sigmoid0 ( const float x )
+inline float drumkv1_sigmoid ( const float x )
 {
 //	return 2.0f / (1.0f + ::expf(-5.0f * x)) - 1.0f;
-//	return drumkv1_tanhf(2.0f * x);
+	return drumkv1_tanhf(2.0f * x);
+}
+
+inline float drumkv1_sigmoid_0 ( const float x )
+{
 	if (x > +0.75f)
 		return +0.75f + 0.25f * drumkv1_tanhf(+4.0f * (x - 0.75f));
 	else
@@ -85,9 +89,9 @@ inline float drumkv1_sigmoid0 ( const float x )
 		return x;
 }
 
-inline float drumkv1_sigmoid1 ( const float x )
+inline float drumkv1_sigmoid_1 ( const float x )
 {
-	return 0.5f * (1.0f + drumkv1_sigmoid0(2.0f * x - 1.0f));
+	return 0.5f * (1.0f + drumkv1_sigmoid_0(2.0f * x - 1.0f));
 }
 
 
@@ -1443,9 +1447,9 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 				const float env1 = 0.5f * (1.0f + vel1
 					* *elem->dcf1.envelope * pv->dcf1_env.value2(j));
-				const float cutoff1 = drumkv1_sigmoid1(*elem->dcf1.cutoff
+				const float cutoff1 = drumkv1_sigmoid_1(*elem->dcf1.cutoff
 					* env1 * (1.0f + *elem->lfo1.cutoff * lfo1));
-				const float reso1 = drumkv1_sigmoid1(*elem->dcf1.reso
+				const float reso1 = drumkv1_sigmoid_1(*elem->dcf1.reso
 					* env1 * (1.0f + *elem->lfo1.reso * lfo1));
 
 				gen1 = pv->dcf11.output(gen1, cutoff1, reso1);
@@ -1552,7 +1556,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		// limiter
 		if (int(*m_dyn.limiter) > 0) {
 			for (uint32_t n = 0; n < nframes; ++n)
-				*out++ = drumkv1_sigmoid0(*in++);
+				*out++ = drumkv1_sigmoid(*in++);
 		}
 	}
 }
