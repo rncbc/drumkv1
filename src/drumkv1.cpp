@@ -120,7 +120,10 @@ struct drumkv1_env
 			{ return level + float(n) * delta; }
 
 		float value2(uint32_t n) const
-			{ const float y = value(n); return y * y; }
+		{
+			const float v = value(n);
+			return v * (stage == Attack ? (2.0f - v) : v);
+		}
 
 		// state
 		bool running;
