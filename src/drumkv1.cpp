@@ -164,7 +164,7 @@ struct drumkv1_env
 			p->frames = uint32_t(drumkv1_quad(*decay1) * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
-			p->delta = (drumkv1_quad(*level2) - p->level) / float(p->frames);
+			p->delta = (drumkv1_quad(*level2, true) - p->level) / float(p->frames);
 		}
 		else if (p->stage == Decay1) {
 			p->stage = Decay2;
