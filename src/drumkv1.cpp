@@ -103,6 +103,13 @@ inline float drumkv1_velocity ( const float x, const float p = 0.2f )
 }
 
 
+// quadratic easing
+inline float drumkv1_quad ( const float x, const bool b = false )
+{
+	return x * (b ? (2.0f - x) : x);
+}
+
+
 // envelope
 
 struct drumkv1_env
@@ -116,17 +123,22 @@ struct drumkv1_env
 	struct State
 	{
 		// process
-		float value(uint32_t n) const
-			{ return level + float(n) * delta; }
-
-		float value2(uint32_t n) const
-			{ const float v = value(n); return v * v; }
+		float tick()
+		{
+			if (running && frames > 0) {
+				level += delta;
+				value = drumkv1_quad(level/*, (stage == Attack)*/);
+				--frames;
+			}
+			return value;
+		}
 
 		// state
 		bool running;
 		Stage stage;
 		float level;
 		float delta;
+		float value;
 		uint32_t frames;
 	};
 
@@ -134,38 +146,40 @@ struct drumkv1_env
 	{
 		p->running = true;
 		p->stage = Attack;
-		p->level = 0.0f;
-		p->frames = int(*attack * *attack * max_frames);
-		if (p->frames > 0)
+		p->frames = uint32_t(drumkv1_quad(*attack) * max_frames);
+		if (p->frames > 0) {
+			p->level = 0.0f;
 			p->delta = 1.0f / float(p->frames);
-		else
+		} else {
+			p->level = 1.0f;
 			p->delta = 0.0f;
+		}
+		p->value = 0.0f;
 	}
 
 	void next(State *p)
 	{
 		if (p->stage == Attack) {
 			p->stage = Decay1;
-			p->level = 1.0f;
-			p->frames = int(*decay1 * *decay1 * max_frames);
+			p->frames = uint32_t(drumkv1_quad(*decay1) * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
-			p->delta = (*level2 * *level2 - 1.0f) / float(p->frames);
+			p->delta = (drumkv1_quad(*level2) - p->level) / float(p->frames);
 		}
 		else if (p->stage == Decay1) {
 			p->stage = Decay2;
-			p->level = *level2 * *level2;
-			p->frames = int(*decay2 * *decay2 * max_frames);
+			p->frames = uint32_t(drumkv1_quad(*decay2) * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
-			p->delta = -(*level2 * *level2) / float(p->frames);
+			p->delta = -(p->level) / float(p->frames);
 		}
 		else if (p->stage == Decay2) {
 			p->running = false;
 			p->stage = Done;
 			p->level = 0.0f;
-			p->frames = 0;
 			p->delta = 0.0f;
+			p->value = 0.0f;
+			p->frames = 0;
 		}
 	}
 
@@ -173,17 +187,17 @@ struct drumkv1_env
 	{
 		p->running = true;
 		p->stage = Attack;
-		p->frames = int(*attack * *attack * max_frames);
+		p->frames = uint32_t(drumkv1_quad(*attack) * max_frames);
 		if (p->frames < min_frames) // prevent click on too fast attack
 			p->frames = min_frames;
-		p->delta = (1.0f - p->level) / float(p->frames);
+		p->delta = 1.0f / float(p->frames);
 	}
 
 	void note_off(State *p)
 	{
 		p->running = true;
 		p->stage = Decay2;
-		p->frames = int(*decay2 * *decay2 * max_frames);
+		p->frames = uint32_t(drumkv1_quad(*decay2) * max_frames);
 		if (p->frames < min_frames) // prevent click on too fast release
 			p->frames = min_frames;
 		p->delta = -(p->level) / float(p->frames);
@@ -1432,7 +1446,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 				// generators
 
-				const float lfo1_env = pv->lfo1_env.value2(j);
+				const float lfo1_env = pv->lfo1_env.tick();
 				const float lfo1 = pv->lfo1_sample * lfo1_env;
 
 				pv->gen1.next(pv->gen1_freq * (pitchbend1 + modwheel1 * lfo1));
@@ -1446,7 +1460,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				// filters
 
 				const float env1 = 0.5f * (1.0f + vel1
-					* *elem->dcf1.envelope * pv->dcf1_env.value2(j));
+					* *elem->dcf1.envelope * pv->dcf1_env.tick());
 				const float cutoff1 = drumkv1_sigmoid_1(*elem->dcf1.cutoff
 					* env1 * (1.0f + *elem->lfo1.cutoff * lfo1));
 				const float reso1 = drumkv1_sigmoid_1(*elem->dcf1.reso
@@ -1465,7 +1479,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float mid1 = 0.5f * (gen1 + gen2);
 				const float sid1 = 0.5f * (gen1 - gen2);
 				const float vol1 = vel1 * elem->vol1.value(j)
-					* pv->dca1_env.value2(j);
+					* pv->dca1_env.tick();
 
 				// outputs
 
@@ -1487,15 +1501,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 			// envelope countdowns
 
-			if (pv->dca1_env.running) {
-				if (pv->dca1_env.frames >= ngen) {
-					pv->dca1_env.frames -= ngen;
-					pv->dca1_env.level  += ngen * pv->dca1_env.delta;
-				}
-				else pv->dca1_env.frames = 0;
-				if (pv->dca1_env.frames == 0)
-					elem->dca1.env.next(&pv->dca1_env);
-			}
+			if (pv->dca1_env.running && pv->dca1_env.frames == 0)
+				elem->dca1.env.next(&pv->dca1_env);
 
 			if (pv->dca1_env.stage == drumkv1_env::Done || pv->gen1.isOver()) {
 				if (pv->note >= 0)
@@ -1505,24 +1512,10 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				free_voice(pv);
 				nblock = 0;
 			} else {
-				if (pv->dcf1_env.running) {
-					if (pv->dcf1_env.frames >= ngen) {
-						pv->dcf1_env.frames -= ngen;
-						pv->dcf1_env.level  += ngen * pv->dcf1_env.delta;
-					}
-					else pv->dcf1_env.frames = 0;
-					if (pv->dcf1_env.frames == 0)
-						elem->dcf1.env.next(&pv->dcf1_env);
-				}
-				if (pv->lfo1_env.running) {
-					if (pv->lfo1_env.frames >= ngen) {
-						pv->lfo1_env.frames -= ngen;
-						pv->lfo1_env.level  += ngen * pv->lfo1_env.delta;
-					}
-					else pv->lfo1_env.frames = 0;
-					if (pv->lfo1_env.frames == 0)
-						elem->lfo1.env.next(&pv->lfo1_env);
-				}
+				if (pv->dcf1_env.running && pv->dcf1_env.frames == 0)
+					elem->dcf1.env.next(&pv->dcf1_env);
+				if (pv->lfo1_env.running && pv->lfo1_env.frames == 0)
+					elem->lfo1.env.next(&pv->lfo1_env);
 			}
 		}
 
