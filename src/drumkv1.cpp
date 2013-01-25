@@ -103,13 +103,6 @@ inline float drumkv1_velocity ( const float x, const float p = 0.2f )
 }
 
 
-// quadratic easing
-inline float drumkv1_quad ( const float x, const bool b = false )
-{
-	return x * (b ? (2.0f - x) : x);
-}
-
-
 // envelope
 
 struct drumkv1_env
@@ -126,8 +119,8 @@ struct drumkv1_env
 		float tick()
 		{
 			if (running && frames > 0) {
-				level += delta;
-				value = drumkv1_quad(level/*, (stage == Attack)*/);
+				phase += delta;
+				value = c1 * phase * (2.0f - phase) + c0;
 				--frames;
 			}
 			return value;
@@ -136,9 +129,10 @@ struct drumkv1_env
 		// state
 		bool running;
 		Stage stage;
-		float level;
+		float phase;
 		float delta;
 		float value;
+		float c1, c0;
 		uint32_t frames;
 	};
 
@@ -146,40 +140,50 @@ struct drumkv1_env
 	{
 		p->running = true;
 		p->stage = Attack;
-		p->frames = uint32_t(drumkv1_quad(*attack) * max_frames);
+		p->frames = uint32_t(*attack * *attack * max_frames);
+		p->phase = 0.0f;
 		if (p->frames > 0) {
-			p->level = 0.0f;
 			p->delta = 1.0f / float(p->frames);
+			p->value = 0.0f;
 		} else {
-			p->level = 1.0f;
 			p->delta = 0.0f;
+			p->value = 1.0f;
 		}
-		p->value = 0.0f;
+		p->c1 = 1.0f;
+		p->c0 = 0.0f;
 	}
 
 	void next(State *p)
 	{
 		if (p->stage == Attack) {
 			p->stage = Decay1;
-			p->frames = uint32_t(drumkv1_quad(*decay1) * max_frames);
+			p->frames = uint32_t(*decay1 * *decay1 * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
-			p->delta = (drumkv1_quad(*level2, true) - p->level) / float(p->frames);
+			p->phase = 0.0f;
+			p->delta = 1.0f / float(p->frames);
+			p->c1 = *level2 - 1.0f;
+			p->c0 = p->value;
 		}
 		else if (p->stage == Decay1) {
 			p->stage = Decay2;
-			p->frames = uint32_t(drumkv1_quad(*decay2) * max_frames);
+			p->frames = uint32_t(*decay2 * *decay2 * max_frames);
 			if (p->frames < min_frames) // prevent click on too fast decay
 				p->frames = min_frames;
-			p->delta = -(p->level) / float(p->frames);
+			p->phase = 0.0f;
+			p->delta = 1.0f / float(p->frames);
+			p->c1 = p->value - 1.0f;
+			p->c0 = p->value;
 		}
 		else if (p->stage == Decay2) {
 			p->running = false;
 			p->stage = Done;
-			p->level = 0.0f;
+			p->frames = 0;
+			p->phase = 0.0f;
 			p->delta = 0.0f;
 			p->value = 0.0f;
-			p->frames = 0;
+			p->c1 = 0.0f;
+			p->c0 = 0.0f;
 		}
 	}
 
@@ -187,20 +191,26 @@ struct drumkv1_env
 	{
 		p->running = true;
 		p->stage = Attack;
-		p->frames = uint32_t(drumkv1_quad(*attack) * max_frames);
+		p->frames = uint32_t(*attack * *attack * max_frames);
 		if (p->frames < min_frames) // prevent click on too fast attack
 			p->frames = min_frames;
+		p->phase = 0.0f;
 		p->delta = 1.0f / float(p->frames);
+		p->c1 = 1.0f - p->value;
+		p->c0 = p->value;
 	}
 
 	void note_off(State *p)
 	{
 		p->running = true;
 		p->stage = Decay2;
-		p->frames = uint32_t(drumkv1_quad(*decay2) * max_frames);
+		p->frames = uint32_t(*decay2 * *decay2 * max_frames);
 		if (p->frames < min_frames) // prevent click on too fast release
 			p->frames = min_frames;
-		p->delta = -(p->level) / float(p->frames);
+		p->phase = 0.0f;
+		p->delta = 1.0f / float(p->frames);
+		p->c1 = -(p->value);
+		p->c0 = p->value;
 	}
 
 	void note_off_fast(State *p)
@@ -209,7 +219,10 @@ struct drumkv1_env
 		p->stage = Decay2;
 		if (p->frames > min_frames)
 			p->frames = min_frames;
-		p->delta = -(p->level) / float(p->frames);
+		p->phase = 0.0f;
+		p->delta = 1.0f / float(p->frames);
+		p->c1 = -(p->value);
+		p->c0 = p->value;
 	}
 
 	// parameters
