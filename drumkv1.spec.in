@@ -8,11 +8,11 @@ Summary:	an old-school drum-kit sampler
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
-License:	GPL
+License:	GPL-2.0+
 Group:		Productivity/Multimedia/Sound/Midi
 Source0:	%{name}-%{version}.tar.gz
 URL:		http://drumkv1.sourceforge.net
-Packager:	rncbc.org
+#Packager:	rncbc.org
 
 BuildRoot:	%{_tmppath}/%{name}-%{version}-%{release}-buildroot
 
