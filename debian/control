@@ -10,5 +10,5 @@ Package: drumkv1
 Architecture: any
 Depends: ${shlibs:Depends}, ${misc:Depends}
 Description: an old-school polyphonic sampler
-  an old-school drum-kit sampler synthesizer with stereo fx.
+  An old-school drum-kit sampler synthesizer with stereo fx.
 

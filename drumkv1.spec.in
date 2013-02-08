@@ -1,10 +1,10 @@
 %define name    @PACKAGE_TARNAME@
 %define version @PACKAGE_VERSION@
-%define release 3
+%define release 4
 
 %define _prefix	@ac_prefix@
 
-Summary:	an old-school drum-kit sampler
+Summary:	An old-school drum-kit sampler
 Name:		%{name}
 Version:	%{version}
 Release:	%{release}
@@ -23,7 +23,7 @@ BuildRequires:	alsa-devel
 BuildRequires:	lv2-devel
 
 %description
-  an old-school all-digital drum-kit sampler synthesizer with stereo fx.
+  An old-school all-digital drum-kit sampler synthesizer with stereo fx.
 
 %prep
 %setup
@@ -56,11 +56,13 @@ BuildRequires:	lv2-devel
 %{_bindir}/%{name}_jack
 
 %changelog
-* Fri Dec 21 2012 Rui Nuno Capela <rncbc@users.sourceforge.net> 0.3.0-3
+* Fri Feb  8 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.1-4
+- One second bug-fix release.
+* Fri Dec 21 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.3.0-3
 - Third coming release.
-* Thu Nov 22 2012 Rui Nuno Capela <rncbc@users.sourceforge.net> 0.2.0-2
+* Thu Nov 22 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.2.0-2
 - Second public release.
-* Thu Oct 25 2012 Rui Nuno Capela <rncbc@users.sourceforge.net> 0.1.0-1
+* Thu Oct 25 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.1.0-1
 - First public release.
-* Wed Oct  3 2012 Rui Nuno Capela <rncbc@users.sourceforge.net> 0.0.0-0
+* Wed Oct  3 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.0.0-0
 - Created initial drumkv1.spec
