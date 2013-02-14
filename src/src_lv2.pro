@@ -96,4 +96,6 @@ unix {
 QT += xml
 
 # QT5 support
-QT += widgets
+!lessThan(QT_MAJOR_VERSION, 5) {
+	QT += widgets
+}
