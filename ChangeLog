@@ -5,6 +5,7 @@ ChangeLog
 
 SVN TRUNK
 
+- LV2 State save flags now forced to be portable POD.
 - Color palette hack on Qt5 dark themes. (TESTING)
 
 
