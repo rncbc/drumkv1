@@ -57,6 +57,7 @@ const float PHASE_SCALE   = 0.5f;
 const float COARSE_SCALE  = 12.0f;
 const float FINE_SCALE    = 1.0f;
 const float SWEEP_SCALE   = 0.5f;
+const float PITCH_SCALE   = 0.5f;
 
 const float LFO_FREQ_MIN  = 0.4f;
 const float LFO_FREQ_MAX  = 40.0f;
@@ -105,6 +106,15 @@ inline float drumkv1_sigmoid_1 ( const float x, const float t0 = 0.01f )
 inline float drumkv1_velocity ( const float x, const float p = 0.2f )
 {
 	return ::powf(x, (1.0f - p));
+}
+
+
+// simplest power-of-2 straight linearization
+// -- x argument valid in [-1, 1] interval
+inline float drumkv1_pitchbend ( const float x )
+{
+//	return ::powf(2.0f, x);
+	return 1.0f + (x < 0.0f ? 0.5f : 1.0f) * x;
 }
 
 
@@ -251,7 +261,7 @@ struct drumkv1_ctl
 	void reset()
 	{
 		pressure = 0.0f;
-		pitchbend = 0.0f;
+		pitchbend = 1.0f;
 		modwheel = 0.0f;
 		panning = 0.0f;
 		volume = 1.0f;
@@ -754,7 +764,9 @@ private:
 	uint32_t m_iSampleRate;
 
 	drumkv1_ctl m_ctl;
+
 	drumkv1_def m_def;
+
 	drumkv1_cho m_cho;
 	drumkv1_fla m_fla;
 	drumkv1_pha m_pha;
@@ -1231,7 +1243,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 		switch (key) {
 		case 0x01:
 			// modulation wheel (cc#1)
-			m_ctl.modwheel = float(value) / 127.0f;
+			m_ctl.modwheel = *m_def.modwheel * float(value) / 127.0f;
 			break;
 		case 0x07:
 			// channel volume (cc#7)
@@ -1257,7 +1269,8 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 	}
 	// pitch bend
 	else if (status == 0xe0) {
-		m_ctl.pitchbend = float(key + (value << 7) - 0x2000) / 8192.0f;
+		const float pitchbend = float(key + (value << 7) - 0x2000) / 8192.0f;
+		m_ctl.pitchbend = drumkv1_pitchbend(*m_def.pitchbend * pitchbend);
 	}
 }
 
@@ -1424,11 +1437,9 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		// controls
 		drumkv1_elem *elem = pv->elem;
 
-		const float lfo1_rate  = *elem->lfo1.rate * *elem->lfo1.rate;
-		const float lfo1_freq  = LFO_FREQ_MIN + lfo1_rate * (LFO_FREQ_MAX - LFO_FREQ_MIN);
-		const float lfo1_pitch = *elem->lfo1.pitch * *elem->lfo1.pitch;
-		const float modwheel1  = *m_def.modwheel * (lfo1_pitch + m_ctl.modwheel);
-		const float pitchbend1 = (1.0f + *m_def.pitchbend * m_ctl.pitchbend);
+		const float lfo1_rate = *elem->lfo1.rate * *elem->lfo1.rate;
+		const float lfo1_freq = LFO_FREQ_MIN + lfo1_rate * (LFO_FREQ_MAX - LFO_FREQ_MIN);
+		const float modwheel1 = m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch;
 
 		// channel indexes
 
@@ -1467,7 +1478,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float lfo1_env = pv->lfo1_env.tick();
 				const float lfo1 = pv->lfo1_sample * lfo1_env;
 
-				pv->gen1.next(pv->gen1_freq * (pitchbend1 + modwheel1 * lfo1));
+				pv->gen1.next(pv->gen1_freq
+					* (m_ctl.pitchbend + modwheel1 * lfo1));
 
 				float gen1 = pv->gen1.value(k1);
 				float gen2 = pv->gen1.value(k2);
