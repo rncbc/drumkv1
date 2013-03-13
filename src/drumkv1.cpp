@@ -624,8 +624,8 @@ drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate, int key )
 	: element(this)
 {
 	// element parameter value set
-	for (int i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
-		for (int j = 0; j < 3; ++j)	params[j][i] = 0.0f;
+	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
+		for (int j = 0; j < 3; ++j) params[j][i] = 0.0f;
 
 	// element key (sample note)
 	gen1.sample0 = float(key);
@@ -652,6 +652,12 @@ drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate, int key )
 
 	dca1.env.min_frames = min_frames;
 	dca1.env.max_frames = max_frames;
+
+	// initial parameter port set
+	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		element.setParamPort(index, &(params[1][i]));
+	}
 }
 
 
@@ -974,13 +980,13 @@ void drumkv1_impl::setCurrentElement ( int key )
 				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				float *pfParam = element->paramPort(index);
+				float *pfParam = m_params[i];
 				if (pfParam) {
-					m_params[i] = pfParam;
 					elem->params[1][i] = *pfParam;
 					element->setParamPort(index, &(elem->params[1][i]));
 				}
 			}
+			resetElement(elem);
 		}
 		// swap new element parameter port values
 		elem = m_elems[key];
@@ -996,9 +1002,9 @@ void drumkv1_impl::setCurrentElement ( int key )
 					element->setParamPort(index, pfParam);
 				}
 			}
+			resetElement(elem);
 		}
 		// set new current element
-		resetElement(elem);
 		m_elem = elem;
 	}
 	else m_elem = 0;
@@ -1091,10 +1097,12 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DYN1_COMPRESS:  m_dyn.compress  = pfParam; break;
 	case drumkv1::DYN1_LIMITER:   m_dyn.limiter   = pfParam; break;
 	default:
+	#if 0
 		if (m_elem)
 			m_elem->element.setParamPort(index, pfParam);
 		else
-			m_params[index] = pfParam;
+	#endif
+		m_params[index] = pfParam;
 		break;
 	}
 }
@@ -1131,10 +1139,12 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DYN1_COMPRESS:  pfParam = m_dyn.compress;  break;
 	case drumkv1::DYN1_LIMITER:   pfParam = m_dyn.limiter;   break;
 	default:
+	#if 0
 		if (m_elem)
 			pfParam = m_elem->element.paramPort(index);
 		else
-			pfParam = m_params[index];
+	#endif
+		pfParam = m_params[index];
 		break;
 	}
 
@@ -1330,13 +1340,11 @@ void drumkv1_impl::allNotesOff (void)
 
 void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 {
-	if (elem) {
-		elem->vol1.reset(elem->out1.volume, elem->dca1.volume,
-			&m_ctl.volume, &elem->aux1.volume);
-		elem->pan1.reset(elem->out1.panning,
-			&m_ctl.panning, &elem->aux1.panning);
-		elem->wid1.reset(elem->out1.width);
-	}
+	elem->vol1.reset(elem->out1.volume, elem->dca1.volume,
+		&m_ctl.volume, &elem->aux1.volume);
+	elem->pan1.reset(elem->out1.panning,
+		&m_ctl.panning, &elem->aux1.panning);
+	elem->wid1.reset(elem->out1.width);
 }
 
 
