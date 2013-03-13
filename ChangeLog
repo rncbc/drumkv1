@@ -3,6 +3,11 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
+SVN TRUNK
+
+- LV2 .ttl file fix re. GEN1_GROUP, GEN1_COARSE index order.
+
+
 0.3.2  2012-03-01  One third bug-fix release.
 
 - Pitch-bend, Modwheel and LFO Pitch range internal fixes.

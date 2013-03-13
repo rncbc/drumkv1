@@ -57,25 +57,25 @@
 		lv2:symbol "GEN1_SAMPLE" ;
 		lv2:name "GEN1 Sample" ;
 		lv2:portProperty lv2:integer ;
-		lv2:default 60.0 ;
+		lv2:default 36.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 127.0 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 6 ;
-		lv2:symbol "GEN1_COARSE" ;
-		lv2:name "GEN1 Coarse" ;
-		lv2:default 0.0 ;
-		lv2:minimum -4.0 ;
-		lv2:maximum 4.0 ;
-	], [
-		a lv2:InputPort, lv2:ControlPort ;
-		lv2:index 7 ;
 		lv2:symbol "GEN1_GROUP" ;
 		lv2:name "GEN1 Group" ;
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 128.0 ;
+	], [
+		a lv2:InputPort, lv2:ControlPort ;
+		lv2:index 7 ;
+		lv2:symbol "GEN1_COARSE" ;
+		lv2:name "GEN1 Coarse" ;
+		lv2:default 0.0 ;
+		lv2:minimum -4.0 ;
+		lv2:maximum 4.0 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 8 ;
