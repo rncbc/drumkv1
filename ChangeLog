@@ -5,6 +5,7 @@ ChangeLog
 
 SVN TRUNK
 
+- Fixed JACK client fail/fake initialization.
 - Fixed a current element switching bug (via GUI) which was confusing
   the (stereo)width, panning and volume settings effect from previous
   selected elements. (TESTING)
