@@ -683,7 +683,7 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 	float lfo1_sample;
 
 	drumkv1_filter1 dcf11, dcf12;				// filters
-	drumkv1_filter1 dcf13, dcf14;
+	drumkv1_filter2 dcf13, dcf14;
 
 	drumkv1_env::State dca1_env;				// envelope states
 	drumkv1_env::State dcf1_env;
@@ -1196,12 +1196,11 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				+ *elem->gen1.fine * FINE_SCALE;
 			pv->gen1_freq = note_freq(freq1);
 			// filters
-			const drumkv1_filter1::Type type1
-				= drumkv1_filter1::Type(int(*elem->dcf1.type));
-			pv->dcf11.reset(type1);
-			pv->dcf12.reset(type1);
-			pv->dcf13.reset(type1);
-			pv->dcf14.reset(type1);
+			const int type1 = int(*elem->dcf1.type);
+			pv->dcf11.reset(drumkv1_filter1::Type(type1));
+			pv->dcf12.reset(drumkv1_filter1::Type(type1));
+			pv->dcf13.reset(drumkv1_filter2::Type(type1));
+			pv->dcf14.reset(drumkv1_filter2::Type(type1));
 			// envelopes
 			elem->dcf1.env.start(&pv->dcf1_env);
 			elem->lfo1.env.start(&pv->lfo1_env);
@@ -1497,11 +1496,12 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float reso1 = drumkv1_sigmoid_1(*elem->dcf1.reso
 					* env1 * (1.0f + *elem->lfo1.reso * lfo1));
 
-				gen1 = pv->dcf11.output(gen1, cutoff1, reso1);
-				gen2 = pv->dcf12.output(gen2, cutoff1, reso1);
 				if (int(*elem->dcf1.slope) > 0) { // 24db/octave
 					gen1 = pv->dcf13.output(gen1, cutoff1, reso1);
 					gen2 = pv->dcf14.output(gen2, cutoff1, reso1);
+				} else { // 12db/octave
+					gen1 = pv->dcf11.output(gen1, cutoff1, reso1);
+					gen2 = pv->dcf12.output(gen2, cutoff1, reso1);
 				}
 
 				// volumes
