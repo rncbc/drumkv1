@@ -410,14 +410,12 @@ static LV2UI_Handle drumkv1_lv2ui_instantiate (
 	return pWidget;
 }
 
-
 static void drumkv1_lv2ui_cleanup ( LV2UI_Handle ui )
 {
 	drumkv1widget_lv2 *pWidget = static_cast<drumkv1widget_lv2 *> (ui);
 	if (pWidget)
 		delete pWidget;
 }
-
 
 static void drumkv1_lv2ui_port_event (
 	LV2UI_Handle ui, uint32_t port_index,
@@ -428,11 +426,103 @@ static void drumkv1_lv2ui_port_event (
 		pWidget->port_event(port_index, buffer_size, format, buffer);
 }
 
-
 static const void *drumkv1_lv2ui_extension_data ( const char * )
 {
 	return NULL;
 }
+
+
+#ifdef CONFIG_LV2_EXTERNAL_UI
+
+struct drumkv1_lv2ui_external_widget
+{
+	LV2_External_UI_Widget external;
+	drumkv1widget_lv2     *widget;
+};
+
+static void drumkv1_lv2ui_external_run ( LV2_External_UI_Widget *ui_external )
+{
+	drumkv1_lv2ui_external_widget *pExtWidget
+		= (drumkv1_lv2ui_external_widget *) (ui_external);
+	if (pExtWidget && pExtWidget->widget)
+		pExtWidget->widget->update();
+}
+
+static void drumkv1_lv2ui_external_show ( LV2_External_UI_Widget *ui_external )
+{
+	drumkv1_lv2ui_external_widget *pExtWidget
+		= (drumkv1_lv2ui_external_widget *) (ui_external);
+	if (pExtWidget && pExtWidget->widget)
+		pExtWidget->widget->show();
+}
+
+static void drumkv1_lv2ui_external_hide ( LV2_External_UI_Widget *ui_external )
+{
+	drumkv1_lv2ui_external_widget *pExtWidget
+		= (drumkv1_lv2ui_external_widget *) (ui_external);
+	if (pExtWidget && pExtWidget->widget)
+		pExtWidget->widget->hide();
+}
+
+static LV2UI_Handle drumkv1_lv2ui_external_instantiate (
+	const LV2UI_Descriptor *, const char *, const char *,
+	LV2UI_Write_Function write_function,
+	LV2UI_Controller controller, LV2UI_Widget *widget,
+	const LV2_Feature *const *ui_features )
+{
+	drumkv1_lv2 *pDrumk = NULL;
+	LV2_External_UI_Host *external_host = NULL;
+
+	for (int i = 0; ui_features && ui_features[i]; ++i) {
+		if (::strcmp(ui_features[i]->URI, LV2_INSTANCE_ACCESS_URI) == 0)
+			pDrumk = static_cast<drumkv1_lv2 *> (ui_features[i]->data);
+		else
+		if (::strcmp(ui_features[i]->URI, LV2_EXTERNAL_UI__Host) == 0 ||
+			::strcmp(ui_features[i]->URI, LV2_EXTERNAL_UI_DEPRECATED_URI) == 0)
+			external_host = (LV2_External_UI_Host *) ui_features[i]->data;
+	}
+
+	if (pDrumk == NULL)
+		return NULL;
+
+	drumkv1_lv2ui_external_widget *pExtWidget = new drumkv1_lv2ui_external_widget;
+	pExtWidget->external.run  = drumkv1_lv2ui_external_run;
+	pExtWidget->external.show = drumkv1_lv2ui_external_show;
+	pExtWidget->external.hide = drumkv1_lv2ui_external_hide;
+	pExtWidget->widget = new drumkv1widget_lv2(pDrumk, controller, write_function);
+	if (external_host)
+		pExtWidget->widget->setExternalHost(external_host);
+	*widget = pExtWidget;
+	return pExtWidget;
+}
+
+static void drumkv1_lv2ui_external_cleanup ( LV2UI_Handle ui )
+{
+	drumkv1_lv2ui_external_widget *pExtWidget
+		= static_cast<drumkv1_lv2ui_external_widget *> (ui);
+	if (pExtWidget) {
+		if (pExtWidget->widget)
+			delete pExtWidget->widget;
+		delete pExtWidget;
+	}
+}
+
+static void drumkv1_lv2ui_external_port_event (
+	LV2UI_Handle ui, uint32_t port_index,
+	uint32_t buffer_size, uint32_t format, const void *buffer )
+{
+	drumkv1_lv2ui_external_widget *pExtWidget
+		= static_cast<drumkv1_lv2ui_external_widget *> (ui);
+	if (pExtWidget && pExtWidget->widget)
+		pExtWidget->widget->port_event(port_index, buffer_size, format, buffer);
+}
+
+static const void *drumkv1_lv2ui_external_extension_data ( const char * )
+{
+	return NULL;
+}
+
+#endif	// CONFIG_LV2_EXTERNAL_UI
 
 
 static const LV2_Descriptor drumkv1_lv2_descriptor =
@@ -456,6 +546,17 @@ static const LV2UI_Descriptor drumkv1_lv2ui_descriptor =
 	drumkv1_lv2ui_extension_data
 };
 
+#ifdef CONFIG_LV2_EXTERNAL_UI
+static const LV2UI_Descriptor drumkv1_lv2ui_external_descriptor =
+{
+	DRUMKV1_LV2UI_EXTERNAL_URI,
+	drumkv1_lv2ui_external_instantiate,
+	drumkv1_lv2ui_external_cleanup,
+	drumkv1_lv2ui_external_port_event,
+	drumkv1_lv2ui_external_extension_data
+};
+#endif	// CONFIG_LV2_EXTERNAL_UI
+
 
 LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor ( uint32_t index )
 {
@@ -465,7 +566,15 @@ LV2_SYMBOL_EXPORT const LV2_Descriptor *lv2_descriptor ( uint32_t index )
 
 LV2_SYMBOL_EXPORT const LV2UI_Descriptor *lv2ui_descriptor ( uint32_t index )
 {
-	return (index == 0 ? &drumkv1_lv2ui_descriptor : NULL);
+	if (index == 0)
+		return &drumkv1_lv2ui_descriptor;
+	else
+#ifdef CONFIG_LV2_EXTERNAL_UI
+	if (index == 1)
+		return &drumkv1_lv2ui_external_descriptor;
+	else
+#endif
+	return NULL;
 }
 
 
