@@ -91,6 +91,10 @@ private:
 	LV2_State_Map_Path *m_map_path;		
 };
 
+#ifdef CONFIG_LV2_EXTERNAL_UI
+#include <QApplication>
+#endif
+
 
 //-------------------------------------------------------------------------
 // drumkv1_lv2 - impl.
@@ -437,15 +441,21 @@ static const void *drumkv1_lv2ui_extension_data ( const char * )
 struct drumkv1_lv2ui_external_widget
 {
 	LV2_External_UI_Widget external;
+	static QApplication   *app_instance;
+	static unsigned int    app_refcount;
 	drumkv1widget_lv2     *widget;
 };
+
+QApplication *drumkv1_lv2ui_external_widget::app_instance = NULL;
+unsigned int  drumkv1_lv2ui_external_widget::app_refcount = 0;
+
 
 static void drumkv1_lv2ui_external_run ( LV2_External_UI_Widget *ui_external )
 {
 	drumkv1_lv2ui_external_widget *pExtWidget
 		= (drumkv1_lv2ui_external_widget *) (ui_external);
-	if (pExtWidget && pExtWidget->widget)
-		pExtWidget->widget->update();
+	if (pExtWidget && pExtWidget->app_instance)
+		pExtWidget->app_instance->processEvents();
 }
 
 static void drumkv1_lv2ui_external_show ( LV2_External_UI_Widget *ui_external )
@@ -486,6 +496,13 @@ static LV2UI_Handle drumkv1_lv2ui_external_instantiate (
 		return NULL;
 
 	drumkv1_lv2ui_external_widget *pExtWidget = new drumkv1_lv2ui_external_widget;
+	if (qApp == NULL && pExtWidget->app_instance == NULL) {
+		static int s_argc = 1;
+		static const char *s_argv[] = { __func__, NULL };
+		pExtWidget->app_instance = new QApplication(s_argc, (char **) s_argv);
+	}
+	pExtWidget->app_refcount++;
+
 	pExtWidget->external.run  = drumkv1_lv2ui_external_run;
 	pExtWidget->external.show = drumkv1_lv2ui_external_show;
 	pExtWidget->external.hide = drumkv1_lv2ui_external_hide;
@@ -503,6 +520,10 @@ static void drumkv1_lv2ui_external_cleanup ( LV2UI_Handle ui )
 	if (pExtWidget) {
 		if (pExtWidget->widget)
 			delete pExtWidget->widget;
+		if (--pExtWidget->app_refcount == 0 && pExtWidget->app_instance) {
+			delete pExtWidget->app_instance;
+			pExtWidget->app_instance = NULL;
+		}
 		delete pExtWidget;
 	}
 }
