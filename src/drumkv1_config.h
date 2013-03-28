@@ -1,4 +1,4 @@
-// drumkv1widget_config.h
+// drumkv1_config.h
 //
 /****************************************************************************
    Copyright (C) 2012-2013, rncbc aka Rui Nuno Capela. All rights reserved.
@@ -19,50 +19,20 @@
 
 *****************************************************************************/
 
-#ifndef __drumkv1widget_config_h
-#define __drumkv1widget_config_h
+#ifndef __drumkv1_config_h
+#define __drumkv1_config_h
 
-#include "drumkv1_config.h"
+#include "config.h"
 
-#include <QSettings>
-#include <QStringList>
+#define DRUMKV1_TITLE	PACKAGE_NAME
+#define DRUMKV1_VERSION	PACKAGE_VERSION
 
+#define DRUMKV1_SUBTITLE     "an old-school drum-kit sampler."
+#define DRUMKV1_WEBSITE      "http://drumkv1.sourceforge.net"
+#define DRUMKV1_COPYRIGHT    "Copyright (C) 2012-2013, rncbc aka Rui Nuno Capela. All rights reserved."
 
-//-------------------------------------------------------------------------
-// drumkv1widget_config - Prototype settings class (singleton).
-//
+#define DRUMKV1_DOMAIN	"rncbc.org"
 
-class drumkv1widget_config : public QSettings
-{
-public:
+#endif	// __drumkv1_config_h
 
-	// Constructor.
-	drumkv1widget_config();
-
-	// Default destructor.
-	~drumkv1widget_config();
-
-	// Default options...
-	QString sPreset;
-	QString sPresetDir;
-	QString sSampleDir;
-
-	// Singleton instance accessor.
-	static drumkv1widget_config *getInstance();
-
-protected:
-
-	// Explicit I/O methods.
-	void load();
-	void save();
-
-private:
-
-	// The singleton instance.
-	static drumkv1widget_config *g_pSettings;
-};
-
-
-#endif	// __drumkv1widget_config_h
-
-// end of drumkv1widget_config.h
+// end of drumkv1_config.h

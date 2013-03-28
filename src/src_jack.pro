@@ -11,6 +11,7 @@ HEADERS = \
 	config.h \
 	drumkv1.h \
 	drumkv1_jack.h \
+	drumkv1_config.h \
 	drumkv1_sample.h \
 	drumkv1_wave.h \
 	drumkv1_ramp.h \
