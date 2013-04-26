@@ -504,6 +504,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	m_ui.StatusBar->showMessage(tr("Ready"), 5000);
 	m_ui.StatusBar->setModified(false);
+	m_ui.Preset->setDirtyPreset(false);
 }
 
 
@@ -557,9 +558,8 @@ void drumkv1widget::paramChanged ( float fValue )
 			.arg(pKnob->toolTip())
 			.arg(pKnob->valueText()), 5000);
 		m_ui.StatusBar->setModified(true);
+		m_ui.Preset->setDirtyPreset(true);
 	}
-
-	m_ui.Preset->dirtyPreset();
 }
 
 
@@ -581,6 +581,7 @@ void drumkv1widget::resetParams (void)
 
 	m_ui.StatusBar->showMessage(tr("Reset preset"), 5000);
 	m_ui.StatusBar->setModified(false);
+	m_ui.Preset->setDirtyPreset(false);
 }
 
 
@@ -632,11 +633,10 @@ void drumkv1widget::swapParams ( bool bOn )
 		}
 	}
 
-	m_ui.Preset->dirtyPreset();
-
 	const bool bSwapA = m_ui.SwapParamsAButton->isChecked();
 	m_ui.StatusBar->showMessage(tr("Swap %1").arg(bSwapA ? 'A' : 'B'), 5000);
 	m_ui.StatusBar->setModified(true);
+	m_ui.Preset->setDirtyPreset(true);
 }
 
  
@@ -712,6 +712,7 @@ void drumkv1widget::newPreset (void)
 
 	m_ui.StatusBar->showMessage(tr("New preset"), 5000);
 	m_ui.StatusBar->setModified(false);
+	m_ui.Preset->setDirtyPreset(false);
 }
 
 
@@ -793,6 +794,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 
 	m_ui.StatusBar->showMessage(tr("Load preset: %1").arg(sPreset), 5000);
 	m_ui.StatusBar->setModified(false);
+	m_ui.Preset->setDirtyPreset(false);
 
 	QDir::setCurrent(currentDir.absolutePath());
 
@@ -837,6 +839,7 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 
 	m_ui.StatusBar->showMessage(tr("Save preset: %1").arg(sPreset), 5000);
 	m_ui.StatusBar->setModified(false);
+	m_ui.Preset->setDirtyPreset(false);
 }
 
 
@@ -949,8 +952,7 @@ void drumkv1widget::clearSample (void)
 
 	m_ui.StatusBar->showMessage(tr("Clear sample"), 5000);
 	m_ui.StatusBar->setModified(true);
-
-	m_ui.Preset->dirtyPreset();
+	m_ui.Preset->setDirtyPreset(true);
 }
 
 
@@ -961,8 +963,7 @@ void drumkv1widget::loadSample ( const QString& sFilename )
 
 	m_ui.StatusBar->showMessage(tr("Load sample: %1").arg(sFilename), 5000);
 	m_ui.StatusBar->setModified(true);
-
-	m_ui.Preset->dirtyPreset();
+	m_ui.Preset->setDirtyPreset(true);
 }
 
 
@@ -1032,8 +1033,10 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 	m_ui.Gen1Sample->setSampleName(currentNoteName());
 	m_ui.Gen1Sample->setSample(pSample);
 
-	if (pSample && bDirty)
-		m_ui.Preset->dirtyPreset();
+	if (pSample && bDirty) {
+		m_ui.StatusBar->setModified(true);
+		m_ui.Preset->setDirtyPreset(true);
+	}
 }
 
 
@@ -1260,7 +1263,8 @@ void drumkv1widget::resetElement (void)
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
 		pDrumk->removeElement(pDrumk->currentElement());
-		m_ui.Preset->dirtyPreset();
+		m_ui.StatusBar->setModified(true);
+		m_ui.Preset->setDirtyPreset(true);
 	}
 
 	refreshElements();
