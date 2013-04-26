@@ -1,7 +1,7 @@
 // drumkv1widget_jack.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2013, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -58,6 +58,8 @@ static void drumkv1widget_jack_session_event (
 drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 	: drumkv1widget(), m_pDrumk(pDrumk)
 {
+	m_pDrumk->open("drumkv1");
+
 #ifdef CONFIG_JACK_SESSION
 	// JACK session event callback...
 	if (::jack_set_session_callback) {
@@ -81,6 +83,7 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 drumkv1widget_jack::~drumkv1widget_jack (void)
 {
 	m_pDrumk->deactivate();
+	m_pDrumk->close();
 }
 
 
