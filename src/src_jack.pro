@@ -17,6 +17,7 @@ HEADERS = \
 	drumkv1_ramp.h \
 	drumkv1_list.h \
 	drumkv1_fx.h \
+	drumkv1_nsm.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
 	drumkv1widget_filt.h \
@@ -32,6 +33,7 @@ HEADERS = \
 SOURCES = \
 	drumkv1.cpp \
 	drumkv1_jack.cpp \
+	drumkv1_nsm.cpp \
 	drumkv1widget.cpp \
 	drumkv1widget_env.cpp \
 	drumkv1widget_filt.cpp \

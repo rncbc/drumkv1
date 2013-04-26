@@ -144,7 +144,7 @@ drumkv1_jack::drumkv1_jack (void) : drumkv1(2)
 	m_alsa_thread  = NULL;
 #endif
 
-//	open("drumkv1");
+//	open(DRUMKV1_TITLE);
 //	activate();
 }
 
@@ -280,7 +280,7 @@ void drumkv1_jack::open ( const char *client_id )
 	m_alsa_thread  = NULL;
 	// open alsa sequencer client...
 	if (snd_seq_open(&m_alsa_seq, "hw", SND_SEQ_OPEN_INPUT, 0) >= 0) {
-		snd_seq_set_client_name(m_alsa_seq, "drumkv1");
+		snd_seq_set_client_name(m_alsa_seq, client_id);
 	//	m_alsa_client = snd_seq_client_id(m_alsa_seq);
 		m_alsa_port = snd_seq_create_simple_port(m_alsa_seq, "in",
 			SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
