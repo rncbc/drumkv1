@@ -1,10 +1,11 @@
-# drumkv1.pri
+# drumkv1_jack.pri
 #
 
 PREFIX  = @ac_prefix@
 CONFIG += @ac_debug@
-INCLUDEPATH = @ac_incpath@
-LIBS += @ac_libs@
+
+INCLUDEPATH = @ac_jack_incpath@
+LIBS += @ac_jack_libs@
 
 QMAKE_CXXFLAGS += @ac_cflags@
 
