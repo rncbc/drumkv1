@@ -173,6 +173,9 @@ protected:
 	// Param port method.
 	virtual void updateParam(drumkv1::ParamIndex index, float fValue) const = 0;
 
+	// Dirty flag (overridable virtual) methods.
+	virtual void updateDirtyPreset(bool bDirtyPreset);
+
 private:
 
 	// Instance variables.

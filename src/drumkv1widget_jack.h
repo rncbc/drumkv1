@@ -84,6 +84,9 @@ protected:
 	// Param port method.
 	void updateParam(drumkv1::ParamIndex index, float fValue) const;
 
+	// Dirty flag method.
+	void updateDirtyPreset(bool bDirtyPreset);
+
 	// Application close.
 	void closeEvent(QCloseEvent *pCloseEvent);
 
@@ -93,7 +96,8 @@ private:
 	drumkv1_jack *m_pDrumk;
 
 #ifdef CONFIG_NSM
-	drumkv1_nsm *m_nsm;
+	drumkv1_nsm *m_pNsmClient;
+	bool m_bNsmDirty;
 #endif
 };
 
