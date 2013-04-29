@@ -1418,13 +1418,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			elem->lfo1_wave.reset(
 				drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
 		}
-		elem->wid1.process(nframes);
-		elem->pan1.process(nframes);
-		elem->vol1.process(nframes);
 		elem = elem->next();
 	}
-
-	m_pre.process(nframes);
 
 	// per voice
 
@@ -1583,6 +1578,18 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				*out++ = drumkv1_sigmoid(*in++);
 		}
 	}
+
+	// post-processing
+
+	elem = m_elem_list.next();
+	while (elem) {
+		elem->wid1.process(nframes);
+		elem->pan1.process(nframes);
+		elem->vol1.process(nframes);
+		elem = elem->next();
+	}
+
+	m_pre.process(nframes);
 }
 
 

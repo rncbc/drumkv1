@@ -5,6 +5,8 @@ ChangeLog
 
 SVN TRUNK
 
+- Parameter value ramping moved into the late post-processing,
+  an attempt to reduce some pop/click artifacts even further.
 - NSM support introduced to JACK client. (EXPERIMENTAL)
 - A slight GUI behavior change: (re)writing existing names
   doesn't load the respective preset anymore (after ticket
@@ -12,9 +14,9 @@ SVN TRUNK
 - Introducing LV2 External UI rougue support. (EXPERIMENTAL)
 - Moog-like 24dB/oct resonant filter slight modification.
 - Fixed JACK client fail/fake initialization.
-- Fixed a current element switching bug (via GUI) which was confusing
-  the (stereo)width, panning and volume settings effect from previous
-  selected elements. (TESTING)
+- Fixed a current element switching bug (via GUI) which was
+  confusing the (stereo)width, panning and volume settings
+  effect from previous selected elements. (TESTING)
 - Fixed LV2 .ttl file index order (re. GEN1_GROUP, GEN1_COARSE).
 
 
