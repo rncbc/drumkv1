@@ -251,6 +251,8 @@ void drumkv1widget_jack::showSession (void)
 #endif
 
 	QWidget::show();
+	QWidget::raise();
+	QWidget::activateWindow();
 }
 
 void drumkv1widget_jack::hideSession (void)
