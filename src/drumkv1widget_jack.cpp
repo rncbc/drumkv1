@@ -77,7 +77,13 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 		QObject::connect(m_pNsmClient,
 			SIGNAL(save()),
 			SLOT(saveSession()));
-		m_pNsmClient->announce(DRUMKV1_TITLE, ":switch:dirty:");
+		QObject::connect(m_pNsmClient,
+			SIGNAL(show()),
+			SLOT(showSession()));
+		QObject::connect(m_pNsmClient,
+			SIGNAL(hide()),
+			SLOT(hideSession()));
+		m_pNsmClient->announce(DRUMKV1_TITLE, ":switch:dirty:optional-gui:");
 		return;
 	}
 #endif	// CONFIG_NSM
@@ -202,6 +208,8 @@ void drumkv1widget_jack::openSession (void)
 
 	m_pNsmClient->open_reply();
 	m_pNsmClient->dirty(false);
+
+	m_pNsmClient->visible(QWidget::isVisible());
 }
 
 void drumkv1widget_jack::saveSession (void)
@@ -228,6 +236,38 @@ void drumkv1widget_jack::saveSession (void)
 	m_pNsmClient->save_reply();
 	m_pNsmClient->dirty(false);
 }
+
+
+void drumkv1widget_jack::showSession (void)
+{
+	if (m_pNsmClient == NULL)
+		return;
+
+	if (!m_pNsmClient->is_active())
+		return;
+
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1widget_jack::showSession()");
+#endif
+
+	QWidget::show();
+}
+
+void drumkv1widget_jack::hideSession (void)
+{
+	if (m_pNsmClient == NULL)
+		return;
+
+	if (!m_pNsmClient->is_active())
+		return;
+
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1widget_jack::hideSession()");
+#endif
+
+	QWidget::hide();
+}
+
 
 #endif	// CONFIG_NSM
 
@@ -274,6 +314,28 @@ void drumkv1widget_jack::closeEvent ( QCloseEvent *pCloseEvent )
 		pCloseEvent->ignore();
 	}
 }
+
+
+#ifdef CONFIG_NSM
+
+// Optional GUI handlers.
+void drumkv1widget_jack::showEvent ( QShowEvent *pShowEvent )
+{
+	QWidget::showEvent(pShowEvent);
+
+	if (m_pNsmClient)
+		m_pNsmClient->visible(true);
+}
+
+void drumkv1widget_jack::hideEvent ( QHideEvent *pHideEvent )
+{
+	if (m_pNsmClient)
+		m_pNsmClient->visible(false);
+
+	QWidget::hideEvent(pHideEvent);
+}
+
+#endif	// CONFIG_NSM
 
 
 //-------------------------------------------------------------------------
