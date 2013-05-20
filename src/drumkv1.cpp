@@ -677,6 +677,7 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 	int note;									// voice note
 	int group;									// voice group
 	float vel;									// velocity to vol
+	float pre;									// key pressure/aftertouch
 
 	float gen1_freq;							// frequency and phase
 
@@ -688,6 +689,8 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 	drumkv1_env::State dca1_env;				// envelope states
 	drumkv1_env::State dcf1_env;
 	drumkv1_env::State lfo1_env;
+
+	drumkv1_ramp2 dca1_pre;
 };
 
 
@@ -788,8 +791,6 @@ private:
 	drumkv1_list<drumkv1_voice> m_play_list;
 
 	drumkv1_list<drumkv1_elem>  m_elem_list;
-
-	drumkv1_ramp2 m_pre;
 
 	drumkv1_fx_chorus   m_chorus;
 	drumkv1_fx_flanger *m_flanger;
@@ -1188,6 +1189,9 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			const float vel = float(value) / 127.0f;
 			// quadratic velocity law
 			pv->vel  = drumkv1_velocity(vel * vel, *m_def.velocity);
+			// pressure/aftertouch
+			pv->pre = *m_def.pressure;
+			pv->dca1_pre.reset(&m_ctl.pressure, &pv->pre);
 			// generate
 			pv->gen1.start();
 			// frequencies
@@ -1239,6 +1243,12 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				}
 			}
 		}
+	}
+	// key pressure/poly.aftertouch
+	else if (status == 0xa0) {
+		drumkv1_voice *pv = m_notes[key];
+		if (pv && pv->note >= 0)
+			pv->pre = *m_def.pressure * float(value) / 127.0f;
 	}
 	// control change
 	else if (status == 0xb0) {
@@ -1367,9 +1377,6 @@ void drumkv1_impl::reset (void)
 		elem = elem->next();
 	}
 
-	// pressure state
-	m_pre.reset(m_def.pressure, &m_ctl.pressure);
-
 	// flangers
 	if (m_flanger == 0)
 		m_flanger = new drumkv1_fx_flanger [m_iChannels];
@@ -1466,7 +1473,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				// velocities
 
 				const float vel1
-					= (pv->vel + (1.0f - pv->vel) * m_pre.value(j));
+					= (pv->vel + (1.0f - pv->vel) * pv->dca1_pre.value(j));
 
 				// generators
 
@@ -1524,6 +1531,10 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			}
 
 			nblock -= ngen;
+
+			// voice ramps countdown
+
+			pv->dca1_pre.process(ngen);
 
 			// envelope countdowns
 
@@ -1588,8 +1599,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		elem->vol1.process(nframes);
 		elem = elem->next();
 	}
-
-	m_pre.process(nframes);
 }
 
 
