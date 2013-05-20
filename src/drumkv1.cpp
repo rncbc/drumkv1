@@ -63,7 +63,16 @@ const float LFO_FREQ_MIN  = 0.4f;
 const float LFO_FREQ_MAX  = 40.0f;
 
 
+// maximum helper
+
+inline float drumkv1_max ( float a, float b )
+{
+	return (a > b ? a : b);
+}
+
+
 // hyperbolic-tangent fast approximation
+
 inline float drumkv1_tanhf ( const float x )
 {
 	const float x2 = x * x;
@@ -117,6 +126,14 @@ inline float drumkv1_pow2f ( const float x )
 // -- x argument valid in [-1, 1] interval
 //	return 1.0f + (x < 0.0f ? 0.5f : 1.0f) * x;
 	return ::powf(2.0f, x);
+}
+
+
+// convert note to frequency (hertz)
+
+inline float drumkv1_freq ( float note )
+{
+	return (440.0f / 32.0f) * ::powf(2.0f, (note - 9.0f) / 12.0f);
 }
 
 
@@ -583,12 +600,23 @@ protected:
 
 
 
-// convert note to frequency (hertz)
+// pressure smoother (3 parameters)
 
-inline float note_freq ( float note )
+class drumkv1_pre : public drumkv1_ramp3
 {
-	return (440.0f / 32.0f) * ::powf(2.0f, (note - 9.0f) / 12.0f);
-}
+public:
+
+	drumkv1_pre() : drumkv1_ramp3() {}
+
+protected:
+
+	virtual float evaluate(uint16_t i)
+	{
+		drumkv1_ramp3::evaluate(i);
+
+		return m_param1_v * drumkv1_max(m_param2_v, m_param3_v);
+	}
+};
 
 
 // synth element
@@ -690,7 +718,7 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 	drumkv1_env::State dcf1_env;
 	drumkv1_env::State lfo1_env;
 
-	drumkv1_ramp2 dca1_pre;
+	drumkv1_pre dca1_pre;
 };
 
 
@@ -1190,15 +1218,15 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			// quadratic velocity law
 			pv->vel  = drumkv1_velocity(vel * vel, *m_def.velocity);
 			// pressure/aftertouch
-			pv->pre = *m_def.pressure;
-			pv->dca1_pre.reset(&m_ctl.pressure, &pv->pre);
+			pv->pre = 0.0f;
+			pv->dca1_pre.reset(m_def.pressure, &m_ctl.pressure, &pv->pre);
 			// generate
 			pv->gen1.start();
 			// frequencies
 			const float freq1 = float(key)
 				+ *elem->gen1.coarse * COARSE_SCALE
 				+ *elem->gen1.fine * FINE_SCALE;
-			pv->gen1_freq = note_freq(freq1);
+			pv->gen1_freq = drumkv1_freq(freq1);
 			// filters
 			const int type1 = int(*elem->dcf1.type);
 			pv->dcf11.reset(drumkv1_filter1::Type(type1));
@@ -1767,7 +1795,7 @@ void drumkv1_element::setSampleFile ( const char *pszSampleFile )
 			m_pElem->gen1.sample0 = *(m_pElem->gen1.sample);
 		#endif
 			m_pElem->gen1_sample.open(pszSampleFile,
-				note_freq(m_pElem->gen1.sample0));
+				drumkv1_freq(m_pElem->gen1.sample0));
 		}
 	}
 }
