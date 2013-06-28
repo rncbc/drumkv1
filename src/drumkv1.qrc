@@ -6,5 +6,6 @@
 		<file>images/presetDelete.png</file>
 		<file>images/fileOpen.png</file>
 		<file>images/drumkv1.png</file>
+		<file>images/drumkv1_preset.png</file>
 	</qresource>
 </RCC>
