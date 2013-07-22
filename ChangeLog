@@ -3,6 +3,11 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
+SVN TRUNK
+
+- Another minor fix to note-off fast-release.
+
+
 0.3.4  2013-07-16  Brand new icon ready.
 
 - Preset file icon and mimetype now introduced.

@@ -251,8 +251,7 @@ struct drumkv1_env
 	{
 		p->running = true;
 		p->stage = Decay2;
-		if (p->frames > min_frames)
-			p->frames = min_frames;
+		p->frames = min_frames;
 		p->phase = 0.0f;
 		p->delta = 1.0f / float(p->frames);
 		p->c1 = -(p->value);
