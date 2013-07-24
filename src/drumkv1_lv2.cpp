@@ -20,9 +20,8 @@
 *****************************************************************************/
 
 #include "drumkv1_lv2.h"
-#include "drumkv1_config.h"
 
-#include "drumkv1_preset.h"
+#include "drumkv1widget.h"
 
 #include "lv2/lv2plug.in/ns/ext/atom/atom.h"
 #include "lv2/lv2plug.in/ns/ext/midi/midi.h"
@@ -43,7 +42,7 @@
 // drumkv1_lv2_map_path - abstract/absolute path functors.
 //
 
-class drumkv1_lv2_map_path : public drumkv1_preset::map_path
+class drumkv1_lv2_map_path : public drumkv1_map_path
 {
 public:
 
@@ -212,7 +211,7 @@ uint32_t drumkv1_lv2::urid_map ( const char *uri ) const
 }
 
 
-int drumkv1_lv2::update_fds ( int mode )
+int drumkv1_lv2::update_fds ( int mode ) const
 {
 	return m_update_fds[mode];
 }
@@ -267,7 +266,7 @@ static LV2_State_Status drumkv1_lv2_state_save ( LV2_Handle instance,
 
 	QDomDocument doc(DRUMKV1_TITLE);
 	QDomElement eElements = doc.createElement("elements");
-	drumkv1_preset::saveElements(pPlugin, doc, eElements, mapPath);
+	drumkv1widget::saveElements(pPlugin, doc, eElements, mapPath);
 	doc.appendChild(eElements);
 
 	const QByteArray data(doc.toByteArray());
@@ -319,7 +318,7 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 	if (doc.setContent(QByteArray(value, size))) {
 		QDomElement eElements = doc.documentElement();
 		if (eElements.tagName() == "elements")
-			drumkv1_preset::loadElements(pPlugin, eElements, mapPath);
+			drumkv1widget::loadElements(pPlugin, eElements, mapPath);
 	}
 
 	return LV2_STATE_SUCCESS;

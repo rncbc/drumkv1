@@ -2,7 +2,7 @@
 #
 NAME = drumkv1
 
-TARGET = $${NAME}
+TARGET = $${NAME}_lv2
 TEMPLATE = lib
 CONFIG += shared plugin
 
@@ -18,12 +18,37 @@ HEADERS = \
 	drumkv1_ramp.h \
 	drumkv1_list.h \
 	drumkv1_fx.h \
-	drumkv1_preset.h
+	drumkv1widget.h \
+	drumkv1widget_env.h \
+	drumkv1widget_filt.h \
+	drumkv1widget_sample.h \
+	drumkv1widget_wave.h \
+	drumkv1widget_knob.h \
+	drumkv1widget_preset.h \
+	drumkv1widget_status.h \
+	drumkv1widget_config.h \
+	drumkv1widget_elements.h \
+	drumkv1widget_lv2.h
 
 SOURCES = \
 	drumkv1.cpp \
 	drumkv1_lv2.cpp \
-	drumkv1_preset.cpp
+	drumkv1widget.cpp \
+	drumkv1widget_env.cpp \
+	drumkv1widget_filt.cpp \
+	drumkv1widget_sample.cpp \
+	drumkv1widget_wave.cpp \
+	drumkv1widget_knob.cpp \
+	drumkv1widget_preset.cpp \
+	drumkv1widget_status.cpp \
+	drumkv1widget_config.cpp \
+	drumkv1widget_elements.cpp \
+	drumkv1widget_lv2.cpp
+
+FORMS = \
+	drumkv1widget.ui
+
+RESOURCES += drumkv1.qrc
 
 
 unix {
@@ -51,7 +76,7 @@ unix {
 		QMAKE_EXTENSION_SHLIB = so
 	}
 
-	TARGET_LV2 = $${NAME}.lv2/$${TARGET}.$${QMAKE_EXTENSION_SHLIB}
+	TARGET_LV2 = $${NAME}.lv2/$${NAME}.$${QMAKE_EXTENSION_SHLIB}
 
 	!exists($${TARGET_LV2}) {
 		system(touch $${TARGET_LV2})
@@ -69,5 +94,9 @@ unix {
 	QMAKE_CLEAN += $${TARGET_LV2}
 }
 
-QT -= gui
 QT += xml
+
+# QT5 support
+!lessThan(QT_MAJOR_VERSION, 5) {
+	QT += widgets
+}

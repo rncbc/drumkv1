@@ -86,6 +86,14 @@ public:
 	static QString noteName(int note);
 	static QString completeNoteName(int note);
 
+	// Element serialization methods.
+	static void loadElements(drumkv1 *pDrumk,
+		const QDomElement& eElements,
+		const drumkv1_map_path& mapPath = drumkv1_map_path());
+	static void saveElements(drumkv1 *pDrumk,
+		QDomDocument& doc, QDomElement& eElements,
+		const drumkv1_map_path& mapPath = drumkv1_map_path());
+
 public slots:
 
 	// Preset file I/O.
