@@ -143,12 +143,17 @@ struct drumkv1_env
 {
 	// envelope stages
 
-	enum Stage { Attack = 0, Decay1, Decay2, Done };
+	enum Stage { Done = 0, Attack, Decay1, Decay2 };
 
 	// per voice
 
 	struct State
 	{
+		// ctor.
+		State() : running(false), stage(Done),
+			phase(0.0f), delta(0.0f), value(0.0f),
+			c1(1.0f), c0(0.0f), frames(0) {}
+
 		// process
 		float tick()
 		{
@@ -372,6 +377,7 @@ struct drumkv1_def
 	float *modwheel;
 	float *pressure;
 	float *velocity;
+	float *channel;
 	float *noteoff;
 };
 
@@ -698,13 +704,14 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 
 	drumkv1_elem *elem;
 
-	drumkv1_generator  gen1;
-	drumkv1_oscillator lfo1;
-
 	int note;									// voice note
 	int group;									// voice group
-	float vel;									// velocity to vol
-	float pre;									// key pressure/aftertouch
+
+	float vel;									// key velocity
+	float pre;									// key pressure/after-touch
+
+	drumkv1_generator  gen1;
+	drumkv1_oscillator lfo1;
 
 	float gen1_freq;							// frequency and phase
 
@@ -1098,6 +1105,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DEF1_MODWHEEL:  m_def.modwheel  = pfParam; break;
 	case drumkv1::DEF1_PRESSURE:  m_def.pressure  = pfParam; break;
 	case drumkv1::DEF1_VELOCITY:  m_def.velocity  = pfParam; break;
+	case drumkv1::DEF1_CHANNEL:   m_def.channel   = pfParam; break;
 	case drumkv1::DEF1_NOTEOFF:   m_def.noteoff   = pfParam; break;
 	case drumkv1::CHO1_WET:       m_cho.wet       = pfParam; break;
 	case drumkv1::CHO1_DELAY:     m_cho.delay     = pfParam; break;
@@ -1138,6 +1146,7 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DEF1_MODWHEEL:  pfParam = m_def.modwheel;  break;
 	case drumkv1::DEF1_PRESSURE:  pfParam = m_def.pressure;  break;
 	case drumkv1::DEF1_VELOCITY:  pfParam = m_def.velocity;  break;
+	case drumkv1::DEF1_CHANNEL:   pfParam = m_def.channel;   break;
 	case drumkv1::DEF1_NOTEOFF:   pfParam = m_def.noteoff;   break;
 	case drumkv1::CHO1_WET:       pfParam = m_cho.wet;       break;
 	case drumkv1::CHO1_DELAY:     pfParam = m_cho.delay;	 break;
@@ -1179,6 +1188,15 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 	if (size < 2)
 		return;
 
+	// channel filter
+	const int channel = (data[0] & 0x0f) + 1;
+
+	const int ch = int(*m_def.channel);
+	const int on = (ch == 0 || ch == channel);
+
+	if (!on)
+		return;
+
 	// note on
 	const int status = (data[0] & 0xf0);
 	const int key    = (data[1] & 0x7f);
@@ -1203,8 +1221,8 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			elem->dcf1.env.note_off_fast(&pv->dcf1_env);
 			elem->lfo1.env.note_off_fast(&pv->lfo1_env);
 			elem->dca1.env.note_off_fast(&pv->dca1_env);
-			pv->note = -1;
 			m_notes[key] = 0;
+			pv->note = -1;
 		}
 		// find free voice
 		pv = alloc_voice(key);

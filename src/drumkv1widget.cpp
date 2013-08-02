@@ -79,6 +79,7 @@ struct {
 	{ "DEF1_MODWHEEL",  0.2f },
 	{ "DEF1_PRESSURE",  0.2f },
 	{ "DEF1_VELOCITY",  0.2f },
+	{ "DEF1_CHANNEL",   0.0f },
 	{ "DEF1_NOTEOFF",   1.0f },
 
 	{ "CHO1_WET",       0.0f },
@@ -177,6 +178,14 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	slopes << tr("24dB/oct");
 
 	m_ui.Dcf1SlopeKnob->insertItems(0, slopes);
+
+	// Channel filters
+	QStringList channels;
+	channels << tr("Omni");
+	for (int iChannel = 0; iChannel < 16; ++iChannel)
+		channels << QString::number(iChannel + 1);
+
+	m_ui.Def1ChannelKnob->insertItems(0, channels);
 
 	// Noteoff modes.
 	QStringList modes;
@@ -404,6 +413,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::DEF1_MODWHEEL,  m_ui.Def1ModwheelKnob);
 	setParamKnob(drumkv1::DEF1_PRESSURE,  m_ui.Def1PressureKnob);
 	setParamKnob(drumkv1::DEF1_VELOCITY,  m_ui.Def1VelocityKnob);
+	setParamKnob(drumkv1::DEF1_CHANNEL,   m_ui.Def1ChannelKnob);
 	setParamKnob(drumkv1::DEF1_NOTEOFF,   m_ui.Def1NoteoffKnob);
 
 	// OUT1
