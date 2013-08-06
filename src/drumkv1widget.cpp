@@ -575,6 +575,12 @@ void drumkv1widget::paramChanged ( float fValue )
 // Reset all param knobs to default values.
 void drumkv1widget::resetParams (void)
 {
+	drumkv1 *pDrumk = instance();
+	if (pDrumk == NULL)
+		return;
+
+	pDrumk->reset();
+
 	resetSwapParams();
 
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
