@@ -411,7 +411,7 @@
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 47 ;
-		lv2:symbol "8CHO1_FEEDB" ;
+		lv2:symbol "CHO1_FEEDB" ;
 		lv2:name "Chorus Feedback" ;
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
