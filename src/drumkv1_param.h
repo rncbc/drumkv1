@@ -24,6 +24,7 @@
 
 #include "drumkv1.h"
 
+#include <QString>
 #include <QHash>
 
 // forward decl.
