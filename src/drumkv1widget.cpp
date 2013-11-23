@@ -748,6 +748,10 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 #endif
 	const QString& sPreset = QFileInfo(sFilename).completeBaseName();
 
+	const QFileInfo fi(sFilename);
+	const QDir currentDir(QDir::current());
+	QDir::setCurrent(fi.absolutePath());
+
 	QDomDocument doc(DRUMKV1_TITLE);
 	QDomElement ePreset = doc.createElement("preset");
 	ePreset.setAttribute("name", sPreset);
@@ -778,6 +782,8 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 
 	m_ui.StatusBar->showMessage(tr("Save preset: %1").arg(sPreset), 5000);
 	updateDirtyPreset(false);
+
+	QDir::setCurrent(currentDir.absolutePath());
 }
 
 

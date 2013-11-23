@@ -22,6 +22,7 @@
 #include "drumkv1_param.h"
 
 #include <QDomDocument>
+#include <QDir>
 
 
 //-------------------------------------------------------------------------
@@ -194,8 +195,9 @@ void drumkv1_param::saveElements (
 		QDomElement eSample = doc.createElement("sample");
 		eSample.setAttribute("index", 0);
 		eSample.setAttribute("name", "GEN1_SAMPLE");
-		eSample.appendChild(doc.createTextNode(
-			mapPath.abstractPath(pszSampleFile)));
+		eSample.appendChild(doc.createTextNode(mapPath.abstractPath(
+			QDir::current().relativeFilePath(
+				QString::fromUtf8(pszSampleFile)))));
 		eElement.appendChild(eSample);
 		QDomElement eParams = doc.createElement("params");
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
