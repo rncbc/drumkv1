@@ -134,6 +134,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Pha1WetKnob->setSpecialValueText(sOff);
 	m_ui.Del1WetKnob->setSpecialValueText(sOff);
 
+	m_ui.Del1BpmKnob->setSpecialValueText(tr("Auto"));
+
 	// GEN group limits. [0=off, 1..128]
 	m_ui.Gen1GroupKnob->setSpecialValueText(sOff);
 	m_ui.Gen1GroupKnob->setMaximum(1.28f);
@@ -370,7 +372,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::DEL1_FEEDB, m_ui.Del1FeedbKnob);
 	setParamKnob(drumkv1::DEL1_BPM,   m_ui.Del1BpmKnob);
 
-	// Dynamics
+	QObject::connect(m_ui.Del1BpmKnob,
+		SIGNAL(valueChanged(float)),
+		SLOT(bpmSyncChanged()));
+
+		// Dynamics
 	setParamKnob(drumkv1::DYN1_COMPRESS, m_ui.Dyn1CompressKnob);
 	setParamKnob(drumkv1::DYN1_LIMITER,  m_ui.Dyn1LimiterKnob);
 
@@ -469,6 +475,8 @@ void drumkv1widget::setParamValue ( drumkv1::ParamIndex index, float fValue )
 	if (pKnob)
 		pKnob->setValue(fValue);
 
+	updateParamEx(index, fValue);
+
 	--m_iUpdate;
 }
 
@@ -487,13 +495,33 @@ void drumkv1widget::paramChanged ( float fValue )
 
 	drumkv1widget_knob *pKnob = qobject_cast<drumkv1widget_knob *> (sender());
 	if (pKnob) {
-		updateParam(m_knobParams.value(pKnob), fValue);
+		drumkv1::ParamIndex index = m_knobParams.value(pKnob);
+		updateParam(index, fValue);
+		updateParamEx(index, fValue);
 		m_ui.StatusBar->showMessage(QString("%1 / %2: %3")
 			.arg(m_ui.StackedWidget->currentWidget()->windowTitle())
 			.arg(pKnob->toolTip())
 			.arg(pKnob->valueText()), 5000);
 		updateDirtyPreset(true);
 	}
+}
+
+
+// Update local tied widgets.
+void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
+{
+	++m_iUpdate;
+
+	switch (index) {
+	case drumkv1::DEL1_BPMSYNC:
+		if (fValue > 0.0f)
+			m_ui.Del1BpmKnob->setValue(0.0f);
+		// Fall thru...
+	default:
+		break;
+	}
+
+	--m_iUpdate;
 }
 
 
@@ -1129,6 +1157,29 @@ void drumkv1widget::activateParamKnobsGroupBox ( QGroupBox *pGroupBox, bool bEna
 	QListIterator<QWidget *> iter(children);
 	while (iter.hasNext())
 		iter.next()->setEnabled(bEnabled);
+}
+
+
+// Delay BPM change.
+void drumkv1widget::bpmSyncChanged (void)
+{
+	if (m_iUpdate > 0)
+		return;
+
+	++m_iUpdate;
+	drumkv1 *pDrumk = instance();
+	if (pDrumk) {
+		float *pBpmSync = pDrumk->paramPort(drumkv1::DEL1_BPMSYNC);
+		if (pBpmSync) {
+			const bool bBpmSync0
+				= (*pBpmSync > 0.0f);
+			const bool bBpmSync1
+				= (m_ui.Del1BpmKnob->minimum() >= m_ui.Del1BpmKnob->value());
+			if ((bBpmSync1 && !bBpmSync0) || (!bBpmSync1 && bBpmSync0))
+				*pBpmSync = (bBpmSync1 ? 1.0f : 0.0f);
+		}
+	}
+	--m_iUpdate;
 }
 
 
