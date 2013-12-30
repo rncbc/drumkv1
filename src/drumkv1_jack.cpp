@@ -26,6 +26,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include <math.h>
+
 
 #ifdef CONFIG_ALSA_MIDI
 
@@ -143,6 +145,8 @@ drumkv1_jack::drumkv1_jack (void) : drumkv1(2)
 	m_alsa_thread  = NULL;
 #endif
 
+	m_bpm = 0.0f;
+
 //	open(DRUMKV1_TITLE);
 //	activate();
 }
@@ -170,6 +174,20 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 			::jack_port_get_buffer(m_audio_ins[k], nframes));
 		outs[k] = static_cast<float *> (
 			::jack_port_get_buffer(m_audio_outs[k], nframes));
+	}
+
+	const float *bpm_sync = drumkv1::paramPort(drumkv1::DEL1_BPMSYNC);
+	if (bpm_sync && *bpm_sync > 0.0f) {
+		float *bpm_port = drumkv1::paramPort(drumkv1::DEL1_BPM);
+		if (bpm_port) {
+			jack_position_t pos;
+			jack_transport_query(m_client, &pos);
+			if (pos.valid & JackPositionBBT) {
+				const float bpm = float(pos.beats_per_minute);
+				if (::fabs(*bpm_port - bpm) > 0.01f)
+					*bpm_port = bpm;
+			}
+		}
 	}
 
 	uint32_t ndelta = 0;

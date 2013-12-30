@@ -482,8 +482,21 @@ void drumkv1widget::setParamValue ( drumkv1::ParamIndex index, float fValue )
 
 float drumkv1widget::paramValue ( drumkv1::ParamIndex index ) const
 {
+	float fParamValue = 0.0f;
+
 	drumkv1widget_knob *pKnob = paramKnob(index);
-	return (pKnob ? pKnob->value() : 0.0f);
+	if (pKnob) {
+		fParamValue = pKnob->value();
+	} else {
+		drumkv1 *pDrumk = instance();
+		if (pDrumk) {
+			const float *pParamPort = pDrumk->paramPort(index);
+			if (pParamPort)
+				fParamValue = *pParamPort;
+		}
+	}
+
+	return fParamValue;
 }
 
 
