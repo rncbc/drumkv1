@@ -1,6 +1,6 @@
 %define name    @PACKAGE_TARNAME@
 %define version @PACKAGE_VERSION@
-%define release 8
+%define release 9
 
 %define _prefix	@ac_prefix@
 
@@ -68,21 +68,23 @@ BuildRequires:	lv2-devel
 %{_datadir}/icons/hicolor/scalable/mimetypes/application-x-%{name}*.svg
 
 %changelog
-* Mon Sep 30 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.5-8
+* Tue Dec 31 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.6
+- A fifth of a Jubilee release.
+* Mon Sep 30 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.5
 - Fall greetings release.
-* Tue Jul 16 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.4-7
+* Tue Jul 16 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.4
 - Brand new icon ready.
-* Fri May 31 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.3-6
+* Fri May 31 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.3
 - Late spring blossoming.
-* Fri Mar  1 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.2-5
+* Fri Mar  1 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.2
 - One third bug-fix release.
-* Fri Feb  8 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.1-4
+* Fri Feb  8 2013 Rui Nuno Capela <rncbc@rncbc.org> 0.3.1
 - One second bug-fix release.
-* Fri Dec 21 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.3.0-3
+* Fri Dec 21 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.3.0
 - Third coming release.
-* Thu Nov 22 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.2.0-2
+* Thu Nov 22 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.2.0
 - Second public release.
-* Thu Oct 25 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.1.0-1
+* Thu Oct 25 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.1.0
 - First public release.
-* Wed Oct  3 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.0.0-0
+* Wed Oct  3 2012 Rui Nuno Capela <rncbc@rncbc.org> 0.0.0
 - Created initial drumkv1.spec
