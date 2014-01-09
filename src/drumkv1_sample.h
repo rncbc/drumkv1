@@ -189,25 +189,20 @@ public:
 	// begin.
 	void start(void)
 	{
-		m_phase  = 1.0f;
-		m_phase1 = float(m_sample ? m_sample->length() : 0.0f);
-		m_index  = 1;
-		m_alpha  = 0.0f;
-		m_frame  = 0;
+		m_phase = 1.0f;
+		m_index = 1;
+		m_alpha = 0.0f;
+		m_frame = 0;
 	}
 
 	// iterate.
 	void next(float freq)
 	{
+		const float delta = freq * m_sample->ratio();
+
 		m_index  = int(m_phase);
 		m_alpha  = m_phase - float(m_index);
-		m_phase += freq * m_sample->ratio();
-
-		if (m_phase >= m_phase1) {
-			m_phase -= m_phase1;
-			if (m_phase < 1.0f)
-				m_phase = 1.0f;
-		}
+		m_phase += delta;
 
 		if (m_frame < m_index)
 			m_frame = m_index;
@@ -245,7 +240,6 @@ private:
 	drumkv1_sample *m_sample;
 
 	float    m_phase;
-	float    m_phase1;
 	uint32_t m_index;
 	float    m_alpha;
 	uint32_t m_frame;

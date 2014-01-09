@@ -5,7 +5,7 @@ ChangeLog
 
 SVN TRUNK
 
-- Purged dead zero-crossing code.
+- Purging out some dead code (eg. non-looping, zero-crossing).
 
 
 0.3.6  2013-12-31  A fifth of a Jubilee.
