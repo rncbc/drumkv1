@@ -3,6 +3,11 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
+SVN TRUNK
+
+- Purged dead zero-crossing code.
+
+
 0.3.6  2013-12-31  A fifth of a Jubilee.
 
 - Effects/Delay BPM sync option to current transport (Auto).

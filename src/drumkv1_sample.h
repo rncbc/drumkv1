@@ -1,7 +1,7 @@
 // drumkv1_sample.h
 //
 /****************************************************************************
-   Copyright (C) 2012, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -150,41 +150,6 @@ public:
 	// predicate.
 	bool isOver(uint32_t frame) const
 		{ return !m_pframes || (frame >= m_nframes - 4); }
-
-protected:
-
-	// zero-crossing aliasing (channel).
-	uint32_t zero_crossing_k ( uint32_t i, uint16_t k ) const
-	{
-		const float *frames = m_pframes[k];
-		const float v0 = frames[i];
-
-		int dmax = m_nframes - i;
-		if (dmax < int(i))
-			dmax = i;
-
-		int d = 1;
-		while (d < dmax) {
-			const float v1 = frames[i + d];
-			if ((v0 >= 0.0f && v1 < 0.0f) ||
-				(v1 >= 0.0f && v0 < 0.0f))
-				return (i + d);
-			d = -d;
-			if (d > 0)
-				++d;
-		}
-
-		return (i + d < m_nframes ? 0 : m_nframes);
-	}
-
-	// zero-crossing aliasing (median).
-	uint32_t zero_crossing ( uint32_t i ) const
-	{
-		uint32_t sum = 0;
-		for (uint16_t k = 0; k < m_nchannels; ++k)
-			sum += zero_crossing_k(i, k);
-		return (sum / m_nchannels);
-	}
 
 private:
 
