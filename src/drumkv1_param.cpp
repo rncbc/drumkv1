@@ -1,7 +1,7 @@
 // drumkv1_param.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2013, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -40,6 +40,7 @@ struct {
 	{ "GEN1_GROUP",     0.0f },
 	{ "GEN1_COARSE",    0.0f },
 	{ "GEN1_FINE",      0.0f },
+	{ "GEN1_ENVTIME",   0.2f },
 	{ "DCF1_CUTOFF",    1.0f }, // 0.5f
 	{ "DCF1_RESO",      0.0f },
 	{ "DCF1_TYPE",      0.0f },

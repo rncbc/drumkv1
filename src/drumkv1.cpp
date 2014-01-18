@@ -1,7 +1,7 @@
 // drumkv1.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2013, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -50,7 +50,7 @@ const uint8_t  MAX_NOTES  = 128;
 const uint8_t  MAX_GROUP  = 128;
 
 const float MIN_ENV_MSECS = 2.0f;		// min 2msec per stage
-const float MAX_ENV_MSECS = 2000.0f;	// max 2 sec per stage
+const float MAX_ENV_MSECS = 2000.0f;	// max 2 sec per stage (default)
 
 const float DETUNE_SCALE  = 0.5f;
 const float PHASE_SCALE   = 0.5f;
@@ -310,6 +310,7 @@ struct drumkv1_gen
 	float *group;
 	float *coarse;
 	float *fine;
+	float *envtime, envtime0;
 };
 
 
@@ -637,6 +638,8 @@ public:
 	drumkv1_ramp4  vol1;
 
 	float params[3][drumkv1::NUM_ELEMENT_PARAMS];
+
+	void updateEnvTimes(uint32_t iSampleRate);
 };
 
 
@@ -652,6 +655,9 @@ drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate, int key )
 	// element key (sample note)
 	gen1.sample0 = float(key);
 
+	// max env. stage length (default)
+	gen1.envtime0 = 0.0001f * MAX_ENV_MSECS;
+
 	params[0][drumkv1::GEN1_SAMPLE] = gen1.sample0;
 	params[1][drumkv1::GEN1_SAMPLE] = gen1.sample0;
 	params[2][drumkv1::GEN1_SAMPLE] = gen1.sample0;
@@ -660,11 +666,17 @@ drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate, int key )
 	gen1_sample.setSampleRate(iSampleRate);
 	lfo1_wave.setSampleRate(iSampleRate);
 
+	updateEnvTimes(iSampleRate);
+}
+
+
+void drumkv1_elem::updateEnvTimes ( uint32_t iSampleRate )
+{
 	// element envelope range times in frames
 	const float srate_ms = 0.001f * float(iSampleRate);
 
 	const uint32_t min_frames = uint32_t(srate_ms * MIN_ENV_MSECS);
-	const uint32_t max_frames = uint32_t(srate_ms * MAX_ENV_MSECS);
+	const uint32_t max_frames = uint32_t(srate_ms * gen1.envtime0 * 10000.0f);
 
 	dcf1.env.min_frames = min_frames;
 	dcf1.env.max_frames = max_frames;
@@ -1466,6 +1478,10 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			elem->lfo1_wave.reset(
 				drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
 		}
+		if (elem->gen1.envtime0 != *elem->gen1.envtime) {
+			elem->gen1.envtime0  = *elem->gen1.envtime;
+			elem->updateEnvTimes(m_iSampleRate);
+		}
 		elem = elem->next();
 	}
 
@@ -1845,6 +1861,7 @@ void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::GEN1_GROUP:    m_pElem->gen1.group       = pfParam; break;
 	case drumkv1::GEN1_COARSE:   m_pElem->gen1.coarse      = pfParam; break;
 	case drumkv1::GEN1_FINE:     m_pElem->gen1.fine        = pfParam; break;
+	case drumkv1::GEN1_ENVTIME:  m_pElem->gen1.envtime     = pfParam; break;
 	case drumkv1::DCF1_CUTOFF:   m_pElem->dcf1.cutoff      = pfParam; break;
 	case drumkv1::DCF1_RESO:     m_pElem->dcf1.reso        = pfParam; break;
 	case drumkv1::DCF1_TYPE:     m_pElem->dcf1.type        = pfParam; break;
@@ -1892,6 +1909,7 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::GEN1_GROUP:    pfParam = m_pElem->gen1.group;      break;
 	case drumkv1::GEN1_COARSE:   pfParam = m_pElem->gen1.coarse;     break;
 	case drumkv1::GEN1_FINE:     pfParam = m_pElem->gen1.fine;       break;
+	case drumkv1::GEN1_ENVTIME:  pfParam = m_pElem->gen1.envtime;    break;
 	case drumkv1::DCF1_CUTOFF:   pfParam = m_pElem->dcf1.cutoff;     break;
 	case drumkv1::DCF1_RESO:     pfParam = m_pElem->dcf1.reso;       break;
 	case drumkv1::DCF1_TYPE:     pfParam = m_pElem->dcf1.type;       break;
