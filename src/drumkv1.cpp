@@ -1472,15 +1472,15 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			elem->gen1.sample0  = *elem->gen1.sample;
 			elem->gen1_sample.reset(note_freq(elem->gen1.sample0));
 		}
+		if (elem->gen1.envtime0 != *elem->gen1.envtime) {
+			elem->gen1.envtime0  = *elem->gen1.envtime;
+			elem->updateEnvTimes(m_iSampleRate);
+		}
 	#endif
 		if (int(*elem->lfo1.shape) != int(elem->lfo1_wave.shape())
 			||  *elem->lfo1.width  !=     elem->lfo1_wave.width()) {
 			elem->lfo1_wave.reset(
 				drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
-		}
-		if (elem->gen1.envtime0 != *elem->gen1.envtime) {
-			elem->gen1.envtime0  = *elem->gen1.envtime;
-			elem->updateEnvTimes(m_iSampleRate);
 		}
 		elem = elem->next();
 	}
