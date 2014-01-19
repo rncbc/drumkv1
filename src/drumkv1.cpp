@@ -658,9 +658,10 @@ drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate, int key )
 	// max env. stage length (default)
 	gen1.envtime0 = 0.0001f * MAX_ENV_MSECS;
 
-	params[0][drumkv1::GEN1_SAMPLE] = gen1.sample0;
-	params[1][drumkv1::GEN1_SAMPLE] = gen1.sample0;
-	params[2][drumkv1::GEN1_SAMPLE] = gen1.sample0;
+	for (int j = 0; j < 3; ++j) {
+		params[j][drumkv1::GEN1_SAMPLE]  = gen1.sample0;
+		params[j][drumkv1::GEN1_ENVTIME] = gen1.envtime0;
+	}
 
 	// element sample rate
 	gen1_sample.setSampleRate(iSampleRate);
@@ -1472,11 +1473,11 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			elem->gen1.sample0  = *elem->gen1.sample;
 			elem->gen1_sample.reset(note_freq(elem->gen1.sample0));
 		}
+	#endif
 		if (elem->gen1.envtime0 != *elem->gen1.envtime) {
 			elem->gen1.envtime0  = *elem->gen1.envtime;
 			elem->updateEnvTimes(m_iSampleRate);
 		}
-	#endif
 		if (int(*elem->lfo1.shape) != int(elem->lfo1_wave.shape())
 			||  *elem->lfo1.width  !=     elem->lfo1_wave.width()) {
 			elem->lfo1_wave.reset(
