@@ -1,7 +1,7 @@
 // drumkv1widget.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2013, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -180,9 +180,10 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Del1BpmKnob->setMaximum(360.0f);
 
 	// GEN1
-	setParamKnob(drumkv1::GEN1_GROUP,  m_ui.Gen1GroupKnob);
-	setParamKnob(drumkv1::GEN1_COARSE, m_ui.Gen1CoarseKnob);
-	setParamKnob(drumkv1::GEN1_FINE,   m_ui.Gen1FineKnob);
+	setParamKnob(drumkv1::GEN1_GROUP,   m_ui.Gen1GroupKnob);
+	setParamKnob(drumkv1::GEN1_COARSE,  m_ui.Gen1CoarseKnob);
+	setParamKnob(drumkv1::GEN1_FINE,    m_ui.Gen1FineKnob);
+	setParamKnob(drumkv1::GEN1_ENVTIME, m_ui.Gen1EnvTimeKnob);
 
 	// DCF1
 	setParamKnob(drumkv1::DCF1_CUTOFF,   m_ui.Dcf1CutoffKnob);
