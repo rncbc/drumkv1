@@ -211,7 +211,7 @@ struct drumkv1_env
 				p->frames = min_frames;
 			p->phase = 0.0f;
 			p->delta = 1.0f / float(p->frames);
-			p->c1 = p->value - 1.0f;
+			p->c1 = -(p->value);
 			p->c0 = p->value;
 		}
 		else if (p->stage == Decay2) {
