@@ -453,6 +453,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 // Param kbob (widget) map accesors.
 void drumkv1widget::setParamKnob ( drumkv1::ParamIndex index, drumkv1widget_knob *pKnob )
 {
+	pKnob->setDefaultValue(drumkv1_param::paramDefaultValue(index));
+
 	m_paramKnobs.insert(index, pKnob);
 	m_knobParams.insert(pKnob, index);
 
