@@ -19,6 +19,7 @@ HEADERS = \
 	drumkv1_fx.h \
 	drumkv1_nsm.h \
 	drumkv1_param.h \
+	drumkv1_reverb.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
 	drumkv1widget_filt.h \

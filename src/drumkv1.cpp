@@ -30,6 +30,8 @@
 
 #include "drumkv1_fx.h"
 
+#include "drumkv1_reverb.h"
+
 
 #ifdef CONFIG_DEBUG_0
 #include <stdio.h>
@@ -437,6 +439,17 @@ struct drumkv1_dyn
 };
 
 
+// reverb
+
+struct drumkv1_rev
+{
+	float *wet;
+	float *room;
+	float *damp;
+	float *width;
+};
+
+
 // (Hal Chamberlin's state variable) filter
 
 class drumkv1_filter1
@@ -815,6 +828,7 @@ private:
 	drumkv1_pha m_pha;
 	drumkv1_del m_del;
 	drumkv1_dyn m_dyn;
+	drumkv1_rev m_rev;
 
 	drumkv1_voice **m_voices;
 	drumkv1_voice  *m_notes[MAX_NOTES];
@@ -835,6 +849,8 @@ private:
 	drumkv1_fx_phaser  *m_phaser;
 	drumkv1_fx_delay   *m_delay;
 	drumkv1_fx_comp    *m_comp;
+
+	drumkv1_reverb m_reverb;
 };
 
 
@@ -1136,6 +1152,10 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DEL1_BPMHOST:   m_del.bpmhost   = pfParam; break;
 	case drumkv1::DYN1_COMPRESS:  m_dyn.compress  = pfParam; break;
 	case drumkv1::DYN1_LIMITER:   m_dyn.limiter   = pfParam; break;
+	case drumkv1::REV1_WET:       m_rev.wet       = pfParam; break;
+	case drumkv1::REV1_ROOM:      m_rev.room      = pfParam; break;
+	case drumkv1::REV1_DAMP:      m_rev.damp      = pfParam; break;
+	case drumkv1::REV1_WIDTH:     m_rev.width     = pfParam; break;
 	default:
 		if (m_elem)
 			m_elem->element.setParamPort(index, pfParam);
@@ -1179,6 +1199,10 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DEL1_BPMHOST:   pfParam = m_del.bpmhost;   break;
 	case drumkv1::DYN1_COMPRESS:  pfParam = m_dyn.compress;  break;
 	case drumkv1::DYN1_LIMITER:   pfParam = m_dyn.limiter;   break;
+	case drumkv1::REV1_WET:       pfParam = m_rev.wet;       break;
+	case drumkv1::REV1_ROOM:      pfParam = m_rev.room;      break;
+	case drumkv1::REV1_DAMP:      pfParam = m_rev.damp;      break;
+	case drumkv1::REV1_WIDTH:     pfParam = m_rev.width;     break;
 	default:
 		if (m_elem)
 			pfParam = m_elem->element.paramPort(index);
@@ -1367,6 +1391,8 @@ void drumkv1_impl::allSoundOff (void)
 		m_delay[k].reset();
 		m_comp[k].reset();
 	}
+
+	m_reverb.setSampleRate(m_iSampleRate);
 }
 
 
@@ -1448,6 +1474,9 @@ void drumkv1_impl::reset (void)
 	// compressors
 	if (m_comp == 0)
 		m_comp = new drumkv1_fx_comp [m_iChannels];
+
+	// reverbs
+	m_reverb.reset(true);
 
 	allSoundOff();
 //	allControllersOff();
@@ -1656,6 +1685,11 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		if (int(*m_dyn.limiter) > 0) {
 			for (uint32_t n = 0; n < nframes; ++n)
 				*out++ = drumkv1_sigmoid(*in++);
+		}
+		// reverb
+		if (k > 0) {
+			m_reverb.process(outs[k - 1], outs[k], nframes, *m_rev.wet,
+				*m_rev.room, *m_rev.damp, *m_rev.width);
 		}
 	}
 

@@ -18,6 +18,7 @@ HEADERS = \
 	drumkv1_ramp.h \
 	drumkv1_list.h \
 	drumkv1_fx.h \
+	drumkv1_reverb.h \
 	drumkv1_param.h
 
 SOURCES = \

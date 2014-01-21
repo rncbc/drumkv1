@@ -349,6 +349,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::OUT1_PANNING, m_ui.Out1PanningKnob);
 	setParamKnob(drumkv1::OUT1_VOLUME,  m_ui.Out1VolumeKnob);
 
+	// Reverb (stereo-)width limits.
+	m_ui.Rev1WidthKnob->setMinimum(-1.0f);
+	m_ui.Rev1WidthKnob->setMaximum(+1.0f);
 
 	// Effects
 	setParamKnob(drumkv1::CHO1_WET,   m_ui.Cho1WetKnob);
@@ -394,6 +397,13 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	QObject::connect(m_ui.Gen1Sample,
 		SIGNAL(loadSampleFile(const QString&)),
 		SLOT(loadSample(const QString&)));
+
+	// Reverb
+	setParamKnob(drumkv1::REV1_WET,   m_ui.Rev1WetKnob);
+	setParamKnob(drumkv1::REV1_ROOM,  m_ui.Rev1RoomKnob);
+	setParamKnob(drumkv1::REV1_DAMP,  m_ui.Rev1DampKnob);
+	setParamKnob(drumkv1::REV1_WIDTH, m_ui.Rev1WidthKnob);
+
 
 	// Preset management
 	QObject::connect(m_ui.Preset,
