@@ -400,6 +400,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// Reverb
 	setParamKnob(drumkv1::REV1_WET,   m_ui.Rev1WetKnob);
+	setParamKnob(drumkv1::REV1_FEEDB, m_ui.Rev1FeedbKnob);
 	setParamKnob(drumkv1::REV1_ROOM,  m_ui.Rev1RoomKnob);
 	setParamKnob(drumkv1::REV1_DAMP,  m_ui.Rev1DampKnob);
 	setParamKnob(drumkv1::REV1_WIDTH, m_ui.Rev1WidthKnob);

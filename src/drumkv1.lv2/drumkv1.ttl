@@ -596,6 +596,14 @@
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 69 ;
+		lv2:symbol "REV1_FEEDB" ;
+		lv2:name "Reverb Feedback" ;
+		lv2:default 0.5 ;
+		lv2:minimum 0.0 ;
+		lv2:maximum 1.0 ;
+	], [
+		a lv2:InputPort, lv2:ControlPort ;
+		lv2:index 70 ;
 		lv2:symbol "REV1_ROOM" ;
 		lv2:name "Reverb Room" ;
 		lv2:default 0.5 ;
@@ -603,7 +611,7 @@
 		lv2:maximum 1.0 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
-		lv2:index 70 ;
+		lv2:index 71 ;
 		lv2:symbol "REV1_DAMP" ;
 		lv2:name "Reverb Damp" ;
 		lv2:default 0.5 ;
@@ -611,7 +619,7 @@
 		lv2:maximum 1.0 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
-		lv2:index 71 ;
+		lv2:index 72 ;
 		lv2:symbol "REV1_WIDTH" ;
 		lv2:name "Reverb Width" ;
 		lv2:default 0.0 ;
