@@ -1396,6 +1396,7 @@ void drumkv1_impl::allSoundOff (void)
 	}
 
 	m_reverb.setSampleRate(m_iSampleRate);
+	m_reverb.reset();
 }
 
 
@@ -1479,7 +1480,7 @@ void drumkv1_impl::reset (void)
 		m_comp = new drumkv1_fx_comp [m_iChannels];
 
 	// reverbs
-	m_reverb.reset(true);
+	m_reverb.reset();
 
 	allSoundOff();
 //	allControllersOff();
