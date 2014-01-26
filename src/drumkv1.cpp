@@ -690,7 +690,7 @@ void drumkv1_elem::updateEnvTimes ( uint32_t iSampleRate )
 	// element envelope range times in frames
 	const float srate_ms = 0.001f * float(iSampleRate);
 
-	const float envtime_msecs = 10000.0f * drumkv1_max(gen1.envtime0, 0.1f);
+	const float envtime_msecs = 10000.0f * drumkv1_max(gen1.envtime0, 0.01f);
 
 	const uint32_t min_frames = uint32_t(srate_ms * MIN_ENV_MSECS);
 	const uint32_t max_frames = uint32_t(srate_ms * envtime_msecs);
