@@ -764,8 +764,11 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 							drumkv1::ParamIndex index = drumkv1::ParamIndex(
 								eParam.attribute("index").toULong());
 							const QString& sName = eParam.attribute("name");
-							if (!sName.isEmpty() && s_hash.contains(sName))
+							if (!sName.isEmpty()) {
+								if (!s_hash.contains(sName))
+									continue;
 								index = s_hash.value(sName);
+							}
 							float fValue = eParam.text().toFloat();
 						//--legacy support < 0.3.0.4 -- begin
 							if (index == drumkv1::DEL1_BPM && fValue < 3.6f)
