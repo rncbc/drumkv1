@@ -22,6 +22,9 @@
 #ifndef __drumkv1_fx_h
 #define __drumkv1_fx_h
 
+#include <stdint.h>
+#include <math.h>
+
 
 //-------------------------------------------------------------------------
 // drumkv1_fx
