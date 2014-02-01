@@ -192,9 +192,12 @@ void drumkv1widget_jack::openSession (void)
 	m_pDrumk->deactivate();
 	m_pDrumk->close();
 
+	const QString& client_id = m_pNsmClient->client_id();
 	const QString& path_name = m_pNsmClient->path_name();
 	const QString& display_name = m_pNsmClient->display_name();
-	const QString& client_id = m_pNsmClient->client_id();
+
+	m_pDrumk->open(client_id.toUtf8().constData());
+	m_pDrumk->activate();
 
 	const QDir dir(path_name);
 	if (!dir.exists())
@@ -203,9 +206,6 @@ void drumkv1widget_jack::openSession (void)
 	const QFileInfo fi(path_name, display_name + '.' + DRUMKV1_TITLE);
 	if (fi.exists())
 		loadPreset(fi.absoluteFilePath());
-
-	m_pDrumk->open(client_id.toUtf8().constData());
-	m_pDrumk->activate();
 
 	m_bNsmDirty = false;
 
