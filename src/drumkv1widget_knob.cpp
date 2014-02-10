@@ -86,14 +86,14 @@ QString drumkv1widget_knob::text (void) const
 }
 
 
-void drumkv1widget_knob::setValue ( float fValue )
+void drumkv1widget_knob::setValue ( float fValue, bool bDefault )
 {
 	bool bDialBlock = m_pDial->blockSignals(true);
 
 	m_pDial->setValue(scaleFromValue(fValue));
 
 	QPalette pal;
-	if (m_iDefaultValue < 1) {
+	if (m_iDefaultValue < 1 || bDefault) {
 		m_fDefaultValue = fValue;
 		m_iDefaultValue++;
 	}
@@ -250,12 +250,12 @@ drumkv1widget_spin::drumkv1widget_spin ( QWidget *pParent )
 }
 
 
-void drumkv1widget_spin::setValue ( float fValue )
+void drumkv1widget_spin::setValue ( float fValue, bool bDefault )
 {
 	bool bSpinBlock = m_pSpinBox->blockSignals(true);
 
 	m_pSpinBox->setValue(scaleFromValue(fValue));
-	drumkv1widget_knob::setValue(fValue);
+	drumkv1widget_knob::setValue(fValue, bDefault);
 
 	m_pSpinBox->blockSignals(bSpinBlock);
 }
@@ -319,13 +319,13 @@ drumkv1widget_combo::drumkv1widget_combo ( QWidget *pParent )
 }
 
 
-void drumkv1widget_combo::setValue ( float fValue )
+void drumkv1widget_combo::setValue ( float fValue, bool bDefault )
 {
 	bool bComboBlock = m_pComboBox->blockSignals(true);
 
 	int iValue = iroundf(fValue);
 	m_pComboBox->setCurrentIndex(iValue);
-	drumkv1widget_knob::setValue(float(iValue));
+	drumkv1widget_knob::setValue(float(iValue), bDefault);
 
 	m_pComboBox->blockSignals(bComboBlock);
 }

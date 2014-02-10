@@ -481,13 +481,14 @@ drumkv1widget_knob *drumkv1widget::paramKnob ( drumkv1::ParamIndex index ) const
 
 
 // Param port accessors.
-void drumkv1widget::setParamValue ( drumkv1::ParamIndex index, float fValue )
+void drumkv1widget::setParamValue (
+	drumkv1::ParamIndex index, float fValue, bool bDefault )
 {
 	++m_iUpdate;
 
 	drumkv1widget_knob *pKnob = paramKnob(index);
 	if (pKnob)
-		pKnob->setValue(fValue);
+		pKnob->setValue(fValue, bDefault);
 
 	updateParamEx(index, fValue);
 
@@ -650,7 +651,7 @@ void drumkv1widget::resetParamValues ( uint32_t nparams )
 	for (uint32_t i = 0; i < nparams; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		float fValue = drumkv1_param::paramDefaultValue(index);
-		setParamValue(index, fValue);
+		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
 		m_params_ab[index] = fValue;
 	}
@@ -731,8 +732,8 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 
 	clearSampleFile();
 
-	resetParamValues(drumkv1::NUM_PARAMS);
 	resetParamKnobs(drumkv1::NUM_PARAMS);
+	resetParamValues(drumkv1::NUM_PARAMS);
 
 	const QFileInfo fi(sFilename);
 	const QDir currentDir(QDir::current());
@@ -774,7 +775,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 							if (index == drumkv1::DEL1_BPM && fValue < 3.6f)
 								fValue *= 100.0f;
 						//--legacy support < 0.3.0.4 -- end.
-							setParamValue(index, fValue);
+							setParamValue(index, fValue, true);
 							updateParam(index, fValue);
 							m_params_ab[index] = fValue;
 						}
