@@ -1533,8 +1533,12 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		drumkv1_elem *elem = pv->elem;
 
 		const float lfo1_rate = *elem->lfo1.rate * *elem->lfo1.rate;
-		const float lfo1_freq = LFO_FREQ_MIN + lfo1_rate * (LFO_FREQ_MAX - LFO_FREQ_MIN);
-		const float modwheel1 = m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch;
+
+		const float lfo1_freq
+			= LFO_FREQ_MIN + lfo1_rate * (LFO_FREQ_MAX - LFO_FREQ_MIN);
+
+		const float modwheel1
+			= m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch;
 
 		// channel indexes
 
