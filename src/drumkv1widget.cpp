@@ -135,7 +135,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Del1WetKnob->setSpecialValueText(sOff);
 	m_ui.Rev1WetKnob->setSpecialValueText(sOff);
 
-	m_ui.Del1BpmKnob->setSpecialValueText(tr("Auto"));
+	const QString& sAuto = tr("Auto");
+	m_ui.Gen1EnvTimeKnob->setSpecialValueText(sAuto);
+	m_ui.Del1BpmKnob->setSpecialValueText(sAuto);
 
 	// GEN group limits. [0=off, 1..128]
 	m_ui.Gen1GroupKnob->setSpecialValueText(sOff);
