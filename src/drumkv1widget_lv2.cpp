@@ -1,7 +1,7 @@
 // drumkv1widget_lv2.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2013, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -53,6 +53,9 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	m_external_host = NULL;
 #endif
 	
+	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
+		m_params_def[i] = true;
+
 	QObject::connect(m_pUpdateNotifier,
 		SIGNAL(activated(int)),
 		SLOT(updateNotify()));
@@ -117,7 +120,8 @@ void drumkv1widget_lv2::port_event ( uint32_t port_index,
 		if (index == drumkv1::DEL1_BPM && fValue < 3.6f)
 			fValue *= 100.0f;
 	//--legacy support < 0.3.0.4 -- end.
-		setParamValue(index, fValue);
+		setParamValue(index, fValue, m_params_def[index]);
+		m_params_def[index] = false;
 	}
 }
 
