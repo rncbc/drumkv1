@@ -86,7 +86,7 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 		m_pNsmClient->announce(DRUMKV1_TITLE, ":switch:dirty:optional-gui:");
 		drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
 		if (pConfig)
-			pConfig->bDontUseNativeDialog = true;
+			pConfig->bDontUseNativeDialogs = true;
 		return;
 	}
 #endif	// CONFIG_NSM
