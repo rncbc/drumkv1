@@ -80,7 +80,7 @@ public:
 		m_pframes = new float * [m_nchannels];
 		for (uint16_t k = 0; k < m_nchannels; ++k) {
 			m_pframes[k] = new float [nsize];
-			::memset(m_pframes[k], 0, nsize + sizeof(float));
+			::memset(m_pframes[k], 0, nsize * sizeof(float));
 		}
 
 		float *buffer = new float [m_nchannels * m_nframes];
@@ -193,8 +193,8 @@ public:
 	// begin.
 	void start(void)
 	{
-		m_phase = 1.0f;
-		m_index = 1;
+		m_phase = 0.0f;
+		m_index = 0;
 		m_alpha = 0.0f;
 		m_frame = 0;
 	}
@@ -220,10 +220,10 @@ public:
 
 		const float *frames = m_sample->frames(k);
 
-		const float x0 = frames[m_index - 1];
-		const float x1 = frames[m_index];
-		const float x2 = frames[m_index + 1];
-		const float x3 = frames[m_index + 2];
+		const float x0 = frames[m_index];
+		const float x1 = frames[m_index + 1];
+		const float x2 = frames[m_index + 2];
+		const float x3 = frames[m_index + 3];
 
 		const float c1 = (x2 - x0) * 0.5f;
 		const float b1 = (x1 - x2);
