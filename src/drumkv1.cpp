@@ -638,11 +638,12 @@ public:
 
 	drumkv1_element element;
 
-	drumkv1_sample gen1_sample;
+	drumkv1_sample  gen1_sample;
+	drumkv1_wave_lf lfo1_wave;
+
 	drumkv1_gen    gen1;
 	drumkv1_dcf    dcf1;
 	drumkv1_lfo    lfo1;
-	drumkv1_wave   lfo1_wave;
 	drumkv1_dca    dca1;
 	drumkv1_out    out1;
 
