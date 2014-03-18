@@ -35,6 +35,7 @@ HEADERS = \
 SOURCES = \
 	drumkv1.cpp \
 	drumkv1_jack.cpp \
+	drumkv1_wave.cpp \
 	drumkv1_nsm.cpp \
 	drumkv1_param.cpp \
 	drumkv1widget.cpp \

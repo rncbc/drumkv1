@@ -24,6 +24,7 @@ HEADERS = \
 SOURCES = \
 	drumkv1.cpp \
 	drumkv1_lv2.cpp \
+	drumkv1_wave.cpp \
 	drumkv1_param.cpp
 
 
