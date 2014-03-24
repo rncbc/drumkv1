@@ -19,6 +19,7 @@ HEADERS = \
 	drumkv1_fx.h \
 	drumkv1_nsm.h \
 	drumkv1_param.h \
+	drumkv1_sched.h \
 	drumkv1_reverb.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
@@ -38,6 +39,7 @@ SOURCES = \
 	drumkv1_wave.cpp \
 	drumkv1_nsm.cpp \
 	drumkv1_param.cpp \
+	drumkv1_sched.cpp \
 	drumkv1widget.cpp \
 	drumkv1widget_env.cpp \
 	drumkv1widget_filt.cpp \

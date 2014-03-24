@@ -19,13 +19,15 @@ HEADERS = \
 	drumkv1_list.h \
 	drumkv1_fx.h \
 	drumkv1_reverb.h \
-	drumkv1_param.h
+	drumkv1_param.h \
+	drumkv1_sched.h
 
 SOURCES = \
 	drumkv1.cpp \
 	drumkv1_lv2.cpp \
 	drumkv1_wave.cpp \
-	drumkv1_param.cpp
+	drumkv1_param.cpp \
+	drumkv1_sched.cpp
 
 
 unix {
