@@ -58,7 +58,7 @@ namespace drumkv1_param
 		const map_path& mapPath = map_path());
 
 	// Default parameter name/value helpers.
-	QString paramName(drumkv1::ParamIndex index);
+	const char *paramName(drumkv1::ParamIndex index);
 	float paramDefaultValue(drumkv1::ParamIndex index);
 };
 

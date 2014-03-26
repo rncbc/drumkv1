@@ -109,7 +109,7 @@ struct {
 };
 
 
-QString drumkv1_param::paramName ( drumkv1::ParamIndex index )
+const char *drumkv1_param::paramName ( drumkv1::ParamIndex index )
 {
 	return drumkv1_default_params[index].name;
 }
