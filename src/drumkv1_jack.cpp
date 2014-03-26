@@ -34,27 +34,26 @@
 //-------------------------------------------------------------------------
 // alsa input thread.
 
-#include <pthread.h>
+#include <QThread>
 
 
-class drumkv1_alsa_thread
+class drumkv1_alsa_thread : public QThread
 {
 public:
 
 	drumkv1_alsa_thread(drumkv1_jack *drumk)
-		: m_drumk(drumk), m_running(false) {}
+		: QThread(), m_drumk(drumk), m_running(false) {}
 
 	~drumkv1_alsa_thread()
 		{ m_running = false; wait(); }
 
-	void start()
-		{ pthread_create(&m_pthread, NULL, drumkv1_alsa_thread::run, this); }
+protected:
 
-	void *run()
+	void run()
 	{
 		snd_seq_t *seq = m_drumk->alsa_seq();
 		if (seq == NULL)
-			return NULL;
+			return;
 
 		m_running = true;
 
@@ -82,26 +81,11 @@ public:
 		return NULL;
 	}
 
-	void wait()
-		{ pthread_join(m_pthread, NULL); }
-
-	void setRunning(bool running)
-		{ m_running = running; }
-	bool isRunning() const
-		{ return m_running; }
-
-protected:
-
-	static void *run ( void *arg )
-		{ return static_cast<drumkv1_alsa_thread *> (arg)->run(); }
-
 private:
 
 	drumkv1_jack *m_drumk;
 
 	bool m_running;
-
-	pthread_t m_pthread;
 };
 
 #endif	// CONFIG_ALSA_MIDI
@@ -306,7 +290,7 @@ void drumkv1_jack::open ( const char *client_id )
 		m_alsa_buffer = ::jack_ringbuffer_create(
 			1024 * (sizeof(jack_midi_event_t) + 4));
 		m_alsa_thread = new drumkv1_alsa_thread(this);
-		m_alsa_thread->start();
+		m_alsa_thread->start(QThread::TimeCriticalPriority);
 	}
 #endif	// CONFIG_ALSA_MIDI
 
