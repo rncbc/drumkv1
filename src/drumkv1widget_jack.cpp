@@ -116,7 +116,7 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 drumkv1widget_jack::~drumkv1widget_jack (void)
 {
 	m_pDrumk->deactivate();
-	m_pDrumk->close();
+//	m_pDrumk->close();
 }
 
 
