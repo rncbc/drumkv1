@@ -1518,11 +1518,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			elem->gen1.envtime0  = *elem->gen1.envtime;
 			elem->updateEnvTimes(m_iSampleRate);
 		}
-		if (int(*elem->lfo1.shape) != int(elem->lfo1_wave.shape())
-			||  *elem->lfo1.width  !=     elem->lfo1_wave.width()) {
-			elem->lfo1_wave.reset(
-				drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
-		}
+		elem->lfo1_wave.reset_test(
+			drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
 		elem = elem->next();
 	}
 
