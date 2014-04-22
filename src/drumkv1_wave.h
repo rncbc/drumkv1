@@ -34,7 +34,7 @@ class drumkv1_wave
 public:
 
 	// shape.
-	enum Shape { Pulse = 0, Saw, Sine, Random };
+	enum Shape { Pulse = 0, Saw, Sine, Rand, Noise };
 
 	// ctor.
 	drumkv1_wave(uint32_t nsize = 1024, uint16_t nover = 24);
@@ -133,6 +133,9 @@ protected:
 	// init random table.
 	void reset_rand();
 
+	// init noise table.
+	void reset_noise();
+
 	// post-processors
 	void reset_filter();
 	void reset_normalize();
@@ -142,7 +145,7 @@ protected:
 	uint32_t pseudo_srand ()
 		{ return (m_srand = (m_srand * 196314165) + 907633515); }
 	float pseudo_randf ()
-		{ return pseudo_srand() / float(1 << 16) - 1.0f; }
+		{ return pseudo_srand() / float(0x8000U << 16) - 1.0f; }
 
 private:
 
