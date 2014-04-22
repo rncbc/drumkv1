@@ -68,9 +68,9 @@ void drumkv1widget_wave::setWaveShape ( float fWaveShape )
 	int iWaveShape = int(fWaveShape);
 	if (iWaveShape != int(m_pWave->shape())) {
 		if (iWaveShape < int(drumkv1_wave::Pulse))
-			iWaveShape = int(drumkv1_wave::Noise);
+			iWaveShape = int(drumkv1_wave::Random);
 		else
-		if (iWaveShape > int(drumkv1_wave::Noise))
+		if (iWaveShape > int(drumkv1_wave::Random))
 			iWaveShape = int(drumkv1_wave::Pulse);
 		m_pWave->reset(drumkv1_wave::Shape(iWaveShape), m_pWave->width());
 		update();

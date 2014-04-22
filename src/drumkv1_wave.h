@@ -34,7 +34,7 @@ class drumkv1_wave
 public:
 
 	// shape.
-	enum Shape { Pulse = 0, Saw, Sine, Noise };
+	enum Shape { Pulse = 0, Saw, Sine, Random };
 
 	// ctor.
 	drumkv1_wave(uint32_t nsize = 1024, uint16_t nover = 24);
@@ -130,8 +130,8 @@ protected:
 	// init sine table.
 	void reset_sine();
 
-	// init noise table.
-	void reset_noise();
+	// init random table.
+	void reset_rand();
 
 	// post-processors
 	void reset_filter();
