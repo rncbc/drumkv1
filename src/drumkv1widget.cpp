@@ -911,7 +911,7 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 	if (pDrumk == NULL)
 		return;
 
-	int note = currentNote();
+	const int note = currentNote();
 	if (note < 0)
 		return;
 
@@ -958,7 +958,7 @@ int drumkv1widget::currentNote (void) const
 
 QString drumkv1widget::currentNoteName (void) const
 {
-	int note = currentNote();
+	const int note = currentNote();
 	return (note < 0 ? tr("(None)") : completeNoteName(note));
 }
 
@@ -1105,7 +1105,7 @@ void drumkv1widget::clearElements (void)
 // Element activation.
 void drumkv1widget::activateElement ( bool bOpenSample )
 {
-	int iCurrentNote = currentNote();
+	const int iCurrentNote = currentNote();
 	if (iCurrentNote < 0)
 		return;
 
