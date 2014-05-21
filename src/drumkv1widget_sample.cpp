@@ -20,10 +20,11 @@
 *****************************************************************************/
 
 #include "drumkv1widget_sample.h"
-
 #include "drumkv1widget_config.h"
 
 #include "drumkv1_sample.h"
+
+#include <sndfile.h>
 
 #include <QPainter>
 
