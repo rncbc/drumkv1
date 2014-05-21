@@ -25,6 +25,44 @@
 
 
 //-------------------------------------------------------------------------
+// drumkv1_reverse_sched - local module schedule thread stuff.
+//
+
+#include "drumkv1_sched.h"
+
+
+class drumkv1_reverse_sched : public drumkv1_sched
+{
+public:
+
+	// ctor.
+	drumkv1_reverse_sched (drumkv1_sample *sample) : drumkv1_sched(),
+		m_sample(sample), m_reverse(false) {}
+
+	// schedule reverse.
+	void sched_reverse(bool reverse)
+	{
+		m_reverse = reverse;
+
+		schedule();
+	}
+
+	// process reverse (virtual).
+	void process()
+	{
+		m_sample->setReverse(m_reverse);
+	}
+
+private:
+
+	// instance variables.
+	drumkv1_sample *m_sample;
+
+	bool m_reverse;
+};
+
+
+//-------------------------------------------------------------------------
 // drumkv1_sample - sampler wave table.
 //
 
@@ -34,13 +72,16 @@ drumkv1_sample::drumkv1_sample ( float srate )
 		m_rate0(0.0f), m_freq0(1.0f), m_ratio(0.0f),
 		m_nframes(0), m_pframes(0), m_reverse(false)
 {
+	m_reverse_sched = new drumkv1_reverse_sched(this);
 }
 
 
 // dtor.
 drumkv1_sample::~drumkv1_sample (void)
 {
-	close();	
+	close();
+
+	delete m_reverse_sched;
 }
 
 
@@ -116,6 +157,13 @@ void drumkv1_sample::close (void)
 		::free(m_filename);
 		m_filename = 0;
 	}
+}
+
+
+// schedule sample reverse.
+void drumkv1_sample::sched_reverse ( bool reverse )
+{
+	m_reverse_sched->sched_reverse(reverse);
 }
 
 

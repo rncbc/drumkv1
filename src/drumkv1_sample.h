@@ -27,6 +27,9 @@
 #include <stdlib.h>
 #include <string.h>
 
+// forward decls.
+class drumkv1_reverse_sched;
+
 
 //-------------------------------------------------------------------------
 // drumkv1_sample - sampler wave table.
@@ -60,6 +63,9 @@ public:
 
 	bool isReverse() const
 		{ return m_reverse; }
+
+	// schedule sample reverse.
+	void sched_reverse(bool reverse);
 
 	// init.
 	bool open(const char *filename, float freq0 = 1.0f);
@@ -112,6 +118,8 @@ private:
 	uint32_t m_nframes;
 	float  **m_pframes;
 	bool     m_reverse;
+
+	drumkv1_reverse_sched *m_reverse_sched;
 };
 
 
