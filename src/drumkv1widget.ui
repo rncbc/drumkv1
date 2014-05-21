@@ -132,6 +132,16 @@
            </widget>
           </item>
           <item>
+           <widget class="drumkv1widget_combo" name="Gen1ReverseKnob">
+            <property name="toolTip">
+             <string>GEN Reverse</string>
+            </property>
+            <property name="text">
+             <string>Reverse</string>
+            </property>
+           </widget>
+          </item>
+          <item>
            <widget class="drumkv1widget_spin" name="Gen1GroupKnob">
             <property name="toolTip">
              <string>GEN Group</string>

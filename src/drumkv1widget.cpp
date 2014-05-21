@@ -127,6 +127,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	states << tr("Off");
 	states << tr("On");
 
+	m_ui.Gen1ReverseKnob->insertItems(0, states);
+
 	m_ui.Dyn1CompressKnob->insertItems(0, states);
 	m_ui.Dyn1LimiterKnob->insertItems(0, states);
 
@@ -186,6 +188,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Del1BpmKnob->setMaximum(360.0f);
 
 	// GEN1
+	setParamKnob(drumkv1::GEN1_REVERSE, m_ui.Gen1ReverseKnob);
 	setParamKnob(drumkv1::GEN1_GROUP,   m_ui.Gen1GroupKnob);
 	setParamKnob(drumkv1::GEN1_COARSE,  m_ui.Gen1CoarseKnob);
 	setParamKnob(drumkv1::GEN1_FINE,    m_ui.Gen1FineKnob);
@@ -550,9 +553,19 @@ void drumkv1widget::paramChanged ( float fValue )
 // Update local tied widgets.
 void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 {
+	drumkv1 *pDrumk = instance();
+	if (pDrumk == NULL)
+		return;
+
 	++m_iUpdate;
 
 	switch (index) {
+	case drumkv1::GEN1_REVERSE: {
+		const bool bReverse = bool(fValue > 0.0f);
+		pDrumk->setReverse(bReverse);
+		updateSample(pDrumk->sample());
+		break;
+	}
 	case drumkv1::DEL1_BPMSYNC:
 		if (fValue > 0.0f)
 			m_ui.Del1BpmKnob->setValue(0.0f);

@@ -309,6 +309,7 @@ struct drumkv1_aux
 struct drumkv1_gen
 {
 	float *sample, sample0;
+	float *reverse;
 	float *group;
 	float *coarse;
 	float *fine;
@@ -781,6 +782,9 @@ public:
 
 	drumkv1_sample *sample() const;
 
+	void setReverse(bool bReverse);
+	bool isReverse() const;
+
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
 	float *paramPort(drumkv1::ParamIndex index);
 
@@ -1119,6 +1123,18 @@ const char *drumkv1_impl::sampleFile (void) const
 drumkv1_sample *drumkv1_impl::sample (void) const
 {
 	return (m_elem ? m_elem->element.sample() : 0);
+}
+
+
+void drumkv1_impl::setReverse ( bool bReverse )
+{
+	if (m_elem) m_elem->element.setReverse(bReverse);
+}
+
+
+bool drumkv1_impl::isReverse (void) const
+{
+	return (m_elem ? m_elem->element.isReverse() : false);
 }
 
 
@@ -1518,6 +1534,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			elem->gen1.envtime0  = *elem->gen1.envtime;
 			elem->updateEnvTimes(m_iSampleRate);
 		}
+		if (bool(int(*elem->gen1.reverse)) != elem->gen1_sample.isReverse())
+			elem->gen1_sample.setReverse(bool(*elem->gen1.reverse));
 		elem->lfo1_wave.reset_test(
 			drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
 		elem = elem->next();
@@ -1811,6 +1829,17 @@ drumkv1_sample *drumkv1::sample (void) const
 }
 
 
+void drumkv1::setReverse ( bool bReverse )
+{
+	m_pImpl->setReverse(bReverse);
+}
+
+bool drumkv1::isReverse (void) const
+{
+	return m_pImpl->isReverse();
+}
+
+
 void drumkv1::setParamPort ( ParamIndex index, float *pfParam )
 {
 	m_pImpl->setParamPort(index, pfParam);
@@ -1904,6 +1933,18 @@ drumkv1_sample *drumkv1_element::sample (void) const
 }
 
 
+void drumkv1_element::setReverse ( bool bReverse )
+{
+	if (m_pElem) m_pElem->gen1_sample.setReverse(bReverse);
+}
+
+
+bool drumkv1_element::isReverse (void) const
+{
+	return (m_pElem ? m_pElem->gen1_sample.isReverse() : false);
+}
+
+
 void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 {
 	if (m_pElem == 0)
@@ -1911,6 +1952,7 @@ void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 
 	switch (index) {
 //	case drumkv1::GEN1_SAMPLE:   m_pElem->gen1.sample      = pfParam; break;
+	case drumkv1::GEN1_REVERSE:  m_pElem->gen1.reverse     = pfParam; break;
 	case drumkv1::GEN1_GROUP:    m_pElem->gen1.group       = pfParam; break;
 	case drumkv1::GEN1_COARSE:   m_pElem->gen1.coarse      = pfParam; break;
 	case drumkv1::GEN1_FINE:     m_pElem->gen1.fine        = pfParam; break;
@@ -1959,6 +2001,7 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 
 	switch (index) {
 //	case drumkv1::GEN1_SAMPLE:   pfParam = m_pElem->gen1.sample;     break;
+	case drumkv1::GEN1_REVERSE:  pfParam = m_pElem->gen1.reverse;    break;
 	case drumkv1::GEN1_GROUP:    pfParam = m_pElem->gen1.group;      break;
 	case drumkv1::GEN1_COARSE:   pfParam = m_pElem->gen1.coarse;     break;
 	case drumkv1::GEN1_FINE:     pfParam = m_pElem->gen1.fine;       break;

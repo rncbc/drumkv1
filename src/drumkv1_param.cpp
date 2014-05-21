@@ -37,6 +37,7 @@ struct {
 } drumkv1_default_params[drumkv1::NUM_PARAMS] = {
 
 	{ "GEN1_SAMPLE",   36.0f }, // Bass Drum 1 (GM) aka. C2 (36)
+	{ "GEN1_REVERSE",   0.0f },
 	{ "GEN1_GROUP",     0.0f },
 	{ "GEN1_COARSE",    0.0f },
 	{ "GEN1_FINE",      0.0f },

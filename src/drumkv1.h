@@ -65,9 +65,13 @@ public:
 
 	drumkv1_sample *sample() const;
 
+	void setReverse(bool bReverse);
+	bool isReverse() const;
+
 	enum ParamIndex	 {
 
 		GEN1_SAMPLE = 0,
+		GEN1_REVERSE,
 		GEN1_GROUP,
 		GEN1_COARSE,
 		GEN1_FINE,
@@ -176,6 +180,9 @@ public:
 	const char *sampleFile() const;
 
 	drumkv1_sample *sample() const;
+
+	void setReverse(bool bReverse);
+	bool isReverse() const;
 
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
 	float *paramPort(drumkv1::ParamIndex index);

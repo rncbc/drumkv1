@@ -42,7 +42,7 @@ public:
 	drumkv1_sample(float srate = 44100.0f)
 		: m_srate(srate), m_filename(0), m_nchannels(0),
 			m_rate0(0.0f), m_freq0(1.0f), m_ratio(0.0f),
-			m_nframes(0), m_pframes(0) {}
+			m_nframes(0), m_pframes(0), m_reverse(false) {}
 
 	// dtor.
 	~drumkv1_sample()
@@ -53,6 +53,19 @@ public:
 		{ m_srate = srate; }
 	float sampleRate() const
 		{ return m_srate; }
+
+	// reverse mode.
+	void setReverse ( bool reverse )
+	{
+		if (( m_reverse && !reverse) ||
+			(!m_reverse &&  reverse)) {
+			m_reverse = reverse;
+			reverse_sample();
+		}
+	}
+
+	bool isReverse() const
+		{ return m_reverse; }
 
 	// init.
 	bool open(const char *filename, float freq0 = 1.0f)
@@ -97,6 +110,9 @@ public:
 	
 		delete [] buffer;
 		::sf_close(file);
+
+		if (m_reverse)
+			reverse_sample();
 
 		reset(freq0);
 
@@ -155,6 +171,26 @@ public:
 	bool isOver(uint32_t frame) const
 		{ return !m_pframes || (frame >= m_nframes); }
 
+protected:
+
+	// reverse sample buffer.
+	void reverse_sample()
+	{
+		if (m_nframes > 0 && m_pframes) {
+			const uint32_t nsize1 = (m_nframes - 1);
+			const uint32_t nsize2 = (m_nframes >> 1);
+			for (uint16_t k = 0; k < m_nchannels; ++k) {
+				float *frames = m_pframes[k];
+				for (uint32_t i = 0; i < nsize2; ++i) {
+					const uint32_t j = nsize1 - i;
+					const float sample = frames[i];
+					frames[i] = frames[j];
+					frames[j] = sample;
+				}
+			}
+		}
+	}
+
 private:
 
 	float    m_srate;
@@ -165,6 +201,7 @@ private:
 	float    m_ratio;
 	uint32_t m_nframes;
 	float  **m_pframes;
+	bool     m_reverse;
 };
 
 

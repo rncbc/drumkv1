@@ -107,7 +107,7 @@ protected slots:
 	// Sample openner.
 	void openSample();
 
-	// Sample loader slot.
+	// Sample loader.
 	void loadSample(const QString& sFilename);
 
 	// All element clear.
