@@ -802,6 +802,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 						//--legacy support < 0.3.0.4 -- end.
 							setParamValue(index, fValue, true);
 							updateParam(index, fValue);
+							updateParamEx(index, fValue);
 							m_params_ab[index] = fValue;
 						}
 					}
