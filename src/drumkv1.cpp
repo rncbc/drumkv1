@@ -1534,7 +1534,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			elem->gen1.envtime0  = *elem->gen1.envtime;
 			elem->updateEnvTimes(m_iSampleRate);
 		}
-		elem->gen1_sample.reverse_test(*elem->gen1.reverse > 0.0f);
+		elem->gen1_sample.reverse_test(*elem->gen1.reverse > 0.5f);
 		elem->lfo1_wave.reset_test(
 			drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
 		elem = elem->next();
