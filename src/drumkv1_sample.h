@@ -52,7 +52,7 @@ public:
 		{ return m_srate; }
 
 	// reverse mode.
-	void setReverse ( bool reverse )
+	void setReverse (bool reverse)
 	{
 		if (( m_reverse && !reverse) ||
 			(!m_reverse &&  reverse)) {
@@ -65,7 +65,15 @@ public:
 		{ return m_reverse; }
 
 	// schedule sample reverse.
-	void sched_reverse(bool reverse);
+	void reverse_test(bool reverse)
+	{
+		if (( m_reverse && !reverse) ||
+			(!m_reverse &&  reverse)) {
+			reverse_sched(reverse);
+		}
+	}
+
+	void reverse_sched(bool reverse);
 
 	// init.
 	bool open(const char *filename, float freq0 = 1.0f);
