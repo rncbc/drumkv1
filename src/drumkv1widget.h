@@ -28,26 +28,6 @@
 
 #include "drumkv1.h"
 
-#include <QHash>
-
-// forward decl.
-class QDomElement;
-class QDomDocument;
-
-
-//-------------------------------------------------------------------------
-// drumkv1_map_path - abstract/absolute path functors.
-
-class drumkv1_map_path
-{
-public:
-
-	virtual QString absolutePath(const QString& sAbstractPath) const
-		{ return sAbstractPath; }
-	virtual QString abstractPath(const QString& sAbsolutePath) const
-		{ return sAbsolutePath; }
-};
-
 
 //-------------------------------------------------------------------------
 // drumkv1widget - decl.
@@ -150,6 +130,9 @@ protected:
 
 	// Reset swap params A/B group.
 	void resetSwapParams();
+
+	// Initialize param values.
+	void initParamValues(uint32_t nparams);
 
 	// Reset all param/knob default values.
 	void resetParamValues(uint32_t nparams);

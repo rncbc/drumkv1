@@ -25,7 +25,6 @@
 #include "drumkv1.h"
 
 #include <QString>
-#include <QHash>
 
 // forward decl.
 class QDomElement;
@@ -56,6 +55,12 @@ namespace drumkv1_param
 	void saveElements(drumkv1 *pDrumk,
 		QDomDocument& doc, QDomElement& eElements,
 		const map_path& mapPath = map_path());
+
+	// Preset serialization methods.
+	void loadPreset(drumkv1 *pDrumk,
+		const QString& sFilename);
+	void savePreset(drumkv1 *pDrumk,
+		const QString& sFilename);
 
 	// Default parameter name/value helpers.
 	const char *paramName(drumkv1::ParamIndex index);
