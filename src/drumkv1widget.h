@@ -132,7 +132,7 @@ protected:
 	void resetSwapParams();
 
 	// Initialize param values.
-	void initParamValues(uint32_t nparams);
+	void updateParamValues(uint32_t nparams);
 
 	// Reset all param/knob default values.
 	void resetParamValues(uint32_t nparams);

@@ -665,7 +665,7 @@ void drumkv1widget::resetSwapParams (void)
 
 
 // Initialize param values.
-void drumkv1widget::initParamValues ( uint32_t nparams )
+void drumkv1widget::updateParamValues ( uint32_t nparams )
 {
 	resetSwapParams();
 
@@ -772,17 +772,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 
 	drumkv1_param::loadPreset(pDrumk, sFilename);
 
-	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
-		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		const float *pfParamPort = pDrumk->paramPort(index);
-		if (pfParamPort) {
-			const float fValue = *pfParamPort;
-			setParamValue(index, fValue, true);
-			updateParam(index, fValue);
-			updateParamEx(index, fValue);
-			m_params_ab[i] = fValue;
-		}
-	}
+	updateParamValues(drumkv1::NUM_PARAMS);
 
 	const QString& sPreset
 		= QFileInfo(sFilename).completeBaseName();
