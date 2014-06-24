@@ -603,7 +603,8 @@ void drumkv1_jack::sessionEvent ( void *pvSessionArg )
 
 // Constructor.
 drumkv1_application::drumkv1_application ( int& argc, char **argv )
-	: QObject(NULL), m_pApp(NULL), m_bGui(true)
+	: QObject(NULL), m_pApp(NULL), m_bGui(true),
+		m_pDrumk(NULL), m_pWidget(NULL)
 {
 #ifdef Q_WS_X11
 	m_bGui = (::getenv("DISPLAY") != 0);
@@ -627,6 +628,8 @@ drumkv1_application::drumkv1_application ( int& argc, char **argv )
 // Destructor.
 drumkv1_application::~drumkv1_application (void)
 {
+	if (m_pWidget) delete m_pWidget;
+	if (m_pDrumk) delete m_pDrumk;
 	if (m_pApp) delete m_pApp;
 }
 
@@ -663,33 +666,40 @@ bool drumkv1_application::parse_args (void)
 }
 
 
-// Facade method.
-int drumkv1_application::exec (void)
+// Startup methods.
+bool drumkv1_application::setup (void)
 {
 	if (m_pApp == NULL)
-		return -1;
+		return false;
 
 	if (!parse_args()) {
 		m_pApp->quit();
-		return 1;
+		return false;
 	}
 
-	drumkv1_jack drumk;
+	m_pDrumk = new drumkv1_jack();
 
 	if (m_bGui) {
-		drumkv1widget_jack w(&drumk);
+		m_pWidget = new drumkv1widget_jack(m_pDrumk);
 		if (m_presets.isEmpty())
-			w.initPreset();
+			m_pWidget->initPreset();
 		else
-			w.loadPreset(m_presets.first());
-		w.show();
-		return m_pApp->exec();
+			m_pWidget->loadPreset(m_presets.first());
+		m_pWidget->show();
 	} else {
 		if (!m_presets.isEmpty())
-			drumkv1_param::loadPreset(&drumk, m_presets.first());
-		drumk.reset();
-		return m_pApp->exec();
+			drumkv1_param::loadPreset(m_pDrumk, m_presets.first());
+		m_pDrumk->reset();
 	}
+
+	return true;
+}
+
+
+// Facade method.
+int drumkv1_application::exec (void)
+{
+	return (setup() ? m_pApp->exec() : 1);
 }
 
 
