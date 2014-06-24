@@ -299,6 +299,8 @@ void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 
 	file.close();
 
+	pDrumk->reset();
+
 	QDir::setCurrent(currentDir.absolutePath());
 }
 
