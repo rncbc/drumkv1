@@ -600,11 +600,18 @@ void drumkv1_jack::sessionEvent ( void *pvSessionArg )
 #include <QApplication>
 #include <QTextStream>
 
+#ifdef CONFIG_NSM
+#include "drumkv1_nsm.h"
+#endif
+
 
 // Constructor.
 drumkv1_application::drumkv1_application ( int& argc, char **argv )
 	: QObject(NULL), m_pApp(NULL), m_bGui(true),
 		m_pDrumk(NULL), m_pWidget(NULL)
+	  #ifdef CONFIG_NSM
+		, m_pNsmClient(NULL)
+	  #endif
 {
 #ifdef Q_WS_X11
 	m_bGui = (::getenv("DISPLAY") != 0);
@@ -628,6 +635,9 @@ drumkv1_application::drumkv1_application ( int& argc, char **argv )
 // Destructor.
 drumkv1_application::~drumkv1_application (void)
 {
+#ifdef CONFIG_NSM
+	if (m_pNsmClient) delete m_pNsmClient;
+#endif
 	if (m_pWidget) delete m_pWidget;
 	if (m_pDrumk) delete m_pDrumk;
 	if (m_pApp) delete m_pApp;
@@ -692,6 +702,33 @@ bool drumkv1_application::setup (void)
 		m_pDrumk->reset();
 	}
 
+#ifdef CONFIG_NSM
+	// Check whether to participate into a NSM session...
+	const QString& nsm_url
+		= QString::fromLatin1(::getenv("NSM_URL"));
+	if (!nsm_url.isEmpty()) {
+		m_pNsmClient = new drumkv1_nsm(nsm_url);
+		QObject::connect(m_pNsmClient,
+			SIGNAL(open()),
+			SLOT(openSession()));
+		QObject::connect(m_pNsmClient,
+			SIGNAL(save()),
+			SLOT(saveSession()));
+		QObject::connect(m_pNsmClient,
+			SIGNAL(show()),
+			SLOT(showSession()));
+		QObject::connect(m_pNsmClient,
+			SIGNAL(hide()),
+			SLOT(hideSession()));
+		QString caps(":switch:dirty:");
+		if (m_bGui)
+			caps += "optional-gui:";
+		m_pNsmClient->announce(DRUMKV1_TITLE, caps.toLatin1().constData());
+		if (m_pWidget)
+			m_pWidget->setNsmClient(m_pNsmClient);
+	}
+#endif	// CONFIG_NSM
+
 	return true;
 }
 
@@ -701,6 +738,120 @@ int drumkv1_application::exec (void)
 {
 	return (setup() ? m_pApp->exec() : 1);
 }
+
+
+#ifdef CONFIG_NSM
+
+void drumkv1_application::openSession (void)
+{
+	if (m_pDrumk == NULL)
+		return;
+
+	if (m_pNsmClient == NULL)
+		return;
+
+	if (!m_pNsmClient->is_active())
+		return;
+
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1_jack::openSession()");
+#endif
+
+	m_pDrumk->deactivate();
+	m_pDrumk->close();
+
+	const QString& client_id = m_pNsmClient->client_id();
+	const QString& path_name = m_pNsmClient->path_name();
+	const QString& display_name = m_pNsmClient->display_name();
+
+	m_pDrumk->open(client_id.toUtf8().constData());
+	m_pDrumk->activate();
+
+	const QDir dir(path_name);
+	if (!dir.exists())
+		dir.mkpath(path_name);
+
+	const QFileInfo fi(path_name, display_name + '.' + DRUMKV1_TITLE);
+	if (fi.exists()) {
+		const QString& sFilename = fi.absoluteFilePath();
+		if (m_pWidget) {
+			m_pWidget->loadPreset(sFilename);
+		} else {
+			drumkv1_param::loadPreset(m_pDrumk, sFilename);
+		}
+	}
+
+	m_pNsmClient->open_reply();
+	m_pNsmClient->dirty(false);
+
+	if (m_pWidget)
+		m_pNsmClient->visible(m_pWidget->isVisible());
+}
+
+void drumkv1_application::saveSession (void)
+{
+	if (m_pDrumk == NULL)
+		return;
+
+	if (m_pNsmClient == NULL)
+		return;
+
+	if (!m_pNsmClient->is_active())
+		return;
+
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1_jack::saveSession()");
+#endif
+
+	const QString& path_name = m_pNsmClient->path_name();
+	const QString& display_name = m_pNsmClient->display_name();
+//	const QString& client_id = m_pNsmClient->client_id();
+	const QFileInfo fi(path_name, display_name + '.' + DRUMKV1_TITLE);
+
+	drumkv1_param::savePreset(m_pDrumk, fi.absoluteFilePath());
+
+	m_pNsmClient->save_reply();
+	m_pNsmClient->dirty(false);
+}
+
+
+void drumkv1_application::showSession (void)
+{
+	if (m_pNsmClient == NULL)
+		return;
+
+	if (!m_pNsmClient->is_active())
+		return;
+
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1_jack::showSession()");
+#endif
+
+	if (m_pWidget) {
+		m_pWidget->show();
+		m_pWidget->raise();
+		m_pWidget->activateWindow();
+	}
+}
+
+void drumkv1_application::hideSession (void)
+{
+	if (m_pNsmClient == NULL)
+		return;
+
+	if (!m_pNsmClient->is_active())
+		return;
+
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1_jack::hideSession()");
+#endif
+
+	if (m_pWidget)
+		m_pWidget->hide();
+}
+
+
+#endif	// CONFIG_NSM
 
 
 //-------------------------------------------------------------------------
