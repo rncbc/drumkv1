@@ -19,8 +19,10 @@
 
 *****************************************************************************/
 
-#include "drumkv1_param.h"
 #include "drumkv1_config.h"
+#include "drumkv1_param.h"
+
+#include <QHash>
 
 #include <QDomDocument>
 #include <QTextStream>
