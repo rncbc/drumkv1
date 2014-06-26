@@ -102,6 +102,9 @@ protected slots:
 	// Element deactivation.
 	void resetElement(void);
 
+	// Sample updater.
+	void updateSampleNotify();
+
 	// Common context menu.
 	void contextMenuRequest(const QPoint& pos);
 

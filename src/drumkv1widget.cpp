@@ -22,6 +22,9 @@
 #include "drumkv1widget.h"
 #include "drumkv1_param.h"
 
+#include "drumkv1_sample.h"
+#include "drumkv1_sched.h"
+
 #include "drumkv1widget_config.h"
 
 #include <QMessageBox>
@@ -463,6 +466,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(triggered(bool)),
 		SLOT(helpAboutQt()));
 
+	// Special sample update notifications (eg. reverse)
+	QObject::connect(drumkv1_sched::notifier(),
+		SIGNAL(notify()),
+		SLOT(updateSampleNotify()));
+
 	// Epilog.
 	// QWidget::adjustSize();
 
@@ -556,12 +564,14 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 	++m_iUpdate;
 
 	switch (index) {
+#if 0//--updateSampleNotify();
 	case drumkv1::GEN1_REVERSE: {
 		const bool bReverse = bool(fValue > 0.0f);
 		pDrumk->setReverse(bReverse);
 		updateSample(pDrumk->sample());
 		break;
 	}
+#endif
 	case drumkv1::DEL1_BPMSYNC:
 		if (fValue > 0.0f)
 			m_ui.Del1BpmKnob->setValue(0.0f);
@@ -826,6 +836,19 @@ void drumkv1widget::loadSample ( const QString& sFilename )
 void drumkv1widget::openSample (void)
 {
 	m_ui.Gen1Sample->openSample(currentNoteName());
+}
+
+
+// Sample updater slot.
+void drumkv1widget::updateSampleNotify (void)
+{
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1widget::updateSampleNotify()");
+#endif
+
+	drumkv1 *pDrumk = instance();
+	if (pDrumk)
+		updateSample(pDrumk->sample());
 }
 
 

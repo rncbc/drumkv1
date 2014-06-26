@@ -23,6 +23,10 @@
 #define __drumkv1_sched_h
 
 
+// forward decls.
+class drumkv1_sched_notifier;
+
+
 //-------------------------------------------------------------------------
 // drumkv1_sched - worker/scheduled stuff (pure virtual).
 //
@@ -49,10 +53,35 @@ public:
 	// (pure) virtual processor.
 	virtual void process() = 0;
 
+	// signal/slot proxy accessor (static).
+	static drumkv1_sched_notifier *notifier();
+
 private:
 
 	// instance variables.
 	volatile bool m_sync_wait;
+};
+
+
+//-------------------------------------------------------------------------
+// drumkv1_sched_notifier - worker/schedule proxy decl.
+//
+
+#include <QObject>
+
+class drumkv1_sched_notifier : public QObject
+{
+	Q_OBJECT
+
+public:
+
+	drumkv1_sched_notifier(QObject *parent = NULL);
+
+	void sync_notify();
+
+signals:
+
+	void notify();
 };
 
 

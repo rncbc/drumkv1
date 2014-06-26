@@ -70,8 +70,9 @@ private:
 };
 
 
-static drumkv1_sched_thread *g_sched_thread   = NULL;
-static uint32_t              g_sched_refcount = 0;
+static drumkv1_sched_thread *g_sched_thread = NULL;
+static drumkv1_sched_notifier *g_sched_notifier = NULL;
+static uint32_t g_sched_refcount = 0;
 
 
 //-------------------------------------------------------------------------
@@ -99,7 +100,7 @@ drumkv1_sched_thread::drumkv1_sched_thread ( uint32_t nsize ) : QThread()
 // dtor.
 drumkv1_sched_thread::~drumkv1_sched_thread (void)
 {
-	// fake sync and wait 
+	// fake sync and wait
 	if (m_running && isRunning()) do {
 		if (m_mutex.tryLock()) {
 			m_running = false;
@@ -162,7 +163,8 @@ void drumkv1_sched_thread::run (void)
 //
 
 // ctor.
-drumkv1_sched::drumkv1_sched (void) : m_sync_wait(false)
+drumkv1_sched::drumkv1_sched (void)
+	: m_sync_wait(false)
 {
 	if (++g_sched_refcount == 1 && g_sched_thread == NULL) {
 		g_sched_thread = new drumkv1_sched_thread();
@@ -174,9 +176,15 @@ drumkv1_sched::drumkv1_sched (void) : m_sync_wait(false)
 // dtor (virtual).
 drumkv1_sched::~drumkv1_sched (void)
 {
-	if (--g_sched_refcount == 0 && g_sched_thread) {
-		delete g_sched_thread;
-		g_sched_thread = NULL;
+	if (--g_sched_refcount == 0) {
+		if (g_sched_thread) {
+			delete g_sched_thread;
+			g_sched_thread = NULL;
+		}
+		if (g_sched_notifier) {
+			delete g_sched_notifier;
+			g_sched_notifier = NULL;
+		}
 	}
 }
 
@@ -207,6 +215,34 @@ void drumkv1_sched::sync_process (void)
 	process();
 
 	m_sync_wait = false;
+
+	if (g_sched_notifier)
+		g_sched_notifier->sync_notify();
+}
+
+
+drumkv1_sched_notifier *drumkv1_sched::notifier (void)
+{
+	if (g_sched_notifier == NULL)
+		g_sched_notifier = new drumkv1_sched_notifier();
+
+	return g_sched_notifier;
+}
+
+
+//-------------------------------------------------------------------------
+// drumkv1_sched_notifier - worker/schedule proxy decl.
+//
+
+drumkv1_sched_notifier::drumkv1_sched_notifier ( QObject *parent )
+	: QObject(parent)
+{
+}
+
+
+void drumkv1_sched_notifier::sync_notify (void)
+{
+	emit notify();
 }
 
 
