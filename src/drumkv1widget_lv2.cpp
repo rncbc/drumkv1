@@ -50,7 +50,10 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 #ifdef CONFIG_LV2_EXTERNAL_UI
 	m_external_host = NULL;
 #endif
-	
+#ifdef CONFIG_LV2_UI_IDLE
+	m_bIdleClosed = false;
+#endif
+
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
 		m_params_def[i] = true;
 
@@ -156,9 +159,6 @@ void drumkv1widget_lv2::updateNotify (void)
 {
 #ifdef CONFIG_DEBUG
 	qDebug("drumkv1widget_lv2::updateNotify()");
-#endif
-#ifdef CONFIG_LV2_UI_IDLE
-	m_bIdleClosed = false;
 #endif
 
 	updateSample(m_pDrumk->sample());
