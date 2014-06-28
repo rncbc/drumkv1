@@ -25,8 +25,6 @@
 
 #include "lv2/lv2plug.in/ns/ext/instance-access/instance-access.h"
 
-#include <QSocketNotifier>
-
 #include <QApplication>
 #include <QCloseEvent>
 
@@ -43,10 +41,6 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	m_controller = controller;
 	m_write_function = write_function;
 
-	// Update notifier setup.
-	m_pUpdateNotifier = new QSocketNotifier(
-		m_pDrumk->update_fds(1), QSocketNotifier::Read, this);
-
 #ifdef CONFIG_LV2_EXTERNAL_UI
 	m_external_host = NULL;
 #endif
@@ -57,20 +51,9 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
 		m_params_def[i] = true;
 
-	QObject::connect(m_pUpdateNotifier,
-		SIGNAL(activated(int)),
-		SLOT(updateNotify()));
-
 	// Initial update, always...
 	refreshElements();
 	activateElement();
-}
-
-
-// Destructor.
-drumkv1widget_lv2::~drumkv1widget_lv2 (void)
-{
-	delete m_pUpdateNotifier;
 }
 
 
@@ -151,25 +134,6 @@ void drumkv1widget_lv2::updateParam (
 {
 	m_write_function(m_controller,
 		drumkv1_lv2::ParamBase + index, sizeof(float), 0, &fValue);
-}
-
-
-// Update notification slot.
-void drumkv1widget_lv2::updateNotify (void)
-{
-#ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget_lv2::updateNotify()");
-#endif
-
-	updateSample(m_pDrumk->sample());
-
-	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
-		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		const float *pfValue = m_pDrumk->paramPort(index);
-		setParamValue(index, (pfValue ? *pfValue : 0.0f));
-	}
-
-	m_pDrumk->update_reset();
 }
 
 
