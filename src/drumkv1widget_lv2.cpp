@@ -206,7 +206,7 @@ int drumkv1_lv2ui_idle ( LV2UI_Handle ui )
 {
 	drumkv1widget_lv2 *pWidget = static_cast<drumkv1widget_lv2 *> (ui);
 	if  (pWidget && !pWidget->isIdleClosed()) {
-	//	QApplication::processEvents();
+		QApplication::processEvents();
 		return 0;
 	} else {
 		return 1;
