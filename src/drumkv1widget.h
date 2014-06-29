@@ -29,6 +29,10 @@
 #include "drumkv1.h"
 
 
+// forward decls.
+class drumkv1_sched_notifier;
+
+
 //-------------------------------------------------------------------------
 // drumkv1widget - decl.
 //
@@ -41,6 +45,9 @@ public:
 
 	// Constructor
 	drumkv1widget(QWidget *pParent = 0, Qt::WindowFlags wflags = 0);
+
+	// Destructor.
+	~drumkv1widget();
 
 	// Param port accessors.
 	void setParamValue(
@@ -169,6 +176,8 @@ private:
 	Ui::drumkv1widget m_ui;
 
 	drumkv1widget_config m_config;
+
+	drumkv1_sched_notifier *m_sched_notifier;
 
 	QHash<drumkv1::ParamIndex, drumkv1widget_knob *> m_paramKnobs;
 	QHash<drumkv1widget_knob *, drumkv1::ParamIndex> m_knobParams;

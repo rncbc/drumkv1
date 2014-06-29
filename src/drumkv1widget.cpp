@@ -62,6 +62,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	m_ui.setupUi(this);
 
+	// Init sched notifier.
+	m_sched_notifier = new drumkv1_sched_notifier(this);
+
 	// Init swapable params A/B to default.
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
 		m_params_ab[i] = drumkv1_param::paramDefaultValue(drumkv1::ParamIndex(i));
@@ -467,7 +470,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SLOT(helpAboutQt()));
 
 	// Special sample update notifications (eg. reverse)
-	QObject::connect(drumkv1_sched::notifier(),
+	QObject::connect(m_sched_notifier,
 		SIGNAL(notify()),
 		SLOT(updateSampleNotify()));
 
@@ -477,6 +480,13 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.StatusBar->showMessage(tr("Ready"), 5000);
 	m_ui.StatusBar->setModified(false);
 	m_ui.Preset->setDirtyPreset(false);
+}
+
+
+// Destructor.
+drumkv1widget::~drumkv1widget (void)
+{
+	delete m_sched_notifier;
 }
 
 

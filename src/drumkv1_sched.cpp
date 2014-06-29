@@ -71,8 +71,9 @@ private:
 
 
 static drumkv1_sched_thread *g_sched_thread = NULL;
-static drumkv1_sched_notifier *g_sched_notifier = NULL;
 static uint32_t g_sched_refcount = 0;
+
+static QList<drumkv1_sched_notifier *> g_sched_notifiers;
 
 
 //-------------------------------------------------------------------------
@@ -181,10 +182,6 @@ drumkv1_sched::~drumkv1_sched (void)
 			delete g_sched_thread;
 			g_sched_thread = NULL;
 		}
-		if (g_sched_notifier) {
-			delete g_sched_notifier;
-			g_sched_notifier = NULL;
-		}
 	}
 }
 
@@ -216,17 +213,16 @@ void drumkv1_sched::sync_process (void)
 
 	m_sync_wait = false;
 
-	if (g_sched_notifier)
-		g_sched_notifier->sync_notify();
+	sync_notify();
 }
 
 
-drumkv1_sched_notifier *drumkv1_sched::notifier (void)
+// signal broadcast (static).
+void drumkv1_sched::sync_notify (void)
 {
-	if (g_sched_notifier == NULL)
-		g_sched_notifier = new drumkv1_sched_notifier();
-
-	return g_sched_notifier;
+	QListIterator<drumkv1_sched_notifier *> iter(g_sched_notifiers);
+	while (iter.hasNext())
+		iter.next()->sync_notify();
 }
 
 
@@ -234,9 +230,18 @@ drumkv1_sched_notifier *drumkv1_sched::notifier (void)
 // drumkv1_sched_notifier - worker/schedule proxy decl.
 //
 
+// ctor.
 drumkv1_sched_notifier::drumkv1_sched_notifier ( QObject *parent )
 	: QObject(parent)
 {
+	g_sched_notifiers.append(this);
+}
+
+
+// dtor.
+drumkv1_sched_notifier::~drumkv1_sched_notifier (void)
+{
+	g_sched_notifiers.removeAll(this);
 }
 
 

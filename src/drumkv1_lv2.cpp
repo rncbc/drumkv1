@@ -290,7 +290,8 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 			drumkv1_param::loadElements(pPlugin, eElements, mapPath);
 	}
 
-	drumkv1_sched::notifier()->sync_notify();
+	drumkv1_sched::sync_notify();
+
 	return LV2_STATE_SUCCESS;
 }
 

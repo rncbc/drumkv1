@@ -53,8 +53,8 @@ public:
 	// (pure) virtual processor.
 	virtual void process() = 0;
 
-	// signal/slot proxy accessor (static).
-	static drumkv1_sched_notifier *notifier();
+	// signal broadcast (static).
+	static void sync_notify();
 
 private:
 
@@ -75,8 +75,13 @@ class drumkv1_sched_notifier : public QObject
 
 public:
 
+	// ctor.
 	drumkv1_sched_notifier(QObject *parent = NULL);
 
+	// dtor.
+	~drumkv1_sched_notifier();
+
+	// signal notifier.
 	void sync_notify();
 
 signals:
