@@ -1471,10 +1471,10 @@ void drumkv1_impl::resetParamValues ( bool bSwap )
 
 void drumkv1_impl::reset (void)
 {
-//--legacy support < 0.3.0.4 -- begin
+#if 0 //--legacy support < 0.3.0.4 -- begin...
 	if (*m_del.bpm < 3.6f)
 		*m_del.bpm *= 100.0f;
-//--legacy support < 0.3.0.4 -- end.
+#endif//--legacy support < 0.3.0.4 -- end.
 
 	// reset all elements
 	drumkv1_elem *elem = m_elem_list.next();

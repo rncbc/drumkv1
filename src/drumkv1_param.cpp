@@ -283,10 +283,10 @@ void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 								index = s_hash.value(sName);
 							}
 							float fParamValue = eParam.text().toFloat();
-						//--legacy support < 0.3.0.4 -- begin
+						#if 0 //--legacy support < 0.3.0.4 -- begin...
 							if (index == drumkv1::DEL1_BPM && fParamValue < 3.6f)
 								fParamValue *= 100.0f;
-						//--legacy support < 0.3.0.4 -- end.
+						#endif//--legacy support < 0.3.0.4 -- end.
 							float *pfParamPort = pDrumk->paramPort(index);
 							if (pfParamPort)
 								*pfParamPort = fParamValue;
