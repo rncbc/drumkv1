@@ -1049,7 +1049,7 @@ bool drumkv1widget::queryClose (void)
 // Reload all elements.
 void drumkv1widget::refreshElements (void)
 {
-	bool bBlockSignals = m_ui.Elements->blockSignals(true);
+	const bool bBlockSignals = m_ui.Elements->blockSignals(true);
 
 	if (m_ui.Elements->instance() == NULL)
 		m_ui.Elements->setInstance(instance());

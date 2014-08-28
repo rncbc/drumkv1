@@ -183,8 +183,6 @@ void drumkv1_param::loadElements (
 			}
 		}
 	}
-
-	pDrumk->reset();
 }
 
 
