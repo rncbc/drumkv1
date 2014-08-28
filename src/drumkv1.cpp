@@ -1476,7 +1476,7 @@ void drumkv1_impl::reset (void)
 		*m_del.bpm *= 100.0f;
 #endif//--legacy support < 0.3.0.4 -- end.
 
-	// make sure dangling states aren't
+	// make sure dangling states aren't...
 	m_del.bpmsync0 = *m_del.bpmsync;
 
 	// reset all elements
