@@ -148,7 +148,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// GEN group limits. [0=off, 1..128]
 	m_ui.Gen1GroupKnob->setSpecialValueText(sOff);
-	m_ui.Gen1GroupKnob->setMaximum(1.28f);
+	m_ui.Gen1GroupKnob->setScale(1.0f);
+	m_ui.Gen1GroupKnob->setMinimum(0.0f);
+	m_ui.Gen1GroupKnob->setMaximum(128.0f);
+	m_ui.Gen1GroupKnob->setDecimals(0);
+	m_ui.Gen1GroupKnob->setSingleStep(10.0f);
 
 	// GEN octave limits.
 	m_ui.Gen1CoarseKnob->setMinimum(-4.0f);
