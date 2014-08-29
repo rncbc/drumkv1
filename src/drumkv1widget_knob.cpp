@@ -88,7 +88,7 @@ QString drumkv1widget_knob::text (void) const
 
 void drumkv1widget_knob::setValue ( float fValue, bool bDefault )
 {
-	bool bDialBlock = m_pDial->blockSignals(true);
+	const bool bDialBlock = m_pDial->blockSignals(true);
 
 	m_pDial->setValue(scaleFromValue(fValue));
 
@@ -252,7 +252,7 @@ drumkv1widget_spin::drumkv1widget_spin ( QWidget *pParent )
 
 void drumkv1widget_spin::setValue ( float fValue, bool bDefault )
 {
-	bool bSpinBlock = m_pSpinBox->blockSignals(true);
+	const bool bSpinBlock = m_pSpinBox->blockSignals(true);
 
 	m_pSpinBox->setValue(scaleFromValue(fValue));
 	drumkv1widget_knob::setValue(fValue, bDefault);
@@ -321,9 +321,9 @@ drumkv1widget_combo::drumkv1widget_combo ( QWidget *pParent )
 
 void drumkv1widget_combo::setValue ( float fValue, bool bDefault )
 {
-	bool bComboBlock = m_pComboBox->blockSignals(true);
+	const bool bComboBlock = m_pComboBox->blockSignals(true);
 
-	int iValue = iroundf(fValue);
+	const int iValue = iroundf(fValue);
 	m_pComboBox->setCurrentIndex(iValue);
 	drumkv1widget_knob::setValue(float(iValue), bDefault);
 
@@ -365,7 +365,8 @@ void drumkv1widget_combo::comboBoxValueChanged ( int iComboValue )
 // Reimplemented mouse-wheel stepping.
 void drumkv1widget_combo::wheelEvent ( QWheelEvent *pWheelEvent )
 {
-	int delta = (pWheelEvent->delta() / 120);
+	const int delta
+		= (pWheelEvent->delta() / 120);
 	if (delta) {
 		float fValue = value() + float(delta);
 		if (fValue < minimum())

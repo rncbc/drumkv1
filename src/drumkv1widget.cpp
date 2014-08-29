@@ -700,7 +700,7 @@ void drumkv1widget::updateParamValues ( uint32_t nparams )
 			fValue = *pfParamPort;
 		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
-		updateParamEx(index, fValue);
+	//	updateParamEx(index, fValue);
 		m_params_ab[index] = fValue;
 	}
 }
