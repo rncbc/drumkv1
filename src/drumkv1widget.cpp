@@ -146,6 +146,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Gen1EnvTimeKnob->setSpecialValueText(sAuto);
 	m_ui.Del1BpmKnob->setSpecialValueText(sAuto);
 
+	// Wave integer widths.
+	m_ui.Lfo1WidthKnob->setDecimals(0);
+
 	// GEN group limits. [0=off, 1..128]
 	m_ui.Gen1GroupKnob->setSpecialValueText(sOff);
 	m_ui.Gen1GroupKnob->setScale(1.0f);
@@ -190,9 +193,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// Effects (delay BPM)
 	m_ui.Del1BpmKnob->setScale(1.0f);
-	m_ui.Del1BpmKnob->setMinimum(0.0f);
+	m_ui.Del1BpmKnob->setMinimum(3.6f);
 	m_ui.Del1BpmKnob->setMaximum(360.0f);
-	m_ui.Del1BpmKnob->setSingleStep(10.0f);
+	m_ui.Del1BpmKnob->setSingleStep(1.0f);
 
 	// GEN1
 	setParamKnob(drumkv1::GEN1_REVERSE, m_ui.Gen1ReverseKnob);
