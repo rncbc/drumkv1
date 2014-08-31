@@ -1199,10 +1199,8 @@ void drumkv1widget::bpmSyncChanged (void)
 	if (pDrumk) {
 		float *pBpmSync = pDrumk->paramPort(drumkv1::DEL1_BPMSYNC);
 		if (pBpmSync) {
-			const bool bBpmSync0
-				= (*pBpmSync > 0.0f);
-			const bool bBpmSync1
-				= (m_ui.Del1BpmKnob->minimum() >= m_ui.Del1BpmKnob->value());
+			const bool bBpmSync0 = (*pBpmSync > 0.0f);
+			const bool bBpmSync1 = m_ui.Del1BpmKnob->isSpecialValue();
 			if ((bBpmSync1 && !bBpmSync0) || (!bBpmSync1 && bBpmSync0))
 				*pBpmSync = (bBpmSync1 ? 1.0f : 0.0f);
 		}
