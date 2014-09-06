@@ -126,6 +126,20 @@ float drumkv1_param::paramDefaultValue ( drumkv1::ParamIndex index )
 }
 
 
+// Abstract/absolute path functors.
+QString drumkv1_param::map_path::absolutePath (
+	const QString& sAbstractPath ) const
+{
+	return QDir::current().absoluteFilePath(sAbstractPath);
+}
+
+QString drumkv1_param::map_path::abstractPath (
+	const QString& sAbsolutePath ) const
+{
+	return QDir::current().relativeFilePath(sAbsolutePath);
+}
+
+
 // Element serialization methods.
 void drumkv1_param::loadElements (
 	drumkv1 *pDrumk, const QDomElement& eElements,
@@ -206,9 +220,8 @@ void drumkv1_param::saveElements (
 		QDomElement eSample = doc.createElement("sample");
 		eSample.setAttribute("index", 0);
 		eSample.setAttribute("name", "GEN1_SAMPLE");
-		eSample.appendChild(doc.createTextNode(mapPath.abstractPath(
-			QDir::current().relativeFilePath(
-				QString::fromUtf8(pszSampleFile)))));
+		eSample.appendChild(doc.createTextNode(
+			mapPath.abstractPath(QString::fromUtf8(pszSampleFile))));
 		eElement.appendChild(eSample);
 		QDomElement eParams = doc.createElement("params");
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {

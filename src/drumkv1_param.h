@@ -42,10 +42,8 @@ namespace drumkv1_param
 	{
 	public:
 
-		virtual QString absolutePath(const QString& sAbstractPath) const
-			{ return sAbstractPath; }
-		virtual QString abstractPath(const QString& sAbsolutePath) const
-			{ return sAbsolutePath; }
+		virtual QString absolutePath(const QString& sAbstractPath) const;
+		virtual QString abstractPath(const QString& sAbsolutePath) const;
 	};
 
 	// Element serialization methods.
