@@ -4,8 +4,9 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-SVN TRUNK
+0.5.1  2014-09-12  One second official beta.
 
+- Fixed LV2 plugin relative/absolute file path state resolution.
 - One decimal digit added to all scalar parameters and knobs.
 - Stand-alone JACK client ports outrageously renamed from a
   zero based numbering scheme into a plus one natural one.
