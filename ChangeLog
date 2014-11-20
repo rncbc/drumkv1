@@ -4,7 +4,7 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-SVN TRUNK
+GIT HEAD
 
 - Fixed parameters A/B comparison swap. (EXPERIMENTAL)
 
