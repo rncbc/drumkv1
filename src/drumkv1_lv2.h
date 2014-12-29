@@ -23,6 +23,7 @@
 #define __drumkv1_lv2_h
 
 #include "drumkv1.h"
+#include "drumkv1_config.h"
 
 #include "lv2.h"
 #include "lv2/lv2plug.in/ns/ext/urid/urid.h"
@@ -66,6 +67,8 @@ public:
 private:
 
 	LV2_URID_Map *m_urid_map;
+
+	drumkv1_config m_config;
 
 	struct lv2_urids
 	{

@@ -19,8 +19,6 @@
 
 *****************************************************************************/
 
-#include "drumkv1_config.h"
-
 #include "drumkv1_jack.h"
 #include "drumkv1_param.h"
 

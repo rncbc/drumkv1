@@ -175,8 +175,6 @@ private:
 	// Instance variables.
 	Ui::drumkv1widget m_ui;
 
-	drumkv1_config m_config;
-
 	drumkv1_sched_notifier *m_sched_notifier;
 
 	QHash<drumkv1::ParamIndex, drumkv1widget_knob *> m_paramKnobs;

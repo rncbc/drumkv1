@@ -23,6 +23,7 @@
 #define __drumkv1_jack_h
 
 #include "drumkv1.h"
+#include "drumkv1_config.h"
 
 #include <jack/jack.h>
 
@@ -71,6 +72,8 @@ public:
 #endif
 
 private:
+
+	drumkv1_config m_config;
 
 	jack_client_t *m_client;
 
