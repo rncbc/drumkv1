@@ -20,8 +20,8 @@
 *****************************************************************************/
 
 #include "drumkv1widget_sample.h"
-#include "drumkv1widget_config.h"
 
+#include "drumkv1_config.h"
 #include "drumkv1_sample.h"
 
 #include <sndfile.h>
@@ -485,7 +485,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 // Browse for a new sample.
 void drumkv1widget_sample::openSample ( const QString& sName )
 {
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig == NULL)
 		return;
 

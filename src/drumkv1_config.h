@@ -33,6 +33,52 @@
 
 #define DRUMKV1_DOMAIN	"rncbc.org"
 
+
+//-------------------------------------------------------------------------
+// drumkv1_config - Prototype settings class (singleton).
+//
+
+#include <QSettings>
+#include <QStringList>
+
+
+class drumkv1_config : public QSettings
+{
+public:
+
+	// Constructor.
+	drumkv1_config();
+
+	// Default destructor.
+	~drumkv1_config();
+
+	// Default options...
+	QString sPreset;
+	QString sPresetDir;
+	QString sSampleDir;
+
+	// Special persistent options.
+	bool bUseNativeDialogs;
+
+	// Run-time special non-persistent options.
+	bool bDontUseNativeDialogs;
+
+	// Singleton instance accessor.
+	static drumkv1_config *getInstance();
+
+protected:
+
+	// Explicit I/O methods.
+	void load();
+	void save();
+
+private:
+
+	// The singleton instance.
+	static drumkv1_config *g_pSettings;
+};
+
+
 #endif	// __drumkv1_config_h
 
 // end of drumkv1_config.h

@@ -1,4 +1,4 @@
-// drumkv1widget_config.cpp
+// drumkv1_config.cpp
 //
 /****************************************************************************
    Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
@@ -19,24 +19,24 @@
 
 *****************************************************************************/
 
-#include "drumkv1widget_config.h"
+#include "drumkv1_config.h"
 
 
 //-------------------------------------------------------------------------
-// drumkv1widget_config - Prototype settings structure (pseudo-singleton).
+// drumkv1_config - Prototype settings structure (pseudo-singleton).
 //
 
 // Singleton instance accessor (static).
-drumkv1widget_config *drumkv1widget_config::g_pSettings = NULL;
+drumkv1_config *drumkv1_config::g_pSettings = NULL;
 
-drumkv1widget_config *drumkv1widget_config::getInstance (void)
+drumkv1_config *drumkv1_config::getInstance (void)
 {
 	return g_pSettings;
 }
 
 
 // Constructor.
-drumkv1widget_config::drumkv1widget_config (void)
+drumkv1_config::drumkv1_config (void)
 	: QSettings(DRUMKV1_DOMAIN, DRUMKV1_TITLE)
 {
 	g_pSettings = this;
@@ -46,7 +46,7 @@ drumkv1widget_config::drumkv1widget_config (void)
 
 
 // Default destructor.
-drumkv1widget_config::~drumkv1widget_config (void)
+drumkv1_config::~drumkv1_config (void)
 {
 	save();
 
@@ -55,7 +55,7 @@ drumkv1widget_config::~drumkv1widget_config (void)
 
 
 // Explicit I/O methods.
-void drumkv1widget_config::load (void)
+void drumkv1_config::load (void)
 {
 	QSettings::beginGroup("/Default");
 	sPreset = QSettings::value("/Preset").toString();
@@ -71,7 +71,7 @@ void drumkv1widget_config::load (void)
 }
 
 
-void drumkv1widget_config::save (void)
+void drumkv1_config::save (void)
 {
 	QSettings::beginGroup("/Program");
 	QSettings::setValue("/Version", DRUMKV1_VERSION);
@@ -91,4 +91,4 @@ void drumkv1widget_config::save (void)
 }
 
 
-// end of drumkv1widget_config.cpp
+// end of drumkv1_config.cpp

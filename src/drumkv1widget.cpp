@@ -25,8 +25,6 @@
 #include "drumkv1_sample.h"
 #include "drumkv1_sched.h"
 
-#include "drumkv1widget_config.h"
-
 #include <QMessageBox>
 #include <QDir>
 
@@ -462,7 +460,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	QObject::connect(m_ui.TabBar, SIGNAL(currentChanged(int)),
 		m_ui.StackedWidget, SLOT(setCurrentIndex(int)));
 
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig)
 		m_ui.helpUseNativeDialogsAction->setChecked(pConfig->bUseNativeDialogs);
 
@@ -1245,7 +1243,7 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 // Menu actions.
 void drumkv1widget::helpUseNativeDialogs ( bool bOn )
 {
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig) {
 		pConfig->bUseNativeDialogs = bOn;
 		pConfig->bDontUseNativeDialogs = !pConfig->bUseNativeDialogs;

@@ -29,13 +29,13 @@ HEADERS = \
 	drumkv1widget_knob.h \
 	drumkv1widget_preset.h \
 	drumkv1widget_status.h \
-	drumkv1widget_config.h \
 	drumkv1widget_elements.h \
 	drumkv1widget_jack.h
 
 SOURCES = \
 	drumkv1.cpp \
 	drumkv1_jack.cpp \
+	drumkv1_config.cpp \
 	drumkv1_sample.cpp \
 	drumkv1_wave.cpp \
 	drumkv1_nsm.cpp \
@@ -49,7 +49,6 @@ SOURCES = \
 	drumkv1widget_knob.cpp \
 	drumkv1widget_preset.cpp \
 	drumkv1widget_status.cpp \
-	drumkv1widget_config.cpp \
 	drumkv1widget_elements.cpp \
 	drumkv1widget_jack.cpp
 

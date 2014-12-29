@@ -66,7 +66,7 @@ void drumkv1widget_jack::setNsmClient ( drumkv1_nsm *pNsmClient )
 {
 	m_pNsmClient = pNsmClient;
 
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig)
 		pConfig->bDontUseNativeDialogs = true;
 }

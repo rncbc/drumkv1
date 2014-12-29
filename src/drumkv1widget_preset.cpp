@@ -21,7 +21,7 @@
 
 #include "drumkv1widget_preset.h"
 
-#include "drumkv1widget_config.h"
+#include "drumkv1_config.h"
 
 #include <QHBoxLayout>
 
@@ -121,7 +121,7 @@ void drumkv1widget_preset::clearPreset (void)
 {
 	++m_iInitPreset;
 
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig)
 		pConfig->sPreset.clear();
 
@@ -150,7 +150,7 @@ bool drumkv1widget_preset::queryPreset (void)
 	if (m_iInitPreset == 0)
 		return true;
 
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig == NULL)
 		return false;
 
@@ -202,7 +202,7 @@ void drumkv1widget_preset::loadPreset ( const QString& sPreset )
 	if (sPreset.isEmpty())
 		return;
 
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig) {
 		pConfig->beginGroup(presetGroup());
 		emit loadPresetFile(pConfig->value(sPreset).toString());
@@ -231,7 +231,7 @@ void drumkv1widget_preset::newPreset (void)
 
 void drumkv1widget_preset::openPreset (void)
 {
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig == NULL)
 		return;
 
@@ -290,7 +290,7 @@ void drumkv1widget_preset::savePreset ( const QString& sPreset )
 	if (sPreset.isEmpty())
 		return;
 
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig == NULL)
 		return;
 
@@ -356,7 +356,7 @@ void drumkv1widget_preset::deletePreset (void)
 	if (sPreset.isEmpty())
 		return;
 
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig == NULL)
 		return;
 
@@ -409,7 +409,7 @@ void drumkv1widget_preset::refreshPreset (void)
 	const QString sOldPreset = m_pComboBox->currentText();
 	const QIcon icon(":/images/drumkv1_preset.png");
 	m_pComboBox->clear();
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig) {
 		pConfig->beginGroup(presetGroup());
 		const QStringList& list = pConfig->childKeys();
@@ -438,7 +438,7 @@ void drumkv1widget_preset::refreshPreset (void)
 // Preset control.
 void drumkv1widget_preset::initPreset (void)
 {
-	drumkv1widget_config *pConfig = drumkv1widget_config::getInstance();
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig && !pConfig->sPreset.isEmpty())
 		loadPreset(pConfig->sPreset);
 	else

@@ -24,7 +24,7 @@
 
 #include "ui_drumkv1widget.h"
 
-#include "drumkv1widget_config.h"
+#include "drumkv1_config.h"
 
 #include "drumkv1.h"
 
@@ -175,7 +175,7 @@ private:
 	// Instance variables.
 	Ui::drumkv1widget m_ui;
 
-	drumkv1widget_config m_config;
+	drumkv1_config m_config;
 
 	drumkv1_sched_notifier *m_sched_notifier;
 
