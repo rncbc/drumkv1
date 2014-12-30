@@ -24,7 +24,6 @@ HEADERS = \
 	drumkv1widget_lv2.h
 
 SOURCES = \
-	drumkv1_config.cpp \
 	drumkv1_param.cpp \
 	drumkv1widget.cpp \
 	drumkv1widget_env.cpp \
