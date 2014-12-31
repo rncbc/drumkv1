@@ -19,8 +19,8 @@
 
 *****************************************************************************/
 
-#include "drumkv1_config.h"
 #include "drumkv1_param.h"
+#include "drumkv1_config.h"
 
 #include <QHash>
 
@@ -246,7 +246,21 @@ void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 	if (pDrumk == NULL)
 		return;
 
-	QFile file(sFilename);
+	QFileInfo fi(sFilename);
+	if (!fi.exists()) {
+		drumkv1_config *pConfig = drumkv1_config::getInstance();
+		if (pConfig) {
+			const QString& sPresetFile
+				= pConfig->presetFile(sFilename);
+			if (sPresetFile.isEmpty())
+				return;
+			fi.setFile(sPresetFile);
+			if (!fi.exists())
+				return;
+		}
+	}
+
+	QFile file(fi.filePath());
 	if (!file.open(QIODevice::ReadOnly))
 		return;
 
@@ -258,7 +272,6 @@ void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 		}
 	}
 
-	const QFileInfo fi(sFilename);
 	const QDir currentDir(QDir::current());
 	QDir::setCurrent(fi.absolutePath());
 
@@ -321,16 +334,13 @@ void drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
 	if (pDrumk == NULL)
 		return;
 
-	const QString& sPreset
-		= QFileInfo(sFilename).completeBaseName();
-
 	const QFileInfo fi(sFilename);
 	const QDir currentDir(QDir::current());
 	QDir::setCurrent(fi.absolutePath());
 
 	QDomDocument doc(DRUMKV1_TITLE);
 	QDomElement ePreset = doc.createElement("preset");
-	ePreset.setAttribute("name", sPreset);
+	ePreset.setAttribute("name", fi.completeBaseName());
 	ePreset.setAttribute("version", DRUMKV1_VERSION);
 
 	QDomElement eElements = doc.createElement("elements");
@@ -354,7 +364,7 @@ void drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
 	ePreset.appendChild(eParams);
 	doc.appendChild(ePreset);
 
-	QFile file(sFilename);
+	QFile file(fi.filePath());
 	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
 		QTextStream(&file) << doc.toString();
 		file.close();
