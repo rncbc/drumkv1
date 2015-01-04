@@ -18,9 +18,10 @@ HEADERS = \
 	drumkv1_list.h \
 	drumkv1_fx.h \
 	drumkv1_nsm.h \
+	drumkv1_reverb.h \
 	drumkv1_param.h \
 	drumkv1_sched.h \
-	drumkv1_reverb.h \
+	drumkv1_programs.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
 	drumkv1widget_filt.h \
@@ -30,6 +31,7 @@ HEADERS = \
 	drumkv1widget_preset.h \
 	drumkv1widget_status.h \
 	drumkv1widget_elements.h \
+	drumkv1widget_programs.h \
 	drumkv1widget_jack.h
 
 SOURCES = \
@@ -41,6 +43,7 @@ SOURCES = \
 	drumkv1_nsm.cpp \
 	drumkv1_param.cpp \
 	drumkv1_sched.cpp \
+	drumkv1_programs.cpp \
 	drumkv1widget.cpp \
 	drumkv1widget_env.cpp \
 	drumkv1widget_filt.cpp \
@@ -50,6 +53,7 @@ SOURCES = \
 	drumkv1widget_preset.cpp \
 	drumkv1widget_status.cpp \
 	drumkv1widget_elements.cpp \
+	drumkv1widget_programs.cpp \
 	drumkv1widget_jack.cpp
 
 FORMS = \

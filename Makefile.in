@@ -18,7 +18,8 @@ headers = \
 	src/$(name)_wave.h \
 	src/$(name)_config.h \
 	src/$(name)_param.h \
-	src/$(name)_sched.h
+	src/$(name)_sched.h \
+	src/$(name)_programs.h
 
 sources = \
 	src/$(name).cpp \
@@ -26,7 +27,8 @@ sources = \
 	src/$(name)_wave.cpp \
 	src/$(name)_config.cpp \
 	src/$(name)_param.cpp \
-	src/$(name)_sched.cpp
+	src/$(name)_sched.cpp \
+	src/$(name)_programs.cpp
 
 headers_ui = \
 	src/$(name)widget.h \
@@ -36,7 +38,9 @@ headers_ui = \
 	src/$(name)widget_preset.h \
 	src/$(name)widget_status.h \
 	src/$(name)widget_sample.h \
-	src/$(name)widget_elements.h
+	src/$(name)widget_elements.h \
+	src/$(name)widget_programs.h
+
 
 sources_ui = \
 	src/$(name)widget.cpp \
@@ -46,7 +50,8 @@ sources_ui = \
 	src/$(name)widget_preset.cpp \
 	src/$(name)widget_status.cpp \
 	src/$(name)widget_sample.cpp \
-	src/$(name)widget_elements.cpp
+	src/$(name)widget_elements.cpp \
+	src/$(name)widget_programs.cpp
 
 
 forms = \
