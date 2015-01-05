@@ -476,7 +476,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// Special sample update notifications (eg. reverse)
 	QObject::connect(m_sched_notifier,
 		SIGNAL(notify()),
-		SLOT(updateSampleNotify()));
+		SLOT(updateNotify()));
 
 	// Epilog.
 	// QWidget::adjustSize();
@@ -578,7 +578,7 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 	++m_iUpdate;
 
 	switch (index) {
-#if 0//--updateSampleNotify();
+#if 0//--updateNotify();
 	case drumkv1::GEN1_REVERSE: {
 		const bool bReverse = bool(fValue > 0.0f);
 		pDrumk->setReverse(bReverse);
@@ -850,19 +850,6 @@ void drumkv1widget::loadSample ( const QString& sFilename )
 void drumkv1widget::openSample (void)
 {
 	m_ui.Gen1Sample->openSample(currentNoteName());
-}
-
-
-// Sample updater slot.
-void drumkv1widget::updateSampleNotify (void)
-{
-#ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget::updateSampleNotify()");
-#endif
-
-	drumkv1 *pDrumk = instance();
-	if (pDrumk)
-		updateSample(pDrumk->sample());
 }
 
 
@@ -1238,6 +1225,24 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 }
 
 
+// Notification updater.
+void drumkv1widget::updateNotify (void)
+{
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1widget::updateNotify()");
+#endif
+
+	drumkv1 *pDrumk = instance();
+	if (pDrumk) {
+		updateSample(pDrumk->sample());
+		drumkv1_programs *pPrograms = pDrumk->programs();
+		drumkv1_programs::Prog *pProg = pPrograms->current_prog();
+		if (pProg)
+			m_ui.Preset->setPreset(pProg->name());
+	}
+}
+
+
 // Menu actions.
 void drumkv1widget::helpConfigure (void)
 {
@@ -1246,8 +1251,9 @@ void drumkv1widget::helpConfigure (void)
 		return;
 
 	drumkv1widget_config form(this);
-	// TODO: Set programs database...
-//	form.setPrograms(pDrumk->programs());
+
+	// Set programs database...
+	form.setPrograms(pDrumk->programs());
 	form.exec();
 }
 

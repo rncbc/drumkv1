@@ -1,7 +1,7 @@
 // drumkv1.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -29,8 +29,11 @@
 #include "drumkv1_list.h"
 
 #include "drumkv1_fx.h"
-
 #include "drumkv1_reverb.h"
+
+#include "drumkv1_programs.h"
+#include "drumkv1_sched.h"
+#include "drumkv1_param.h"
 
 
 #ifdef CONFIG_DEBUG_0
@@ -752,13 +755,50 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 };
 
 
+// programs scheduled thread
+
+class drumkv1_programs_sched : public drumkv1_sched
+{
+public:
+
+	// ctor.
+	drumkv1_programs_sched (drumkv1 *pDrumk)
+		: drumkv1_sched(), m_pDrumk(pDrumk), m_prog_id(0) {}
+
+	// schedule reset.
+	void set_current_prog(uint16_t prog_id)
+	{
+		m_prog_id = prog_id;
+
+		schedule();
+	}
+
+	// process reset (virtual).
+	void process()
+	{
+		drumkv1_programs *pPrograms = m_pDrumk->programs();
+		pPrograms->set_current_prog(m_prog_id);
+		drumkv1_programs::Prog *pProg = pPrograms->current_prog();
+		if (pProg)
+			drumkv1_param::loadPreset(m_pDrumk, pProg->name());
+	}
+
+private:
+
+	// instance variables.
+	drumkv1 *m_pDrumk;
+
+	uint16_t m_prog_id;
+};
+
+
 // synth engine implementation
 
 class drumkv1_impl
 {
 public:
 
-	drumkv1_impl(uint16_t iChannels, uint32_t iSampleRate);
+	drumkv1_impl(drumkv1 *pDrumk, uint16_t iChannels, uint32_t iSampleRate);
 
 	~drumkv1_impl();
 
@@ -787,6 +827,8 @@ public:
 
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
 	float *paramPort(drumkv1::ParamIndex index);
+
+	drumkv1_programs *programs();
 
 	void process_midi(uint8_t *data, uint32_t size);
 	void process(float **ins, float **outs, uint32_t nframes);
@@ -861,12 +903,17 @@ private:
 	drumkv1_fx_comp    *m_comp;
 
 	drumkv1_reverb m_reverb;
+
+	drumkv1_programs       m_programs;
+	drumkv1_programs_sched m_programs_sched;
 };
 
 
 // synth engine constructor
 
-drumkv1_impl::drumkv1_impl ( uint16_t iChannels, uint32_t iSampleRate )
+drumkv1_impl::drumkv1_impl (
+	drumkv1 *pDrumk, uint16_t iChannels, uint32_t iSampleRate )
+	: m_programs_sched(pDrumk)
 {
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
@@ -1261,6 +1308,10 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 	const int status = (data[0] & 0xf0);
 	const int key    = (data[1] & 0x7f);
 
+	// program change
+	if (status == 0xc0)
+		m_programs_sched.set_current_prog(key);
+	else
 	if (status == 0xd0) {
 		// channel aftertouch
 		m_ctl.pressure = float(key) / 127.0f;
@@ -1357,7 +1408,11 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 	}
 	// control change
 	else if (status == 0xb0) {
-		switch (key) {
+	switch (key) {
+		case 0x00:
+			// bank-select MSB (cc#0)
+			m_programs.set_current_bank_msb(value);
+			break;
 		case 0x01:
 			// modulation wheel (cc#1)
 			m_ctl.modwheel = *m_def.modwheel * float(value) / 127.0f;
@@ -1369,6 +1424,10 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 		case 0x0a:
 			// channel panning (cc#10)
 			m_ctl.panning = float(value - 64) / 64.0f;
+			break;
+		case 0x20:
+			// bank-select LSB (cc#32)
+			m_programs.set_current_bank_lsb(value);
 			break;
 		case 0x78:
 			// all sound off (cc#120)
@@ -1511,6 +1570,14 @@ void drumkv1_impl::reset (void)
 	allSoundOff();
 //	allControllersOff();
 	allNotesOff();
+}
+
+
+// programs accessor
+
+drumkv1_programs *drumkv1_impl::programs (void)
+{
+	return &m_programs;
 }
 
 
@@ -1740,13 +1807,14 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 }
 
 
+
 //-------------------------------------------------------------------------
 // drumkv1 - decl.
 //
 
 drumkv1::drumkv1 ( uint16_t iChannels, uint32_t iSampleRate )
 {
-	m_pImpl = new drumkv1_impl(iChannels, iSampleRate);
+	m_pImpl = new drumkv1_impl(this, iChannels, iSampleRate);
 }
 
 
@@ -1876,6 +1944,14 @@ void drumkv1::process ( float **ins, float **outs, uint32_t nframes )
 void drumkv1::resetParamValues ( bool bSwap )
 {
 	m_pImpl->resetParamValues(bSwap);
+}
+
+
+// programs accessor
+
+drumkv1_programs *drumkv1::programs (void) const
+{
+	return m_pImpl->programs();
 }
 
 

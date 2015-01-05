@@ -109,9 +109,6 @@ protected slots:
 	// Element deactivation.
 	void resetElement(void);
 
-	// Sample updater.
-	void updateSampleNotify();
-
 	// Common context menu.
 	void contextMenuRequest(const QPoint& pos);
 
@@ -123,6 +120,9 @@ protected slots:
 
 	// Delay BPM change.
 	void bpmSyncChanged();
+
+	// Notification updater.
+	void updateNotify();
 
 	// Menu actions.
 	void helpConfigure();

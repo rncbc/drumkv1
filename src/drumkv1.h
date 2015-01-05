@@ -1,7 +1,7 @@
 // drumkv1.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -31,6 +31,7 @@ class drumkv1_impl;
 class drumkv1_elem;
 class drumkv1_element;
 class drumkv1_sample;
+class drumkv1_programs;
 
 
 //-------------------------------------------------------------------------
@@ -152,6 +153,8 @@ public:
 
 	void resetParamValues(bool bSwap);
 	void reset();
+
+	drumkv1_programs *programs() const;
 
 protected:
 
