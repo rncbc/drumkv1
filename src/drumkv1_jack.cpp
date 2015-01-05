@@ -1,7 +1,7 @@
 // drumkv1_jack.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include "drumkv1_jack.h"
+#include "drumkv1_config.h"
 #include "drumkv1_param.h"
 
 #include <jack/midiport.h>

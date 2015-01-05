@@ -1237,8 +1237,12 @@ void drumkv1widget::updateNotify (void)
 		updateSample(pDrumk->sample());
 		drumkv1_programs *pPrograms = pDrumk->programs();
 		drumkv1_programs::Prog *pProg = pPrograms->current_prog();
-		if (pProg)
+		if (pProg) {
 			m_ui.Preset->setPreset(pProg->name());
+			updateParamValues(drumkv1::NUM_PARAMS);
+			refreshElements();
+			activateElement();
+		}
 	}
 }
 

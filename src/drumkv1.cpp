@@ -31,6 +31,7 @@
 #include "drumkv1_fx.h"
 #include "drumkv1_reverb.h"
 
+#include "drumkv1_config.h"
 #include "drumkv1_programs.h"
 #include "drumkv1_sched.h"
 #include "drumkv1_param.h"
@@ -904,6 +905,8 @@ private:
 
 	drumkv1_reverb m_reverb;
 
+	drumkv1_config m_config;
+
 	drumkv1_programs       m_programs;
 	drumkv1_programs_sched m_programs_sched;
 };
@@ -945,6 +948,10 @@ drumkv1_impl::drumkv1_impl (
 	m_del.bpmsync0 = 0.0f;
 	m_del.bpm0 = 0;
 
+	// load programs database...
+	m_config.loadPrograms(&m_programs);
+//	m_config.loadProgramsCurrent(&m_programs);
+
 	// number of channels
 	setChannels(iChannels);
 
@@ -972,6 +979,10 @@ drumkv1_impl::drumkv1_impl (
 
 drumkv1_impl::~drumkv1_impl (void)
 {
+	// save programs database...
+	m_config.savePrograms(&m_programs);
+	m_config.saveProgramsCurrent(&m_programs);
+
 	// deallocate sample filenames
 	setSampleFile(0);
 
