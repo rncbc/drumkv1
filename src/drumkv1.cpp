@@ -764,7 +764,7 @@ public:
 
 	// ctor.
 	drumkv1_programs_sched (drumkv1 *pDrumk)
-		: drumkv1_sched(), m_pDrumk(pDrumk), m_prog_id(0) {}
+		: drumkv1_sched(Programs), m_pDrumk(pDrumk), m_prog_id(0) {}
 
 	// schedule reset.
 	void set_current_prog(uint16_t prog_id)

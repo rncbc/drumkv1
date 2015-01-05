@@ -475,8 +475,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// Special sample update notifications (eg. reverse)
 	QObject::connect(m_sched_notifier,
-		SIGNAL(notify()),
-		SLOT(updateNotify()));
+		SIGNAL(notify(int)),
+		SLOT(updateNotify(int)));
 
 	// Epilog.
 	// QWidget::adjustSize();
@@ -1226,15 +1226,18 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 
 
 // Notification updater.
-void drumkv1widget::updateNotify (void)
+void drumkv1widget::updateNotify ( int stype )
 {
+	drumkv1 *pDrumk = instance();
+	if (pDrumk == NULL)
+		return;
+
 #ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget::updateNotify()");
+	qDebug("drumkv1widget::updateNotify(%d)", stype);
 #endif
 
-	drumkv1 *pDrumk = instance();
-	if (pDrumk) {
-		updateSample(pDrumk->sample());
+	switch (drumkv1_sched::Type(stype)) {
+	case drumkv1_sched::Programs: {
 		drumkv1_programs *pPrograms = pDrumk->programs();
 		drumkv1_programs::Prog *pProg = pPrograms->current_prog();
 		if (pProg) {
@@ -1243,6 +1246,13 @@ void drumkv1widget::updateNotify (void)
 			refreshElements();
 			activateElement();
 		}
+		// Fall thru...
+	}
+	case drumkv1_sched::Sample:
+		updateSample(pDrumk->sample());
+		// Fall thru again...
+	default:
+		break;
 	}
 }
 

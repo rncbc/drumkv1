@@ -122,7 +122,7 @@ protected slots:
 	void bpmSyncChanged();
 
 	// Notification updater.
-	void updateNotify();
+	void updateNotify(int stype);
 
 	// Menu actions.
 	void helpConfigure();
