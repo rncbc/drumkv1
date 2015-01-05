@@ -476,7 +476,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// Special sample update notifications (eg. reverse)
 	QObject::connect(m_sched_notifier,
 		SIGNAL(notify(int)),
-		SLOT(updateNotify(int)));
+		SLOT(updateSchedNotify(int)));
 
 	// Epilog.
 	// QWidget::adjustSize();
@@ -578,7 +578,7 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 	++m_iUpdate;
 
 	switch (index) {
-#if 0//--updateNotify();
+#if 0//--updateSchedNotify(drumkv1_sched::Sample);
 	case drumkv1::GEN1_REVERSE: {
 		const bool bReverse = bool(fValue > 0.0f);
 		pDrumk->setReverse(bReverse);
@@ -1226,14 +1226,14 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 
 
 // Notification updater.
-void drumkv1widget::updateNotify ( int stype )
+void drumkv1widget::updateSchedNotify ( int stype )
 {
 	drumkv1 *pDrumk = instance();
 	if (pDrumk == NULL)
 		return;
 
 #ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget::updateNotify(%d)", stype);
+	qDebug("drumkv1widget::updateSchedNotify(%d)", stype);
 #endif
 
 	switch (drumkv1_sched::Type(stype)) {
