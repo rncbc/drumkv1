@@ -167,6 +167,9 @@ protected:
 	// Update local tied widgets.
 	void updateParamEx(drumkv1::ParamIndex index, float fValue);
 
+	// Preset status updater.
+	void updateLoadPreset(const QString& sPreset);
+
 	// Dirty flag (overridable virtual) methods.
 	virtual void updateDirtyPreset(bool bDirtyPreset);
 

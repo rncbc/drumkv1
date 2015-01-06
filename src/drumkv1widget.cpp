@@ -796,17 +796,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 
 	drumkv1_param::loadPreset(pDrumk, sFilename);
 
-	updateParamValues(drumkv1::NUM_PARAMS);
-
-	const QString& sPreset
-		= QFileInfo(sFilename).completeBaseName();
-
-	m_ui.Preset->setPreset(sPreset);
-	m_ui.StatusBar->showMessage(tr("Load preset: %1").arg(sPreset), 5000);
-	updateDirtyPreset(false);
-
-	refreshElements();
-	activateElement();
+	updateLoadPreset(QFileInfo(sFilename).completeBaseName());
 }
 
 
@@ -1225,6 +1215,20 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 }
 
 
+// Preset status updater.
+void drumkv1widget::updateLoadPreset ( const QString& sPreset )
+{
+	updateParamValues(drumkv1::NUM_PARAMS);
+
+	m_ui.Preset->setPreset(sPreset);
+	m_ui.StatusBar->showMessage(tr("Load preset: %1").arg(sPreset), 5000);
+	updateDirtyPreset(false);
+
+	refreshElements();
+	activateElement();
+}
+
+
 // Notification updater.
 void drumkv1widget::updateSchedNotify ( int stype )
 {
@@ -1240,17 +1244,12 @@ void drumkv1widget::updateSchedNotify ( int stype )
 	case drumkv1_sched::Programs: {
 		drumkv1_programs *pPrograms = pDrumk->programs();
 		drumkv1_programs::Prog *pProg = pPrograms->current_prog();
-		if (pProg) {
-			m_ui.Preset->setPreset(pProg->name());
-			updateParamValues(drumkv1::NUM_PARAMS);
-			refreshElements();
-			activateElement();
-		}
-		// Fall thru...
+		if (pProg) updateLoadPreset(pProg->name());
+		break;
 	}
 	case drumkv1_sched::Sample:
 		updateSample(pDrumk->sample());
-		// Fall thru again...
+		// Fall thru...
 	default:
 		break;
 	}
