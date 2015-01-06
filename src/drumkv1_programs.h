@@ -22,10 +22,10 @@
 #ifndef __drumkv1_programs_h
 #define __drumkv1_programs_h
 
-#include <QMap>
-#include <QString>
+#include "drumkv1_sched.h"
+#include "drumkv1_param.h"
 
-#include <stdint.h>
+#include <QMap>
 
 
 //-------------------------------------------------------------------------
@@ -37,7 +37,7 @@ class drumkv1_programs
 public:
 
 	// ctor.
-	drumkv1_programs();
+	drumkv1_programs(drumkv1 *pDrumk);
 
 	// dtor.
 	~drumkv1_programs();
@@ -110,15 +110,42 @@ protected:
 
 	uint16_t current_bank_id() const;
 
+	// current bank/prog. scheduled thread
+	class Sched : public drumkv1_sched
+	{
+	public:
+
+		// ctor.
+		Sched (drumkv1 *pDrumk)
+			: drumkv1_sched(Programs), m_pDrumk(pDrumk) {}
+
+		// process reset (virtual).
+		void process()
+		{
+			drumkv1_programs *pPrograms = m_pDrumk->programs();
+			drumkv1_programs::Prog *pProg = pPrograms->current_prog();
+			if (pProg)
+				drumkv1_param::loadPreset(m_pDrumk, pProg->name());
+		}
+
+	private:
+
+		// instance variables.
+		drumkv1 *m_pDrumk;
+	};
+
 private:
 
-	Banks m_banks;
+	// instance variables.
+	Sched *m_sched;
 
 	uint8_t m_bank_msb;
 	uint8_t m_bank_lsb;
 
 	Bank *m_bank;
 	Prog *m_prog;
+
+	Banks m_banks;
 };
 
 

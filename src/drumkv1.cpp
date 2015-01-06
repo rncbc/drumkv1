@@ -33,8 +33,6 @@
 
 #include "drumkv1_config.h"
 #include "drumkv1_programs.h"
-#include "drumkv1_sched.h"
-#include "drumkv1_param.h"
 
 
 #ifdef CONFIG_DEBUG_0
@@ -756,43 +754,6 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 };
 
 
-// programs scheduled thread
-
-class drumkv1_programs_sched : public drumkv1_sched
-{
-public:
-
-	// ctor.
-	drumkv1_programs_sched (drumkv1 *pDrumk)
-		: drumkv1_sched(Programs), m_pDrumk(pDrumk), m_prog_id(0) {}
-
-	// schedule reset.
-	void set_current_prog(uint16_t prog_id)
-	{
-		m_prog_id = prog_id;
-
-		schedule();
-	}
-
-	// process reset (virtual).
-	void process()
-	{
-		drumkv1_programs *pPrograms = m_pDrumk->programs();
-		pPrograms->set_current_prog(m_prog_id);
-		drumkv1_programs::Prog *pProg = pPrograms->current_prog();
-		if (pProg)
-			drumkv1_param::loadPreset(m_pDrumk, pProg->name());
-	}
-
-private:
-
-	// instance variables.
-	drumkv1 *m_pDrumk;
-
-	uint16_t m_prog_id;
-};
-
-
 // synth engine implementation
 
 class drumkv1_impl
@@ -871,6 +832,9 @@ protected:
 
 private:
 
+	drumkv1_config   m_config;
+	drumkv1_programs m_programs;
+
 	uint16_t m_iChannels;
 	uint32_t m_iSampleRate;
 
@@ -906,11 +870,6 @@ private:
 	drumkv1_fx_comp    *m_comp;
 
 	drumkv1_reverb m_reverb;
-
-	drumkv1_config m_config;
-
-	drumkv1_programs       m_programs;
-	drumkv1_programs_sched m_programs_sched;
 };
 
 
@@ -918,7 +877,7 @@ private:
 
 drumkv1_impl::drumkv1_impl (
 	drumkv1 *pDrumk, uint16_t iChannels, uint32_t iSampleRate )
-	: m_programs_sched(pDrumk)
+	: m_programs(pDrumk)
 {
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
@@ -1323,7 +1282,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 
 	// program change
 	if (status == 0xc0)
-		m_programs_sched.set_current_prog(key);
+		m_programs.set_current_prog(key);
 	else
 	if (status == 0xd0) {
 		// channel aftertouch
@@ -1591,7 +1550,7 @@ void drumkv1_impl::reset (void)
 void drumkv1_impl::selectProgram ( uint16_t bank_id, uint16_t prog_id )
 {
 	m_programs.set_current_bank(bank_id);
-	m_programs_sched.set_current_prog(prog_id);
+	m_programs.set_current_prog(prog_id);
 }
 
 
