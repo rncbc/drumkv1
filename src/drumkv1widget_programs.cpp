@@ -333,8 +333,7 @@ void drumkv1widget_programs::saveProgramsCurrent ( drumkv1_programs *pPrograms )
 		if (pBankItem) {
 			const uint16_t bank_id = pBankItem->data(0, Qt::UserRole).toInt();
 			const uint16_t prog_id = pProgItem->data(0, Qt::UserRole).toInt();
-			pPrograms->set_current_bank(bank_id);
-			pPrograms->set_current_prog(prog_id);
+			pPrograms->select_program(bank_id, prog_id);
 		}
 	}
 }
