@@ -829,6 +829,8 @@ public:
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
 	float *paramPort(drumkv1::ParamIndex index);
 
+	void selectProgram(uint16_t bank_id, uint16_t prog_id);
+
 	drumkv1_programs *programs();
 
 	void process_midi(uint8_t *data, uint32_t size);
@@ -1586,6 +1588,13 @@ void drumkv1_impl::reset (void)
 
 // programs accessor
 
+void drumkv1_impl::selectProgram ( uint16_t bank_id, uint16_t prog_id )
+{
+	m_programs.set_current_bank(bank_id);
+	m_programs_sched.set_current_prog(prog_id);
+}
+
+
 drumkv1_programs *drumkv1_impl::programs (void)
 {
 	return &m_programs;
@@ -1959,6 +1968,12 @@ void drumkv1::resetParamValues ( bool bSwap )
 
 
 // programs accessor
+
+void drumkv1::selectProgram ( uint16_t bank_id, uint16_t prog_id )
+{
+	m_pImpl->selectProgram(bank_id, prog_id);
+}
+
 
 drumkv1_programs *drumkv1::programs (void) const
 {

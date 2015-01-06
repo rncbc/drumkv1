@@ -154,6 +154,8 @@ public:
 	void resetParamValues(bool bSwap);
 	void reset();
 
+	void selectProgram(uint16_t bank_id, uint16_t prog_id);
+
 	drumkv1_programs *programs() const;
 
 protected:
