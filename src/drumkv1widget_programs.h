@@ -79,8 +79,7 @@ public:
 	void loadPrograms(drumkv1_programs *pPrograms);
 	void savePrograms(drumkv1_programs *pPrograms);
 
-	void loadProgramsCurrent(drumkv1_programs *pPrograms);
-	void saveProgramsCurrent(drumkv1_programs *pPrograms);
+	void selectPrograms(drumkv1_programs *pPrograms);
 
 public slots:
 

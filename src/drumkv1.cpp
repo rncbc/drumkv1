@@ -790,8 +790,6 @@ public:
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
 	float *paramPort(drumkv1::ParamIndex index);
 
-	void selectProgram(uint16_t bank_id, uint16_t prog_id);
-
 	drumkv1_programs *programs();
 
 	void process_midi(uint8_t *data, uint32_t size);
@@ -911,7 +909,6 @@ drumkv1_impl::drumkv1_impl (
 
 	// load programs database...
 	m_config.loadPrograms(&m_programs);
-//	m_config.loadProgramsCurrent(&m_programs);
 
 	// number of channels
 	setChannels(iChannels);
@@ -940,9 +937,11 @@ drumkv1_impl::drumkv1_impl (
 
 drumkv1_impl::~drumkv1_impl (void)
 {
-	// save programs database...
+#if 0
+	// DO NOT save programs database here:
+	// prevent multi-instance clash...
 	m_config.savePrograms(&m_programs);
-	m_config.saveProgramsCurrent(&m_programs);
+#endif
 
 	// deallocate sample filenames
 	setSampleFile(0);
@@ -1547,13 +1546,6 @@ void drumkv1_impl::reset (void)
 
 // programs accessor
 
-void drumkv1_impl::selectProgram ( uint16_t bank_id, uint16_t prog_id )
-{
-	m_programs.bank_select(bank_id);
-	m_programs.prog_change(prog_id);
-}
-
-
 drumkv1_programs *drumkv1_impl::programs (void)
 {
 	return &m_programs;
@@ -1927,12 +1919,6 @@ void drumkv1::resetParamValues ( bool bSwap )
 
 
 // programs accessor
-
-void drumkv1::selectProgram ( uint16_t bank_id, uint16_t prog_id )
-{
-	m_pImpl->selectProgram(bank_id, prog_id);
-}
-
 
 drumkv1_programs *drumkv1::programs (void) const
 {

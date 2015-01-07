@@ -51,8 +51,11 @@ drumkv1_config::drumkv1_config (void)
 // Default destructor.
 drumkv1_config::~drumkv1_config (void)
 {
+#if 0
+	// DO NOT save config here:
+	// prevent multi-instance clash...
 	save();
-
+#endif
 	g_pSettings = NULL;
 }
 
@@ -119,11 +122,6 @@ QString drumkv1_config::bankPrefix (void) const
 	return "/Bank_";
 }
 
-QString drumkv1_config::currentGroup (void) const
-{
-	return "/Current";
-}
-
 
 void drumkv1_config::loadPrograms ( drumkv1_programs *pPrograms )
 {
@@ -184,6 +182,7 @@ void drumkv1_config::savePrograms ( drumkv1_programs *pPrograms )
 	}
 
 	QSettings::endGroup();
+	QSettings::sync();
 }
 
 
@@ -206,26 +205,6 @@ void drumkv1_config::clearPrograms (void)
 		QSettings::remove(bank_key);
 	}
 
-	QSettings::endGroup();
-}
-
-
-void drumkv1_config::loadProgramsCurrent ( drumkv1_programs *pPrograms )
-{
-	QSettings::beginGroup(currentGroup());
-	pPrograms->bank_select(QSettings::value("/Bank", 0).toInt());
-	pPrograms->prog_change(QSettings::value("/Prog", 0).toInt());
-	QSettings::endGroup();
-}
-
-
-void drumkv1_config::saveProgramsCurrent ( drumkv1_programs *pPrograms )
-{
-	QSettings::beginGroup(currentGroup());
-	drumkv1_programs::Bank *pBank = pPrograms->current_bank();
-	drumkv1_programs::Prog *pProg = pPrograms->current_prog();
-	QSettings::setValue("/Bank", (pBank ? pBank->id() : 0));
-	QSettings::setValue("/Prog", (pProg ? pProg->id() : 0));
 	QSettings::endGroup();
 }
 
