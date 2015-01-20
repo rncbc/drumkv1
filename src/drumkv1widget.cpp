@@ -1096,7 +1096,8 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 			drumkv1widget_knob *pKnob = paramKnob(index);
 			if (pKnob)
 				pKnob->setDefaultValue(element->paramValue(index, 0));
-			setParamValue(index, element->paramValue(index));
+			const float fValue = element->paramValue(index);
+			setParamValue(index, fValue);
 		}
 		updateSample(pDrumk->sample());
 		refreshElements();
@@ -1218,14 +1219,14 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 // Preset status updater.
 void drumkv1widget::updateLoadPreset ( const QString& sPreset )
 {
+//	refreshElements();
+	activateElement();
+
 	updateParamValues(drumkv1::NUM_PARAMS);
 
 	m_ui.Preset->setPreset(sPreset);
 	m_ui.StatusBar->showMessage(tr("Load preset: %1").arg(sPreset), 5000);
 	updateDirtyPreset(false);
-
-	refreshElements();
-	activateElement();
 }
 
 

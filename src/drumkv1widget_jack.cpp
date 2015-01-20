@@ -1,7 +1,7 @@
 // drumkv1widget_jack.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -46,10 +46,9 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 {
 	// Initialize preset stuff...
 	//initPreset();
-	updateParamValues(drumkv1::NUM_PARAMS);
-
 	refreshElements();
 	activateElement();
+	updateParamValues(drumkv1::NUM_PARAMS);
 }
 
 
