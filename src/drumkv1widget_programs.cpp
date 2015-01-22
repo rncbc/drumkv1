@@ -381,6 +381,8 @@ QTreeWidgetItem *drumkv1widget_programs::newProgramItem (void)
 	else
 		pProgItem = pItem;
 	if (pBankItem == NULL)
+		pBankItem = QTreeWidget::topLevelItem(0);
+	if (pBankItem == NULL)
 		pBankItem = newBankItem();
 	if (pBankItem == NULL)
 		return NULL;
