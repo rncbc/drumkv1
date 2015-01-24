@@ -202,7 +202,11 @@ drumkv1widget_programs::drumkv1widget_programs ( QWidget *pParent )
 	QTreeWidget::setSelectionMode(QAbstractItemView::SingleSelection);
 
 	QHeaderView *pHeaderView = QTreeWidget::header();
+#if QT_VERSION < 0x050000
 	pHeaderView->setResizeMode(QHeaderView::ResizeToContents);
+#else
+	pHeaderView->setSectionResizeMode(QHeaderView::ResizeToContents);
+#endif
 	pHeaderView->hide();
 
 	QTreeWidget::setItemDelegate(new drumkv1widget_programs_item_delegate(this));
