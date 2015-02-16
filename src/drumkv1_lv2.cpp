@@ -202,13 +202,13 @@ void drumkv1_lv2::run ( uint32_t nframes )
 					lv2_atom_object_get(object,
 						m_urids.time_beatsPerMinute, &atom, NULL);
 					if (atom && atom->type == m_urids.atom_Float) {
-						const float *bpmsync = paramPort(drumkv1::DEL1_BPMSYNC);
-						if (bpmsync && *bpmsync > 0.0f) {
-							float *bpmhost = paramPort(drumkv1::DEL1_BPMHOST);
-							if (bpmhost) {
+						const float bpm_sync = paramValue(drumkv1::DEL1_BPMSYNC);
+						if (bpm_sync > 0.0f) {
+							const float bpm_host = paramValue(drumkv1::DEL1_BPMHOST);
+							if (bpm_host > 0.0f) {
 								const float bpm	= ((LV2_Atom_Float *) atom)->body;
-								if (::fabs(*bpmhost - bpm) > 0.01f)
-									*bpmhost = bpm;
+								if (::fabs(bpm_host - bpm) > 0.01f)
+									setParamValue(drumkv1::DEL1_BPMHOST, bpm);
 							}
 						}
 					}
