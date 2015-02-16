@@ -82,9 +82,7 @@ drumkv1_nsm *drumkv1widget_jack::nsmClient (void) const
 void drumkv1widget_jack::updateParam (
 	drumkv1::ParamIndex index, float fValue ) const
 {
-	float *pParamPort = m_pDrumk->paramPort(index);
-	if (pParamPort)
-		*pParamPort = fValue;
+	m_pDrumk->setParamValue(index, fValue);
 }
 
 

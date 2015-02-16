@@ -151,6 +151,9 @@ public:
 	void setParamPort(ParamIndex index, float *pfParam);
 	float *paramPort(ParamIndex index) const;
 
+	void setParamValue(ParamIndex index, float fValue);
+	float paramValue(ParamIndex index) const;
+
 	void resetParamValues(bool bSwap);
 	void reset();
 

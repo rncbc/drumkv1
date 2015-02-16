@@ -788,7 +788,10 @@ public:
 	bool isReverse() const;
 
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
-	float *paramPort(drumkv1::ParamIndex index);
+	float *paramPort(drumkv1::ParamIndex index) const;
+
+	void setParamValue(drumkv1::ParamIndex index, float fValue);
+	float paramValue(drumkv1::ParamIndex index) const;
 
 	drumkv1_programs *programs();
 
@@ -1208,7 +1211,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 }
 
 
-float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
+float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index ) const
 {
 	float *pfParam = 0;
 
@@ -1255,6 +1258,21 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	}
 
 	return pfParam;
+}
+
+
+void drumkv1_impl::setParamValue ( drumkv1::ParamIndex index, float fValue )
+{
+	float *pfParamPort = paramPort(index);
+	if (pfParamPort)
+		*pfParamPort = fValue;
+}
+
+
+float drumkv1_impl::paramValue ( drumkv1::ParamIndex index ) const
+{
+	float *pfParamPort = paramPort(index);
+	return (pfParamPort ? *pfParamPort : 0.0f);
 }
 
 
@@ -1888,6 +1906,17 @@ void drumkv1::setParamPort ( ParamIndex index, float *pfParam )
 float *drumkv1::paramPort ( ParamIndex index ) const
 {
 	return m_pImpl->paramPort(index);
+}
+
+
+void drumkv1::setParamValue ( ParamIndex index, float fValue )
+{
+	m_pImpl->setParamValue(index, fValue);
+}
+
+float drumkv1::paramValue ( ParamIndex index ) const
+{
+	return m_pImpl->paramValue(index);
 }
 
 

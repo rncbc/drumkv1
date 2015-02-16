@@ -530,21 +530,18 @@ void drumkv1widget::setParamValue (
 
 float drumkv1widget::paramValue ( drumkv1::ParamIndex index ) const
 {
-	float fParamValue = 0.0f;
+	float fValue = 0.0f;
 
 	drumkv1widget_knob *pKnob = paramKnob(index);
 	if (pKnob) {
-		fParamValue = pKnob->value();
+		fValue = pKnob->value();
 	} else {
 		drumkv1 *pDrumk = instance();
-		if (pDrumk) {
-			const float *pParamPort = pDrumk->paramPort(index);
-			if (pParamPort)
-				fParamValue = *pParamPort;
-		}
+		if (pDrumk)
+			fValue = pDrumk->paramValue(index);
 	}
 
-	return fParamValue;
+	return fValue;
 }
 
 
@@ -697,11 +694,9 @@ void drumkv1widget::updateParamValues ( uint32_t nparams )
 
 	for (uint32_t i = 0; i < nparams; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		float fValue = drumkv1_param::paramDefaultValue(index);
-		const float *pfParamPort
-			= (pDrumk ? pDrumk->paramPort(index) : NULL);
-		if (pfParamPort)
-			fValue = *pfParamPort;
+		const float fValue = (pDrumk
+			? pDrumk->paramValue(index)
+			: drumkv1_param::paramDefaultValue(index));
 		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
 	//	updateParamEx(index, fValue);
@@ -1171,13 +1166,10 @@ void drumkv1widget::bpmSyncChanged (void)
 	++m_iUpdate;
 	drumkv1 *pDrumk = instance();
 	if (pDrumk) {
-		float *pBpmSync = pDrumk->paramPort(drumkv1::DEL1_BPMSYNC);
-		if (pBpmSync) {
-			const bool bBpmSync0 = (*pBpmSync > 0.0f);
-			const bool bBpmSync1 = m_ui.Del1BpmKnob->isSpecialValue();
-			if ((bBpmSync1 && !bBpmSync0) || (!bBpmSync1 && bBpmSync0))
-				*pBpmSync = (bBpmSync1 ? 1.0f : 0.0f);
-		}
+		const bool bBpmSync0 = (pDrumk->paramValue(drumkv1::DEL1_BPMSYNC) > 0.0f);
+		const bool bBpmSync1 = m_ui.Del1BpmKnob->isSpecialValue();
+		if ((bBpmSync1 && !bBpmSync0) || (!bBpmSync1 && bBpmSync0))
+			pDrumk->setParamValue(drumkv1::DEL1_BPMSYNC, (bBpmSync1 ? 1.0f : 0.0f));
 	}
 	--m_iUpdate;
 }

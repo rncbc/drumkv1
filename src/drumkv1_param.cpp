@@ -191,7 +191,7 @@ void drumkv1_param::loadElements (
 							const QString& sName = eParam.attribute("name");
 							if (!sName.isEmpty() && s_hash.contains(sName))
 								index = s_hash.value(sName);
-							float fValue = eParam.text().toFloat();
+							const float fValue = eParam.text().toFloat();
 							element->setParamValue(index, fValue);
 						}
 					}
@@ -231,9 +231,8 @@ void drumkv1_param::saveElements (
 			eParam.setAttribute("index", QString::number(i));
 			eParam.setAttribute("name", drumkv1_default_params[i].name);
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-			float *pfParam = element->paramPort(index);
-			eParam.appendChild(doc.createTextNode(QString::number(
-				pfParam ? *pfParam : element->paramValue(index))));
+			eParam.appendChild(doc.createTextNode(
+				QString::number(element->paramValue(index))));
 			eParams.appendChild(eParam);
 		}
 		eElement.appendChild(eParams);
@@ -308,14 +307,12 @@ void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 									continue;
 								index = s_hash.value(sName);
 							}
-							float fParamValue = eParam.text().toFloat();
+							float fValue = eParam.text().toFloat();
 						#if 1//--legacy support < 0.3.0.4
-							if (index == drumkv1::DEL1_BPM && fParamValue < 3.6f)
-								fParamValue *= 100.0f;
+							if (index == drumkv1::DEL1_BPM && fValue < 3.6f)
+								fValue *= 100.0f;
 						#endif
-							float *pfParamPort = pDrumk->paramPort(index);
-							if (pfParamPort)
-								*pfParamPort = fParamValue;
+							pDrumk->setParamValue(index, fValue);
 						}
 					}
 				}
@@ -355,12 +352,8 @@ void drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		eParam.setAttribute("index", QString::number(i));
 		eParam.setAttribute("name", drumkv1_param::paramName(index));
-		const float *pfParamPort = pDrumk->paramPort(index);
-		float fParamValue = 0.0f;
-		if (pfParamPort)
-			fParamValue = *pfParamPort;
-		eParam.appendChild(
-			doc.createTextNode(QString::number(fParamValue)));
+		const float fValue = pDrumk->paramValue(index);
+		eParam.appendChild(doc.createTextNode(QString::number(fValue)));
 		eParams.appendChild(eParam);
 	}
 	ePreset.appendChild(eParams);
