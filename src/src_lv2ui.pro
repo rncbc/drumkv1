@@ -10,6 +10,8 @@ include(src_lv2.pri)
 
 HEADERS = \
 	config.h \
+	drumkv1.h \
+	drumkv1_lv2.h \
 	drumkv1_config.h \
 	drumkv1_param.h \
 	drumkv1widget.h \
@@ -26,7 +28,6 @@ HEADERS = \
 	drumkv1widget_lv2.h
 
 SOURCES = \
-	drumkv1_param.cpp \
 	drumkv1widget.cpp \
 	drumkv1widget_env.cpp \
 	drumkv1widget_filt.cpp \
