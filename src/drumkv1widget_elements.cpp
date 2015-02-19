@@ -1,7 +1,7 @@
 // drumkv1widget_elements.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -23,7 +23,7 @@
 
 #include "drumkv1widget.h"
 
-#include "drumkv1.h"
+#include "drumkv1_ui.h"
 
 #include <QAbstractItemModel>
 #include <QHeaderView>
@@ -38,7 +38,7 @@ class drumkv1widget_elements_model : public QAbstractItemModel
 public:
 
 	// Constructor.
-	drumkv1widget_elements_model(drumkv1 *pDrumk, QObject *pParent = NULL);
+	drumkv1widget_elements_model(drumkv1_ui *pDrumkUi, QObject *pParent = NULL);
 
 	// Concretizers (virtual).
 	int rowCount(const QModelIndex& parent = QModelIndex()) const;
@@ -55,7 +55,7 @@ public:
 	void reset();
 
 	// Accessor specific.
-	drumkv1 *instance() const;
+	drumkv1_ui *instance() const;
 
 protected:
 
@@ -72,14 +72,14 @@ private:
 	// Model variables.
 	QStringList m_headers;
 
-	drumkv1 *m_pDrumk;
+	drumkv1_ui *m_pDrumkUi;
 };
 
 
 // Constructor.
 drumkv1widget_elements_model::drumkv1widget_elements_model (
-	drumkv1 *pDrumk, QObject *pParent )
-	: QAbstractItemModel(pParent), m_pDrumk(pDrumk)
+	drumkv1_ui *pDrumkUi, QObject *pParent )
+	: QAbstractItemModel(pParent), m_pDrumkUi(pDrumkUi)
 {
 	m_headers
 		<< tr("Element")
@@ -140,7 +140,7 @@ QVariant drumkv1widget_elements_model::data (
 QModelIndex drumkv1widget_elements_model::index (
 	int row, int column, const QModelIndex& /*parent*/) const
 {
-	return createIndex(row, column, (m_pDrumk ? m_pDrumk->element(row) : NULL));
+	return createIndex(row, column, (m_pDrumkUi ? m_pDrumkUi->element(row) : NULL));
 }
 
 
@@ -157,9 +157,9 @@ drumkv1_element *drumkv1widget_elements_model::elementFromIndex (
 }
 
 
-drumkv1 *drumkv1widget_elements_model::instance (void) const
+drumkv1_ui *drumkv1widget_elements_model::instance (void) const
 {
-	return m_pDrumk;
+	return m_pDrumkUi;
 }
 
 
@@ -236,12 +236,12 @@ drumkv1widget_elements::~drumkv1widget_elements (void)
 
 
 // Settlers.
-void drumkv1widget_elements::setInstance ( drumkv1 *pDrumk )
+void drumkv1widget_elements::setInstance ( drumkv1_ui *pDrumkUi )
 {
 	if (m_pModel)
 		delete m_pModel;
 
-	m_pModel = new drumkv1widget_elements_model(pDrumk);
+	m_pModel = new drumkv1widget_elements_model(pDrumkUi);
 
 	QTreeView::setModel(m_pModel);
 
@@ -273,7 +273,7 @@ void drumkv1widget_elements::setInstance ( drumkv1 *pDrumk )
 }
 
 
-drumkv1 *drumkv1widget_elements::instance (void) const
+drumkv1_ui *drumkv1widget_elements::instance (void) const
 {
 	return (m_pModel ? m_pModel->instance() : NULL);
 }

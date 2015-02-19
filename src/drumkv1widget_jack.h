@@ -53,7 +53,7 @@ public:
 protected:
 
 	// Synth engine accessor.
-	drumkv1 *instance() const;
+	drumkv1_ui *ui_instance() const;
 
 	// Param port method.
 	void updateParam(drumkv1::ParamIndex index, float fValue) const;
@@ -73,7 +73,7 @@ protected:
 private:
 
 	// Instance variables.
-	drumkv1_jack *m_pDrumk;
+	drumkv1_jack *m_pDrumkUi;
 
 #ifdef CONFIG_NSM
 	drumkv1_nsm *m_pNsmClient;

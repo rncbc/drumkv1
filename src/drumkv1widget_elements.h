@@ -1,7 +1,7 @@
 // drumkv1widget_elements.h
 //
 /****************************************************************************
-   Copyright (C) 2012, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -28,7 +28,7 @@
 // Forwards.
 class drumkv1widget_elements_model;
 
-class drumkv1;
+class drumkv1_ui;
 
 
 //----------------------------------------------------------------------------
@@ -47,8 +47,8 @@ public:
 	~drumkv1widget_elements();
 
 	// Settlers.
-	void setInstance(drumkv1 *pDrumk);
-	drumkv1 *instance() const;
+	void setInstance(drumkv1_ui *pDrumkUi);
+	drumkv1_ui *instance() const;
 
 	// Current element accessors.
 	void setCurrentIndex(int row);

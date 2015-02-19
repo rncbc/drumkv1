@@ -22,7 +22,7 @@
 #ifndef __drumkv1_jack_h
 #define __drumkv1_jack_h
 
-#include "drumkv1.h"
+#include "drumkv1_ui.h"
 
 #include <jack/jack.h>
 
@@ -39,7 +39,7 @@ class drumkv1_alsa_thread;
 // drumkv1_jack - decl.
 //
 
-class drumkv1_jack : public drumkv1
+class drumkv1_jack : public drumkv1_ui
 {
 public:
 
@@ -71,6 +71,8 @@ public:
 #endif
 
 private:
+
+	drumkv1 *m_drumk;
 
 	jack_client_t *m_client;
 

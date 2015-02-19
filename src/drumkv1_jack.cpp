@@ -136,8 +136,10 @@ static void drumkv1_jack_session_event (
 // drumkv1_jack - impl.
 //
 
-drumkv1_jack::drumkv1_jack (void) : drumkv1(2)
+drumkv1_jack::drumkv1_jack (void) : drumkv1_ui(new drumkv1(2))
 {
+	m_drumk = drumkv1_ui::instance();
+
 	m_client = NULL;
 
 	m_activated = false;
@@ -147,7 +149,7 @@ drumkv1_jack::drumkv1_jack (void) : drumkv1(2)
 
 	m_ins = m_outs = NULL;
 
-	::memset(m_params, 0, NUM_PARAMS * sizeof(float));
+	::memset(m_params, 0, drumkv1::NUM_PARAMS * sizeof(float));
 
 #ifdef CONFIG_JACK_MIDI
 	m_midi_in = NULL;
@@ -172,6 +174,8 @@ drumkv1_jack::~drumkv1_jack (void)
 {
 	deactivate();
 	close();
+
+	delete m_drumk;
 }
 
 
@@ -186,7 +190,7 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 	if (!m_activated)
 		return 0;
 
-	const uint16_t nchannels = channels();
+	const uint16_t nchannels = m_drumk->channels();
 	float *ins[nchannels], *outs[nchannels];
 	for (uint16_t k = 0; k < nchannels; ++k) {
 		ins[k]  = static_cast<float *> (
@@ -220,14 +224,14 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 			::jack_midi_event_get(&event, midi_in, n);
 			uint32_t nread = event.time - ndelta;
 			if (nread > 0) {
-				drumkv1::process(ins, outs, nread);
+				m_drumk->process(ins, outs, nread);
 				for (uint16_t k = 0; k < nchannels; ++k) {
 					ins[k]  += nread;
 					outs[k] += nread;
 				}
 			}
 			ndelta = event.time;
-			drumkv1::process_midi(event.buffer, event.size);
+			m_drumk->process_midi(event.buffer, event.size);
 		}
 	}
 #endif
@@ -248,7 +252,7 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 		if (event_time > ndelta) {
 			const uint32_t nread = event_time - ndelta;
 			if (nread > 0) {
-				drumkv1::process(ins, outs, nread);
+				m_drumk->process(ins, outs, nread);
 				for (uint16_t k = 0; k < nchannels; ++k) {
 					ins[k]  += nread;
 					outs[k] += nread;
@@ -258,11 +262,11 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 		}
 		::jack_ringbuffer_read_advance(m_alsa_buffer, sizeof(event));
 		::jack_ringbuffer_read(m_alsa_buffer, (char *) event_buffer, event.size);
-		drumkv1::process_midi(event_buffer, event.size);
+		m_drumk->process_midi(event_buffer, event.size);
 	}
 #endif // CONFIG_ALSA_MIDI
 
-	drumkv1::process(ins, outs, nframes - ndelta);
+	m_drumk->process(ins, outs, nframes - ndelta);
 
 	return 0;
 }
@@ -274,7 +278,7 @@ void drumkv1_jack::open ( const char *client_id )
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		m_params[i] = drumkv1_param::paramDefaultValue(index);
-		drumkv1::setParamPort(index, &m_params[i]);
+		m_drumk->setParamPort(index, &m_params[i]);
 	}
 
 	// open client
@@ -283,11 +287,11 @@ void drumkv1_jack::open ( const char *client_id )
 		return;
 
 	// set sample rate
-	drumkv1::setSampleRate(jack_get_sample_rate(m_client));
-//	drumkv1::reset();
+	m_drumk->setSampleRate(jack_get_sample_rate(m_client));
+//	m_drumk->reset();
 
 	// register audio ports & buffers
-	uint16_t nchannels = channels();
+	uint16_t nchannels = m_drumk->channels();
 
 	m_audio_ins  = new jack_port_t * [nchannels];
 	m_audio_outs = new jack_port_t * [nchannels];
@@ -351,7 +355,7 @@ void drumkv1_jack::open ( const char *client_id )
 void drumkv1_jack::activate (void)
 {
 	if (!m_activated) {
-		drumkv1::reset();
+		m_drumk->reset();
 		if (m_client) {
 			::jack_activate(m_client);
 			m_activated = true;
@@ -409,7 +413,7 @@ void drumkv1_jack::close (void)
 #endif
 
 	// unregister audio ports
-	const uint16_t nchannels = channels();
+	const uint16_t nchannels = m_drumk->channels();
 
 	for (uint16_t k = 0; k < nchannels; ++k) {
 		if (m_audio_outs && m_audio_outs[k]) {

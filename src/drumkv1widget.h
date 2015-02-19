@@ -26,7 +26,7 @@
 
 #include "drumkv1_config.h"
 
-#include "drumkv1.h"
+#include "drumkv1_ui.h"
 
 
 // forward decls.
@@ -133,7 +133,7 @@ protected slots:
 protected:
 
 	// Synth engine accessor.
-	virtual drumkv1 *instance() const = 0;
+	virtual drumkv1_ui *ui_instance() const = 0;
 
 	// Reload all elements.
 	void refreshElements();

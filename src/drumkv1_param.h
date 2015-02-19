@@ -22,7 +22,7 @@
 #ifndef __drumkv1_param_h
 #define __drumkv1_param_h
 
-#include "drumkv1.h"
+#include "drumkv1_ui.h"
 
 #include <QString>
 
@@ -47,17 +47,17 @@ namespace drumkv1_param
 	};
 
 	// Element serialization methods.
-	void loadElements(drumkv1 *pDrumk,
+	void loadElements(drumkv1_ui *pDrumkUi,
 		const QDomElement& eElements,
 		const map_path& mapPath = map_path());
-	void saveElements(drumkv1 *pDrumk,
+	void saveElements(drumkv1_ui *pDrumkUi,
 		QDomDocument& doc, QDomElement& eElements,
 		const map_path& mapPath = map_path());
 
 	// Preset serialization methods.
-	void loadPreset(drumkv1 *pDrumk,
+	void loadPreset(drumkv1_ui *pDrumkUi,
 		const QString& sFilename);
-	void savePreset(drumkv1 *pDrumk,
+	void savePreset(drumkv1_ui *pDrumkUi,
 		const QString& sFilename);
 
 	// Default parameter name/value helpers.

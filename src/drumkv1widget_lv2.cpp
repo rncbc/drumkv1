@@ -1,7 +1,7 @@
 // drumkv1widget_lv2.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -34,9 +34,9 @@
 //
 
 // Constructor.
-drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
+drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumkUi,
 	LV2UI_Controller controller, LV2UI_Write_Function write_function )
-	: drumkv1widget(), m_pDrumk(pDrumk)
+	: drumkv1widget(), m_pDrumkUi(pDrumkUi)
 {
 	m_controller = controller;
 	m_write_function = write_function;
@@ -58,9 +58,9 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 
 
 // Synth engine accessor.
-drumkv1 *drumkv1widget_lv2::instance (void) const
+drumkv1_ui *drumkv1widget_lv2::ui_instance (void) const
 {
-	return m_pDrumk;
+	return m_pDrumkUi;
 }
 
 

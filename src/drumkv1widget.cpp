@@ -536,9 +536,9 @@ float drumkv1widget::paramValue ( drumkv1::ParamIndex index ) const
 	if (pKnob) {
 		fValue = pKnob->value();
 	} else {
-		drumkv1 *pDrumk = instance();
-		if (pDrumk)
-			fValue = pDrumk->paramValue(index);
+		drumkv1_ui *pDrumkUi = ui_instance();
+		if (pDrumkUi)
+			fValue = pDrumkUi->paramValue(index);
 	}
 
 	return fValue;
@@ -568,8 +568,8 @@ void drumkv1widget::paramChanged ( float fValue )
 // Update local tied widgets.
 void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 {
-	drumkv1 *pDrumk = instance();
-	if (pDrumk == NULL)
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
 		return;
 
 	++m_iUpdate;
@@ -598,11 +598,11 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 // Reset all param knobs to default values.
 void drumkv1widget::resetParams (void)
 {
-	drumkv1 *pDrumk = instance();
-	if (pDrumk == NULL)
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
 		return;
 
-	pDrumk->reset();
+	pDrumkUi->reset();
 
 	resetSwapParams();
 
@@ -633,10 +633,11 @@ void drumkv1widget::swapParams ( bool bOn )
 #endif
 //	resetParamKnobs(drumkv1::NUM_PARAMS);
 
-	drumkv1 *pDrumk = instance();
-	if (pDrumk) {
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi) {
 		// Save current element param values...
-		drumkv1_element *element = pDrumk->element(pDrumk->currentElement());
+		const int key = pDrumkUi->currentElement();
+		drumkv1_element *element = pDrumkUi->element(key);
 		if (element) {
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
@@ -648,7 +649,7 @@ void drumkv1widget::swapParams ( bool bOn )
 			}
 		}
 		// Swap all element params A/B...
-		pDrumk->resetParamValues(true);
+		pDrumkUi->resetParamValues(true);
 		// Retrieve current element param values...
 		if (element) {
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -690,12 +691,12 @@ void drumkv1widget::updateParamValues ( uint32_t nparams )
 {
 	resetSwapParams();
 
-	drumkv1 *pDrumk = instance();
+	drumkv1_ui *pDrumkUi = ui_instance();
 
 	for (uint32_t i = 0; i < nparams; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		const float fValue = (pDrumk
-			? pDrumk->paramValue(index)
+		const float fValue = (pDrumkUi
+			? pDrumkUi->paramValue(index)
 			: drumkv1_param::paramDefaultValue(index));
 		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
@@ -759,9 +760,9 @@ void drumkv1widget::newPreset (void)
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 	resetParamValues(drumkv1::NUM_PARAMS);
 
-	drumkv1 *pDrumk = instance();
-	if (pDrumk)
-		pDrumk->reset();
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi)
+		pDrumkUi->reset();
 
 	refreshElements();
 	activateElement();
@@ -785,11 +786,11 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 	resetParamValues(drumkv1::NUM_PARAMS);
 
-	drumkv1 *pDrumk = instance();
-	if (pDrumk == NULL)
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
 		return;
 
-	drumkv1_param::loadPreset(pDrumk, sFilename);
+	drumkv1_param::loadPreset(pDrumkUi, sFilename);
 
 	updateLoadPreset(QFileInfo(sFilename).completeBaseName());
 }
@@ -801,7 +802,7 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 	qDebug("drumkv1widget::savePreset(\"%s\")", sFilename.toUtf8().constData());
 #endif
 
-	drumkv1_param::savePreset(instance(), sFilename);
+	drumkv1_param::savePreset(ui_instance(), sFilename);
 
 	const QString& sPreset
 		= QFileInfo(sFilename).completeBaseName();
@@ -845,9 +846,9 @@ void drumkv1widget::clearSampleFile (void)
 	qDebug("drumkv1widget::clearSampleFile()");
 #endif
 
-	drumkv1 *pDrumk = instance();
-	if (pDrumk)
-		pDrumk->setSampleFile(NULL);
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi)
+		pDrumkUi->setSampleFile(NULL);
 
 	updateSample(NULL);
 }
@@ -860,23 +861,23 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 	qDebug("drumkv1widget::loadSampleFile(\"%s\")", sFilename.toUtf8().constData());
 #endif
 
-	drumkv1 *pDrumk = instance();
-	if (pDrumk == NULL)
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
 		return;
 
 	const int note = currentNote();
 	if (note < 0)
 		return;
 
-	drumkv1_element *element = pDrumk->element(note);
+	drumkv1_element *element = pDrumkUi->element(note);
 	if (element == NULL) {
-		element = pDrumk->addElement(note);
+		element = pDrumkUi->addElement(note);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			float fValue = drumkv1_param::paramDefaultValue(index);
 			element->setParamValue(index, fValue);
 		}
-		pDrumk->setCurrentElement(note);
+		pDrumkUi->setCurrentElement(note);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			setParamValue(index, element->paramValue(index));
@@ -884,8 +885,8 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 		activateParamKnobs(true);
 	}
 
-	pDrumk->setSampleFile(sFilename.toUtf8().constData());
-	updateSample(pDrumk->sample(), true);
+	pDrumkUi->setSampleFile(sFilename.toUtf8().constData());
+	updateSample(pDrumkUi->sample(), true);
 
 	refreshElements();
 }
@@ -1028,7 +1029,7 @@ void drumkv1widget::refreshElements (void)
 	const bool bBlockSignals = m_ui.Elements->blockSignals(true);
 
 	if (m_ui.Elements->instance() == NULL)
-		m_ui.Elements->setInstance(instance());
+		m_ui.Elements->setInstance(ui_instance());
 
 	int iCurrentNote = currentNote();
 
@@ -1049,9 +1050,9 @@ void drumkv1widget::refreshElements (void)
 // All element clear.
 void drumkv1widget::clearElements (void)
 {
-	drumkv1 *pDrumk = instance();
-	if (pDrumk)
-		pDrumk->clearElements();
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi)
+		pDrumkUi->clearElements();
 }
 
 
@@ -1066,13 +1067,13 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 	qDebug("drumkv1widget::activateElement(%d)", iCurrentNote);
 #endif
 
-	drumkv1 *pDrumk = instance();
-	if (pDrumk == NULL)
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
 		return;
 
-	drumkv1_element *element = pDrumk->element(iCurrentNote);
+	drumkv1_element *element = pDrumkUi->element(iCurrentNote);
 	if (element == NULL && bOpenSample) {
-		element = pDrumk->addElement(iCurrentNote);
+		element = pDrumkUi->addElement(iCurrentNote);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			float fValue = drumkv1_param::paramDefaultValue(index);
@@ -1081,7 +1082,7 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 		}
 	}
 
-	pDrumk->setCurrentElement(iCurrentNote);
+	pDrumkUi->setCurrentElement(iCurrentNote);
 
 	resetParamKnobs(drumkv1::NUM_ELEMENT_PARAMS);
 
@@ -1094,7 +1095,7 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 			const float fValue = element->paramValue(index);
 			setParamValue(index, fValue);
 		}
-		updateSample(pDrumk->sample());
+		updateSample(pDrumkUi->sample());
 		refreshElements();
 	} else {
 		updateSample(NULL);
@@ -1123,9 +1124,10 @@ void drumkv1widget::resetElement (void)
 {
 	clearSampleFile();
 
-	drumkv1 *pDrumk = instance();
-	if (pDrumk) {
-		pDrumk->removeElement(pDrumk->currentElement());
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi) {
+		const int key = pDrumkUi->currentElement();
+		pDrumkUi->removeElement(key);
 		updateDirtyPreset(true);
 	}
 
@@ -1164,12 +1166,12 @@ void drumkv1widget::bpmSyncChanged (void)
 		return;
 
 	++m_iUpdate;
-	drumkv1 *pDrumk = instance();
-	if (pDrumk) {
-		const bool bBpmSync0 = (pDrumk->paramValue(drumkv1::DEL1_BPMSYNC) > 0.0f);
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi) {
+		const bool bBpmSync0 = (pDrumkUi->paramValue(drumkv1::DEL1_BPMSYNC) > 0.0f);
 		const bool bBpmSync1 = m_ui.Del1BpmKnob->isSpecialValue();
 		if ((bBpmSync1 && !bBpmSync0) || (!bBpmSync1 && bBpmSync0))
-			pDrumk->setParamValue(drumkv1::DEL1_BPMSYNC, (bBpmSync1 ? 1.0f : 0.0f));
+			pDrumkUi->setParamValue(drumkv1::DEL1_BPMSYNC, (bBpmSync1 ? 1.0f : 0.0f));
 	}
 	--m_iUpdate;
 }
@@ -1185,15 +1187,17 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 	QMenu menu(this);
 	QAction *pAction;
 
-	drumkv1 *pDrumk = instance();
+	drumkv1_ui *pDrumkUi = ui_instance();
 	drumkv1_element *element = NULL;
-	if (pDrumk)
-		element = pDrumk->element(pDrumk->currentElement());
+	if (pDrumkUi) {
+		const int key = pDrumkUi->currentElement();
+		element = pDrumkUi->element(key);
+	}
 
 	pAction = menu.addAction(
 		QIcon(":/images/fileOpen.png"),
 		tr("Open Sample..."), this, SLOT(openSample()));
-	pAction->setEnabled(pDrumk != NULL);
+	pAction->setEnabled(pDrumkUi != NULL);
 	menu.addSeparator();
 	pAction = menu.addAction(
 		tr("Reset"), this, SLOT(resetElement()));
@@ -1225,8 +1229,8 @@ void drumkv1widget::updateLoadPreset ( const QString& sPreset )
 // Notification updater.
 void drumkv1widget::updateSchedNotify ( int stype )
 {
-	drumkv1 *pDrumk = instance();
-	if (pDrumk == NULL)
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
 		return;
 
 #ifdef CONFIG_DEBUG
@@ -1235,13 +1239,13 @@ void drumkv1widget::updateSchedNotify ( int stype )
 
 	switch (drumkv1_sched::Type(stype)) {
 	case drumkv1_sched::Programs: {
-		drumkv1_programs *pPrograms = pDrumk->programs();
+		drumkv1_programs *pPrograms = pDrumkUi->programs();
 		drumkv1_programs::Prog *pProg = pPrograms->current_prog();
 		if (pProg) updateLoadPreset(pProg->name());
 		break;
 	}
 	case drumkv1_sched::Sample:
-		updateSample(pDrumk->sample());
+		updateSample(pDrumkUi->sample());
 		// Fall thru...
 	default:
 		break;
@@ -1252,14 +1256,14 @@ void drumkv1widget::updateSchedNotify ( int stype )
 // Menu actions.
 void drumkv1widget::helpConfigure (void)
 {
-	drumkv1 *pDrumk = instance();
-	if (pDrumk == NULL)
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
 		return;
 
 	drumkv1widget_config form(this);
 
 	// Set programs database...
-	form.setPrograms(pDrumk->programs());
+	form.setPrograms(pDrumkUi->programs());
 	form.exec();
 }
 

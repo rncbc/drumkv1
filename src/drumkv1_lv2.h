@@ -22,7 +22,7 @@
 #ifndef __drumkv1_lv2_h
 #define __drumkv1_lv2_h
 
-#include "drumkv1.h"
+#include "drumkv1_ui.h"
 
 #include "lv2.h"
 #include "lv2/lv2plug.in/ns/ext/urid/urid.h"
@@ -42,7 +42,7 @@
 // drumkv1_lv2 - decl.
 //
 
-class drumkv1_lv2 : public drumkv1
+class drumkv1_lv2 : public drumkv1_ui
 {
 public:
 
@@ -77,6 +77,8 @@ public:
 private:
 
 	LV2_URID_Map *m_urid_map;
+
+	drumkv1 *m_drumk;
 
 	struct lv2_urids
 	{

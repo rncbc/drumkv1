@@ -38,8 +38,8 @@
 //
 
 // Constructor.
-drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
-	: drumkv1widget(), m_pDrumk(pDrumk)
+drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumkUi )
+	: drumkv1widget(), m_pDrumkUi(pDrumkUi)
 	#ifdef CONFIG_NSM
 		, m_pNsmClient(NULL)
 	#endif
@@ -48,14 +48,15 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 	//initPreset();
 	refreshElements();
 	activateElement();
+
 	updateParamValues(drumkv1::NUM_PARAMS);
 }
 
 
 // Synth engine accessor.
-drumkv1 *drumkv1widget_jack::instance (void) const
+drumkv1_ui *drumkv1widget_jack::ui_instance (void) const
 {
-	return m_pDrumk;
+	return m_pDrumkUi;
 }
 
 #ifdef CONFIG_NSM
@@ -82,7 +83,7 @@ drumkv1_nsm *drumkv1widget_jack::nsmClient (void) const
 void drumkv1widget_jack::updateParam (
 	drumkv1::ParamIndex index, float fValue ) const
 {
-	m_pDrumk->setParamValue(index, fValue);
+	m_pDrumkUi->setParamValue(index, fValue);
 }
 
 

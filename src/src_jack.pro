@@ -10,6 +10,7 @@ include(src_jack.pri)
 HEADERS = \
 	config.h \
 	drumkv1.h \
+	drumkv1_ui.h \
 	drumkv1_jack.h \
 	drumkv1_config.h \
 	drumkv1_sample.h \
@@ -37,6 +38,7 @@ HEADERS = \
 
 SOURCES = \
 	drumkv1.cpp \
+	drumkv1_ui.cpp \
 	drumkv1_jack.cpp \
 	drumkv1_config.cpp \
 	drumkv1_sample.cpp \
