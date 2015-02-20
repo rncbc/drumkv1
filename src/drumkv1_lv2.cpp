@@ -98,10 +98,8 @@ private:
 
 drumkv1_lv2::drumkv1_lv2 (
 	double sample_rate, const LV2_Feature *const *host_features )
-	: drumkv1_ui(new drumkv1(2, uint32_t(sample_rate)))
+	: drumkv1(2, uint32_t(sample_rate))
 {
-	m_drumk = drumkv1_ui::instance();
-
 	m_urid_map = NULL;
 	m_atom_sequence = NULL;
 
@@ -126,7 +124,7 @@ drumkv1_lv2::drumkv1_lv2 (
 		}
 	}
 
-	const uint16_t nchannels = m_drumk->channels();
+	const uint16_t nchannels = drumkv1::channels();
 	m_ins  = new float * [nchannels];
 	m_outs = new float * [nchannels];
 	for (uint16_t k = 0; k < nchannels; ++k)
@@ -138,8 +136,6 @@ drumkv1_lv2::~drumkv1_lv2 (void)
 {
 	delete [] m_outs;
 	delete [] m_ins;
-
-	delete m_drumk;
 }
 
 
@@ -162,7 +158,7 @@ void drumkv1_lv2::connect_port ( uint32_t port, void *data )
 		m_outs[1] = (float *) data;
 		break;
 	default:
-		m_drumk->setParamPort(drumkv1::ParamIndex(port - ParamBase), (float *) data);
+		drumkv1::setParamPort(drumkv1::ParamIndex(port - ParamBase), (float *) data);
 		break;
 	}
 }
@@ -170,7 +166,7 @@ void drumkv1_lv2::connect_port ( uint32_t port, void *data )
 
 void drumkv1_lv2::run ( uint32_t nframes )
 {
-	const uint16_t nchannels = m_drumk->channels();
+	const uint16_t nchannels = drumkv1::channels();
 	float *ins[nchannels], *outs[nchannels];
 	for (uint16_t k = 0; k < nchannels; ++k) {
 		ins[k]  = m_ins[k];
@@ -187,14 +183,14 @@ void drumkv1_lv2::run ( uint32_t nframes )
 				uint8_t *data = (uint8_t *) LV2_ATOM_BODY(&event->body);
 				const uint32_t nread = event->time.frames - ndelta;
 				if (nread > 0) {
-					m_drumk->process(ins, outs, nread);
+					drumkv1::process(ins, outs, nread);
 					for (uint16_t k = 0; k < nchannels; ++k) {
 						ins[k]  += nread;
 						outs[k] += nread;
 					}
 				}
 				ndelta = event->time.frames;
-				m_drumk->process_midi(data, event->body.size);
+				drumkv1::process_midi(data, event->body.size);
 			}
 			else
 			if (event->body.type == m_urids.atom_Blank ||
@@ -206,13 +202,13 @@ void drumkv1_lv2::run ( uint32_t nframes )
 					lv2_atom_object_get(object,
 						m_urids.time_beatsPerMinute, &atom, NULL);
 					if (atom && atom->type == m_urids.atom_Float) {
-						const float bpm_sync = paramValue(drumkv1::DEL1_BPMSYNC);
+						const float bpm_sync = drumkv1::paramValue(drumkv1::DEL1_BPMSYNC);
 						if (bpm_sync > 0.0f) {
-							const float bpm_host = paramValue(drumkv1::DEL1_BPMHOST);
+							const float bpm_host = drumkv1::paramValue(drumkv1::DEL1_BPMHOST);
 							if (bpm_host > 0.0f) {
 								const float bpm	= ((LV2_Atom_Float *) atom)->body;
 								if (::fabs(bpm_host - bpm) > 0.01f)
-									setParamValue(drumkv1::DEL1_BPMHOST, bpm);
+									drumkv1::setParamValue(drumkv1::DEL1_BPMHOST, bpm);
 							}
 						}
 					}
@@ -222,19 +218,19 @@ void drumkv1_lv2::run ( uint32_t nframes )
 	//	m_atom_sequence = NULL;
 	}
 
-	m_drumk->process(ins, outs, nframes - ndelta);
+	drumkv1::process(ins, outs, nframes - ndelta);
 }
 
 
 void drumkv1_lv2::activate (void)
 {
-	reset();
+	drumkv1::reset();
 }
 
 
 void drumkv1_lv2::deactivate (void)
 {
-	reset();
+	drumkv1::reset();
 }
 
 
@@ -256,11 +252,11 @@ static LV2_State_Status drumkv1_lv2_state_save ( LV2_Handle instance,
 	if (pPlugin == NULL)
 		return LV2_STATE_ERR_UNKNOWN;
 
-	uint32_t key = pPlugin->urid_map(DRUMKV1_LV2_PREFIX "state");
+	const uint32_t key = pPlugin->urid_map(DRUMKV1_LV2_PREFIX "state");
 	if (key == 0)
 		return LV2_STATE_ERR_NO_PROPERTY;
 
-	uint32_t type = pPlugin->urid_map(LV2_ATOM__Chunk);
+	const uint32_t type = pPlugin->urid_map(LV2_ATOM__Chunk);
 	if (type == 0)
 		return LV2_STATE_ERR_BAD_TYPE;
 #if 0
@@ -292,11 +288,11 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 	if (pPlugin == NULL)
 		return LV2_STATE_ERR_UNKNOWN;
 
-	uint32_t key = pPlugin->urid_map(DRUMKV1_LV2_PREFIX "state");
+	const uint32_t key = pPlugin->urid_map(DRUMKV1_LV2_PREFIX "state");
 	if (key == 0)
 		return LV2_STATE_ERR_NO_PROPERTY;
 
-	uint32_t chunk_type = pPlugin->urid_map(LV2_ATOM__Chunk);
+	const uint32_t chunk_type = pPlugin->urid_map(LV2_ATOM__Chunk);
 	if (chunk_type == 0)
 		return LV2_STATE_ERR_BAD_TYPE;
 
@@ -347,7 +343,7 @@ static const LV2_State_Interface drumkv1_lv2_state_interface =
 
 const LV2_Program_Descriptor *drumkv1_lv2::get_program ( uint32_t index )
 {
-	drumkv1_programs *pPrograms = programs();
+	drumkv1_programs *pPrograms = drumkv1::programs();
 	const drumkv1_programs::Banks& banks = pPrograms->banks();
 	drumkv1_programs::Banks::ConstIterator bank_iter = banks.constBegin();
 	const drumkv1_programs::Banks::ConstIterator& bank_end = banks.constEnd();
@@ -373,7 +369,7 @@ const LV2_Program_Descriptor *drumkv1_lv2::get_program ( uint32_t index )
 
 void drumkv1_lv2::select_program ( uint32_t bank, uint32_t program )
 {
-	programs()->select_program(bank, program);
+	drumkv1::programs()->select_program(bank, program);
 }
 
 #endif	// CONFIG_LV2_PROGRAMS

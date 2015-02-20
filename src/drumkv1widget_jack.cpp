@@ -38,18 +38,28 @@
 //
 
 // Constructor.
-drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumkUi )
-	: drumkv1widget(), m_pDrumkUi(pDrumkUi)
+drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
+	: drumkv1widget(), m_pDrumk(pDrumk)
 	#ifdef CONFIG_NSM
 		, m_pNsmClient(NULL)
 	#endif
 {
+	// Initialize (user) interface stuff...
+	m_pDrumkUi = new drumkv1_ui(m_pDrumk);
+
 	// Initialize preset stuff...
 	//initPreset();
 	refreshElements();
 	activateElement();
 
 	updateParamValues(drumkv1::NUM_PARAMS);
+}
+
+
+// Destructor.
+drumkv1widget_jack::~drumkv1widget_jack (void)
+{
+	delete m_pDrumkUi;
 }
 
 

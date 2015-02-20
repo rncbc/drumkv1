@@ -22,7 +22,7 @@
 #ifndef __drumkv1_jack_h
 #define __drumkv1_jack_h
 
-#include "drumkv1_ui.h"
+#include "drumkv1.h"
 
 #include <jack/jack.h>
 
@@ -39,7 +39,7 @@ class drumkv1_alsa_thread;
 // drumkv1_jack - decl.
 //
 
-class drumkv1_jack : public drumkv1_ui
+class drumkv1_jack : public drumkv1
 {
 public:
 
@@ -72,8 +72,6 @@ public:
 
 private:
 
-	drumkv1 *m_drumk;
-
 	jack_client_t *m_client;
 
 	volatile bool m_activated;
@@ -103,7 +101,7 @@ private:
 
 
 //-------------------------------------------------------------------------
-// drumkv1_application -- Singleton application instance.
+// drumkv1_jack_application -- Singleton application instance.
 //
 
 #include <QObject>
@@ -119,17 +117,17 @@ class drumkv1_nsm;
 #endif
 
 
-class drumkv1_application : public QObject
+class drumkv1_jack_application : public QObject
 {
 	Q_OBJECT
 
 public:
 
 	// Constructor.
-	drumkv1_application(int& argc, char **argv);
+	drumkv1_jack_application(int& argc, char **argv);
 
 	// Destructor.
-	~drumkv1_application();
+	~drumkv1_jack_application();
 
 	// Facade method.
 	int exec();

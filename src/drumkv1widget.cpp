@@ -787,10 +787,8 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 	resetParamValues(drumkv1::NUM_PARAMS);
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
-		return;
-
-	drumkv1_param::loadPreset(pDrumkUi, sFilename);
+	if (pDrumkUi)
+		drumkv1_param::loadPreset(pDrumkUi->instance(), sFilename);
 
 	updateLoadPreset(QFileInfo(sFilename).completeBaseName());
 }
@@ -802,7 +800,9 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 	qDebug("drumkv1widget::savePreset(\"%s\")", sFilename.toUtf8().constData());
 #endif
 
-	drumkv1_param::savePreset(ui_instance(), sFilename);
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi)
+		drumkv1_param::savePreset(pDrumkUi->instance(), sFilename);
 
 	const QString& sPreset
 		= QFileInfo(sFilename).completeBaseName();

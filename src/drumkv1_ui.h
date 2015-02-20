@@ -52,6 +52,8 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
+	drumkv1 *instance() const;
+
 	void setParamValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index) const;
 
@@ -59,10 +61,6 @@ public:
 
 	void resetParamValues(bool bSwap);
 	void reset();
-
-protected:
-
-	drumkv1 *instance() const;
 
 private:
 

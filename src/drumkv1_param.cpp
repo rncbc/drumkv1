@@ -142,13 +142,13 @@ QString drumkv1_param::map_path::abstractPath (
 
 // Element serialization methods.
 void drumkv1_param::loadElements (
-	drumkv1_ui *pDrumkUi, const QDomElement& eElements,
+	drumkv1 *pDrumk, const QDomElement& eElements,
 	const drumkv1_param::map_path& mapPath )
 {
-	if (pDrumkUi == NULL)
+	if (pDrumk == NULL)
 		return;
 
-	pDrumkUi->clearElements();
+	pDrumk->clearElements();
 
 	static QHash<QString, drumkv1::ParamIndex> s_hash;
 	if (s_hash.isEmpty()) {
@@ -164,7 +164,7 @@ void drumkv1_param::loadElements (
 			continue;
 		if (eElement.tagName() == "element") {
 			int note = eElement.attribute("index").toInt();
-			drumkv1_element *element = pDrumkUi->addElement(note);
+			drumkv1_element *element = pDrumk->addElement(note);
 			for (QDomNode nChild = eElement.firstChild();
 					!nChild.isNull();
 						nChild = nChild.nextSibling()) {
@@ -203,14 +203,14 @@ void drumkv1_param::loadElements (
 
 
 void drumkv1_param::saveElements (
-	drumkv1_ui *pDrumkUi, QDomDocument& doc, QDomElement& eElements,
+	drumkv1 *pDrumk, QDomDocument& doc, QDomElement& eElements,
 	const drumkv1_param::map_path& mapPath )
 {
-	if (pDrumkUi == NULL)
+	if (pDrumk == NULL)
 		return;
 
 	for (int note = 0; note < 128; ++note) {
-		drumkv1_element *element = pDrumkUi->element(note);
+		drumkv1_element *element = pDrumk->element(note);
 		if (element == NULL)
 			continue;
 		const char *pszSampleFile = element->sampleFile();
@@ -242,9 +242,9 @@ void drumkv1_param::saveElements (
 
 
 // Preset serialization methods.
-void drumkv1_param::loadPreset ( drumkv1_ui *pDrumkUi, const QString& sFilename )
+void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 {
-	if (pDrumkUi == NULL)
+	if (pDrumk == NULL)
 		return;
 
 	QFileInfo fi(sFilename);
@@ -288,7 +288,7 @@ void drumkv1_param::loadPreset ( drumkv1_ui *pDrumkUi, const QString& sFilename 
 				if (eChild.isNull())
 					continue;
 				if (eChild.tagName() == "elements") {
-					drumkv1_param::loadElements(pDrumkUi, eChild);
+					drumkv1_param::loadElements(pDrumk, eChild);
 				}
 				else
 				if (eChild.tagName() == "params") {
@@ -312,7 +312,7 @@ void drumkv1_param::loadPreset ( drumkv1_ui *pDrumkUi, const QString& sFilename 
 							if (index == drumkv1::DEL1_BPM && fValue < 3.6f)
 								fValue *= 100.0f;
 						#endif
-							pDrumkUi->setParamValue(index, fValue);
+							pDrumk->setParamValue(index, fValue);
 						}
 					}
 				}
@@ -322,15 +322,15 @@ void drumkv1_param::loadPreset ( drumkv1_ui *pDrumkUi, const QString& sFilename 
 
 	file.close();
 
-	pDrumkUi->reset();
+	pDrumk->reset();
 
 	QDir::setCurrent(currentDir.absolutePath());
 }
 
 
-void drumkv1_param::savePreset ( drumkv1_ui *pDrumkUi, const QString& sFilename )
+void drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
 {
-	if (pDrumkUi == NULL)
+	if (pDrumk == NULL)
 		return;
 
 	const QFileInfo fi(sFilename);
@@ -343,7 +343,7 @@ void drumkv1_param::savePreset ( drumkv1_ui *pDrumkUi, const QString& sFilename 
 	ePreset.setAttribute("version", DRUMKV1_VERSION);
 
 	QDomElement eElements = doc.createElement("elements");
-	drumkv1_param::saveElements(pDrumkUi, doc, eElements);
+	drumkv1_param::saveElements(pDrumk, doc, eElements);
 	ePreset.appendChild(eElements);
 
 	QDomElement eParams = doc.createElement("params");
@@ -352,7 +352,7 @@ void drumkv1_param::savePreset ( drumkv1_ui *pDrumkUi, const QString& sFilename 
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		eParam.setAttribute("index", QString::number(i));
 		eParam.setAttribute("name", drumkv1_param::paramName(index));
-		const float fValue = pDrumkUi->paramValue(index);
+		const float fValue = pDrumk->paramValue(index);
 		eParam.appendChild(doc.createTextNode(QString::number(fValue)));
 		eParams.appendChild(eParam);
 	}

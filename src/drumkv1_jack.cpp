@@ -136,10 +136,8 @@ static void drumkv1_jack_session_event (
 // drumkv1_jack - impl.
 //
 
-drumkv1_jack::drumkv1_jack (void) : drumkv1_ui(new drumkv1(2))
+drumkv1_jack::drumkv1_jack (void) : drumkv1(2)
 {
-	m_drumk = drumkv1_ui::instance();
-
 	m_client = NULL;
 
 	m_activated = false;
@@ -174,8 +172,6 @@ drumkv1_jack::~drumkv1_jack (void)
 {
 	deactivate();
 	close();
-
-	delete m_drumk;
 }
 
 
@@ -190,7 +186,7 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 	if (!m_activated)
 		return 0;
 
-	const uint16_t nchannels = m_drumk->channels();
+	const uint16_t nchannels = drumkv1::channels();
 	float *ins[nchannels], *outs[nchannels];
 	for (uint16_t k = 0; k < nchannels; ++k) {
 		ins[k]  = static_cast<float *> (
@@ -224,14 +220,14 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 			::jack_midi_event_get(&event, midi_in, n);
 			uint32_t nread = event.time - ndelta;
 			if (nread > 0) {
-				m_drumk->process(ins, outs, nread);
+				drumkv1::process(ins, outs, nread);
 				for (uint16_t k = 0; k < nchannels; ++k) {
 					ins[k]  += nread;
 					outs[k] += nread;
 				}
 			}
 			ndelta = event.time;
-			m_drumk->process_midi(event.buffer, event.size);
+			drumkv1::process_midi(event.buffer, event.size);
 		}
 	}
 #endif
@@ -252,7 +248,7 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 		if (event_time > ndelta) {
 			const uint32_t nread = event_time - ndelta;
 			if (nread > 0) {
-				m_drumk->process(ins, outs, nread);
+				drumkv1::process(ins, outs, nread);
 				for (uint16_t k = 0; k < nchannels; ++k) {
 					ins[k]  += nread;
 					outs[k] += nread;
@@ -262,11 +258,11 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 		}
 		::jack_ringbuffer_read_advance(m_alsa_buffer, sizeof(event));
 		::jack_ringbuffer_read(m_alsa_buffer, (char *) event_buffer, event.size);
-		m_drumk->process_midi(event_buffer, event.size);
+		drumkv1::process_midi(event_buffer, event.size);
 	}
 #endif // CONFIG_ALSA_MIDI
 
-	m_drumk->process(ins, outs, nframes - ndelta);
+	drumkv1::process(ins, outs, nframes - ndelta);
 
 	return 0;
 }
@@ -278,7 +274,7 @@ void drumkv1_jack::open ( const char *client_id )
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		m_params[i] = drumkv1_param::paramDefaultValue(index);
-		m_drumk->setParamPort(index, &m_params[i]);
+		drumkv1::setParamPort(index, &m_params[i]);
 	}
 
 	// open client
@@ -287,11 +283,11 @@ void drumkv1_jack::open ( const char *client_id )
 		return;
 
 	// set sample rate
-	m_drumk->setSampleRate(jack_get_sample_rate(m_client));
-//	m_drumk->reset();
+	drumkv1::setSampleRate(jack_get_sample_rate(m_client));
+//	drumkv1::reset();
 
 	// register audio ports & buffers
-	uint16_t nchannels = m_drumk->channels();
+	uint16_t nchannels = drumkv1::channels();
 
 	m_audio_ins  = new jack_port_t * [nchannels];
 	m_audio_outs = new jack_port_t * [nchannels];
@@ -355,7 +351,7 @@ void drumkv1_jack::open ( const char *client_id )
 void drumkv1_jack::activate (void)
 {
 	if (!m_activated) {
-		m_drumk->reset();
+		drumkv1::reset();
 		if (m_client) {
 			::jack_activate(m_client);
 			m_activated = true;
@@ -413,7 +409,7 @@ void drumkv1_jack::close (void)
 #endif
 
 	// unregister audio ports
-	const uint16_t nchannels = m_drumk->channels();
+	const uint16_t nchannels = drumkv1::channels();
 
 	for (uint16_t k = 0; k < nchannels; ++k) {
 		if (m_audio_outs && m_audio_outs[k]) {
@@ -595,7 +591,7 @@ void drumkv1_jack::sessionEvent ( void *pvSessionArg )
 
 
 //-------------------------------------------------------------------------
-// drumkv1_application -- Singleton application instance.
+// drumkv1_jack_application -- Singleton application instance.
 //
 
 #include "drumkv1widget_jack.h"
@@ -609,7 +605,7 @@ void drumkv1_jack::sessionEvent ( void *pvSessionArg )
 
 
 // Constructor.
-drumkv1_application::drumkv1_application ( int& argc, char **argv )
+drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 	: QObject(NULL), m_pApp(NULL), m_bGui(true),
 		m_pDrumk(NULL), m_pWidget(NULL)
 	  #ifdef CONFIG_NSM
@@ -636,7 +632,7 @@ drumkv1_application::drumkv1_application ( int& argc, char **argv )
 
 
 // Destructor.
-drumkv1_application::~drumkv1_application (void)
+drumkv1_jack_application::~drumkv1_jack_application (void)
 {
 #ifdef CONFIG_NSM
 	if (m_pNsmClient) delete m_pNsmClient;
@@ -648,7 +644,7 @@ drumkv1_application::~drumkv1_application (void)
 
 
 // Argument parser method.
-bool drumkv1_application::parse_args (void)
+bool drumkv1_jack_application::parse_args (void)
 {
 	QTextStream out(stderr);
 
@@ -680,7 +676,7 @@ bool drumkv1_application::parse_args (void)
 
 
 // Startup methods.
-bool drumkv1_application::setup (void)
+bool drumkv1_jack_application::setup (void)
 {
 	if (m_pApp == NULL)
 		return false;
@@ -736,7 +732,7 @@ bool drumkv1_application::setup (void)
 
 
 // Facade method.
-int drumkv1_application::exec (void)
+int drumkv1_jack_application::exec (void)
 {
 	return (setup() ? m_pApp->exec() : 1);
 }
@@ -744,7 +740,7 @@ int drumkv1_application::exec (void)
 
 #ifdef CONFIG_NSM
 
-void drumkv1_application::openSession (void)
+void drumkv1_jack_application::openSession (void)
 {
 	if (m_pDrumk == NULL)
 		return;
@@ -790,7 +786,7 @@ void drumkv1_application::openSession (void)
 		m_pNsmClient->visible(m_pWidget->isVisible());
 }
 
-void drumkv1_application::saveSession (void)
+void drumkv1_jack_application::saveSession (void)
 {
 	if (m_pDrumk == NULL)
 		return;
@@ -817,7 +813,7 @@ void drumkv1_application::saveSession (void)
 }
 
 
-void drumkv1_application::showSession (void)
+void drumkv1_jack_application::showSession (void)
 {
 	if (m_pNsmClient == NULL)
 		return;
@@ -836,7 +832,7 @@ void drumkv1_application::showSession (void)
 	}
 }
 
-void drumkv1_application::hideSession (void)
+void drumkv1_jack_application::hideSession (void)
 {
 	if (m_pNsmClient == NULL)
 		return;
@@ -863,7 +859,7 @@ int main ( int argc, char *argv[] )
 {
 	Q_INIT_RESOURCE(drumkv1);
 
-	drumkv1_application app(argc, argv);
+	drumkv1_jack_application app(argc, argv);
 
 	return app.exec();
 }

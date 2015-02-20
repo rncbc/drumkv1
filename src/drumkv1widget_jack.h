@@ -44,6 +44,9 @@ public:
 	// Constructor.
 	drumkv1widget_jack(drumkv1_jack *pDrumk);
 
+	// Destructor.
+	~drumkv1widget_jack();
+
 #ifdef CONFIG_NSM
 	// NSM client accessors.
 	void setNsmClient(drumkv1_nsm *pNsmClient);
@@ -73,7 +76,8 @@ protected:
 private:
 
 	// Instance variables.
-	drumkv1_jack *m_pDrumkUi;
+	drumkv1     *m_pDrumk;
+	drumkv1_ui  *m_pDrumkUi;
 
 #ifdef CONFIG_NSM
 	drumkv1_nsm *m_pNsmClient;

@@ -34,10 +34,12 @@
 //
 
 // Constructor.
-drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumkUi,
+drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	LV2UI_Controller controller, LV2UI_Write_Function write_function )
-	: drumkv1widget(), m_pDrumkUi(pDrumkUi)
+	: drumkv1widget()
 {
+	m_pDrumkUi = new drumkv1_ui(pDrumk);
+
 	m_controller = controller;
 	m_write_function = write_function;
 
@@ -54,6 +56,13 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumkUi,
 	// Initial update, always...
 	refreshElements();
 	activateElement();
+}
+
+
+// Destructor.
+drumkv1widget_lv2::~drumkv1widget_lv2 (void)
+{
+	delete m_pDrumkUi;
 }
 
 
@@ -110,7 +119,7 @@ void drumkv1widget_lv2::closeEvent ( QCloseEvent *pCloseEvent )
 }
 
 
-// Plugin port event notification.
+// LV2 port event dispatcher.
 void drumkv1widget_lv2::port_event ( uint32_t port_index,
 	uint32_t buffer_size, uint32_t format, const void *buffer )
 {
