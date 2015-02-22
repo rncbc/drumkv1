@@ -13,6 +13,7 @@ HEADERS = \
 	drumkv1.h \
 	drumkv1_ui.h \
 	drumkv1_lv2.h \
+	drumkv1_lv2ui.h \
 	drumkv1_config.h \
 	drumkv1_param.h \
 	drumkv1widget.h \
@@ -29,6 +30,7 @@ HEADERS = \
 	drumkv1widget_lv2.h
 
 SOURCES = \
+	drumkv1_lv2ui.cpp \
 	drumkv1widget.cpp \
 	drumkv1widget_env.cpp \
 	drumkv1widget_filt.cpp \

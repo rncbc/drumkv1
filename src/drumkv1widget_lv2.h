@@ -23,22 +23,7 @@
 #define __drumkv1widget_lv2_h
 
 #include "drumkv1widget.h"
-
-#include "lv2.h"
-#include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
-
-
-#define DRUMKV1_LV2UI_URI DRUMKV1_LV2_PREFIX "ui"
-
-
-// Forward decls.
-class drumkv1_lv2;
-
-
-#ifdef CONFIG_LV2_EXTERNAL_UI
-#include "lv2_external_ui.h"
-#define DRUMKV1_LV2UI_EXTERNAL_URI DRUMKV1_LV2_PREFIX "ui_external"
-#endif
+#include "drumkv1_lv2ui.h"
 
 
 //-------------------------------------------------------------------------
@@ -85,10 +70,7 @@ protected:
 private:
 
 	// Instance variables.
-	drumkv1_ui *m_pDrumkUi;
-
-	LV2UI_Controller     m_controller;
-	LV2UI_Write_Function m_write_function;
+	drumkv1_lv2ui *m_pDrumkUi;
 
 #ifdef CONFIG_LV2_EXTERNAL_UI
 	LV2_External_UI_Host *m_external_host;
