@@ -173,7 +173,8 @@ void drumkv1_param::loadElements (
 					continue;
 				if (eChild.tagName() == "sample") {
 				//	int index = eChild.attribute("index").toInt();
-					const QString& sFilename = eChild.text();
+					const QString& sFilename
+						= QFileInfo(eChild.text()).canonicalFilePath();
 					element->setSampleFile(
 						mapPath.absolutePath(sFilename).toUtf8().constData());
 				}
