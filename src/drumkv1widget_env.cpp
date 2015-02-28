@@ -242,7 +242,8 @@ void drumkv1widget_env::dragNode ( const QPoint& pos )
 			setDecay2(float(x + dx) / float(w3));
 			break;
 		}
-		m_posDrag = pos;
+		m_posDrag = m_poly.at(m_iDragNode);
+	//	m_posDrag = pos;
 	}
 }
 
@@ -290,9 +291,8 @@ void drumkv1widget_env::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 {
 	QFrame::mouseReleaseEvent(pMouseEvent);
 
-	dragNode(pMouseEvent->pos());
-
 	if (m_iDragNode >= 0) {
+		dragNode(pMouseEvent->pos());
 		m_iDragNode = -1;
 		unsetCursor();
 	}
