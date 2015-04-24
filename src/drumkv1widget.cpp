@@ -478,6 +478,13 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(notify(int)),
 		SLOT(updateSchedNotify(int)));
 
+	// General knob/dial  behavior init...
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
+	if (pConfig) {
+		drumkv1widget_dial::setDialMode(
+			drumkv1widget_dial::DialMode(pConfig->iKnobDialMode));
+	}
+
 	// Epilog.
 	// QWidget::adjustSize();
 
