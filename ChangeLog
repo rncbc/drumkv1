@@ -6,6 +6,9 @@ ChangeLog
 
 GIT HEAD
 
+- Sample file path mapping has been fixed for LV2 plugin state
+  restoration, which were preventing Ardour to reload any of
+  the saved session or preset sample files in particular.
 - Custom knob/dial behavior mode options are now introduced:
   linear and angular (aka. radial) as far to avoid abrupt
   changes on first mouse click (still the default behavior).
