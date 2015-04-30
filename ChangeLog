@@ -4,7 +4,7 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-GIT HEAD
+0.6.2  2015-04-30  A fifth official beta.
 
 - Sample file path mapping has been fixed for LV2 plugin state
   restoration, which were preventing Ardour to reload any of
