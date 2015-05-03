@@ -6,7 +6,7 @@ ChangeLog
 GIT HEAD
 
 - Main widget layout changed as much to allow note/element list
-  to expand or grow vertically.
+  to expand or grow vertically as needed.
 
 
 0.6.2  2015-04-30  A fifth official beta.
