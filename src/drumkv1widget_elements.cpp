@@ -252,7 +252,9 @@ void drumkv1widget_elements::setInstance ( drumkv1_ui *pDrumkUi )
 	QTreeView::setAllColumnsShowFocus(true);
 	QTreeView::setAlternatingRowColors(true);
 
-	QTreeView::setMaximumSize(QSize(360, 120));
+//	QTreeView::setMinimumSize(QSize(360, 120));
+	QTreeView::setSizePolicy(
+		QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
 	QHeaderView *pHeader = QTreeView::header();
 	//	pHeader->setDefaultAlignment(Qt::AlignLeft);
@@ -305,7 +307,7 @@ void drumkv1widget_elements::doubleClicked ( const QModelIndex& index )
 }
 
 
-// Refreshne0r.
+// Refreshner.
 void drumkv1widget_elements::refresh (void)
 {
 	if (m_pModel == NULL)
@@ -317,6 +319,13 @@ void drumkv1widget_elements::refresh (void)
 	m_pModel->reset();
 
 	pSelectionModel->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
+}
+
+
+// Default size hint
+QSize drumkv1widget_elements::sizeHint (void) const
+{
+	return QSize(360, 120);
 }
 
 

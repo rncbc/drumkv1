@@ -69,6 +69,10 @@ protected slots:
 	void currentRowChanged(const QModelIndex&, const QModelIndex&);
 	void doubleClicked(const QModelIndex&);
 
+protected:
+
+	QSize sizeHint() const;
+
 private:
 
 	// Instance variables.

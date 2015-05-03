@@ -3,6 +3,11 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
+GIT HEAD
+
+- Main widget layout changed as much to allow note/element list
+  to expand or grow vertically.
+
 
 0.6.2  2015-04-30  A fifth official beta.
 
