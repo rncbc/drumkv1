@@ -1169,13 +1169,13 @@
   </layout>
   <action name="helpConfigureAction" >
    <property name="text" >
-	<string>&amp;Configure...</string>
+    <string>&amp;Configure...</string>
    </property>
    <property name="iconText" >
-	<string>Configure</string>
+    <string>Configure</string>
    </property>
    <property name="statusTip" >
-	<string>Configure options</string>
+    <string>Configure options</string>
    </property>
   </action>
   <action name="helpAboutAction" >
