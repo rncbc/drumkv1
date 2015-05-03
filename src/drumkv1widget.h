@@ -103,8 +103,11 @@ protected slots:
 	// Element activation.
 	void activateElement(bool bOpenSample = false);
 
-	// Element sample loader.
+	// Element sample requester.
 	void doubleClickElement();
+
+	// Element sample loader.
+	void loadSampleElement(const QString& sFilename);
 
 	// Element deactivation.
 	void resetElement(void);

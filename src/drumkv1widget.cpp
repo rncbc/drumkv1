@@ -418,6 +418,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	QObject::connect(m_ui.Elements,
 		SIGNAL(itemDoubleClicked(int)),
 		SLOT(doubleClickElement()));
+	QObject::connect(m_ui.Elements,
+		SIGNAL(itemLoadSampleFile(const QString&, int)),
+		SLOT(loadSampleElement(const QString&)));
 
 	// Sample management...
 	QObject::connect(m_ui.Gen1Sample,
@@ -1119,10 +1122,17 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 }
 
 
-// Element sample loader.
+// Element sample requester.
 void drumkv1widget::doubleClickElement (void)
 {
 	activateElement(true);
+}
+
+
+// Element sample loader.
+void drumkv1widget::loadSampleElement ( const QString& sFilename )
+{
+	emit loadSampleFile(sFilename);
 }
 
 

@@ -30,6 +30,10 @@ class drumkv1widget_elements_model;
 
 class drumkv1_ui;
 
+class QDragEnterEvent;
+class QDragMoveEvent;
+class QDropEvent;
+
 
 //----------------------------------------------------------------------------
 // drumkv1widget_elements -- Custom (tree) list view.
@@ -63,11 +67,19 @@ signals:
 	void itemActivated(int);
 	void itemDoubleClicked(int);
 
+	// Load new sample file on current item.
+	void itemLoadSampleFile(const QString&, int);
+
 protected slots:
 
 	// Internal slot handlers.
 	void currentRowChanged(const QModelIndex&, const QModelIndex&);
 	void doubleClicked(const QModelIndex&);
+
+	// Drag-n-drop (more of the later) support.
+	void dragEnterEvent(QDragEnterEvent *pDragEnterEvent);
+	void dragMoveEvent(QDragMoveEvent *pDragMoveEvent);
+	void dropEvent(QDropEvent *pDropEvent);
 
 protected:
 

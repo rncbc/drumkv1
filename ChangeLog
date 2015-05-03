@@ -5,6 +5,8 @@ ChangeLog
 
 GIT HEAD
 
+- Sample file drag-and-drop support has been added to the note
+  element list widget (drop only).
 - Main widget layout changed as much to allow sampler display
   and element list to expand or grow vertically as needed.
 

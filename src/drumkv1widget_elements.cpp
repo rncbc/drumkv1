@@ -28,6 +28,13 @@
 #include <QAbstractItemModel>
 #include <QHeaderView>
 #include <QFileInfo>
+#include <QMimeData>
+#include <QDrag>
+#include <QUrl>
+
+#include <QDragEnterEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
 
 
 //----------------------------------------------------------------------------
@@ -256,6 +263,8 @@ void drumkv1widget_elements::setInstance ( drumkv1_ui *pDrumkUi )
 	QTreeView::setSizePolicy(
 		QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
+	QTreeView::setAcceptDrops(true);
+
 	QHeaderView *pHeader = QTreeView::header();
 	//	pHeader->setDefaultAlignment(Qt::AlignLeft);
 #if QT_VERSION >= 0x050000
@@ -304,6 +313,39 @@ void drumkv1widget_elements::currentRowChanged (
 void drumkv1widget_elements::doubleClicked ( const QModelIndex& index )
 {
 	emit itemDoubleClicked(index.row());
+}
+
+
+// Drag-n-drop (more of the later) support.
+void drumkv1widget_elements::dragEnterEvent ( QDragEnterEvent *pDragEnterEvent )
+{
+	if (pDragEnterEvent->mimeData()->hasUrls())
+		pDragEnterEvent->acceptProposedAction();
+}
+
+
+void drumkv1widget_elements::dragMoveEvent ( QDragMoveEvent *pDragMoveEvent )
+{
+	if (pDragMoveEvent->mimeData()->hasUrls()) {
+		const QModelIndex& index
+			= QTreeView::indexAt(pDragMoveEvent->pos());
+		if (index.isValid()) {
+			setCurrentIndex(index.row());
+			pDragMoveEvent->acceptProposedAction();
+		}
+	}
+}
+
+
+void drumkv1widget_elements::dropEvent ( QDropEvent *pDropEvent )
+{
+	const QMimeData *pMimeData = pDropEvent->mimeData();
+	if (pMimeData->hasUrls()) {
+		const QString& sFilename
+			= QListIterator<QUrl>(pMimeData->urls()).peekNext().toLocalFile();
+		if (!sFilename.isEmpty())
+			emit itemLoadSampleFile(sFilename, currentIndex());
+	}
 }
 
 
