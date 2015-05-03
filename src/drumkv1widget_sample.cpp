@@ -64,6 +64,7 @@ drumkv1widget_sample::drumkv1widget_sample (
 	m_bLoop = false;
 	m_iLoopStart = m_iLoopEnd = 0;
 
+	m_dragCursor = DragNone;
 	resetDragState();
 }
 

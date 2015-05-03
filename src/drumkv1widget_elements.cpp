@@ -319,6 +319,8 @@ void drumkv1widget_elements::doubleClicked ( const QModelIndex& index )
 // Drag-n-drop (more of the later) support.
 void drumkv1widget_elements::dragEnterEvent ( QDragEnterEvent *pDragEnterEvent )
 {
+	QTreeView::dragEnterEvent(pDragEnterEvent);
+
 	if (pDragEnterEvent->mimeData()->hasUrls())
 		pDragEnterEvent->acceptProposedAction();
 }
@@ -326,6 +328,8 @@ void drumkv1widget_elements::dragEnterEvent ( QDragEnterEvent *pDragEnterEvent )
 
 void drumkv1widget_elements::dragMoveEvent ( QDragMoveEvent *pDragMoveEvent )
 {
+	QTreeView::dragMoveEvent(pDragMoveEvent);
+
 	if (pDragMoveEvent->mimeData()->hasUrls()) {
 		const QModelIndex& index
 			= QTreeView::indexAt(pDragMoveEvent->pos());
@@ -339,6 +343,8 @@ void drumkv1widget_elements::dragMoveEvent ( QDragMoveEvent *pDragMoveEvent )
 
 void drumkv1widget_elements::dropEvent ( QDropEvent *pDropEvent )
 {
+	QTreeView::dropEvent(pDropEvent);
+
 	const QMimeData *pMimeData = pDropEvent->mimeData();
 	if (pMimeData->hasUrls()) {
 		const QString& sFilename
