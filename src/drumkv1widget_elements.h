@@ -71,6 +71,7 @@ protected slots:
 
 protected:
 
+	// Default size hint.
 	QSize sizeHint() const;
 
 private:

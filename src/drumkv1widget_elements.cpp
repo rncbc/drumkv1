@@ -252,7 +252,7 @@ void drumkv1widget_elements::setInstance ( drumkv1_ui *pDrumkUi )
 	QTreeView::setAllColumnsShowFocus(true);
 	QTreeView::setAlternatingRowColors(true);
 
-//	QTreeView::setMinimumSize(QSize(360, 120));
+	QTreeView::setMinimumSize(QSize(360, 80));
 	QTreeView::setSizePolicy(
 		QSizePolicy::Preferred, QSizePolicy::MinimumExpanding);
 
@@ -322,10 +322,10 @@ void drumkv1widget_elements::refresh (void)
 }
 
 
-// Default size hint
+// Default size hint.
 QSize drumkv1widget_elements::sizeHint (void) const
 {
-	return QSize(360, 120);
+	return QSize(360, 80);
 }
 
 
