@@ -64,7 +64,9 @@ drumkv1widget_sample::drumkv1widget_sample (
 	m_bLoop = false;
 	m_iLoopStart = m_iLoopEnd = 0;
 
-	m_dragCursor = DragNone;
+	m_dragCursor  = DragNone;
+	m_pDragSample = NULL;
+
 	resetDragState();
 }
 
@@ -337,7 +339,8 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 				QFrame::setCursor(QCursor(Qt::SizeHorCursor));
 			} else if (m_pSample && m_pSample->filename()) {
 				QList<QUrl> urls;
-				urls.append(QUrl::fromLocalFile(m_pSample->filename()));
+				m_pDragSample = m_pSample;
+				urls.append(QUrl::fromLocalFile(m_pDragSample->filename()));
 				QMimeData *pMimeData = new QMimeData();
 				pMimeData->setUrls(urls);;
 				QDrag *pDrag = new QDrag(this);
@@ -398,6 +401,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 		break;
 	}
 
+	m_pDragSample = NULL;
 	resetDragState();
 }
 
@@ -426,7 +430,9 @@ void drumkv1widget_sample::keyPressEvent ( QKeyEvent *pKeyEvent )
 // Drag-n-drop (more of the later) support.
 void drumkv1widget_sample::dragEnterEvent ( QDragEnterEvent *pDragEnterEvent )
 {
-	if (pDragEnterEvent->source() != this
+	QFrame::dragEnterEvent(pDragEnterEvent);
+
+	if (m_pDragSample && m_pDragSample != sample()
 		&& pDragEnterEvent->mimeData()->hasUrls())
 		pDragEnterEvent->acceptProposedAction();
 }
@@ -434,6 +440,8 @@ void drumkv1widget_sample::dragEnterEvent ( QDragEnterEvent *pDragEnterEvent )
 
 void drumkv1widget_sample::dropEvent ( QDropEvent *pDropEvent )
 {
+	QFrame::dropEvent(pDropEvent);
+
 	const QMimeData *pMimeData = pDropEvent->mimeData();
 	if (pMimeData->hasUrls()) {
 		const QString& sFilename
