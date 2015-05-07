@@ -432,7 +432,7 @@ void drumkv1widget_sample::dragEnterEvent ( QDragEnterEvent *pDragEnterEvent )
 {
 	QFrame::dragEnterEvent(pDragEnterEvent);
 
-	if (m_pDragSample && m_pDragSample != sample()
+	if ((m_pDragSample == NULL || m_pDragSample != sample())
 		&& pDragEnterEvent->mimeData()->hasUrls())
 		pDragEnterEvent->acceptProposedAction();
 }
