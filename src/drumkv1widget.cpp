@@ -564,6 +564,15 @@ void drumkv1widget::paramChanged ( float fValue )
 	drumkv1widget_knob *pKnob = qobject_cast<drumkv1widget_knob *> (sender());
 	if (pKnob) {
 		drumkv1::ParamIndex index = m_knobParams.value(pKnob);
+		// Save current element param value...
+		drumkv1_ui *pDrumkUi = ui_instance();
+		if (pDrumkUi) {
+			const int key = pDrumkUi->currentElement();
+			drumkv1_element *element = pDrumkUi->element(key);
+			if (element)
+				element->setParamValue(index, fValue);
+		}
+		// Proceed with regular formalities...
 		updateParam(index, fValue);
 		updateParamEx(index, fValue);
 		m_ui.StatusBar->showMessage(QString("%1 / %2: %3")
@@ -578,18 +587,17 @@ void drumkv1widget::paramChanged ( float fValue )
 // Update local tied widgets.
 void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 {
-	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
-		return;
-
 	++m_iUpdate;
 
 	switch (index) {
 #if 0//--updateSchedNotify(drumkv1_sched::Sample);
 	case drumkv1::GEN1_REVERSE: {
-		const bool bReverse = bool(fValue > 0.0f);
-		pDrumk->setReverse(bReverse);
-		updateSample(pDrumk->sample());
+		drumkv1_ui *pDrumkUi = ui_instance();
+		if (pDrumkUi) {
+			const bool bReverse = bool(fValue > 0.0f);
+			pDrumkUi->setReverse(bReverse);
+			updateSample(pDrumk->sample());
+		}
 		break;
 	}
 #endif
@@ -723,7 +731,7 @@ void drumkv1widget::resetParamValues ( uint32_t nparams )
 
 	for (uint32_t i = 0; i < nparams; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		float fValue = drumkv1_param::paramDefaultValue(index);
+		const float fValue = drumkv1_param::paramDefaultValue(index);
 		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
 		m_params_ab[index] = fValue;
@@ -884,7 +892,7 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 		element = pDrumkUi->addElement(note);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-			float fValue = drumkv1_param::paramDefaultValue(index);
+			const float fValue = drumkv1_param::paramDefaultValue(index);
 			element->setParamValue(index, fValue);
 		}
 		pDrumkUi->setCurrentElement(note);
@@ -1086,7 +1094,7 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 		element = pDrumkUi->addElement(iCurrentNote);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-			float fValue = drumkv1_param::paramDefaultValue(index);
+			const float fValue = drumkv1_param::paramDefaultValue(index);
 			element->setParamValue(index, fValue, 0);
 			element->setParamValue(index, fValue);
 		}
