@@ -596,7 +596,7 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 		if (pDrumkUi) {
 			const bool bReverse = bool(fValue > 0.0f);
 			pDrumkUi->setReverse(bReverse);
-			updateSample(pDrumk->sample());
+			updateSample(pDrumkUi->sample());
 		}
 		break;
 	}

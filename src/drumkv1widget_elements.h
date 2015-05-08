@@ -30,6 +30,8 @@ class drumkv1widget_elements_model;
 
 class drumkv1_ui;
 
+class drumkv1_sample;
+
 class QDragEnterEvent;
 class QDragMoveEvent;
 class QDropEvent;
@@ -76,12 +78,20 @@ protected slots:
 	void currentRowChanged(const QModelIndex&, const QModelIndex&);
 	void doubleClicked(const QModelIndex&);
 
+protected:
+
+	// Mouse interaction.
+	void mousePressEvent(QMouseEvent *pMouseEvent);
+	void mouseMoveEvent(QMouseEvent *pMouseEvent);
+	void mouseReleaseEvent(QMouseEvent *pMouseEvent);
+
 	// Drag-n-drop (more of the later) support.
 	void dragEnterEvent(QDragEnterEvent *pDragEnterEvent);
 	void dragMoveEvent(QDragMoveEvent *pDragMoveEvent);
 	void dropEvent(QDropEvent *pDropEvent);
 
-protected:
+	// Reset drag/select state.
+	void resetDragState();
 
 	// Default size hint.
 	QSize sizeHint() const;
@@ -90,6 +100,13 @@ private:
 
 	// Instance variables.
 	drumkv1widget_elements_model *m_pModel;
+
+	// Drag state.
+	enum DragState { DragNone = 0, DragStart } m_dragState;
+
+	QPoint m_posDrag;
+
+	drumkv1_sample *m_pDragSample;
 };
 
 

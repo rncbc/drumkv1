@@ -25,6 +25,8 @@
 
 #include "drumkv1_ui.h"
 
+#include "drumkv1_sample.h"
+
 #include <QAbstractItemModel>
 #include <QHeaderView>
 #include <QFileInfo>
@@ -231,6 +233,9 @@ int drumkv1widget_elements_model::columnAlignment( int /*column*/ ) const
 drumkv1widget_elements::drumkv1widget_elements ( QWidget *pParent )
 	: QTreeView(pParent), m_pModel(NULL)
 {
+	m_pDragSample = NULL;
+
+	resetDragState();
 }
 
 
@@ -316,6 +321,53 @@ void drumkv1widget_elements::doubleClicked ( const QModelIndex& index )
 }
 
 
+// Mouse interaction.
+void drumkv1widget_elements::mousePressEvent ( QMouseEvent *pMouseEvent )
+{
+	if (pMouseEvent->button() == Qt::LeftButton) {
+		m_dragState = DragStart;
+		m_posDrag = pMouseEvent->pos();
+	}
+
+	QTreeView::mousePressEvent(pMouseEvent);
+}
+
+
+void drumkv1widget_elements::mouseMoveEvent ( QMouseEvent *pMouseEvent )
+{
+	QTreeView::mouseMoveEvent(pMouseEvent);
+
+	if (m_dragState == DragStart
+		&& (m_posDrag - pMouseEvent->pos()).manhattanLength()
+			> QApplication::startDragDistance()) {
+		drumkv1_element *element
+			= static_cast<drumkv1_element *> (
+				QTreeView::currentIndex().internalPointer());
+		// Start dragging alright...
+		if (element && element->sample()) {
+			QList<QUrl> urls;
+			m_pDragSample = element->sample();
+			urls.append(QUrl::fromLocalFile(m_pDragSample->filename()));
+			QMimeData *pMimeData = new QMimeData();
+			pMimeData->setUrls(urls);;
+			QDrag *pDrag = new QDrag(this);
+			pDrag->setMimeData(pMimeData);
+			pDrag->exec(Qt::CopyAction);
+		}
+		resetDragState();
+	}
+}
+
+
+void drumkv1widget_elements::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
+{
+	QTreeView::mouseReleaseEvent(pMouseEvent);
+
+	m_pDragSample = NULL;
+	resetDragState();
+}
+
+
 // Drag-n-drop (more of the later) support.
 void drumkv1widget_elements::dragEnterEvent ( QDragEnterEvent *pDragEnterEvent )
 {
@@ -335,6 +387,14 @@ void drumkv1widget_elements::dragMoveEvent ( QDragMoveEvent *pDragMoveEvent )
 			= QTreeView::indexAt(pDragMoveEvent->pos());
 		if (index.isValid()) {
 			setCurrentIndex(index.row());
+			if (m_pDragSample) {
+				drumkv1_element *element
+					= static_cast<drumkv1_element *> (
+						index.internalPointer());
+				// Start dragging alright...
+				if (element && m_pDragSample == element->sample())
+					return;
+			}
 			pDragMoveEvent->acceptProposedAction();
 		}
 	}
@@ -352,6 +412,13 @@ void drumkv1widget_elements::dropEvent ( QDropEvent *pDropEvent )
 		if (!sFilename.isEmpty())
 			emit itemLoadSampleFile(sFilename, currentIndex());
 	}
+}
+
+
+// Reset drag/select state.
+void drumkv1widget_elements::resetDragState (void)
+{
+	m_dragState = DragNone;
 }
 
 

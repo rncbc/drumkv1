@@ -74,7 +74,7 @@ drumkv1widget_sample::drumkv1widget_sample (
 // Destructor.
 drumkv1widget_sample::~drumkv1widget_sample (void)
 {
-	setSample(0);
+	setSample(NULL);
 }
 
 
@@ -93,6 +93,8 @@ void drumkv1widget_sample::setSample ( drumkv1_sample *pSample )
 
 //	m_bLoop = false;
 //	m_iLoopStart = m_iLoopEnd = 0;
+
+	m_pDragSample = NULL;
 
 	if (m_pSample)
 		m_iChannels = m_pSample->channels();
@@ -417,6 +419,7 @@ void drumkv1widget_sample::keyPressEvent ( QKeyEvent *pKeyEvent )
 {
 	switch (pKeyEvent->key()) {
 	case Qt::Key_Escape:
+		m_pDragSample = NULL;
 		resetDragState();
 		update();
 		break;
@@ -432,8 +435,10 @@ void drumkv1widget_sample::dragEnterEvent ( QDragEnterEvent *pDragEnterEvent )
 {
 	QFrame::dragEnterEvent(pDragEnterEvent);
 
-	if ((m_pDragSample == NULL || m_pDragSample != sample())
-		&& pDragEnterEvent->mimeData()->hasUrls())
+	if (m_pDragSample && m_pDragSample == sample())
+		return;
+
+	if (pDragEnterEvent->mimeData()->hasUrls())
 		pDragEnterEvent->acceptProposedAction();
 }
 
