@@ -3,10 +3,11 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
-GIT HEAD
+
+0.6.3  2015-05-09  A sixth official beta.
 
 - Sample file drag-and-drop support has been added to the note
-  element list widget (drop only).
+  element list widget.
 - Main widget layout changed as much to allow sampler display
   and element list to expand or grow vertically as needed.
 
