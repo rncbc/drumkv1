@@ -4,6 +4,12 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
+GIT HEAD
+
+- French (fr) translation line to desktop file added (by Olivier
+  Humbert, thanks).
+
+
 0.6.3  2015-05-09  A sixth official beta.
 
 - Sample file drag-and-drop support has been added to the note
