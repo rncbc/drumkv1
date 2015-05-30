@@ -32,6 +32,7 @@
 #include "drumkv1_reverb.h"
 
 #include "drumkv1_config.h"
+#include "drumkv1_control.h"
 #include "drumkv1_programs.h"
 
 
@@ -834,6 +835,7 @@ protected:
 private:
 
 	drumkv1_config   m_config;
+	drumkv1_control  m_control;
 	drumkv1_programs m_programs;
 
 	uint16_t m_iChannels;
@@ -1431,12 +1433,20 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			allNotesOff();
 			break;
 		}
+		// process controller...
+		m_control.process_enqueue(channel, key, value);
 	}
 	// pitch bend
 	else if (status == 0xe0) {
 		const float pitchbend = float(key + (value << 7) - 0x2000) / 8192.0f;
 		m_ctl.pitchbend = drumkv1_pow2f(*m_def.pitchbend * pitchbend);
 	}
+	else
+	// flush controllers...
+	m_control.flush();
+
+	// process pending controllers...
+	m_control.process_dequeue();
 }
 
 
