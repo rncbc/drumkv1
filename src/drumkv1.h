@@ -31,6 +31,7 @@ class drumkv1_impl;
 class drumkv1_elem;
 class drumkv1_element;
 class drumkv1_sample;
+class drumkv1_control;
 class drumkv1_programs;
 
 
@@ -157,6 +158,7 @@ public:
 	void resetParamValues(bool bSwap);
 	void reset();
 
+	drumkv1_control *control() const;
 	drumkv1_programs *programs() const;
 
 	void process_midi(uint8_t *data, uint32_t size);

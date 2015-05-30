@@ -522,9 +522,9 @@ private:
 // drumkv1_control - impl.
 //
 
-drumkv1_control::drumkv1_control (void)
+drumkv1_control::drumkv1_control ( drumkv1 *pDrumk )
+	: m_pImpl(new drumkv1_control::Impl()), m_pDrumk(pDrumk)
 {
-	m_pImpl = new drumkv1_control::Impl();
 }
 
 
@@ -534,6 +534,7 @@ drumkv1_control::~drumkv1_control (void)
 }
 
 
+// controller queue methods.
 void drumkv1_control::process_enqueue (
 	unsigned short channel, unsigned short param, unsigned short value )
 {
@@ -563,7 +564,17 @@ void drumkv1_control::process_dequeue (void)
 
 void drumkv1_control::process_event ( const Event& event )
 {
+	const Key key(event);
+	const int index = find_controller(key);
+	if (index < 0)
+		return;
+
 	// TODO: process controller event...
+	float fValue = float(event.value) / 127.0f;
+	if (Type(key.status & 0xf0) != CC)
+		fValue /= 127.0f;
+
+	m_pDrumk->setParamValue(drumkv1::ParamIndex(index), fValue);
 }
 
 

@@ -794,6 +794,7 @@ public:
 	void setParamValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index) const;
 
+	drumkv1_control *control();
 	drumkv1_programs *programs();
 
 	void process_midi(uint8_t *data, uint32_t size);
@@ -880,7 +881,7 @@ private:
 
 drumkv1_impl::drumkv1_impl (
 	drumkv1 *pDrumk, uint16_t iChannels, uint32_t iSampleRate )
-	: m_programs(pDrumk)
+	: m_control(pDrumk), m_programs(pDrumk)
 {
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
@@ -1572,6 +1573,14 @@ void drumkv1_impl::reset (void)
 }
 
 
+// controllers accessor
+
+drumkv1_control *drumkv1_impl::control (void)
+{
+	return &m_control;
+}
+
+
 // programs accessor
 
 drumkv1_programs *drumkv1_impl::programs (void)
@@ -1954,6 +1963,14 @@ void drumkv1::process ( float **ins, float **outs, uint32_t nframes )
 void drumkv1::resetParamValues ( bool bSwap )
 {
 	m_pImpl->resetParamValues(bSwap);
+}
+
+
+// controllers accessor
+
+drumkv1_control *drumkv1::control (void) const
+{
+	return m_pImpl->control();
 }
 
 
