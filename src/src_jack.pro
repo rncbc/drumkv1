@@ -23,6 +23,7 @@ HEADERS = \
 	drumkv1_param.h \
 	drumkv1_sched.h \
 	drumkv1_programs.h \
+	drumkv1_control.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
 	drumkv1widget_filt.h \
@@ -47,6 +48,7 @@ SOURCES = \
 	drumkv1_param.cpp \
 	drumkv1_sched.cpp \
 	drumkv1_programs.cpp \
+	drumkv1_control.cpp \
 	drumkv1widget.cpp \
 	drumkv1widget_env.cpp \
 	drumkv1widget_filt.cpp \

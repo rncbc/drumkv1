@@ -21,9 +21,6 @@
 
 #include "drumkv1_programs.h"
 
-#include "drumkv1_sched.h"
-#include "drumkv1_param.h"
-
 
 //-------------------------------------------------------------------------
 // drumkv1_programs - Bank/programs database class (singleton).
