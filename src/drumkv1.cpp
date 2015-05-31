@@ -32,7 +32,7 @@
 #include "drumkv1_reverb.h"
 
 #include "drumkv1_config.h"
-#include "drumkv1_control.h"
+#include "drumkv1_controls.h"
 #include "drumkv1_programs.h"
 
 
@@ -794,7 +794,7 @@ public:
 	void setParamValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index) const;
 
-	drumkv1_control *control();
+	drumkv1_controls *controls();
 	drumkv1_programs *programs();
 
 	void process_midi(uint8_t *data, uint32_t size);
@@ -836,7 +836,7 @@ protected:
 private:
 
 	drumkv1_config   m_config;
-	drumkv1_control  m_control;
+	drumkv1_controls m_controls;
 	drumkv1_programs m_programs;
 
 	uint16_t m_iChannels;
@@ -881,7 +881,7 @@ private:
 
 drumkv1_impl::drumkv1_impl (
 	drumkv1 *pDrumk, uint16_t iChannels, uint32_t iSampleRate )
-	: m_control(pDrumk), m_programs(pDrumk)
+	: m_controls(pDrumk), m_programs(pDrumk)
 {
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
@@ -1435,7 +1435,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			break;
 		}
 		// process controller...
-		m_control.process_enqueue(channel, key, value);
+		m_controls.process_enqueue(channel, key, value);
 	}
 	// pitch bend
 	else if (status == 0xe0) {
@@ -1444,10 +1444,10 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 	}
 	else
 	// flush controllers...
-	m_control.flush();
+	m_controls.flush();
 
 	// process pending controllers...
-	m_control.process_dequeue();
+	m_controls.process_dequeue();
 }
 
 
@@ -1575,9 +1575,9 @@ void drumkv1_impl::reset (void)
 
 // controllers accessor
 
-drumkv1_control *drumkv1_impl::control (void)
+drumkv1_controls *drumkv1_impl::controls (void)
 {
-	return &m_control;
+	return &m_controls;
 }
 
 
@@ -1968,9 +1968,9 @@ void drumkv1::resetParamValues ( bool bSwap )
 
 // controllers accessor
 
-drumkv1_control *drumkv1::control (void) const
+drumkv1_controls *drumkv1::controls (void) const
 {
-	return m_pImpl->control();
+	return m_pImpl->controls();
 }
 
 
