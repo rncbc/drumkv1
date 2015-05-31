@@ -25,6 +25,7 @@
 #include "ui_drumkv1widget_config.h"
 
 #include "drumkv1_programs.h"
+#include "drumkv1_controls.h"
 #include "drumkv1_config.h"
 
 
@@ -43,6 +44,10 @@ public:
 	// dtor.
 	~drumkv1widget_config();
 
+	// controllers accessors.
+	void setControls(drumkv1_controls *pControls);
+	drumkv1_controls *controls() const;
+
 	// programs accessors.
 	void setPrograms(drumkv1_programs *pPrograms);
 	drumkv1_programs *programs() const;
@@ -50,16 +55,24 @@ public:
 protected slots:
 
 	// command slots.
+	void controlsAddItem();
+	void controlsEditItem();
+	void controlsDeleteItem();
+
 	void programsAddBankItem();
 	void programsAddItem();
 	void programsEditItem();
 	void programsDeleteItem();
 
-	// janitor slots.
+	// janitorial slots.
+	void controlsCurrentChanged();
+	void controlsContextMenuRequested(const QPoint&);
+
 	void programsCurrentChanged();
 	void programsActivated();
 	void programsContextMenuRequested(const QPoint&);
 
+	void controlsChanged();
 	void programsChanged();
 	void optionsChanged();
 
@@ -77,10 +90,14 @@ private:
 	// UI struct.
 	Ui::drumkv1widget_config m_ui;
 
+	// Controllers database.
+	drumkv1_controls *m_pControls;
+
 	// Programs database.
 	drumkv1_programs *m_pPrograms;
 
 	// Dialog dirty flag.
+	int m_iDirtyControls;
 	int m_iDirtyPrograms;
 	int m_iDirtyOptions;
 };

@@ -271,7 +271,7 @@ void drumkv1widget_controls::loadControls ( drumkv1_controls *pControls )
 		pItem->setText(1, drumkv1_controls::textFromType(
 			drumkv1_controls::Type(key.status & 0xf0)));
 		pItem->setText(2, QString::number(key.param));
-		pItem->setText(2, drumkv1_param::paramName(index));
+		pItem->setText(3, drumkv1_param::paramName(index));
 		pItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
 		items.append(pItem);
 	}
@@ -294,8 +294,7 @@ void drumkv1widget_controls::saveControls ( drumkv1_controls *pControls )
 		drumkv1_controls::Key key;
 		key.status = ctype | (channel & 0x0f);
 		key.param = pItem->text(2).toInt();
-		const int index = pItem->text(3).toInt();
-		pControls->add_control(key, index);
+		pControls->add_control(key, pItem->text(3).toInt());
 	}
 }
 

@@ -57,6 +57,7 @@ public:
 	void setParamValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index) const;
 
+	drumkv1_controls *controls() const;
 	drumkv1_programs *programs() const;
 
 	void resetParamValues(bool bSwap);

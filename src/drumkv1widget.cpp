@@ -1287,8 +1287,10 @@ void drumkv1widget::helpConfigure (void)
 
 	drumkv1widget_config form(this);
 
-	// Set programs database...
+	// Set controllers&&programs database...
+	form.setControls(pDrumkUi->controls());
 	form.setPrograms(pDrumkUi->programs());
+
 	form.exec();
 }
 

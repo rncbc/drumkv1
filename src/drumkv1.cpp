@@ -913,7 +913,8 @@ drumkv1_impl::drumkv1_impl (
 	m_del.bpmsync0 = 0.0f;
 	m_del.bpm0 = 0;
 
-	// load programs database...
+	// load controllers & programs database...
+	m_config.loadControls(&m_controls);
 	m_config.loadPrograms(&m_programs);
 
 	// number of channels

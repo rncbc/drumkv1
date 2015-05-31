@@ -109,6 +109,12 @@ float drumkv1_ui::paramValue ( drumkv1::ParamIndex index ) const
 }
 
 
+drumkv1_controls *drumkv1_ui::controls (void) const
+{
+	return m_pDrumk->controls();
+}
+
+
 drumkv1_programs *drumkv1_ui::programs (void) const
 {
 	return m_pDrumk->programs();

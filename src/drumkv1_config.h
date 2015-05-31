@@ -43,6 +43,7 @@
 
 // forward decls.
 class drumkv1_programs;
+class drumkv1_controls;
 
 
 class drumkv1_config : public QSettings
@@ -85,6 +86,10 @@ public:
 	void loadPrograms(drumkv1_programs *pPrograms);
 	void savePrograms(drumkv1_programs *pPrograms);
 
+	// Controllers utility methods.
+	void loadControls(drumkv1_controls *pControls);
+	void saveControls(drumkv1_controls *pControls);
+
 protected:
 
 	// Preset group path.
@@ -95,6 +100,12 @@ protected:
 	QString bankPrefix() const;
 
 	void clearPrograms();
+
+	// Controllers group path.
+	QString controlsGroup() const;
+	QString controlPrefix() const;
+
+	void clearControls();
 
 	// Explicit I/O methods.
 	void load();
