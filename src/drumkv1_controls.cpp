@@ -522,8 +522,8 @@ private:
 // drumkv1_controls - impl.
 //
 
-drumkv1_controls::drumkv1_controls ( drumkv1 *pSynth )
-	: m_pImpl(new drumkv1_controls::Impl()), m_pSynth(pSynth)
+drumkv1_controls::drumkv1_controls ( drumkv1 *pDrumk )
+	: m_pImpl(new drumkv1_controls::Impl()), m_sched(pDrumk)
 {
 }
 
@@ -565,8 +565,8 @@ void drumkv1_controls::process_dequeue (void)
 void drumkv1_controls::process_event ( const Event& event )
 {
 	const Key key(event);
-	const int index = find_control(key);
-	if (index < 0)
+	const int iIndex = find_control(key);
+	if (iIndex < 0)
 		return;
 
 	// TODO: process controller event...
@@ -574,7 +574,7 @@ void drumkv1_controls::process_event ( const Event& event )
 	if (Type(key.status & 0xf0) != CC)
 		fValue /= 127.0f;
 
-	m_pSynth->setParamValue(drumkv1::ParamIndex(index), fValue);
+	m_sched.schedule_event(iIndex, fValue);
 }
 
 

@@ -478,8 +478,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// Special sample update notifications (eg. reverse)
 	QObject::connect(m_sched_notifier,
-		SIGNAL(notify(int)),
-		SLOT(updateSchedNotify(int)));
+		SIGNAL(notify(int, int)),
+		SLOT(updateSchedNotify(int, int)));
 
 	// General knob/dial  behavior init...
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
@@ -590,7 +590,7 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 	++m_iUpdate;
 
 	switch (index) {
-#if 0//--updateSchedNotify(drumkv1_sched::Sample);
+#if 0//--updateSchedNotify(drumkv1_sched::Sample, 0);
 	case drumkv1::GEN1_REVERSE: {
 		drumkv1_ui *pDrumkUi = ui_instance();
 		if (pDrumkUi) {
@@ -1252,17 +1252,22 @@ void drumkv1widget::updateLoadPreset ( const QString& sPreset )
 
 
 // Notification updater.
-void drumkv1widget::updateSchedNotify ( int stype )
+void drumkv1widget::updateSchedNotify ( int stype, int sid )
 {
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi == NULL)
 		return;
 
 #ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget::updateSchedNotify(%d)", stype);
+	qDebug("drumkv1widget::updateSchedNotify(%d, %d)", stype, sid);
 #endif
 
 	switch (drumkv1_sched::Type(stype)) {
+	case drumkv1_sched::Controls: {
+		const drumkv1::ParamIndex index = drumkv1::ParamIndex(sid);
+		setParamValue(index, pDrumkUi->paramValue(index));
+		break;
+	}
 	case drumkv1_sched::Programs: {
 		drumkv1_programs *pPrograms = pDrumkUi->programs();
 		drumkv1_programs::Prog *pProg = pPrograms->current_prog();

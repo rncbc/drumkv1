@@ -133,7 +133,7 @@ protected:
 		}
 
 		// process (virtual).
-		void process()
+		void process(int)
 		{
 			drumkv1_programs *pPrograms = m_pDrumk->programs();
 			pPrograms->process_program(m_pDrumk, m_bank_id, m_prog_id);

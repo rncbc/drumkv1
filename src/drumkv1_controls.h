@@ -23,6 +23,7 @@
 #define __drumkv1_controls_h
 
 #include "drumkv1_param.h"
+#include "drumkv1_sched.h"
 
 #include <QHash>
 
@@ -97,6 +98,31 @@ protected:
 
 	void process_event(const Event& event);
 
+	// controller scheduled thread
+	class Sched : public drumkv1_sched
+	{
+	public:
+
+		// ctor.
+		Sched (drumkv1 *pDrumk)
+			: drumkv1_sched(Controls), m_pDrumk(pDrumk) {}
+
+		void schedule_event(int iIndex, float fValue)
+		{
+			m_pDrumk->setParamValue(drumkv1::ParamIndex(iIndex), fValue);
+
+			schedule(iIndex);
+		}
+
+		// process (virtual stub).
+		void process(int) {}
+
+	private:
+
+		// instance variables.
+		drumkv1 *m_pDrumk;
+	};
+
 private:
 
 	// instance variables.
@@ -104,7 +130,8 @@ private:
 
 	Impl *m_pImpl;
 
-	drumkv1 *m_pSynth;
+	// Event scheduler.
+	Sched m_sched;
 
 	// Controllers map.
 	Map m_map;
