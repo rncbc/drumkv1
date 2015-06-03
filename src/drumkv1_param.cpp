@@ -30,87 +30,93 @@
 
 
 //-------------------------------------------------------------------------
-// default state (params)
+// state params description.
+
+enum Param_Type { PARAM_FLOAT = 0, PARAM_INT, PARAM_BOOL };
 
 static
 struct {
 
 	const char *name;
-	float value;
+	Param_Type type;
+	float def;
+	float min;
+	float max;
 
 } drumkv1_default_params[drumkv1::NUM_PARAMS] = {
 
-	{ "GEN1_SAMPLE",   36.0f }, // Bass Drum 1 (GM) aka. C2 (36)
-	{ "GEN1_REVERSE",   0.0f },
-	{ "GEN1_GROUP",     0.0f },
-	{ "GEN1_COARSE",    0.0f },
-	{ "GEN1_FINE",      0.0f },
-	{ "GEN1_ENVTIME",   0.2f },
-	{ "DCF1_CUTOFF",    1.0f }, // 0.5f
-	{ "DCF1_RESO",      0.0f },
-	{ "DCF1_TYPE",      0.0f },
-	{ "DCF1_SLOPE",     0.0f },
-	{ "DCF1_ENVELOPE",  1.0f },
-	{ "DCF1_ATTACK",    0.0f },
-	{ "DCF1_DECAY1",    0.5f },
-	{ "DCF1_LEVEL2",    0.2f },
-	{ "DCF1_DECAY2",    0.5f },
-	{ "LFO1_SHAPE",     1.0f },
-	{ "LFO1_WIDTH",     1.0f },
-	{ "LFO1_RATE",      0.5f },
-	{ "LFO1_SWEEP",     0.0f },
-	{ "LFO1_PITCH",     0.0f },
-	{ "LFO1_CUTOFF",    0.0f },
-	{ "LFO1_RESO",      0.0f },
-	{ "LFO1_PANNING",   0.0f },
-	{ "LFO1_VOLUME",    0.0f },
-	{ "LFO1_ATTACK",    0.0f },
-	{ "LFO1_DECAY1",    0.5f },
-	{ "LFO1_LEVEL2",    0.2f },
-	{ "LFO1_DECAY2",    0.5f },
-	{ "DCA1_VOLUME",    0.5f },
-	{ "DCA1_ATTACK",    0.0f },
-	{ "DCA1_DECAY1",    0.5f },
-	{ "DCA1_LEVEL2",    0.2f },
-	{ "DCA1_DECAY2",    0.5f },
-	{ "OUT1_WIDTH",     0.0f },
-	{ "OUT1_PANNING",   0.0f },
-	{ "OUT1_VOLUME",    0.5f },
+	// name            type,           def,    min,    max
+	{ "GEN1_SAMPLE",   PARAM_INT,    36.0f,   0.0f, 127.0f }, // GEN1 Sample
+	{ "GEN1_REVERSE",  PARAM_BOOL,    0.0f,   0.0f,   1.0f }, // GEN1 Reverse
+	{ "GEN1_GROUP",    PARAM_FLOAT,   0.0f,   0.0f, 128.0f }, // GEN1 Group
+	{ "GEN1_COARSE",   PARAM_FLOAT,   0.0f,  -4.0f,   4.0f }, // GEN1 Coarse
+	{ "GEN1_FINE",     PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // GEN1 Fine
+	{ "GEN1_ENVTIME",  PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // GEN1 Env.Time
+	{ "DCF1_CUTOFF",   PARAM_FLOAT,   1.0f,   0.0f,   1.0f }, // DCF1 Cutoff
+	{ "DCF1_RESO",     PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // DCF1 Resonance
+	{ "DCF1_TYPE",     PARAM_INT,     0.0f,   0.0f,   3.0f }, // DCF1 Type
+	{ "DCF1_SLOPE",    PARAM_INT,     0.0f,   0.0f,   1.0f }, // DCF1 Slope
+	{ "DCF1_ENVELOPE", PARAM_FLOAT,   1.0f,  -1.0f,   1.0f }, // DCF1 Envelope
+	{ "DCF1_ATTACK",   PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // DCF1 Attack
+	{ "DCF1_DECAY1",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCF1 Decay 1
+	{ "DCF1_LEVEL2",   PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // DCF1 Level 2
+	{ "DCF1_DECAY2",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCF1 Decay 2
+	{ "LFO1_SHAPE",    PARAM_INT,     1.0f,   0.0f,   4.0f }, // LFO1 Wave Shape
+	{ "LFO1_WIDTH",    PARAM_FLOAT,   1.0f,   0.0f,   1.0f }, // LFO1 Wave Width
+	{ "LFO1_RATE",     PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // LFO1 Rate
+	{ "LFO1_SWEEP",    PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // LFO1 Sweep
+	{ "LFO1_PITCH",    PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // LFO1 Pitch
+	{ "LFO1_CUTOFF",   PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // LFO1 Cutoff
+	{ "LFO1_RESO",     PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // LFO1 Resonance
+	{ "LFO1_PANNING",  PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // LFO1 Panning
+	{ "LFO1_VOLUME",   PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // LFO1 Volume
+	{ "LFO1_ATTACK",   PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // LFO1 Attack
+	{ "LFO1_DECAY1",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // LFO1 Decay 1
+	{ "LFO1_LEVEL2",   PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // LFO1 Level 2
+	{ "LFO1_DECAY2",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // LFO1 Decay 2
+	{ "DCA1_VOLUME",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCA1 Volume
+	{ "DCA1_ATTACK",   PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // DCA1 Attack
+	{ "DCA1_DECAY1",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCA1 Decay1
+	{ "DCA1_LEVEL2",   PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // DCA1 Level 2
+	{ "DCA1_DECAY2",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCA1 Decay 2
+	{ "OUT1_WIDTH",    PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // OUT1 Stereo Width
+	{ "OUT1_PANNING",  PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // OUT1 Panning
+	{ "OUT1_VOLUME",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // OUT1 Volume
 
-	{ "DEF1_PITCHBEND", 0.2f },
-	{ "DEF1_MODWHEEL",  0.2f },
-	{ "DEF1_PRESSURE",  0.2f },
-	{ "DEF1_VELOCITY",  0.2f },
-	{ "DEF1_CHANNEL",   0.0f },
-	{ "DEF1_NOTEOFF",   1.0f },
+	{ "DEF1_PITCHBEND",PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // DEF1 Pitchbend
+	{ "DEF1_MODWHEEL", PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // DEF1 Modwheel
+	{ "DEF1_PRESSURE", PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // DEF1 Pressure
+	{ "DEF1_VELOCITY", PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // DEF1 Velocity
+	{ "DEF1_CHANNEL",  PARAM_INT,     0.0f,   0.0f,  16.0f }, // DEF1 Channel
+	{ "DEF1_NOTEOFF",  PARAM_INT,     1.0f,   0.0f,   1.0f }, // DEF1 Note Off
 
-	{ "CHO1_WET",       0.0f },
-	{ "CHO1_DELAY",     0.5f },
-	{ "CHO1_FEEDB",     0.5f },
-	{ "CHO1_RATE",      0.5f },
-	{ "CHO1_MOD",       0.5f },
-	{ "FLA1_WET",       0.0f },
-	{ "FLA1_DELAY",     0.5f },
-	{ "FLA1_FEEDB",     0.5f },
-	{ "FLA1_DAFT",      0.0f },
-	{ "PHA1_WET",       0.0f },
-	{ "PHA1_RATE",      0.5f },
-	{ "PHA1_FEEDB",     0.5f },
-	{ "PHA1_DEPTH",     0.5f },
-	{ "PHA1_DAFT",      0.0f },
-	{ "DEL1_WET",       0.0f },
-	{ "DEL1_DELAY",     0.5f },
-	{ "DEL1_FEEDB",     0.5f },
-	{ "DEL1_BPM",     180.0f },
-	{ "DEL1_BPMSYNC",   0.0f },
-	{ "DEL1_BPMHOST", 180.0f },
-	{ "REV1_WET",       0.0f },
-	{ "REV1_ROOM",      0.5f },
-	{ "REV1_DAMP",      0.5f },
-	{ "REV1_FEEDB",     0.5f },
-	{ "REV1_WIDTH",     0.0f },
-	{ "DYN1_COMPRESS",  0.0f },
-	{ "DYN1_LIMITER",   1.0f }
+	{ "CHO1_WET",      PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // Chorus Wet
+	{ "CHO1_DELAY",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Chorus Delay
+	{ "CHO1_FEEDB",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Chorus Feedback
+	{ "CHO1_RATE",     PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Chorus Rate
+	{ "CHO1_MOD",      PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Chorus Modulation
+	{ "FLA1_WET",      PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // Flanger Wet
+	{ "FLA1_DELAY",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Flanger Delay
+	{ "FLA1_FEEDB",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Flanger Feedback
+	{ "FLA1_DAFT",     PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // Flanger Daft
+	{ "PHA1_WET",      PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // Phaser Wet
+	{ "PHA1_RATE",     PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Phaser Rate
+	{ "PHA1_FEEDB",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Phaser Feedback
+	{ "PHA1_DEPTH",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Phaser Depth
+	{ "PHA1_DAFT",     PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // Phaser Daft
+	{ "DEL1_WET",      PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // Delay Wet
+	{ "DEL1_DELAY",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Delay Delay
+	{ "DEL1_FEEDB",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Delay Feedback
+	{ "DEL1_BPM",      PARAM_FLOAT, 180.0f,   3.6f, 360.0f }, // Delay BPM
+	{ "DEL1_BPMSYNC",  PARAM_BOOL,    0.0f,   0.0f,   1.0f }, // Delay BPM (sync)
+	{ "DEL1_BPMHOST",  PARAM_FLOAT, 180.0f,   3.6f, 360.0f }, // Delay BPM (host)
+	{ "REV1_WET",      PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // Reverb Wet
+	{ "REV1_ROOM",     PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Reverb Room
+	{ "REV1_DAMP",     PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Reverb Damp
+	{ "REV1_FEEDB",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Reverb Feedback
+	{ "REV1_WIDTH",    PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // Reverb Width
+	{ "DYN1_COMPRESS", PARAM_BOOL,    0.0f,   0.0f,   1.0f }, // Dynamic Compressor
+	{ "DYN1_LIMITER",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }  // Dynamic Limiter
 };
 
 
@@ -122,7 +128,7 @@ const char *drumkv1_param::paramName ( drumkv1::ParamIndex index )
 
 float drumkv1_param::paramDefaultValue ( drumkv1::ParamIndex index )
 {
-	return drumkv1_default_params[index].value;
+	return drumkv1_default_params[index].def;
 }
 
 
