@@ -655,7 +655,7 @@ drumkv1widget_controls::drumkv1widget_controls ( QWidget *pParent )
 #else
 	pHeaderView->setSectionResizeMode(QHeaderView::ResizeToContents);
 #endif
-	pHeaderView->hide();
+//	pHeaderView->hide();
 
 	QTreeWidget::setItemDelegate(new drumkv1widget_controls_item_delegate(this));
 

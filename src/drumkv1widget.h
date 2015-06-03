@@ -25,12 +25,13 @@
 #include "ui_drumkv1widget.h"
 
 #include "drumkv1_config.h"
+#include "drumkv1_sched.h"
 
 #include "drumkv1_ui.h"
 
 
 // forward decls.
-class drumkv1_sched_notifier;
+class drumkv1widget_sched_notifier;
 
 
 //-------------------------------------------------------------------------
@@ -181,7 +182,7 @@ private:
 	// Instance variables.
 	Ui::drumkv1widget m_ui;
 
-	drumkv1_sched_notifier *m_sched_notifier;
+	drumkv1widget_sched_notifier *m_sched_notifier;
 
 	QHash<drumkv1::ParamIndex, drumkv1widget_knob *> m_paramKnobs;
 	QHash<drumkv1widget_knob *, drumkv1::ParamIndex> m_knobParams;
@@ -189,6 +190,54 @@ private:
 	float m_params_ab[drumkv1::NUM_PARAMS];
 
 	int m_iUpdate;
+};
+
+
+//-------------------------------------------------------------------------
+// drumkv1widget_sched_notifier - worker/schedule proxy decl.
+//
+
+class drumkv1widget_sched_notifier : public QObject
+{
+	Q_OBJECT
+
+public:
+
+	// ctor.
+	drumkv1widget_sched_notifier(QObject *pParent = NULL)
+		: QObject(pParent), m_notifier(this) {}
+
+signals:
+
+	// Notification signal.
+	void notify(int stype, int sid);
+
+protected:
+
+	// Notififier visitor.
+	class Notifier : public drumkv1_sched_notifier
+	{
+	public:
+
+		Notifier(drumkv1widget_sched_notifier *pNotifier)
+			: drumkv1_sched_notifier(), m_pNotifier(pNotifier) {}
+
+		void notify(drumkv1_sched::Type stype, int sid) const
+			{ m_pNotifier->emit_notify(stype, sid); }
+
+	private:
+
+		drumkv1widget_sched_notifier *m_pNotifier;
+	};
+
+	// Notification method.
+	void emit_notify(drumkv1_sched::Type stype, int sid)
+		{ emit notify(int(stype), sid); }
+
+private:
+
+	// Instance variables.
+	Notifier m_notifier;
 };
 
 

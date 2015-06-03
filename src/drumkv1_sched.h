@@ -24,9 +24,6 @@
 
 #include <stdint.h>
 
-// forward decls.
-class drumkv1_sched_notifier;
-
 
 //-------------------------------------------------------------------------
 // drumkv1_sched - worker/scheduled stuff (pure virtual).
@@ -82,26 +79,18 @@ private:
 // drumkv1_sched_notifier - worker/schedule proxy decl.
 //
 
-#include <QObject>
-
-class drumkv1_sched_notifier : public QObject
+class drumkv1_sched_notifier
 {
-	Q_OBJECT
-
 public:
 
 	// ctor.
-	drumkv1_sched_notifier(QObject *parent = NULL);
+	drumkv1_sched_notifier();
 
 	// dtor.
 	~drumkv1_sched_notifier();
 
 	// signal notifier.
-	void sync_notify(drumkv1_sched::Type stype, int sid);
-
-signals:
-
-	void notify(int stype, int sid);
+	virtual void notify(drumkv1_sched::Type stype, int sid) const = 0;
 };
 
 

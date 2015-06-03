@@ -16,6 +16,7 @@ HEADERS = \
 	drumkv1_lv2ui.h \
 	drumkv1_config.h \
 	drumkv1_param.h \
+	drumkv1_sched.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
 	drumkv1widget_filt.h \

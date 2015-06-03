@@ -246,7 +246,7 @@ void drumkv1_sched::sync_notify ( Type stype, int sid )
 {
 	QListIterator<drumkv1_sched_notifier *> iter(g_sched_notifiers);
 	while (iter.hasNext())
-		iter.next()->sync_notify(stype, sid);
+		iter.next()->notify(stype, sid);
 }
 
 
@@ -255,8 +255,7 @@ void drumkv1_sched::sync_notify ( Type stype, int sid )
 //
 
 // ctor.
-drumkv1_sched_notifier::drumkv1_sched_notifier ( QObject *parent )
-	: QObject(parent)
+drumkv1_sched_notifier::drumkv1_sched_notifier (void)
 {
 	g_sched_notifiers.append(this);
 }
@@ -266,12 +265,6 @@ drumkv1_sched_notifier::drumkv1_sched_notifier ( QObject *parent )
 drumkv1_sched_notifier::~drumkv1_sched_notifier (void)
 {
 	g_sched_notifiers.removeAll(this);
-}
-
-
-void drumkv1_sched_notifier::sync_notify ( drumkv1_sched::Type stype, int sid )
-{
-	emit notify(int(stype), sid);
 }
 
 
