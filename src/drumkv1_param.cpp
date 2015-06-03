@@ -28,22 +28,24 @@
 #include <QTextStream>
 #include <QDir>
 
+#include <math.h>
+
 
 //-------------------------------------------------------------------------
 // state params description.
 
-enum Param_Type { PARAM_FLOAT = 0, PARAM_INT, PARAM_BOOL };
+enum ParamType { PARAM_FLOAT = 0, PARAM_INT, PARAM_BOOL };
 
 static
-struct {
+struct ParamInfo {
 
 	const char *name;
-	Param_Type type;
+	ParamType type;
 	float def;
 	float min;
 	float max;
 
-} drumkv1_default_params[drumkv1::NUM_PARAMS] = {
+} drumkv1_params[drumkv1::NUM_PARAMS] = {
 
 	// name            type,           def,    min,    max
 	{ "GEN1_SAMPLE",   PARAM_INT,    36.0f,   0.0f, 127.0f }, // GEN1 Sample
@@ -122,13 +124,29 @@ struct {
 
 const char *drumkv1_param::paramName ( drumkv1::ParamIndex index )
 {
-	return drumkv1_default_params[index].name;
+	return drumkv1_params[index].name;
 }
 
 
 float drumkv1_param::paramDefaultValue ( drumkv1::ParamIndex index )
 {
-	return drumkv1_default_params[index].def;
+	return drumkv1_params[index].def;
+}
+
+
+float drumkv1_param::paramValue ( drumkv1::ParamIndex index, float fValue )
+{
+	const ParamInfo& param = drumkv1_params[index];
+
+	if (param.type == PARAM_BOOL)
+		return (fValue > 0.5f ? 1.0f : 0.0f);
+
+	fValue = param.min + fValue * (param.max - param.min);
+
+	if (param.type == PARAM_INT)
+		return ::rintf(fValue);
+	else
+		return fValue;
 }
 
 
@@ -159,7 +177,7 @@ void drumkv1_param::loadElements (
 	static QHash<QString, drumkv1::ParamIndex> s_hash;
 	if (s_hash.isEmpty()) {
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
-			s_hash.insert(drumkv1_default_params[i].name, drumkv1::ParamIndex(i));
+			s_hash.insert(drumkv1_params[i].name, drumkv1::ParamIndex(i));
 	}
 
 	for (QDomNode nElement = eElements.firstChild();
@@ -236,7 +254,7 @@ void drumkv1_param::saveElements (
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			QDomElement eParam = doc.createElement("param");
 			eParam.setAttribute("index", QString::number(i));
-			eParam.setAttribute("name", drumkv1_default_params[i].name);
+			eParam.setAttribute("name", drumkv1_params[i].name);
 			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			eParam.appendChild(doc.createTextNode(
 				QString::number(element->paramValue(index))));

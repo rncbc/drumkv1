@@ -107,11 +107,11 @@ protected:
 		Sched (drumkv1 *pDrumk)
 			: drumkv1_sched(Controls), m_pDrumk(pDrumk) {}
 
-		void schedule_event(int iIndex, float fValue)
+		void schedule_event(drumkv1::ParamIndex index, float fValue)
 		{
-			m_pDrumk->setParamValue(drumkv1::ParamIndex(iIndex), fValue);
+			m_pDrumk->setParamValue(index, fValue);
 
-			schedule(iIndex);
+			schedule(int(index));
 		}
 
 		// process (virtual stub).

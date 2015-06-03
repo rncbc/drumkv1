@@ -574,7 +574,8 @@ void drumkv1_controls::process_event ( const Event& event )
 	if (Type(key.status & 0xf0) != CC)
 		fValue /= 127.0f;
 
-	m_sched.schedule_event(iIndex, fValue);
+	const drumkv1::ParamIndex index = drumkv1::ParamIndex(iIndex);
+	m_sched.schedule_event(index, drumkv1_param::paramValue(index, fValue));
 }
 
 
