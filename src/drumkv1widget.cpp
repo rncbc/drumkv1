@@ -63,7 +63,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.setupUi(this);
 
 	// Init sched notifier.
-	m_sched_notifier = new drumkv1widget_sched_notifier(this);
+	m_sched_notifier = new drumkv1widget_sched(this);
 
 	// Init swapable params A/B to default.
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)

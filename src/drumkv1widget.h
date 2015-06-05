@@ -31,7 +31,7 @@
 
 
 // forward decls.
-class drumkv1widget_sched_notifier;
+class drumkv1widget_sched;
 
 
 //-------------------------------------------------------------------------
@@ -48,7 +48,7 @@ public:
 	drumkv1widget(QWidget *pParent = 0, Qt::WindowFlags wflags = 0);
 
 	// Destructor.
-	~drumkv1widget();
+	virtual ~drumkv1widget();
 
 	// Param port accessors.
 	void setParamValue(
@@ -182,7 +182,7 @@ private:
 	// Instance variables.
 	Ui::drumkv1widget m_ui;
 
-	drumkv1widget_sched_notifier *m_sched_notifier;
+	drumkv1widget_sched *m_sched_notifier;
 
 	QHash<drumkv1::ParamIndex, drumkv1widget_knob *> m_paramKnobs;
 	QHash<drumkv1widget_knob *, drumkv1::ParamIndex> m_knobParams;
@@ -194,17 +194,17 @@ private:
 
 
 //-------------------------------------------------------------------------
-// drumkv1widget_sched_notifier - worker/schedule proxy decl.
+// drumkv1widget_sched - worker/schedule proxy decl.
 //
 
-class drumkv1widget_sched_notifier : public QObject
+class drumkv1widget_sched : public QObject
 {
 	Q_OBJECT
 
 public:
 
 	// ctor.
-	drumkv1widget_sched_notifier(QObject *pParent = NULL)
+	drumkv1widget_sched(QObject *pParent = NULL)
 		: QObject(pParent), m_notifier(this) {}
 
 signals:
@@ -219,15 +219,15 @@ protected:
 	{
 	public:
 
-		Notifier(drumkv1widget_sched_notifier *pNotifier)
-			: drumkv1_sched_notifier(), m_pNotifier(pNotifier) {}
+		Notifier(drumkv1widget_sched *pSched)
+			: drumkv1_sched_notifier(), m_pSched(pSched) {}
 
 		void notify(drumkv1_sched::Type stype, int sid) const
-			{ m_pNotifier->emit_notify(stype, sid); }
+			{ m_pSched->emit_notify(stype, sid); }
 
 	private:
 
-		drumkv1widget_sched_notifier *m_pNotifier;
+		drumkv1widget_sched *m_pSched;
 	};
 
 	// Notification method.
