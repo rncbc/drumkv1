@@ -63,7 +63,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.setupUi(this);
 
 	// Init sched notifier.
-	m_sched_notifier = new drumkv1widget_sched(this);
+	m_sched_notifier = NULL;
 
 	// Init swapable params A/B to default.
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
@@ -476,11 +476,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(triggered(bool)),
 		SLOT(helpAboutQt()));
 
-	// Special sample update notifications (eg. reverse)
-	QObject::connect(m_sched_notifier,
-		SIGNAL(notify(int, int)),
-		SLOT(updateSchedNotify(int, int)));
-
 	// General knob/dial  behavior init...
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig) {
@@ -500,7 +495,28 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 // Destructor.
 drumkv1widget::~drumkv1widget (void)
 {
-	delete m_sched_notifier;
+	if (m_sched_notifier)
+		delete m_sched_notifier;
+}
+
+
+// Create/initialize the scheduler/work notifier.
+void drumkv1widget::initSchedNotifier (void)
+{
+	if (m_sched_notifier) {
+		delete m_sched_notifier;
+		m_sched_notifier = NULL;
+	}
+
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
+		return;
+
+	m_sched_notifier = new drumkv1widget_sched(pDrumkUi->instance(), this);
+
+	QObject::connect(m_sched_notifier,
+		SIGNAL(notify(int, int)),
+		SLOT(updateSchedNotify(int, int)));
 }
 
 

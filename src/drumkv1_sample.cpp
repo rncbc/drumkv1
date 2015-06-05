@@ -1,7 +1,7 @@
 // drumkv1_sample.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -36,8 +36,9 @@ class drumkv1_reverse_sched : public drumkv1_sched
 public:
 
 	// ctor.
-	drumkv1_reverse_sched (drumkv1_sample *sample)
-		: drumkv1_sched(Sample), m_sample(sample), m_reverse(false) {}
+	drumkv1_reverse_sched (drumkv1 *pDrumk, drumkv1_sample *sample)
+		: drumkv1_sched(pDrumk, Sample),
+			m_sample(sample), m_reverse(false) {}
 
 	// schedule reverse.
 	void reverse_sched(bool reverse)
@@ -67,12 +68,12 @@ private:
 //
 
 // ctor.
-drumkv1_sample::drumkv1_sample ( float srate )
+drumkv1_sample::drumkv1_sample ( drumkv1 *pDrumk, float srate )
 	: m_srate(srate), m_filename(0), m_nchannels(0),
 		m_rate0(0.0f), m_freq0(1.0f), m_ratio(0.0f),
 		m_nframes(0), m_pframes(0), m_reverse(false)
 {
-	m_reverse_sched = new drumkv1_reverse_sched(this);
+	m_reverse_sched = new drumkv1_reverse_sched(pDrumk, this);
 }
 
 

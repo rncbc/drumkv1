@@ -1,7 +1,7 @@
 // drumkv1_sample.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2014, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -28,6 +28,7 @@
 #include <string.h>
 
 // forward decls.
+class drumkv1;
 class drumkv1_reverse_sched;
 
 
@@ -40,7 +41,7 @@ class drumkv1_sample
 public:
 
 	// ctor.
-	drumkv1_sample(float srate = 44100.0f);
+	drumkv1_sample(drumkv1 *pDrumk, float srate = 44100.0f);
 
 	// dtor.
 	~drumkv1_sample();
@@ -117,6 +118,7 @@ protected:
 
 private:
 
+	// instance variables.
 	float    m_srate;
 	char    *m_filename;
 	uint16_t m_nchannels;

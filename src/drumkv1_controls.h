@@ -105,22 +105,17 @@ protected:
 
 		// ctor.
 		Sched (drumkv1 *pDrumk)
-			: drumkv1_sched(Controls), m_pDrumk(pDrumk) {}
+			: drumkv1_sched(pDrumk, Controls) {}
 
 		void schedule_event(drumkv1::ParamIndex index, float fValue)
 		{
-			m_pDrumk->setParamValue(index, fValue);
+			instance()->setParamValue(index, fValue);
 
 			schedule(int(index));
 		}
 
 		// process (virtual stub).
 		void process(int) {}
-
-	private:
-
-		// instance variables.
-		drumkv1 *m_pDrumk;
 	};
 
 private:

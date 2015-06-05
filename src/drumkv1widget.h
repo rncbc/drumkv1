@@ -50,6 +50,9 @@ public:
 	// Destructor.
 	virtual ~drumkv1widget();
 
+	// Create/initialize the scheduler/work notifier.
+	void initSchedNotifier();
+
 	// Param port accessors.
 	void setParamValue(
 		drumkv1::ParamIndex index, float fValue, bool bDefault = false);
@@ -204,8 +207,8 @@ class drumkv1widget_sched : public QObject
 public:
 
 	// ctor.
-	drumkv1widget_sched(QObject *pParent = NULL)
-		: QObject(pParent), m_notifier(this) {}
+	drumkv1widget_sched(drumkv1 *pDrumk, QObject *pParent = NULL)
+		: QObject(pParent), m_notifier(pDrumk, this) {}
 
 signals:
 
@@ -219,8 +222,8 @@ protected:
 	{
 	public:
 
-		Notifier(drumkv1widget_sched *pSched)
-			: drumkv1_sched_notifier(), m_pSched(pSched) {}
+		Notifier(drumkv1 *pDrumk, drumkv1widget_sched *pSched)
+			: drumkv1_sched_notifier(pDrumk), m_pSched(pSched) {}
 
 		void notify(drumkv1_sched::Type stype, int sid) const
 			{ m_pSched->emit_notify(stype, sid); }

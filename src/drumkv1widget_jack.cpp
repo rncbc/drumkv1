@@ -72,6 +72,9 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 	// Initialize (user) interface stuff...
 	m_pDrumkUi = new drumkv1_ui(m_pDrumk);
 
+	// May initialize the scheduler/work notifier.
+	initSchedNotifier();
+
 	// Initialize preset stuff...
 	//initPreset();
 	refreshElements();

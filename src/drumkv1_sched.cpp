@@ -25,6 +25,8 @@
 #include <QMutex>
 #include <QWaitCondition>
 
+#include <QHash>
+
 
 //-------------------------------------------------------------------------
 // drumkv1_sched_thread - worker/schedule thread decl.
@@ -71,7 +73,7 @@ private:
 static drumkv1_sched_thread *g_sched_thread = NULL;
 static uint32_t g_sched_refcount = 0;
 
-static QList<drumkv1_sched_notifier *> g_sched_notifiers;
+static QHash<drumkv1 *, QList<drumkv1_sched_notifier *> > g_sched_notifiers;
 
 
 //-------------------------------------------------------------------------
@@ -162,8 +164,8 @@ void drumkv1_sched_thread::run (void)
 //
 
 // ctor.
-drumkv1_sched::drumkv1_sched ( Type stype, uint32_t nsize )
-	: m_stype(stype), m_sync_wait(false)
+drumkv1_sched::drumkv1_sched ( drumkv1 *pDrumk, Type stype, uint32_t nsize )
+	: m_pDrumk(pDrumk), m_stype(stype), m_sync_wait(false)
 {
 	m_nsize = (4 << 1);
 	while (m_nsize < nsize)
@@ -194,6 +196,13 @@ drumkv1_sched::~drumkv1_sched (void)
 			g_sched_thread = NULL;
 		}
 	}
+}
+
+
+// instance access.
+drumkv1 *drumkv1_sched::instance (void) const
+{
+	return m_pDrumk;
 }
 
 
@@ -231,7 +240,7 @@ void drumkv1_sched::sync_process (void)
 	while (r != m_iwrite) {
 		const int sid = m_items[r];
 		process(sid);
-		sync_notify(m_stype, sid);
+		sync_notify(m_pDrumk, m_stype, sid);
 		m_items[r] = 0;
 		++r &= m_nmask;
 	}
@@ -242,11 +251,15 @@ void drumkv1_sched::sync_process (void)
 
 
 // signal broadcast (static).
-void drumkv1_sched::sync_notify ( Type stype, int sid )
+void drumkv1_sched::sync_notify ( drumkv1 *pDrumk, Type stype, int sid )
 {
-	QListIterator<drumkv1_sched_notifier *> iter(g_sched_notifiers);
-	while (iter.hasNext())
-		iter.next()->notify(stype, sid);
+	if (g_sched_notifiers.contains(pDrumk)) {
+		const QList<drumkv1_sched_notifier *>& list
+			= g_sched_notifiers.value(pDrumk);
+		QListIterator<drumkv1_sched_notifier *> iter(list);
+		while (iter.hasNext())
+			iter.next()->notify(stype, sid);
+	}
 }
 
 
@@ -255,16 +268,22 @@ void drumkv1_sched::sync_notify ( Type stype, int sid )
 //
 
 // ctor.
-drumkv1_sched_notifier::drumkv1_sched_notifier (void)
+drumkv1_sched_notifier::drumkv1_sched_notifier ( drumkv1 *pDrumk )
+	: m_pDrumk(pDrumk)
 {
-	g_sched_notifiers.append(this);
+	g_sched_notifiers[m_pDrumk].append(this);
 }
 
 
 // dtor.
 drumkv1_sched_notifier::~drumkv1_sched_notifier (void)
 {
-	g_sched_notifiers.removeAll(this);
+	if (g_sched_notifiers.contains(m_pDrumk)) {
+		QList<drumkv1_sched_notifier *>& list = g_sched_notifiers[m_pDrumk];
+		list.removeAll(this);
+		if (list.isEmpty())
+			g_sched_notifiers.remove(m_pDrumk);
+	}
 }
 
 

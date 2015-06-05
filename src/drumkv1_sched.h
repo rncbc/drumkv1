@@ -24,6 +24,9 @@
 
 #include <stdint.h>
 
+// forward decls.
+class drumkv1;
+
 
 //-------------------------------------------------------------------------
 // drumkv1_sched - worker/scheduled stuff (pure virtual).
@@ -37,10 +40,13 @@ public:
 	enum Type { Sample, Programs, Controls };
 
 	// ctor.
-	drumkv1_sched(Type stype, uint32_t nsize = 8);
+	drumkv1_sched(drumkv1 *pDrumk, Type stype, uint32_t nsize = 8);
 
 	// virtual dtor.
 	virtual ~drumkv1_sched();
+
+	// instance access.
+	drumkv1 *instance() const;
 
 	// schedule process.
 	void schedule(int sid = 0);
@@ -55,11 +61,13 @@ public:
 	virtual void process(int sid) = 0;
 
 	// signal broadcast (static).
-	static void sync_notify(Type stype, int sid);
+	static void sync_notify(drumkv1 *pDrumk, Type stype, int sid);
 
 private:
 
 	// instance variables.
+	drumkv1 *m_pDrumk;
+
 	Type m_stype;
 
 	// sched queue instance reference.
@@ -84,13 +92,18 @@ class drumkv1_sched_notifier
 public:
 
 	// ctor.
-	drumkv1_sched_notifier();
+	drumkv1_sched_notifier(drumkv1 *pDrumk);
 
 	// dtor.
 	~drumkv1_sched_notifier();
 
 	// signal notifier.
 	virtual void notify(drumkv1_sched::Type stype, int sid) const = 0;
+
+private:
+
+	// instance variables.
+	drumkv1 *m_pDrumk;
 };
 
 

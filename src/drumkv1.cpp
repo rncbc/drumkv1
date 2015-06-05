@@ -638,7 +638,7 @@ class drumkv1_elem : public drumkv1_list<drumkv1_elem>
 {
 public:
 
-	drumkv1_elem(uint32_t iSampleRate, int key);
+	drumkv1_elem(drumkv1 *pDrumk, uint32_t iSampleRate, int key);
 
 	drumkv1_element element;
 
@@ -664,8 +664,8 @@ public:
 
 // synth element
 
-drumkv1_elem::drumkv1_elem ( uint32_t iSampleRate, int key )
-	: element(this)
+drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, uint32_t iSampleRate, int key )
+	: element(this), gen1_sample(pDrumk)
 {
 	// element parameter value set
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
@@ -835,6 +835,8 @@ protected:
 
 private:
 
+	drumkv1 *m_pDrumk;
+
 	drumkv1_config   m_config;
 	drumkv1_controls m_controls;
 	drumkv1_programs m_programs;
@@ -881,7 +883,7 @@ private:
 
 drumkv1_impl::drumkv1_impl (
 	drumkv1 *pDrumk, uint16_t iChannels, uint32_t iSampleRate )
-	: m_controls(pDrumk), m_programs(pDrumk)
+	: m_pDrumk(pDrumk), m_controls(pDrumk), m_programs(pDrumk)
 {
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
@@ -1022,7 +1024,7 @@ drumkv1_element *drumkv1_impl::addElement ( int key )
 	if (key >= 0 && key < MAX_NOTES) {
 		elem = m_elems[key];
 		if (elem == 0) {
-			elem = new drumkv1_elem(m_iSampleRate, key);
+			elem = new drumkv1_elem(m_pDrumk, m_iSampleRate, key);
 			m_elem_list.append(elem);
 			m_elems[key] = elem;
 		}

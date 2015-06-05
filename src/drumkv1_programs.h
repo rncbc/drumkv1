@@ -120,8 +120,8 @@ protected:
 	public:
 
 		// ctor.
-		Sched (drumkv1 *pDrumk) : drumkv1_sched(Programs),
-			m_pDrumk(pDrumk), m_bank_id(0), m_prog_id(0) {}
+		Sched (drumkv1 *pDrumk)
+			: drumkv1_sched(pDrumk, Programs), m_bank_id(0), m_prog_id(0) {}
 
 		// schedule (override)
 		void select_program(uint16_t bank_id, uint16_t prog_id)
@@ -135,15 +135,14 @@ protected:
 		// process (virtual).
 		void process(int)
 		{
-			drumkv1_programs *pPrograms = m_pDrumk->programs();
-			pPrograms->process_program(m_pDrumk, m_bank_id, m_prog_id);
+			drumkv1 *pDrumk = instance();
+			drumkv1_programs *pPrograms = pDrumk->programs();
+			pPrograms->process_program(pDrumk, m_bank_id, m_prog_id);
 		}
 
 	private:
 
 		// instance variables.
-		drumkv1 *m_pDrumk;
-
 		uint16_t m_bank_id;
 		uint16_t m_prog_id;
 	};
