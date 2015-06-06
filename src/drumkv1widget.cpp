@@ -591,8 +591,7 @@ void drumkv1widget::paramChanged ( float fValue )
 		// Proceed with regular formalities...
 		updateParam(index, fValue);
 		updateParamEx(index, fValue);
-		m_ui.StatusBar->showMessage(QString("%1 / %2: %3")
-			.arg(m_ui.StackedWidget->currentWidget()->windowTitle())
+		m_ui.StatusBar->showMessage(QString("%1: %2")
 			.arg(pKnob->toolTip())
 			.arg(pKnob->valueText()), 5000);
 		updateDirtyPreset(true);
@@ -623,6 +622,26 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 		// Fall thru...
 	default:
 		break;
+	}
+
+	--m_iUpdate;
+}
+
+
+// Update scheduled controllers param/knob widgets.
+void drumkv1widget::updateSchedParam ( drumkv1::ParamIndex index, float fValue )
+{
+	++m_iUpdate;
+
+	drumkv1widget_knob *pKnob = paramKnob(index);
+	if (pKnob) {
+		pKnob->setValue(fValue, false);
+		updateParam(index, fValue);
+		updateParamEx(index, fValue);
+		m_ui.StatusBar->showMessage(QString("%1: %2")
+			.arg(pKnob->toolTip())
+			.arg(pKnob->valueText()), 5000);
+		updateDirtyPreset(true);
 	}
 
 	--m_iUpdate;
@@ -1281,7 +1300,7 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 	switch (drumkv1_sched::Type(stype)) {
 	case drumkv1_sched::Controls: {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(sid);
-		setParamValue(index, pDrumkUi->paramValue(index));
+		updateSchedParam(index, pDrumkUi->paramValue(index));
 		break;
 	}
 	case drumkv1_sched::Programs: {

@@ -174,6 +174,9 @@ protected:
 	// Update local tied widgets.
 	void updateParamEx(drumkv1::ParamIndex index, float fValue);
 
+	// Update scheduled controllers param/knob widgets.
+	void updateSchedParam(drumkv1::ParamIndex index, float fValue);
+
 	// Preset status updater.
 	void updateLoadPreset(const QString& sPreset);
 

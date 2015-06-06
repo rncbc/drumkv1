@@ -395,7 +395,7 @@ void drumkv1widget_spin::setSingleStep ( float fSingleStep )
 
 QString drumkv1widget_spin::valueText (void) const
 {
-	return QString::number(value());
+	return QString::number(m_pSpinBox->value(), 'f', 1);
 }
 
 
