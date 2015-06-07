@@ -26,6 +26,7 @@
 #include "drumkv1_sched.h"
 
 #include "drumkv1widget_config.h"
+#include "drumkv1widget_control.h"
 
 #include <QMessageBox>
 #include <QDir>
@@ -531,6 +532,12 @@ void drumkv1widget::setParamKnob ( drumkv1::ParamIndex index, drumkv1widget_knob
 	QObject::connect(pKnob,
 		SIGNAL(valueChanged(float)),
 		SLOT(paramChanged(float)));
+
+	pKnob->setContextMenuPolicy(Qt::CustomContextMenu);
+
+	QObject::connect(pKnob,
+		SIGNAL(customContextMenuRequested(const QPoint&)),
+		SLOT(paramContextMenu(const QPoint&)));
 }
 
 drumkv1widget_knob *drumkv1widget::paramKnob ( drumkv1::ParamIndex index ) const
@@ -1396,6 +1403,36 @@ void drumkv1widget::updateDirtyPreset ( bool bDirtyPreset )
 {
 	m_ui.StatusBar->setModified(bDirtyPreset);
 	m_ui.Preset->setDirtyPreset(bDirtyPreset);
+}
+
+
+// Param knob context menu.
+void drumkv1widget::paramContextMenu ( const QPoint& pos )
+{
+	drumkv1widget_knob *pKnob
+		= qobject_cast<drumkv1widget_knob *> (sender());
+	if (pKnob == NULL)
+		return;
+
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
+		return;
+
+	drumkv1_controls *pControls = pDrumkUi->controls();
+	if (pControls == NULL)
+		return;
+
+	QMenu menu(this);
+
+	QAction *pAction = menu.addAction(
+		QIcon(":/images/drumkv1_preset.png"),
+		tr("MIDI &Controller..."));
+
+	if (menu.exec(pKnob->mapToGlobal(pos)) == pAction) {
+		const drumkv1::ParamIndex index = m_knobParams.value(pKnob);
+		const QString& sTitle = pKnob->toolTip();
+		drumkv1widget_control::showInstance(pControls, index, sTitle, this);
+	}
 }
 
 

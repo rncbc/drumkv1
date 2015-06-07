@@ -409,7 +409,7 @@ void drumkv1widget_config::accept (void)
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 
 	if (m_iDirtyControls > 0 && pConfig && m_pControls) {
-		// Save programs...
+		// Save controls...
 		m_ui.ControlsTreeWidget->saveControls(m_pControls);
 		pConfig->saveControls(m_pControls);
 		// Reset dirty flag.
