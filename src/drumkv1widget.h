@@ -131,6 +131,9 @@ protected slots:
 	// Notification updater.
 	void updateSchedNotify(int stype, int sid);
 
+	// Param knob context menu.
+	void paramContextMenu(const QPoint& pos);
+
 	// Menu actions.
 	void helpConfigure();
 
@@ -182,9 +185,6 @@ protected:
 
 	// Dirty flag (overridable virtual) methods.
 	virtual void updateDirtyPreset(bool bDirtyPreset);
-
-	// Param knob context menu.
-	void paramContextMenu(const QPoint& pos);
 
 private:
 
