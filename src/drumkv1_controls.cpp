@@ -514,7 +514,8 @@ private:
 //
 
 drumkv1_controls::drumkv1_controls ( drumkv1 *pDrumk )
-	: m_pImpl(new drumkv1_controls::Impl()), m_sched(pDrumk)
+	: m_pImpl(new drumkv1_controls::Impl()),
+		m_sched(pDrumk), m_control_sched(pDrumk)
 {
 }
 
@@ -556,8 +557,10 @@ void drumkv1_controls::process_dequeue (void)
 void drumkv1_controls::process_event ( const Event& event )
 {
 	Key key(event.key);
-	int iIndex = find_control(key);
 
+	m_control_sched.schedule_key(key);
+
+	int iIndex = find_control(key);
 	if (iIndex < 0 && key.channel() > 0) {
 		key.status = key.type(); // channel: 0=Auto
 		iIndex = find_control(key);
@@ -617,6 +620,13 @@ QString drumkv1_controls::textFromType ( Type ctype )
 	}
 
 	return sText;
+}
+
+
+// current/last controller accessor.
+const drumkv1_controls::Key& drumkv1_controls::current_key (void) const
+{
+	return m_control_sched.current_key();
 }
 
 

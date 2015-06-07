@@ -1305,6 +1305,15 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 #endif
 
 	switch (drumkv1_sched::Type(stype)) {
+	case drumkv1_sched::Controller: {
+		drumkv1widget_control *pInstance
+			= drumkv1widget_control::getInstance();
+		if (pInstance) {
+			drumkv1_controls *pControls = pDrumkUi->controls();
+			pInstance->setControlKey(pControls->current_key());
+		}
+		break;
+	}
 	case drumkv1_sched::Controls: {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(sid);
 		updateSchedParam(index, pDrumkUi->paramValue(index));
