@@ -1434,7 +1434,7 @@ void drumkv1widget::paramContextMenu ( const QPoint& pos )
 	QMenu menu(this);
 
 	QAction *pAction = menu.addAction(
-		QIcon(":/images/drumkv1_preset.png"),
+		QIcon(":/images/drumkv1_control.png"),
 		tr("MIDI &Controller..."));
 
 	if (menu.exec(pKnob->mapToGlobal(pos)) == pAction) {

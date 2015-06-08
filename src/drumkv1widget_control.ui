@@ -34,8 +34,7 @@
    <string>MIDI Controller</string>
   </property>
   <property name="windowIcon">
-   <iconset resource="drumkv1.qrc">
-    <normaloff>:/images/drumkv1_preset.png</normaloff>:/images/drumkv1_preset.png</iconset>
+   <iconset resource="drumkv1.qrc">:/images/drumkv1_control.png</iconset>
   </property>
   <layout class="QGridLayout">
    <item row="0" column="0">

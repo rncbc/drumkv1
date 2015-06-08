@@ -682,7 +682,7 @@ void drumkv1widget_controls::loadControls ( drumkv1_controls *pControls )
 {
 	QTreeWidget::clear();
 
-	const QIcon icon(":/images/drumkv1_preset.png");
+	const QIcon icon(":/images/drumkv1_control.png");
 	QList<QTreeWidgetItem *> items;
 	const drumkv1_controls::Map& map = pControls->map();
 	drumkv1_controls::Map::ConstIterator iter = map.constBegin();
@@ -746,7 +746,7 @@ void drumkv1widget_controls::addControlItem (void)
 QTreeWidgetItem *drumkv1widget_controls::newControlItem (void)
 {
 	QTreeWidgetItem *pItem = new QTreeWidgetItem();
-	const QIcon icon(":/images/drumkv1_preset.png");
+	const QIcon icon(":/images/drumkv1_control.png");
 	const drumkv1_controls::Type ctype = drumkv1_controls::CC;
 //	pItem->setIcon(0, icon);
 	pItem->setText(0, tr("Auto"));

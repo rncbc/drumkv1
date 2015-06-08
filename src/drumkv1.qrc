@@ -10,5 +10,6 @@
 		<file>images/fileOpen.png</file>
 		<file>images/drumkv1.png</file>
 		<file>images/drumkv1_preset.png</file>
+		<file>images/drumkv1_control.png</file>
 	</qresource>
 </RCC>
