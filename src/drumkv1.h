@@ -43,15 +43,15 @@ class drumkv1
 {
 public:
 
-	drumkv1(uint16_t iChannels = 2, uint32_t iSampleRate = 44100);
+	drumkv1(uint16_t nchannels = 2, float srate = 44100.0f);
 
 	~drumkv1();
 
-	void setChannels(uint16_t iChannels);
+	void setChannels(uint16_t nchannels);
 	uint16_t channels() const;
 
-	void setSampleRate(uint32_t iSampleRate);
-	uint32_t sampleRate() const;
+	void setSampleRate(float srate);
+	float sampleRate() const;
 
 	drumkv1_element *addElement(int key);
 	drumkv1_element *element(int key) const;

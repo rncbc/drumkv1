@@ -98,7 +98,7 @@ private:
 
 drumkv1_lv2::drumkv1_lv2 (
 	double sample_rate, const LV2_Feature *const *host_features )
-	: drumkv1(2, uint32_t(sample_rate))
+	: drumkv1(2, float(sample_rate))
 {
 	m_urid_map = NULL;
 	m_atom_sequence = NULL;

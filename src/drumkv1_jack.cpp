@@ -283,11 +283,11 @@ void drumkv1_jack::open ( const char *client_id )
 		return;
 
 	// set sample rate
-	drumkv1::setSampleRate(jack_get_sample_rate(m_client));
+	drumkv1::setSampleRate(float(jack_get_sample_rate(m_client)));
 //	drumkv1::reset();
 
 	// register audio ports & buffers
-	uint16_t nchannels = drumkv1::channels();
+	const uint16_t nchannels = drumkv1::channels();
 
 	m_audio_ins  = new jack_port_t * [nchannels];
 	m_audio_outs = new jack_port_t * [nchannels];

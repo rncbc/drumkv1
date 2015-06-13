@@ -638,7 +638,7 @@ class drumkv1_elem : public drumkv1_list<drumkv1_elem>
 {
 public:
 
-	drumkv1_elem(drumkv1 *pDrumk, uint32_t iSampleRate, int key);
+	drumkv1_elem(drumkv1 *pDrumk, float srate, int key);
 
 	drumkv1_element element;
 
@@ -658,13 +658,13 @@ public:
 
 	float params[3][drumkv1::NUM_ELEMENT_PARAMS];
 
-	void updateEnvTimes(uint32_t iSampleRate);
+	void updateEnvTimes(float srate);
 };
 
 
 // synth element
 
-drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, uint32_t iSampleRate, int key )
+drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, float srate, int key )
 	: element(this), gen1_sample(pDrumk)
 {
 	// element parameter value set
@@ -683,17 +683,17 @@ drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, uint32_t iSampleRate, int key )
 	}
 
 	// element sample rate
-	gen1_sample.setSampleRate(iSampleRate);
-	lfo1_wave.setSampleRate(iSampleRate);
+	gen1_sample.setSampleRate(srate);
+	lfo1_wave.setSampleRate(srate);
 
-	updateEnvTimes(iSampleRate);
+	updateEnvTimes(srate);
 }
 
 
-void drumkv1_elem::updateEnvTimes ( uint32_t iSampleRate )
+void drumkv1_elem::updateEnvTimes ( float srate )
 {
 	// element envelope range times in frames
-	const float srate_ms = 0.001f * float(iSampleRate);
+	const float srate_ms = 0.001f * srate;
 
 	float envtime_msecs = 10000.0f * gen1.envtime0;
 	if (envtime_msecs < MIN_ENV_MSECS)
@@ -761,15 +761,15 @@ class drumkv1_impl
 {
 public:
 
-	drumkv1_impl(drumkv1 *pDrumk, uint16_t iChannels, uint32_t iSampleRate);
+	drumkv1_impl(drumkv1 *pDrumk, uint16_t nchannels, float srate);
 
 	~drumkv1_impl();
 
-	void setChannels(uint16_t iChannels);
+	void setChannels(uint16_t nchannels);
 	uint16_t channels() const;
 
-	void setSampleRate(uint32_t iSampleRate);
-	uint32_t sampleRate() const;
+	void setSampleRate(float srate);
+	float sampleRate() const;
 
 	drumkv1_element *addElement(int key);
 	drumkv1_element *element(int key) const;
@@ -841,8 +841,8 @@ private:
 	drumkv1_controls m_controls;
 	drumkv1_programs m_programs;
 
-	uint16_t m_iChannels;
-	uint32_t m_iSampleRate;
+	uint16_t m_nchannels;
+	uint32_t m_srate;
 
 	drumkv1_ctl m_ctl;
 
@@ -882,7 +882,7 @@ private:
 // synth engine constructor
 
 drumkv1_impl::drumkv1_impl (
-	drumkv1 *pDrumk, uint16_t iChannels, uint32_t iSampleRate )
+	drumkv1 *pDrumk, uint16_t nchannels, float srate )
 	: m_pDrumk(pDrumk), m_controls(pDrumk), m_programs(pDrumk)
 {
 	// allocate voice pool.
@@ -920,10 +920,10 @@ drumkv1_impl::drumkv1_impl (
 	m_config.loadPrograms(&m_programs);
 
 	// number of channels
-	setChannels(iChannels);
+	setChannels(nchannels);
 
 	// set default sample rate
-	setSampleRate(iSampleRate);
+	setSampleRate(srate);
 
 	// init default element (eg. 36=Bass Drum 1)
 	clearElements();
@@ -969,9 +969,9 @@ drumkv1_impl::~drumkv1_impl (void)
 }
 
 
-void drumkv1_impl::setChannels ( uint16_t iChannels )
+void drumkv1_impl::setChannels ( uint16_t nchannels )
 {
-	m_iChannels = iChannels;
+	m_nchannels = nchannels;
 
 	// deallocate flangers
 	if (m_flanger) {
@@ -1001,20 +1001,20 @@ void drumkv1_impl::setChannels ( uint16_t iChannels )
 
 uint16_t drumkv1_impl::channels (void) const
 {
-	return m_iChannels;
+	return m_nchannels;
 }
 
 
-void drumkv1_impl::setSampleRate ( uint32_t iSampleRate )
+void drumkv1_impl::setSampleRate ( float srate )
 {
 	// set internal sample rate
-	m_iSampleRate = iSampleRate;
+	m_srate = srate;
 }
 
 
-uint32_t drumkv1_impl::sampleRate (void) const
+float drumkv1_impl::sampleRate (void) const
 {
-	return m_iSampleRate;
+	return m_srate;
 }
 
 
@@ -1024,7 +1024,7 @@ drumkv1_element *drumkv1_impl::addElement ( int key )
 	if (key >= 0 && key < MAX_NOTES) {
 		elem = m_elems[key];
 		if (elem == 0) {
-			elem = new drumkv1_elem(m_pDrumk, m_iSampleRate, key);
+			elem = new drumkv1_elem(m_pDrumk, m_srate, key);
 			m_elem_list.append(elem);
 			m_elems[key] = elem;
 		}
@@ -1127,7 +1127,7 @@ void drumkv1_impl::clearElements (void)
 
 #if 0
 	// init default element (eg. 36=Bass Drum 1)
-	m_elem_list.append(new drumkv1_elem(m_iSampleRate, 36));
+	m_elem_list.append(new drumkv1_elem(m_srate, 36));
 	m_elem = m_elem_list.next();
 	m_elems[36] = m_elem;
 #endif
@@ -1463,20 +1463,20 @@ void drumkv1_impl::allControllersOff (void)
 
 void drumkv1_impl::allSoundOff (void)
 {
-	m_chorus.setSampleRate(m_iSampleRate);
+	m_chorus.setSampleRate(m_srate);
 	m_chorus.reset();
 
-	for (uint16_t k = 0; k < m_iChannels; ++k) {
-		m_phaser[k].setSampleRate(m_iSampleRate);
-		m_delay[k].setSampleRate(m_iSampleRate);
-		m_comp[k].setSampleRate(m_iSampleRate);
+	for (uint16_t k = 0; k < m_nchannels; ++k) {
+		m_phaser[k].setSampleRate(m_srate);
+		m_delay[k].setSampleRate(m_srate);
+		m_comp[k].setSampleRate(m_srate);
 		m_flanger[k].reset();
 		m_phaser[k].reset();
 		m_delay[k].reset();
 		m_comp[k].reset();
 	}
 
-	m_reverb.setSampleRate(m_iSampleRate);
+	m_reverb.setSampleRate(m_srate);
 	m_reverb.reset();
 }
 
@@ -1550,19 +1550,19 @@ void drumkv1_impl::reset (void)
 
 	// flangers
 	if (m_flanger == 0)
-		m_flanger = new drumkv1_fx_flanger [m_iChannels];
+		m_flanger = new drumkv1_fx_flanger [m_nchannels];
 
 	// phasers
 	if (m_phaser == 0)
-		m_phaser = new drumkv1_fx_phaser [m_iChannels];
+		m_phaser = new drumkv1_fx_phaser [m_nchannels];
 
 	// delays
 	if (m_delay == 0)
-		m_delay = new drumkv1_fx_delay [m_iChannels];
+		m_delay = new drumkv1_fx_delay [m_nchannels];
 
 	// compressors
 	if (m_comp == 0)
-		m_comp = new drumkv1_fx_comp [m_iChannels];
+		m_comp = new drumkv1_fx_comp [m_nchannels];
 
 	// reverbs
 	m_reverb.reset();
@@ -1593,13 +1593,13 @@ drumkv1_programs *drumkv1_impl::programs (void)
 
 void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 {
-	float *v_outs[m_iChannels];
+	float *v_outs[m_nchannels];
 
 	// buffer i/o transfer
 
 	uint16_t k;
 
-	for (k = 0; k < m_iChannels; ++k)
+	for (k = 0; k < m_nchannels; ++k)
 		::memcpy(outs[k], ins[k], nframes * sizeof(float));
 
 	drumkv1_elem *elem = m_elem_list.next();
@@ -1612,7 +1612,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 	#endif
 		if (elem->gen1.envtime0 != *elem->gen1.envtime) {
 			elem->gen1.envtime0  = *elem->gen1.envtime;
-			elem->updateEnvTimes(m_iSampleRate);
+			elem->updateEnvTimes(m_srate);
 		}
 		elem->gen1_sample.reverse_test(*elem->gen1.reverse > 0.5f);
 		elem->lfo1_wave.reset_test(
@@ -1646,7 +1646,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 		// output buffers
 
-		for (k = 0; k < m_iChannels; ++k)
+		for (k = 0; k < m_nchannels; ++k)
 			v_outs[k] = outs[k];
 
 		uint32_t nblock = nframes;
@@ -1717,7 +1717,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float out2
 					= vol1 * (mid1 - sid1 * wid1) * elem->pan1.value(j, 1);
 
-				for (k = 0; k < m_iChannels; ++k)
+				for (k = 0; k < m_nchannels; ++k)
 					*v_outs[k]++ += (k & 1 ? out2 : out1);
 
 				if (j == 0) {
@@ -1764,13 +1764,13 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 	}
 
 	// chorus
-	if (m_iChannels > 1) {
+	if (m_nchannels > 1) {
 		m_chorus.process(outs[0], outs[1], nframes, *m_cho.wet,
 			*m_cho.delay, *m_cho.feedb, *m_cho.rate, *m_cho.mod);
 	}
 
 	// effects
-	for (k = 0; k < m_iChannels; ++k) {
+	for (k = 0; k < m_nchannels; ++k) {
 		float *in = outs[k];
 		// flanger
 		m_flanger[k].process(in, nframes, *m_fla.wet,
@@ -1784,13 +1784,13 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 	}
 
 	// reverb
-	if (m_iChannels > 1) {
+	if (m_nchannels > 1) {
 		m_reverb.process(outs[0], outs[1], nframes, *m_rev.wet,
 			*m_rev.feedb, *m_rev.room, *m_rev.damp, *m_rev.width);
 	}
 
 	// dynamics
-	for (k = 0; k < m_iChannels; ++k) {
+	for (k = 0; k < m_nchannels; ++k) {
 		float *in = outs[k];
 		// compressor
 		if (int(*m_dyn.compress) > 0)
@@ -1820,9 +1820,9 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 // drumkv1 - decl.
 //
 
-drumkv1::drumkv1 ( uint16_t iChannels, uint32_t iSampleRate )
+drumkv1::drumkv1 ( uint16_t nchannels, float srate )
 {
-	m_pImpl = new drumkv1_impl(this, iChannels, iSampleRate);
+	m_pImpl = new drumkv1_impl(this, nchannels, srate);
 }
 
 
@@ -1832,9 +1832,9 @@ drumkv1::~drumkv1 (void)
 }
 
 
-void drumkv1::setChannels ( uint16_t iChannels )
+void drumkv1::setChannels ( uint16_t nchannels )
 {
-	m_pImpl->setChannels(iChannels);
+	m_pImpl->setChannels(nchannels);
 }
 
 
@@ -1844,13 +1844,13 @@ uint16_t drumkv1::channels (void) const
 }
 
 
-void drumkv1::setSampleRate ( uint32_t iSampleRate )
+void drumkv1::setSampleRate ( float srate )
 {
-	m_pImpl->setSampleRate(iSampleRate);
+	m_pImpl->setSampleRate(srate);
 }
 
 
-uint32_t drumkv1::sampleRate (void) const
+float drumkv1::sampleRate (void) const
 {
 	return m_pImpl->sampleRate();
 }
