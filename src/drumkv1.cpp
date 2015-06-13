@@ -1286,168 +1286,179 @@ float drumkv1_impl::paramValue ( drumkv1::ParamIndex index ) const
 
 void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 {
-	// check data size (#1)
-	if (size < 2)
-		return;
+	for (uint32_t i = 0; i < size; ++i) {
 
-	// channel filter
-	const int channel = (data[0] & 0x0f) + 1;
+		// channel status
+		const int channel = (data[i] & 0x0f) + 1;
+		const int status  = (data[i] & 0xf0);
 
-	const int ch = int(*m_def.channel);
-	const int on = (ch == 0 || ch == channel);
+		// channel filter
+		const int ch = int(*m_def.channel);
+		const int on = (ch == 0 || ch == channel);
 
-	if (!on)
-		return;
+		// non control change flush...
+		if (status != 0xb0)
+			m_controls.process_flush();
 
-	// note on
-	const int status = (data[0] & 0xf0);
-	const int key    = (data[1] & 0x7f);
+		// check data size (#1)
+		if (++i >= size)
+			break;
 
-	// program change
-	if (status == 0xc0)
-		m_programs.prog_change(key);
-	else
-	if (status == 0xd0) {
+		const int key = (data[i] & 0x7f);
+
+		// program change
+		if (status == 0xc0) {
+			if (on) m_programs.prog_change(key);
+			continue;
+		}
+
 		// channel aftertouch
-		m_ctl.pressure = float(key) / 127.0f;
-	}
-
-	// check data size (#2)
-	if (size < 3)
-		return;
-
-	const int value  = (data[2] & 0x7f);
-
-	// note on
-	if (status == 0x90 && value > 0) {
-		drumkv1_voice *pv = m_notes[key];
-		if (pv && !(int(*m_def.noteoff) > 0)) {
-			drumkv1_elem *elem = pv->elem;
-			// retrigger fast release
-			elem->dcf1.env.note_off_fast(&pv->dcf1_env);
-			elem->lfo1.env.note_off_fast(&pv->lfo1_env);
-			elem->dca1.env.note_off_fast(&pv->dca1_env);
-			m_notes[key] = 0;
-			pv->note = -1;
+		if (status == 0xd0) {
+			if (on) m_ctl.pressure = float(key) / 127.0f;
+			continue;
 		}
-		// find free voice
-		pv = alloc_voice(key);
-		if (pv) {
-			drumkv1_elem *elem = pv->elem;
-			// waveform
-			pv->note = key;
-			// velocity
-			const float vel = float(value) / 127.0f;
-			// quadratic velocity law
-			pv->vel  = drumkv1_velocity(vel * vel, *m_def.velocity);
-			// pressure/aftertouch
-			pv->pre = 0.0f;
-			pv->dca1_pre.reset(m_def.pressure, &m_ctl.pressure, &pv->pre);
-			// generate
-			pv->gen1.start();
-			// frequencies
-			const float freq1 = float(key)
-				+ *elem->gen1.coarse * COARSE_SCALE
-				+ *elem->gen1.fine * FINE_SCALE;
-			pv->gen1_freq = drumkv1_freq(freq1);
-			// filters
-			const int type1 = int(*elem->dcf1.type);
-			pv->dcf11.reset(drumkv1_filter1::Type(type1));
-			pv->dcf12.reset(drumkv1_filter1::Type(type1));
-			pv->dcf13.reset(drumkv1_filter2::Type(type1));
-			pv->dcf14.reset(drumkv1_filter2::Type(type1));
-			// envelopes
-			elem->dcf1.env.start(&pv->dcf1_env);
-			elem->lfo1.env.start(&pv->lfo1_env);
-			elem->dca1.env.start(&pv->dca1_env);
-			// lfos
-			pv->lfo1_sample = pv->lfo1.start();
-			// allocated
-			m_notes[key] = pv;
-			// group management
-			pv->group = int(*elem->gen1.group * 100.0f) - 1;
-			if (pv->group >= 0) {
-				drumkv1_voice *pv_group = m_group[pv->group];
-				if (pv_group && pv_group->note >= 0 && pv_group->note != key) {
-					drumkv1_elem *elem_group = pv_group->elem;
-					// retrigger fast release
-					elem_group->dcf1.env.note_off_fast(&pv_group->dcf1_env);
-					elem_group->lfo1.env.note_off_fast(&pv_group->lfo1_env);
-					elem_group->dca1.env.note_off_fast(&pv_group->dca1_env);
-					m_notes[pv_group->note] = 0;
-					pv_group->note = -1;
-				}
-				m_group[pv->group] = pv;
-			}
-		}
-	}
-	// note off
-	else if (status == 0x80 || (status == 0x90 && value == 0)) {
-		if (int(*m_def.noteoff) > 0) {
+
+		// check data size (#2)
+		if (++i >= size)
+			break;
+
+		// channel filter
+		if (!on)
+			continue;
+
+		const int value = (data[i] & 0x7f);
+
+		// note on
+		if (status == 0x90 && value > 0) {
 			drumkv1_voice *pv = m_notes[key];
-			if (pv && pv->note >= 0) {
-				if (pv->dca1_env.stage != drumkv1_env::Decay2) {
-					drumkv1_elem *elem = pv->elem;
-					elem->dca1.env.note_off(&pv->dca1_env);
-					elem->dcf1.env.note_off(&pv->dcf1_env);
-					elem->lfo1.env.note_off(&pv->lfo1_env);
+			if (pv && !(int(*m_def.noteoff) > 0)) {
+				drumkv1_elem *elem = pv->elem;
+				// retrigger fast release
+				elem->dcf1.env.note_off_fast(&pv->dcf1_env);
+				elem->lfo1.env.note_off_fast(&pv->lfo1_env);
+				elem->dca1.env.note_off_fast(&pv->dca1_env);
+				m_notes[key] = 0;
+				pv->note = -1;
+			}
+			// find free voice
+			pv = alloc_voice(key);
+			if (pv) {
+				drumkv1_elem *elem = pv->elem;
+				// waveform
+				pv->note = key;
+				// velocity
+				const float vel = float(value) / 127.0f;
+				// quadratic velocity law
+				pv->vel  = drumkv1_velocity(vel * vel, *m_def.velocity);
+				// pressure/aftertouch
+				pv->pre = 0.0f;
+				pv->dca1_pre.reset(m_def.pressure, &m_ctl.pressure, &pv->pre);
+				// generate
+				pv->gen1.start();
+				// frequencies
+				const float freq1 = float(key)
+					+ *elem->gen1.coarse * COARSE_SCALE
+					+ *elem->gen1.fine * FINE_SCALE;
+				pv->gen1_freq = drumkv1_freq(freq1);
+				// filters
+				const int type1 = int(*elem->dcf1.type);
+				pv->dcf11.reset(drumkv1_filter1::Type(type1));
+				pv->dcf12.reset(drumkv1_filter1::Type(type1));
+				pv->dcf13.reset(drumkv1_filter2::Type(type1));
+				pv->dcf14.reset(drumkv1_filter2::Type(type1));
+				// envelopes
+				elem->dcf1.env.start(&pv->dcf1_env);
+				elem->lfo1.env.start(&pv->lfo1_env);
+				elem->dca1.env.start(&pv->dca1_env);
+				// lfos
+				pv->lfo1_sample = pv->lfo1.start();
+				// allocated
+				m_notes[key] = pv;
+				// group management
+				pv->group = int(*elem->gen1.group * 100.0f) - 1;
+				if (pv->group >= 0) {
+					drumkv1_voice *pv_group = m_group[pv->group];
+					if (pv_group && pv_group->note >= 0 && pv_group->note != key) {
+						drumkv1_elem *elem_group = pv_group->elem;
+						// retrigger fast release
+						elem_group->dcf1.env.note_off_fast(&pv_group->dcf1_env);
+						elem_group->lfo1.env.note_off_fast(&pv_group->lfo1_env);
+						elem_group->dca1.env.note_off_fast(&pv_group->dca1_env);
+						m_notes[pv_group->note] = 0;
+						pv_group->note = -1;
+					}
+					m_group[pv->group] = pv;
 				}
 			}
 		}
-	}
-	// key pressure/poly.aftertouch
-	else if (status == 0xa0) {
-		drumkv1_voice *pv = m_notes[key];
-		if (pv && pv->note >= 0)
-			pv->pre = *m_def.pressure * float(value) / 127.0f;
-	}
-	// control change
-	else if (status == 0xb0) {
-	switch (key) {
-		case 0x00:
-			// bank-select MSB (cc#0)
-			m_programs.bank_select_msb(value);
-			break;
-		case 0x01:
-			// modulation wheel (cc#1)
-			m_ctl.modwheel = *m_def.modwheel * float(value) / 127.0f;
-			break;
-		case 0x07:
-			// channel volume (cc#7)
-			m_ctl.volume = float(value) / 127.0f;
-			break;
-		case 0x0a:
-			// channel panning (cc#10)
-			m_ctl.panning = float(value - 64) / 64.0f;
-			break;
-		case 0x20:
-			// bank-select LSB (cc#32)
-			m_programs.bank_select_lsb(value);
-			break;
-		case 0x78:
-			// all sound off (cc#120)
-			allSoundOff();
-			break;
-		case 0x79:
-			// all controllers off (cc#121)
-			allControllersOff();
-			break;
-		case 0x7b:
-			// all notes off (cc#123)
-			allNotesOff();
-			break;
+		// note off
+		else if (status == 0x80 || (status == 0x90 && value == 0)) {
+			if (int(*m_def.noteoff) > 0) {
+				drumkv1_voice *pv = m_notes[key];
+				if (pv && pv->note >= 0) {
+					if (pv->dca1_env.stage != drumkv1_env::Decay2) {
+						drumkv1_elem *elem = pv->elem;
+						elem->dca1.env.note_off(&pv->dca1_env);
+						elem->dcf1.env.note_off(&pv->dcf1_env);
+						elem->lfo1.env.note_off(&pv->lfo1_env);
+					}
+				}
+			}
 		}
-		// process controller...
-		m_controls.process_enqueue(channel, key, value);
-	}
-	// pitch bend
-	else if (status == 0xe0) {
-		const float pitchbend = float(key + (value << 7) - 0x2000) / 8192.0f;
-		m_ctl.pitchbend = drumkv1_pow2f(*m_def.pitchbend * pitchbend);
-	}
+		// key pressure/poly.aftertouch
+		else if (status == 0xa0) {
+			drumkv1_voice *pv = m_notes[key];
+			if (pv && pv->note >= 0)
+				pv->pre = *m_def.pressure * float(value) / 127.0f;
+		}
+		// control change
+		else if (status == 0xb0) {
+		switch (key) {
+			case 0x00:
+				// bank-select MSB (cc#0)
+				m_programs.bank_select_msb(value);
+				break;
+			case 0x01:
+				// modulation wheel (cc#1)
+				m_ctl.modwheel = *m_def.modwheel * float(value) / 127.0f;
+				break;
+			case 0x07:
+				// channel volume (cc#7)
+				m_ctl.volume = float(value) / 127.0f;
+				break;
+			case 0x0a:
+				// channel panning (cc#10)
+				m_ctl.panning = float(value - 64) / 64.0f;
+				break;
+			case 0x20:
+				// bank-select LSB (cc#32)
+				m_programs.bank_select_lsb(value);
+				break;
+			case 0x78:
+				// all sound off (cc#120)
+				allSoundOff();
+				break;
+			case 0x79:
+				// all controllers off (cc#121)
+				allControllersOff();
+				break;
+			case 0x7b:
+				// all notes off (cc#123)
+				allNotesOff();
+				break;
+			}
+			// process controller...
+			m_controls.process_enqueue(channel, key, value);
+		}
+		// pitch bend
+		else if (status == 0xe0) {
+			const float pitchbend = float(key + (value << 7) - 0x2000) / 8192.0f;
+			m_ctl.pitchbend = drumkv1_pow2f(*m_def.pitchbend * pitchbend);
+		}
 
-	// process pending controllers...
-	m_controls.process_dequeue();
+		// process pending controllers...
+		m_controls.process_dequeue();
+	}
 }
 
 

@@ -536,15 +536,15 @@ void drumkv1_controls::process_enqueue (
 	event.key.param = param;
 	event.value = value;
 
-	if (!m_pImpl->process(event))
+	if (!m_pImpl->process(event)) {
 		process_event(event);
+		process_flush();
+	}
 }
 
 
 void drumkv1_controls::process_dequeue (void)
 {
-	m_pImpl->flush();
-
 	Event event;
 
 	while (m_pImpl->is_pending()) {
@@ -552,6 +552,12 @@ void drumkv1_controls::process_dequeue (void)
 			process_event(event);
 	}
 }
+
+void drumkv1_controls::process_flush (void)
+{
+	m_pImpl->flush();
+}
+
 
 
 void drumkv1_controls::process_event ( const Event& event )
