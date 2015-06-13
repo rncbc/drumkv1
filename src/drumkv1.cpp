@@ -842,7 +842,7 @@ private:
 	drumkv1_programs m_programs;
 
 	uint16_t m_nchannels;
-	uint32_t m_srate;
+	float    m_srate;
 
 	drumkv1_ctl m_ctl;
 
