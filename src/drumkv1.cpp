@@ -1824,6 +1824,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		elem->vol1.process(nframes);
 		elem = elem->next();
 	}
+
+	m_controls.process(nframes);
 }
 
 

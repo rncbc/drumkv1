@@ -517,6 +517,8 @@ drumkv1_controls::drumkv1_controls ( drumkv1 *pDrumk )
 	: m_pImpl(new drumkv1_controls::Impl()),
 		m_sched(pDrumk), m_control_sched(pDrumk)
 {
+	m_timeout = (unsigned int) (0.2f * pDrumk->sampleRate()); // 200ms.
+	m_nframes = 0;
 }
 
 
@@ -543,13 +545,13 @@ void drumkv1_controls::process_enqueue (
 
 void drumkv1_controls::process_dequeue (void)
 {
-	m_pImpl->flush();
-
 	while (m_pImpl->is_pending()) {
 		Event event;
 		if (m_pImpl->dequeue(event))
 			process_event(event);
 	}
+
+	m_nframes = 0;
 }
 
 
@@ -575,6 +577,18 @@ void drumkv1_controls::process_event ( const Event& event )
 
 	const drumkv1::ParamIndex index = drumkv1::ParamIndex(iIndex);
 	m_sched.schedule_event(index, drumkv1_param::paramValue(index, fValue));
+}
+
+
+// process timer counter.
+void drumkv1_controls::process ( unsigned int nframes )
+{
+	m_nframes += nframes;
+
+	if (m_nframes > m_timeout) {
+		m_pImpl->flush();
+		m_nframes = 0;
+	}
 }
 
 
