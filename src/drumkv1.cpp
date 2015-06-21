@@ -2177,13 +2177,14 @@ void drumkv1_element::resetParamValues ( bool bSwap )
 {
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		const float	fDefValue = m_pElem->params[0][index];
 		const float	fOldValue = m_pElem->params[1][index];
 		const float fNewValue = m_pElem->params[2][index];
 		m_pElem->params[2][index] = fOldValue;
 		if (bSwap)
 			m_pElem->params[1][index] = fNewValue;
 		else
-			m_pElem->params[0][index] = fOldValue;
+			m_pElem->params[1][index] = fDefValue;
 	}
 }
 
