@@ -217,6 +217,7 @@ void drumkv1_param::loadElements (
 							if (!sName.isEmpty() && s_hash.contains(sName))
 								index = s_hash.value(sName);
 							const float fValue = eParam.text().toFloat();
+							element->setParamValue(index, fValue, 0);
 							element->setParamValue(index, fValue);
 						}
 					}

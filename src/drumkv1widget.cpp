@@ -1153,8 +1153,8 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 			if (pKnob)
 				pKnob->setDefaultValue(element->paramValue(index, 0));
 			const float fValue = element->paramValue(index);
-			updateParam(index, fValue);
 			setParamValue(index, fValue);
+			updateParam(index, fValue);
 		}
 		updateSample(pDrumkUi->sample());
 		refreshElements();
