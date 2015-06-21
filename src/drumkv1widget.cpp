@@ -1327,7 +1327,14 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 		break;
 	}
 	case drumkv1_sched::Sample:
-		updateSample(pDrumkUi->sample());
+		if (sid > 0) {
+		//	refreshElements();
+			activateElement();
+			updateParamValues(drumkv1::NUM_PARAMS);
+			updateDirtyPreset(false);
+		} else {
+			updateSample(pDrumkUi->sample());
+		}
 		// Fall thru...
 	default:
 		break;
