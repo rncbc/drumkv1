@@ -255,7 +255,7 @@ void drumkv1_param::saveElements (
 			QDomElement eParam = doc.createElement("param");
 			eParam.setAttribute("index", QString::number(i));
 			eParam.setAttribute("name", drumkv1_params[i].name);
-			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			eParam.appendChild(doc.createTextNode(
 				QString::number(element->paramValue(index))));
 			eParams.appendChild(eParam);
@@ -293,7 +293,7 @@ void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 	static QHash<QString, drumkv1::ParamIndex> s_hash;
 	if (s_hash.isEmpty()) {
 		for (uint32_t i = drumkv1::NUM_ELEMENT_PARAMS; i < drumkv1::NUM_PARAMS; ++i) {
-			drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			s_hash.insert(drumkv1_param::paramName(index), index);
 		}
 	}
@@ -374,7 +374,7 @@ void drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
 	QDomElement eParams = doc.createElement("params");
 	for (uint32_t i = drumkv1::NUM_ELEMENT_PARAMS; i < drumkv1::NUM_PARAMS; ++i) {
 		QDomElement eParam = doc.createElement("param");
-		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		eParam.setAttribute("index", QString::number(i));
 		eParam.setAttribute("name", drumkv1_param::paramName(index));
 		const float fValue = pDrumk->paramValue(index);

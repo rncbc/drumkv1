@@ -122,7 +122,7 @@ void drumkv1widget_lv2::port_event ( uint32_t port_index,
 	uint32_t buffer_size, uint32_t format, const void *buffer )
 {
 	if (format == 0 && buffer_size == sizeof(float)) {
-		drumkv1::ParamIndex index
+		const drumkv1::ParamIndex index
 			= drumkv1::ParamIndex(port_index - drumkv1_lv2::ParamBase);
 		float fValue = *(float *) buffer;
 	//--legacy support < 0.3.0.4 -- begin

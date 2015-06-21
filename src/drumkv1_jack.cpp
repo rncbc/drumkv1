@@ -272,7 +272,7 @@ void drumkv1_jack::open ( const char *client_id )
 {
 	// init param ports
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
-		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		m_params[i] = drumkv1_param::paramDefaultValue(index);
 		drumkv1::setParamPort(index, &m_params[i]);
 	}

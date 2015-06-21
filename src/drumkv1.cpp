@@ -1067,12 +1067,11 @@ void drumkv1_impl::setCurrentElement ( int key )
 		if (elem) {
 			drumkv1_element *element = &(elem->element);
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				float *pfParam = element->paramPort(index);
+				float *pfParam = m_params[i];
 				if (pfParam) {
-					m_params[i] = pfParam;
 					elem->params[1][i] = *pfParam;
 					element->setParamPort(index, &(elem->params[1][i]));
 				}
@@ -1084,12 +1083,12 @@ void drumkv1_impl::setCurrentElement ( int key )
 		if (elem) {
 			drumkv1_element *element = &(elem->element);
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-				drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
 				float *pfParam = m_params[i];
 				if (pfParam) {
-					*pfParam = elem->params[1][i];
+					*pfParam = elem->params[1][i]; // BUG?
 					element->setParamPort(index, pfParam);
 				}
 			}
@@ -1210,8 +1209,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	default:
 		if (m_elem)
 			m_elem->element.setParamPort(index, pfParam);
-		else
-			m_params[index] = pfParam;
+		m_params[index] = pfParam;
 		break;
 	}
 }
@@ -1256,10 +1254,7 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index ) const
 	case drumkv1::DYN1_COMPRESS:  pfParam = m_dyn.compress;  break;
 	case drumkv1::DYN1_LIMITER:   pfParam = m_dyn.limiter;   break;
 	default:
-		if (m_elem)
-			pfParam = m_elem->element.paramPort(index);
-		else
-			pfParam = m_params[index];
+		pfParam = m_params[index];
 		break;
 	}
 
@@ -2012,7 +2007,7 @@ drumkv1_element::drumkv1_element ( drumkv1_elem *pElem )
 	: m_pElem(pElem)
 {
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		setParamPort(index, &(m_pElem->params[1][i]));
 	}
 }
@@ -2181,7 +2176,7 @@ float drumkv1_element::paramValue ( drumkv1::ParamIndex index, int pset )
 void drumkv1_element::resetParamValues ( bool bSwap )
 {
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		const float	fOldValue = m_pElem->params[1][index];
 		const float fNewValue = m_pElem->params[2][index];
 		m_pElem->params[2][index] = fOldValue;
