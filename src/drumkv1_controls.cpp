@@ -557,6 +557,7 @@ void drumkv1_controls::process_dequeue (void)
 }
 
 
+// controller action.
 void drumkv1_controls::process_event ( const Event& event )
 {
 	Key key(event.key);

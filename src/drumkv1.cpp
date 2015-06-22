@@ -1088,7 +1088,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 					continue;
 				float *pfParam = m_params[i];
 				if (pfParam) {
-					*pfParam = elem->params[1][i]; // BUG?
+					*pfParam = elem->params[1][i]; // LV2:BUG?
 					element->setParamPort(index, pfParam);
 				}
 			}
@@ -1266,7 +1266,7 @@ void drumkv1_impl::setParamValue ( drumkv1::ParamIndex index, float fValue )
 {
 	float *pfParamPort = paramPort(index);
 	if (pfParamPort)
-		*pfParamPort = fValue;
+		*pfParamPort = fValue; // LV2:BUG?
 }
 
 
