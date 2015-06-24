@@ -109,6 +109,7 @@ private:
 	drumkv1_controls *m_pControls;
 
 	// Target subject.
+	drumkv1_controls::Key m_key;
 	drumkv1::ParamIndex m_index;
 
 	// Instance variables.

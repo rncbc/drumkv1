@@ -691,7 +691,8 @@ void drumkv1widget_controls::loadControls ( drumkv1_controls *pControls )
 		const drumkv1_controls::Key& key = iter.key();
 		const drumkv1_controls::Type ctype = key.type();
 		const unsigned short channel = key.channel();
-		const drumkv1::ParamIndex index = drumkv1::ParamIndex(iter.value());
+		const drumkv1_controls::Data& data = iter.value();
+		const drumkv1::ParamIndex index = drumkv1::ParamIndex(data.index);
 		QTreeWidgetItem *pItem = new QTreeWidgetItem(this);
 	//	pItem->setIcon(0, icon);
 		pItem->setText(0, (channel > 0 ? QString::number(channel) : tr("Auto")));
@@ -700,9 +701,9 @@ void drumkv1widget_controls::loadControls ( drumkv1_controls *pControls )
 		pItem->setData(2, Qt::UserRole, int(key.param));
 		pItem->setIcon(3, icon);
 		pItem->setText(3, drumkv1_param::paramName(index));
-		pItem->setData(3, Qt::UserRole, int(index));
-		pItem->setFlags(
-			Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
+		pItem->setData(3, Qt::UserRole, data.index);
+		pItem->setData(3, Qt::UserRole + 1, data.flags);
+		pItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
 		items.append(pItem);
 	}
 	QTreeWidget::addTopLevelItems(items);
@@ -724,7 +725,10 @@ void drumkv1widget_controls::saveControls ( drumkv1_controls *pControls )
 		drumkv1_controls::Key key;
 		key.status = ctype | (channel & 0x1f);
 		key.param = pItem->data(2, Qt::UserRole).toInt();
-		pControls->add_control(key, pItem->data(3, Qt::UserRole).toInt());
+		drumkv1_controls::Data data;
+		data.index = pItem->data(3, Qt::UserRole).toInt();
+		data.flags = pItem->data(3, Qt::UserRole + 1).toInt();
+		pControls->add_control(key, data);
 	}
 }
 
@@ -756,8 +760,7 @@ QTreeWidgetItem *drumkv1widget_controls::newControlItem (void)
 	pItem->setIcon(3, icon);
 	pItem->setText(3, drumkv1_param::paramName(drumkv1::ParamIndex(0)));
 	pItem->setData(3, Qt::UserRole, 0);
-	pItem->setFlags(
-		Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
+	pItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
 	QTreeWidget::addTopLevelItem(pItem);
 
 	return pItem;
