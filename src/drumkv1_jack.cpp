@@ -23,6 +23,9 @@
 #include "drumkv1_config.h"
 #include "drumkv1_param.h"
 
+#include "drumkv1_programs.h"
+#include "drumkv1_controls.h"
+
 #include <jack/midiport.h>
 
 #include <stdio.h>
@@ -162,6 +165,9 @@ drumkv1_jack::drumkv1_jack (void) : drumkv1(2)
 #endif
 
 	m_bpm = 0.0f;
+
+	drumkv1::programs()->enabled(true);
+	drumkv1::controls()->enabled(true);
 
 	open(DRUMKV1_TITLE);
 	activate();

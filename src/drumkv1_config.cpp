@@ -20,6 +20,7 @@
 *****************************************************************************/
 
 #include "drumkv1_config.h"
+
 #include "drumkv1_programs.h"
 #include "drumkv1_controls.h"
 
@@ -149,11 +150,15 @@ void drumkv1_config::loadPrograms ( drumkv1_programs *pPrograms )
 	}
 
 	QSettings::endGroup();
+
+	pPrograms->enabled(bProgramsEnabled);
 }
 
 
 void drumkv1_config::savePrograms ( drumkv1_programs *pPrograms )
 {
+	bProgramsEnabled = pPrograms->enabled();
+
 	clearPrograms();
 
 	QSettings::beginGroup(programsGroup());
@@ -249,11 +254,15 @@ void drumkv1_config::loadControls ( drumkv1_controls *pControls )
 	}
 
 	QSettings::endGroup();
+
+	pControls->enabled(bControlsEnabled);
 }
 
 
 void drumkv1_config::saveControls ( drumkv1_controls *pControls )
 {
+	bControlsEnabled = pControls->enabled();
+
 	clearControls();
 
 	QSettings::beginGroup(controlsGroup());
@@ -302,6 +311,8 @@ void drumkv1_config::load (void)
 	sPresetDir = QSettings::value("/PresetDir").toString();
 	sSampleDir = QSettings::value("/SampleDir").toString();
 	iKnobDialMode = QSettings::value("/KnobDialMode", 0).toInt();
+	bControlsEnabled = QSettings::value("/ControlsEnabled", true).toBool();
+	bProgramsEnabled = QSettings::value("/ProgramsEnabled", true).toBool();
 	QSettings::endGroup();
 
 	QSettings::beginGroup("/Dialogs");
@@ -328,6 +339,8 @@ void drumkv1_config::save (void)
 	QSettings::setValue("/PresetDir", sPresetDir);
 	QSettings::setValue("/SampleDir", sSampleDir);
 	QSettings::setValue("/KnobDialMode", iKnobDialMode);
+	QSettings::setValue("/ControlsEnabled", bControlsEnabled);
+	QSettings::setValue("/ProgramsEnabled", bProgramsEnabled);
 	QSettings::endGroup();
 
 	QSettings::beginGroup("/Dialogs");

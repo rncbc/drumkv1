@@ -25,6 +25,9 @@
 #include "drumkv1_sched.h"
 #include "drumkv1_param.h"
 
+#include "drumkv1_programs.h"
+#include "drumkv1_controls.h"
+
 #include "lv2/lv2plug.in/ns/ext/midi/midi.h"
 #include "lv2/lv2plug.in/ns/ext/time/time.h"
 #include "lv2/lv2plug.in/ns/ext/atom/util.h"
@@ -129,6 +132,9 @@ drumkv1_lv2::drumkv1_lv2 (
 	m_outs = new float * [nchannels];
 	for (uint16_t k = 0; k < nchannels; ++k)
 		m_ins[k] = m_outs[k] = NULL;
+
+	drumkv1::programs()->optional(true);
+	drumkv1::controls()->optional(true);
 }
 
 

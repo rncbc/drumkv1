@@ -514,7 +514,7 @@ private:
 //
 
 drumkv1_controls::drumkv1_controls ( drumkv1 *pDrumk )
-	: m_pImpl(new drumkv1_controls::Impl()),
+	: m_pImpl(new drumkv1_controls::Impl()), m_mode(0),
 		m_sched(pDrumk), m_control_sched(pDrumk),
 		m_timeout(0), m_timein(0)
 {
@@ -531,6 +531,9 @@ drumkv1_controls::~drumkv1_controls (void)
 void drumkv1_controls::process_enqueue (
 	unsigned short channel, unsigned short param, unsigned short value )
 {
+	if (!enabled())
+		return;
+
 	Event event;
 
 	event.key.status = CC | (channel & 0x1f);
