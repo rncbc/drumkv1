@@ -515,7 +515,7 @@ private:
 
 drumkv1_controls::drumkv1_controls ( drumkv1 *pDrumk )
 	: m_pImpl(new drumkv1_controls::Impl()), m_mode(0),
-		m_sched(pDrumk), m_control_sched(pDrumk),
+		m_sched_in(pDrumk), m_sched_out(pDrumk),
 		m_timeout(0), m_timein(0)
 {
 }
@@ -544,7 +544,7 @@ void drumkv1_controls::process_enqueue (
 		process_event(event);
 
 	if (m_timeout < 1) // make timeout ~200ms...
-		m_timeout = (unsigned int) (0.2f * m_sched.instance()->sampleRate());
+		m_timeout = (unsigned int) (0.2f * m_sched_in.instance()->sampleRate());
 }
 
 
@@ -565,7 +565,7 @@ void drumkv1_controls::process_event ( const Event& event )
 {
 	Key key(event.key);
 
-	m_control_sched.schedule_key(key);
+	m_sched_in.schedule_key(key);
 
 	Data data;
 	int iIndex = get_control(key, data);
@@ -594,7 +594,7 @@ void drumkv1_controls::process_event ( const Event& event )
 		fValue *= (fValue * fValue);
 
 	const drumkv1::ParamIndex index = drumkv1::ParamIndex(data.index);
-	m_sched.schedule_event(index, drumkv1_param::paramValue(index, fValue));
+	m_sched_out.schedule_event(index, drumkv1_param::paramValue(index, fValue));
 }
 
 
@@ -661,7 +661,7 @@ QString drumkv1_controls::textFromType ( Type ctype )
 // current/last controller accessor.
 const drumkv1_controls::Key& drumkv1_controls::current_key (void) const
 {
-	return m_control_sched.current_key();
+	return m_sched_in.current_key();
 }
 
 
