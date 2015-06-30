@@ -1204,7 +1204,7 @@ void drumkv1widget::resetElement (void)
 }
 
 
-// (En|Dis)able/ all param/knobs.
+// (En|Dis)able all param/knobs.
 void drumkv1widget::activateParamKnobs ( bool bEnabled )
 {
 	activateParamKnobsGroupBox(m_ui.Gen1GroupBox, bEnabled);
@@ -1217,7 +1217,8 @@ void drumkv1widget::activateParamKnobs ( bool bEnabled )
 }
 
 
-void drumkv1widget::activateParamKnobsGroupBox ( QGroupBox *pGroupBox, bool bEnabled )
+void drumkv1widget::activateParamKnobsGroupBox (
+	QGroupBox *pGroupBox, bool bEnabled )
 {
 	const QList<QWidget *>& children
 		= pGroupBox->findChildren<QWidget *> ();
