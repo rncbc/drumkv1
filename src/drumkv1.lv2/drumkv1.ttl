@@ -15,7 +15,7 @@
 @prefix drumkv1_lv2: <http://drumkv1.sourceforge.net/lv2#> .
 
 <http://drumkv1.sourceforge.net/lv2>
-	a lv2:Plugin, lv2:InstrumentPlugin ;
+	a lv2:Plugin, lv2:InstrumentPlugin, doap:Project ;
 	doap:name "drumkv1" ;
 	doap:maintainer [
 		foaf:name "rncbc aka. Rui Nuno Capela" ;
@@ -135,7 +135,7 @@
 		lv2:index 13 ;
 		lv2:symbol "DCF1_TYPE" ;
 		lv2:name "DCF1 Type" ;
-		lv2:portProperty lv2:integer ;
+		lv2:portProperty lv2:integer, lv2:enumeration ;
 		lv2:scalePoint [ rdfs:label "LPF"; rdf:value 0 ] ;
 		lv2:scalePoint [ rdfs:label "BPF"; rdf:value 1 ] ;
 		lv2:scalePoint [ rdfs:label "HPF"; rdf:value 2 ] ;
@@ -149,7 +149,7 @@
 		lv2:index 14 ;
 		lv2:symbol "DCF1_SLOPE" ;
 		lv2:name "DCF1 Slope" ;
-		lv2:portProperty lv2:integer ;
+		lv2:portProperty lv2:integer, lv2:enumeration ;
 		lv2:scalePoint [ rdfs:label "12dB/oct"; rdf:value 0 ] ;
 		lv2:scalePoint [ rdfs:label "24dB/oct"; rdf:value 1 ] ;
 		lv2:default 0.0 ;
@@ -206,7 +206,7 @@
 		lv2:index 20 ;
 		lv2:symbol "LFO1_SHAPE" ;
 		lv2:name "LFO1 Wave Shape" ;
-		lv2:portProperty lv2:integer ;
+		lv2:portProperty lv2:integer, lv2:enumeration ;
 		lv2:scalePoint [ rdfs:label "Pulse"; rdf:value 0 ] ;
 		lv2:scalePoint [ rdfs:label "Saw"; rdf:value 1 ] ;
 		lv2:scalePoint [ rdfs:label "Sine"; rdf:value 2 ] ;
@@ -448,7 +448,7 @@
 		lv2:index 46 ;
 		lv2:symbol "DEF1_NOTEOFF" ;
 		lv2:name "DEF1 Note Off" ;
-		lv2:portProperty lv2:integer ;
+		lv2:portProperty lv2:integer, lv2:enumeration ;
 		lv2:scalePoint [ rdfs:label "Disabled"; rdf:value 0 ] ;
 		lv2:scalePoint [ rdfs:label "Enabled"; rdf:value 1 ] ;
 		lv2:default 1.0 ;
@@ -728,7 +728,7 @@ drumkv1_lv2:103_LFO1
 drumkv1_lv2:104_DCA1
 	a lv2pg:InputGroup;
 	lv2:name "Drum Kit - DCA1" ;
-	lv2:symbol "104_DCA1" .
+	lv2:symbol "DCA1" .
 
 drumkv1_lv2:105_OUT1
 	a lv2pg:InputGroup;
