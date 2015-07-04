@@ -1207,8 +1207,28 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DYN1_COMPRESS:  m_dyn.compress  = pfParam; break;
 	case drumkv1::DYN1_LIMITER:   m_dyn.limiter   = pfParam; break;
 	default:
-		if (m_elem)
+		if (m_elem) {
 			m_elem->element.setParamPort(index, pfParam);
+			switch (index) {
+			case drumkv1::DCA1_VOLUME:
+			case drumkv1::OUT1_VOLUME:
+				m_elem->vol1.reset(m_elem->out1.volume,
+					m_elem->dca1.volume,
+					&m_ctl.volume,
+					&m_elem->aux1.volume);
+				break;
+			case drumkv1::OUT1_WIDTH:
+				m_elem->wid1.reset(m_elem->out1.width);
+				break;
+			case drumkv1::OUT1_PANNING:
+				m_elem->pan1.reset(m_elem->out1.panning,
+					&m_ctl.panning,
+					&m_elem->aux1.panning);
+				break;
+			default:
+				break;
+			}
+		}
 		m_params[index] = pfParam;
 		break;
 	}
