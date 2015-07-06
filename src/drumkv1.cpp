@@ -1209,6 +1209,8 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	default:
 		if (m_elem) {
 			m_elem->element.setParamPort(index, pfParam);
+			// check null connections.
+			if (pfParam != &s_fDummy)
 			switch (index) {
 			case drumkv1::DCA1_VOLUME:
 			case drumkv1::OUT1_VOLUME:
