@@ -92,6 +92,9 @@ drumkv1widget_control::drumkv1widget_control (
 	QObject::connect(m_ui.ControlInvertCheckBox,
 		SIGNAL(toggled(bool)),
 		SLOT(changed()));
+	QObject::connect(m_ui.ControlHookCheckBox,
+		SIGNAL(toggled(bool)),
+		SLOT(changed()));
 	QObject::connect(m_ui.DialogButtonBox,
 		SIGNAL(clicked(QAbstractButton *)),
 		SLOT(clicked(QAbstractButton *)));
@@ -169,6 +172,8 @@ void drumkv1widget_control::setControls (
 		flags & drumkv1_controls::Logarithmic);
 	m_ui.ControlInvertCheckBox->setChecked(
 		flags & drumkv1_controls::Invert);
+	m_ui.ControlHookCheckBox->setChecked(
+		flags & drumkv1_controls::Hook);
 
 	--m_iDirtySetup;
 
@@ -329,6 +334,8 @@ void drumkv1widget_control::accept (void)
 		flags |= drumkv1_controls::Logarithmic;
 	if (m_ui.ControlInvertCheckBox->isChecked())
 		flags |= drumkv1_controls::Invert;
+	if (m_ui.ControlHookCheckBox->isChecked())
+		flags |= drumkv1_controls::Hook;
 
 	// Map the damn controller....
 	drumkv1_controls::Data data;
