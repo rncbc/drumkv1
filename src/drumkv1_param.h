@@ -64,6 +64,7 @@ namespace drumkv1_param
 	const char *paramName(drumkv1::ParamIndex index);
 	float paramDefaultValue(drumkv1::ParamIndex index);
 	float paramValue(drumkv1::ParamIndex index, float fValue);
+	bool paramTypeFloat(drumkv1::ParamIndex index);
 };
 
 

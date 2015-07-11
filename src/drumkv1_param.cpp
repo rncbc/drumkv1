@@ -267,6 +267,13 @@ void drumkv1_param::saveElements (
 }
 
 
+bool drumkv1_param::paramTypeFloat ( drumkv1::ParamIndex index )
+{
+	return (drumkv1_params[index].type == PARAM_FLOAT);
+}
+
+
+
 // Preset serialization methods.
 void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 {
