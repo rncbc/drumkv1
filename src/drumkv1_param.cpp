@@ -134,14 +134,14 @@ float drumkv1_param::paramDefaultValue ( drumkv1::ParamIndex index )
 }
 
 
-float drumkv1_param::paramValue ( drumkv1::ParamIndex index, float fValue )
+float drumkv1_param::paramValue ( drumkv1::ParamIndex index, float fScale )
 {
 	const ParamInfo& param = drumkv1_params[index];
 
 	if (param.type == PARAM_BOOL)
-		return (fValue > 0.5f ? 1.0f : 0.0f);
+		return (fScale > 0.5f ? 1.0f : 0.0f);
 
-	fValue = param.min + fValue * (param.max - param.min);
+	const float fValue = param.min + fScale * (param.max - param.min);
 
 	if (param.type == PARAM_INT)
 		return ::rintf(fValue);
@@ -267,7 +267,23 @@ void drumkv1_param::saveElements (
 }
 
 
-bool drumkv1_param::paramTypeFloat ( drumkv1::ParamIndex index )
+float drumkv1_param::paramScale ( drumkv1::ParamIndex index, float fValue )
+{
+	const ParamInfo& param = drumkv1_params[index];
+
+	if (param.type == PARAM_BOOL)
+		return (fValue > 0.5f ? 1.0f : 0.0f);
+
+	const float fScale = (fValue - param.min) / (param.max - param.min);
+
+	if (param.type == PARAM_INT)
+		return ::rintf(fScale);
+	else
+		return fScale;
+}
+
+
+bool drumkv1_param::paramFloat ( drumkv1::ParamIndex index )
 {
 	return (drumkv1_params[index].type == PARAM_FLOAT);
 }
