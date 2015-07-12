@@ -23,8 +23,6 @@
 
 #include <QHash>
 
-#include <math.h>
-
 
 #define RPN_MSB   0x65
 #define RPN_LSB   0x64
@@ -298,6 +296,7 @@ private:
 //---------------------------------------------------------------------
 // drumkv1_controls:Impl - decl.
 //
+
 class drumkv1_controls::Impl
 {
 public:
@@ -514,6 +513,7 @@ private:
 //---------------------------------------------------------------------
 // drumkv1_controls - impl.
 //
+#include <math.h>
 
 drumkv1_controls::drumkv1_controls ( drumkv1 *pDrumk )
 	: m_pImpl(new drumkv1_controls::Impl()), m_mode(0),
@@ -557,8 +557,6 @@ void drumkv1_controls::process_dequeue (void)
 		if (m_pImpl->dequeue(event))
 			process_event(event);
 	}
-
-	m_timein = 0;
 }
 
 
