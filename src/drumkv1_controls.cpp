@@ -649,7 +649,7 @@ void drumkv1_controls::reset (void)
 		if (data.flags & Hook)
 			continue;
 		const drumkv1::ParamIndex index
-			= drumkv1::ParamIndex(index);
+			= drumkv1::ParamIndex(data.index);
 		data.val = drumkv1_param::paramScale(index,
 			m_sched_in.instance()->paramValue(index));
 	}
