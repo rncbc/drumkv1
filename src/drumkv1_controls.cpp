@@ -608,9 +608,14 @@ void drumkv1_controls::process_event ( const Event& event )
 		const float v0 = data.val;
 		const float v1 = drumkv1_param::paramScale(index,
 			m_sched_in.instance()->paramValue(index));
-		const float vx = (v1 - v0) * (v1 - fScale);
-		bSync = (vx < 0.0f || ::fabsf(vx) < 0.01f);
-		if (bSync) data.val = fScale;
+		const float d0 = (v1 - v0);
+		const float d1 = (v1 - fScale);
+		const float d2 = (data.sync ? d0 : d1) * d1;
+		bSync = (d2 < 0.001f);
+		if (bSync) {
+			data.val = fScale;
+			data.sync = true;
+		}
 	}
 
 	if (bSync) {
@@ -652,6 +657,7 @@ void drumkv1_controls::reset (void)
 			= drumkv1::ParamIndex(data.index);
 		data.val = drumkv1_param::paramScale(index,
 			m_sched_in.instance()->paramValue(index));
+		data.sync = false;
 	}
 }
 
