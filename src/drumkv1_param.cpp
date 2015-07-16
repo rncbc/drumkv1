@@ -328,8 +328,8 @@ void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 	QDomDocument doc(DRUMKV1_TITLE);
 	if (doc.setContent(&file)) {
 		QDomElement ePreset = doc.documentElement();
-		if (ePreset.tagName() == "preset"
-			&& ePreset.attribute("name") == fi.completeBaseName()) {
+		if (ePreset.tagName() == "preset") {
+		//	&& ePreset.attribute("name") == fi.completeBaseName()) {
 			for (QDomNode nChild = ePreset.firstChild();
 					!nChild.isNull();
 						nChild = nChild.nextSibling()) {
