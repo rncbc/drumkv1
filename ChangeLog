@@ -3,11 +3,13 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
+
 GIT HEAD
 
 - Fixed a recent bug/mistake that was causing a complete reset/
   revert of all element parameters to prior values upon loading
   an element sample file.
+- Improved Qt4 vs. Qt5 configure builds (via qmake). 
 
 
 0.7.0  2015-07-24  A seventh official beta.
