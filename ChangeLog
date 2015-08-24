@@ -4,7 +4,7 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-GIT HEAD
+0.7.1  2015-08-24  A seventh-bis official beta.
 
 - Fixed a recent bug/mistake that was causing a complete reset/
   revert of all element parameters to prior values upon loading
