@@ -1392,7 +1392,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				// allocated
 				m_notes[key] = pv;
 				// group management
-				pv->group = int(*elem->gen1.group * 100.0f) - 1;
+				pv->group = int(*elem->gen1.group) - 1;
 				if (pv->group >= 0) {
 					drumkv1_voice *pv_group = m_group[pv->group];
 					if (pv_group && pv_group->note >= 0 && pv_group->note != key) {
