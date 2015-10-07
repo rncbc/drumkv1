@@ -367,8 +367,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// OUT1
 	setParamKnob(drumkv1::OUT1_WIDTH,   m_ui.Out1WidthKnob);
 	setParamKnob(drumkv1::OUT1_PANNING, m_ui.Out1PanningKnob);
-	setParamKnob(drumkv1::OUT1_VOLUME,  m_ui.Out1VolumeKnob);
 	setParamKnob(drumkv1::OUT1_FXSEND,  m_ui.Out1FxSendKnob);
+	setParamKnob(drumkv1::OUT1_VOLUME,  m_ui.Out1VolumeKnob);
 
 	// Reverb (stereo-)width limits.
 	m_ui.Rev1WidthKnob->setMinimum(-1.0f);

@@ -382,8 +382,8 @@ struct drumkv1_out
 {
 	float *width;
 	float *panning;
-	float *volume;
 	float *fxsend;
+	float *volume;
 };
 
 
@@ -1804,10 +1804,12 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float out2
 					= vol1 * (mid1 - sid1 * wid1) * elem->pan1.value(j, 1);
 
-				const float fxsend = *elem->out1.fxsend;
+				const float fxsend
+					= *elem->out1.fxsend
+					* *elem->out1.fxsend;
 				for (k = 0; k < m_nchannels; ++k) {
 					const float dry = (k & 1 ? out2 : out1);
-					const float wet = dry * fxsend;
+					const float wet = fxsend * dry;
 					*v_outs[k]++ += dry - wet;
 					*v_sfxs[k]++ += wet;
 				}
@@ -2202,8 +2204,8 @@ void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DCA1_DECAY2:   m_pElem->dca1.env.decay2  = pfParam; break;
 	case drumkv1::OUT1_WIDTH:    m_pElem->out1.width       = pfParam; break;
 	case drumkv1::OUT1_PANNING:  m_pElem->out1.panning     = pfParam; break;
-	case drumkv1::OUT1_VOLUME:   m_pElem->out1.volume      = pfParam; break;
 	case drumkv1::OUT1_FXSEND:   m_pElem->out1.fxsend      = pfParam; break;
+	case drumkv1::OUT1_VOLUME:   m_pElem->out1.volume      = pfParam; break;
 	default: break;
 	}
 }
@@ -2252,8 +2254,8 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DCA1_DECAY2:   pfParam = m_pElem->dca1.env.decay2; break;
 	case drumkv1::OUT1_WIDTH:    pfParam = m_pElem->out1.width;      break;
 	case drumkv1::OUT1_PANNING:  pfParam = m_pElem->out1.panning;    break;
-	case drumkv1::OUT1_VOLUME:   pfParam = m_pElem->out1.volume;     break;
 	case drumkv1::OUT1_FXSEND:   pfParam = m_pElem->out1.fxsend;     break;
+	case drumkv1::OUT1_VOLUME:   pfParam = m_pElem->out1.volume;     break;
 	default: break;
 	}
 
