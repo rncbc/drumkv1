@@ -383,6 +383,7 @@ struct drumkv1_out
 	float *width;
 	float *panning;
 	float *volume;
+	float *fxsend;
 };
 
 
@@ -771,6 +772,9 @@ public:
 	void setSampleRate(float srate);
 	float sampleRate() const;
 
+	void setBufferSize(uint32_t nsize);
+	uint32_t bufferSize() const;
+
 	drumkv1_element *addElement(int key);
 	drumkv1_element *element(int key) const;
 	void removeElement(int key);
@@ -833,6 +837,8 @@ protected:
 		pv->reset(0);
 	}
 
+	void alloc_sfxs(uint32_t nsize);
+
 private:
 
 	drumkv1 *m_pDrumk;
@@ -869,6 +875,9 @@ private:
 
 	drumkv1_list<drumkv1_elem>  m_elem_list;
 
+	float  **m_sfxs;
+	uint32_t m_nsize;
+
 	drumkv1_fx_chorus   m_chorus;
 	drumkv1_fx_flanger *m_flanger;
 	drumkv1_fx_phaser  *m_phaser;
@@ -898,6 +907,10 @@ drumkv1_impl::drumkv1_impl (
 
 	for (int group = 0; group < MAX_GROUP; ++group)
 		m_group[group] = 0;
+
+	// local buffers none yet
+	m_sfxs = NULL;
+	m_nsize = 0;
 
 	// flangers none yet
 	m_flanger = 0;
@@ -966,6 +979,9 @@ drumkv1_impl::~drumkv1_impl (void)
 
 	// deallocate elements
 	clearElements();
+
+	// deallocate local buffers
+	alloc_sfxs(0);
 }
 
 
@@ -1015,6 +1031,39 @@ void drumkv1_impl::setSampleRate ( float srate )
 float drumkv1_impl::sampleRate (void) const
 {
 	return m_srate;
+}
+
+
+void drumkv1_impl::setBufferSize ( uint32_t nsize )
+{
+	// set nominal buffer size
+	if (m_nsize < nsize) alloc_sfxs(nsize);
+}
+
+
+uint32_t drumkv1_impl::bufferSize (void) const
+{
+	return m_nsize;
+}
+
+
+// allocate local buffers
+void drumkv1_impl::alloc_sfxs ( uint32_t nsize )
+{
+	if (m_sfxs) {
+		for (uint16_t k = 0; k < m_nchannels; ++k)
+			delete [] m_sfxs[k];
+		delete [] m_sfxs;
+		m_sfxs = NULL;
+		m_nsize = 0;
+	}
+
+	if (m_nsize < nsize) {
+		m_nsize = nsize;
+		m_sfxs = new float * [m_nchannels];
+		for (uint16_t k = 0; k < m_nchannels; ++k)
+			m_sfxs[k] = new float [m_nsize];
+	}
 }
 
 
@@ -1626,13 +1675,17 @@ drumkv1_programs *drumkv1_impl::programs (void)
 void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 {
 	float *v_outs[m_nchannels];
+	float *v_sfxs[m_nchannels];
 
 	// buffer i/o transfer
+	if (m_nsize < nframes) alloc_sfxs(nframes);
 
 	uint16_t k;
 
-	for (k = 0; k < m_nchannels; ++k)
+	for (k = 0; k < m_nchannels; ++k) {
 		::memcpy(outs[k], ins[k], nframes * sizeof(float));
+		::memset(m_sfxs[k], 0, nframes * sizeof(float));
+	}
 
 	drumkv1_elem *elem = m_elem_list.next();
 	while (elem) {
@@ -1678,8 +1731,10 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 		// output buffers
 
-		for (k = 0; k < m_nchannels; ++k)
+		for (k = 0; k < m_nchannels; ++k) {
 			v_outs[k] = outs[k];
+			v_sfxs[k] = m_sfxs[k];
+		}
 
 		uint32_t nblock = nframes;
 
@@ -1749,8 +1804,13 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float out2
 					= vol1 * (mid1 - sid1 * wid1) * elem->pan1.value(j, 1);
 
-				for (k = 0; k < m_nchannels; ++k)
-					*v_outs[k]++ += (k & 1 ? out2 : out1);
+				const float fxsend = *elem->out1.fxsend;
+				for (k = 0; k < m_nchannels; ++k) {
+					const float dry = (k & 1 ? out2 : out1);
+					const float wet = dry * fxsend;
+					*v_outs[k]++ += dry - wet;
+					*v_sfxs[k]++ += wet;
+				}
 
 				if (j == 0) {
 					elem->aux1.panning = lfo1 * *elem->lfo1.panning;
@@ -1797,32 +1857,38 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 	// chorus
 	if (m_nchannels > 1) {
-		m_chorus.process(outs[0], outs[1], nframes, *m_cho.wet,
+		m_chorus.process(m_sfxs[0], m_sfxs[1], nframes, *m_cho.wet,
 			*m_cho.delay, *m_cho.feedb, *m_cho.rate, *m_cho.mod);
 	}
 
 	// effects
 	for (k = 0; k < m_nchannels; ++k) {
-		float *in = outs[k];
+		float *sfx = m_sfxs[k];
 		// flanger
-		m_flanger[k].process(in, nframes, *m_fla.wet,
+		m_flanger[k].process(sfx, nframes, *m_fla.wet,
 			*m_fla.delay, *m_fla.feedb, *m_fla.daft * float(k));
 		// phaser
-		m_phaser[k].process(in, nframes, *m_pha.wet,
+		m_phaser[k].process(sfx, nframes, *m_pha.wet,
 			*m_pha.rate, *m_pha.feedb, *m_pha.depth, *m_pha.daft * float(k));
 		// delay
-		m_delay[k].process(in, nframes, *m_del.wet,
+		m_delay[k].process(sfx, nframes, *m_del.wet,
 			*m_del.delay, *m_del.feedb, *m_del.bpm0);
 	}
 
 	// reverb
 	if (m_nchannels > 1) {
-		m_reverb.process(outs[0], outs[1], nframes, *m_rev.wet,
+		m_reverb.process(m_sfxs[0], m_sfxs[1], nframes, *m_rev.wet,
 			*m_rev.feedb, *m_rev.room, *m_rev.damp, *m_rev.width);
 	}
 
-	// dynamics
+	// mix-down
 	for (k = 0; k < m_nchannels; ++k) {
+		// fx sends
+		float *out = outs[k];
+		float *sfx = m_sfxs[k];
+		for (uint32_t n = 0; n < nframes; ++n)
+			*out++ += *sfx++;
+		// dynamics
 		float *in = outs[k];
 		// compressor
 		if (int(*m_dyn.compress) > 0)
@@ -1887,6 +1953,18 @@ void drumkv1::setSampleRate ( float srate )
 float drumkv1::sampleRate (void) const
 {
 	return m_pImpl->sampleRate();
+}
+
+
+void drumkv1::setBufferSize ( uint32_t nsize )
+{
+	m_pImpl->setBufferSize(nsize);
+}
+
+
+uint32_t drumkv1::bufferSize (void) const
+{
+	return m_pImpl->bufferSize();
 }
 
 
@@ -2125,6 +2203,7 @@ void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::OUT1_WIDTH:    m_pElem->out1.width       = pfParam; break;
 	case drumkv1::OUT1_PANNING:  m_pElem->out1.panning     = pfParam; break;
 	case drumkv1::OUT1_VOLUME:   m_pElem->out1.volume      = pfParam; break;
+	case drumkv1::OUT1_FXSEND:   m_pElem->out1.fxsend      = pfParam; break;
 	default: break;
 	}
 }
@@ -2174,6 +2253,7 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::OUT1_WIDTH:    pfParam = m_pElem->out1.width;      break;
 	case drumkv1::OUT1_PANNING:  pfParam = m_pElem->out1.panning;    break;
 	case drumkv1::OUT1_VOLUME:   pfParam = m_pElem->out1.volume;     break;
+	case drumkv1::OUT1_FXSEND:   pfParam = m_pElem->out1.fxsend;     break;
 	default: break;
 	}
 

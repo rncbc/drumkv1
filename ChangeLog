@@ -6,6 +6,7 @@ ChangeLog
 
 GIT HEAD
 
+- Introducing brand new OUT FX Send parameter per key/element.
 - Fixed an old bug that caused an immediate crash on triggering
   any sample key/element with its (exclusive) Group parameter
   set to anything but "Off" or "1".

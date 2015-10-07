@@ -53,6 +53,9 @@ public:
 	void setSampleRate(float srate);
 	float sampleRate() const;
 
+	void setBufferSize(uint32_t nsize);
+	uint32_t bufferSize() const;
+
 	drumkv1_element *addElement(int key);
 	drumkv1_element *element(int key) const;
 	void removeElement(int key);
@@ -107,6 +110,7 @@ public:
 		DCA1_DECAY2,
 		OUT1_WIDTH,
 		OUT1_PANNING,
+		OUT1_FXSEND,
 		OUT1_VOLUME,
 
 		NUM_ELEMENT_PARAMS,

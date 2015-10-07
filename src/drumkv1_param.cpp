@@ -83,6 +83,7 @@ struct ParamInfo {
 	{ "DCA1_DECAY2",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCA1 Decay 2
 	{ "OUT1_WIDTH",    PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // OUT1 Stereo Width
 	{ "OUT1_PANNING",  PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // OUT1 Panning
+	{ "OUT1_FXSEND",   PARAM_FLOAT,   1.0f,   0.0f,   1.0f }, // OUT1 FX Send
 	{ "OUT1_VOLUME",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // OUT1 Volume
 
 	{ "DEF1_PITCHBEND",PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // DEF1 Pitchbend
@@ -187,8 +188,14 @@ void drumkv1_param::loadElements (
 		if (eElement.isNull())
 			continue;
 		if (eElement.tagName() == "element") {
-			int note = eElement.attribute("index").toInt();
+			const int note = eElement.attribute("index").toInt();
 			drumkv1_element *element = pDrumk->addElement(note);
+			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				const float fDefValue = paramDefaultValue(index);
+				element->setParamValue(index, fDefValue, 0);
+				element->setParamValue(index, fDefValue);
+			}
 			for (QDomNode nChild = eElement.firstChild();
 					!nChild.isNull();
 						nChild = nChild.nextSibling()) {
