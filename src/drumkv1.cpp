@@ -1683,8 +1683,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 	uint16_t k;
 
 	for (k = 0; k < m_nchannels; ++k) {
-		::memcpy(outs[k], ins[k], nframes * sizeof(float));
-		::memset(m_sfxs[k], 0, nframes * sizeof(float));
+		::memcpy(m_sfxs[k], ins[k], nframes * sizeof(float));
+		::memset(outs[k], 0, nframes * sizeof(float));
 	}
 
 	drumkv1_elem *elem = m_elem_list.next();
@@ -1883,22 +1883,23 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			*m_rev.feedb, *m_rev.room, *m_rev.damp, *m_rev.width);
 	}
 
-	// mix-down
+	// output mix-down
 	for (k = 0; k < m_nchannels; ++k) {
+		uint32_t n;
 		// fx sends
+		float *in  = m_sfxs[k];
 		float *out = outs[k];
-		float *sfx = m_sfxs[k];
-		for (uint32_t n = 0; n < nframes; ++n)
-			*out++ += *sfx++;
+		for (n = 0; n < nframes; ++n)
+			*out++ += *in++;
 		// dynamics
-		float *in = outs[k];
+		in = outs[k];
 		// compressor
 		if (int(*m_dyn.compress) > 0)
 			m_comp[k].process(in, nframes);
 		// limiter
 		if (int(*m_dyn.limiter) > 0) {
-			float *out = in;
-			for (uint32_t n = 0; n < nframes; ++n)
+			out = in;
+			for (n = 0; n < nframes; ++n)
 				*out++ = drumkv1_sigmoid(*in++);
 		}
 	}
