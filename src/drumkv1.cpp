@@ -1865,15 +1865,15 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 	// effects
 	for (k = 0; k < m_nchannels; ++k) {
-		float *sfx = m_sfxs[k];
+		float *in = m_sfxs[k];
 		// flanger
-		m_flanger[k].process(sfx, nframes, *m_fla.wet,
+		m_flanger[k].process(in, nframes, *m_fla.wet,
 			*m_fla.delay, *m_fla.feedb, *m_fla.daft * float(k));
 		// phaser
-		m_phaser[k].process(sfx, nframes, *m_pha.wet,
+		m_phaser[k].process(in, nframes, *m_pha.wet,
 			*m_pha.rate, *m_pha.feedb, *m_pha.depth, *m_pha.daft * float(k));
 		// delay
-		m_delay[k].process(sfx, nframes, *m_del.wet,
+		m_delay[k].process(in, nframes, *m_del.wet,
 			*m_del.delay, *m_del.feedb, *m_del.bpm0);
 	}
 
