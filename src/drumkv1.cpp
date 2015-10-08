@@ -1724,6 +1724,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		const float modwheel1
 			= m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch;
 
+		const float fxsend1	= *elem->out1.fxsend * *elem->out1.fxsend;
+
 		// channel indexes
 
 		const uint16_t k1 = 0;
@@ -1804,12 +1806,9 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float out2
 					= vol1 * (mid1 - sid1 * wid1) * elem->pan1.value(j, 1);
 
-				const float fxsend
-					= *elem->out1.fxsend
-					* *elem->out1.fxsend;
 				for (k = 0; k < m_nchannels; ++k) {
 					const float dry = (k & 1 ? out2 : out1);
-					const float wet = fxsend * dry;
+					const float wet = fxsend1 * dry;
 					*v_outs[k]++ += dry - wet;
 					*v_sfxs[k]++ += wet;
 				}
