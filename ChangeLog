@@ -6,6 +6,7 @@ ChangeLog
 
 GIT HEAD
 
+- Prefer Qt5 over Qt4 by default with configure script.
 - Introducing brand new OUT FX Send parameter per key/element.
 - Fixed an old bug that caused an immediate crash on triggering
   any sample key/element with its (exclusive) Group parameter
