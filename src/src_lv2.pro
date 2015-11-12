@@ -15,6 +15,7 @@ HEADERS = \
 	drumkv1_lv2.h \
 	drumkv1_config.h \
 	drumkv1_filter.h \
+	drumkv1_formant.h \
 	drumkv1_sample.h \
 	drumkv1_wave.h \
 	drumkv1_ramp.h \
@@ -31,6 +32,7 @@ SOURCES = \
 	drumkv1_ui.cpp \
 	drumkv1_lv2.cpp \
 	drumkv1_config.cpp \
+	drumkv1_formant.cpp \
 	drumkv1_sample.cpp \
 	drumkv1_wave.cpp \
 	drumkv1_param.cpp \

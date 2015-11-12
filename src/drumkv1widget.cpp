@@ -107,7 +107,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	QStringList slopes;
 	slopes << tr("12dB/oct");
 	slopes << tr("24dB/oct");
-	slopes << tr("RBJ");
+	slopes << tr("Biquad");
+	slopes << tr("Formant");
 
 	m_ui.Dcf1SlopeKnob->insertItems(0, slopes);
 
@@ -625,6 +626,9 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 		break;
 	}
 #endif
+	case drumkv1::DCF1_SLOPE:
+		m_ui.Dcf1TypeKnob->setEnabled(int(fValue) != 3); // !Formant
+		break;
 	case drumkv1::DEL1_BPMSYNC:
 		if (fValue > 0.0f)
 			m_ui.Del1BpmKnob->setValue(0.0f);
@@ -1095,7 +1099,7 @@ void drumkv1widget::refreshElements (void)
 
 	int iCurrentNote = currentNote();
 
-#ifdef CONFIG_DEBUG
+#ifdef CONFIG_DEBUG_0
 	qDebug("drumkv1widget::refreshElements(%d)", iCurrentNote);
 #endif
 
@@ -1149,6 +1153,7 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 	resetParamKnobs(drumkv1::NUM_ELEMENT_PARAMS);
 
 	if (element) {
+		activateParamKnobs(true);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			drumkv1widget_knob *pKnob = paramKnob(index);
@@ -1163,9 +1168,9 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 	} else {
 		updateSample(NULL);
 		resetParamValues(drumkv1::NUM_ELEMENT_PARAMS);
+		activateParamKnobs(false);
 	}
 
-	activateParamKnobs(element != NULL);
 
 	const QString& sElementName = completeNoteName(iCurrentNote);
 	m_ui.StatusBar->showMessage(tr("Element: %1").arg(sElementName), 5000);

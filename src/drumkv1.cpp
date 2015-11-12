@@ -29,6 +29,7 @@
 #include "drumkv1_list.h"
 
 #include "drumkv1_filter.h"
+#include "drumkv1_formant.h"
 
 #include "drumkv1_fx.h"
 #include "drumkv1_reverb.h"
@@ -617,6 +618,7 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 	drumkv1_filter1 dcf11, dcf12;				// filters
 	drumkv1_filter2 dcf13, dcf14;
 	drumkv1_filter3 dcf15, dcf16;
+	drumkv1_formant dcf17, dcf18;
 
 	drumkv1_env::State dca1_env;				// envelope states
 	drumkv1_env::State dcf1_env;
@@ -895,6 +897,12 @@ void drumkv1_impl::setSampleRate ( float srate )
 {
 	// set internal sample rate
 	m_srate = srate;
+
+	for (int i = 0; i < MAX_VOICES; ++i) {
+		drumkv1_voice *pv = m_voices[i];
+		pv->dcf17.setSampleRate(m_srate);
+		pv->dcf18.setSampleRate(m_srate);
+	}
 }
 
 
@@ -1656,7 +1664,11 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 					* env1 * (1.0f + *elem->lfo1.reso * lfo1));
 
 				switch (int(*elem->dcf1.slope)) {
-				case 2: // RBJ/bi-quad
+				case 3: // Formant
+					gen1 = pv->dcf17.output(gen1, cutoff1, reso1);
+					gen2 = pv->dcf18.output(gen2, cutoff1, reso1);
+					break;
+				case 2: // Biquad
 					gen1 = pv->dcf15.output(gen1, cutoff1, reso1);
 					gen2 = pv->dcf16.output(gen2, cutoff1, reso1);
 					break;
