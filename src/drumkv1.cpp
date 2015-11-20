@@ -516,6 +516,8 @@ public:
 	drumkv1_sample  gen1_sample;
 	drumkv1_wave_lf lfo1_wave;
 
+	drumkv1_formant::Impl dcf1_formant;
+
 	drumkv1_gen    gen1;
 	drumkv1_dcf    dcf1;
 	drumkv1_lfo    lfo1;
@@ -558,6 +560,8 @@ drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, float srate, int key )
 	lfo1_wave.setSampleRate(srate);
 
 	updateEnvTimes(srate);
+
+	dcf1_formant.setSampleRate(srate);
 }
 
 
@@ -598,6 +602,9 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 
 		gen1.reset(pElem ? &pElem->gen1_sample : 0);
 		lfo1.reset(pElem ? &pElem->lfo1_wave : 0);
+
+		dcf17.reset(pElem ? &pElem->dcf1_formant : 0);
+		dcf18.reset(pElem ? &pElem->dcf1_formant : 0);
 	}
 
 	drumkv1_elem *elem;
@@ -897,12 +904,6 @@ void drumkv1_impl::setSampleRate ( float srate )
 {
 	// set internal sample rate
 	m_srate = srate;
-
-	for (int i = 0; i < MAX_VOICES; ++i) {
-		drumkv1_voice *pv = m_voices[i];
-		pv->dcf17.setSampleRate(m_srate);
-		pv->dcf18.setSampleRate(m_srate);
-	}
 }
 
 
