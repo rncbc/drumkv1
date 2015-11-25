@@ -134,6 +134,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	m_ui.Gen1ReverseKnob->insertItems(0, states);
 
+	m_ui.Lfo1SyncKnob->insertItems(0, states);
+
 	m_ui.Dyn1CompressKnob->insertItems(0, states);
 	m_ui.Dyn1LimiterKnob->insertItems(0, states);
 
@@ -271,6 +273,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::LFO1_SHAPE,   m_ui.Lfo1ShapeKnob);
 	setParamKnob(drumkv1::LFO1_WIDTH,   m_ui.Lfo1WidthKnob);
 	setParamKnob(drumkv1::LFO1_RATE,    m_ui.Lfo1RateKnob);
+	setParamKnob(drumkv1::LFO1_SYNC,    m_ui.Lfo1SyncKnob);
 	setParamKnob(drumkv1::LFO1_PANNING, m_ui.Lfo1PanningKnob);
 	setParamKnob(drumkv1::LFO1_VOLUME,  m_ui.Lfo1VolumeKnob);
 	setParamKnob(drumkv1::LFO1_CUTOFF,  m_ui.Lfo1CutoffKnob);

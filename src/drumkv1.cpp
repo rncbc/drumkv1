@@ -344,6 +344,7 @@ struct drumkv1_lfo
 	float *shape;
 	float *width;
 	float *rate;
+	float *sync;
 	float *sweep;
 	float *pitch;
 	float *cutoff;
@@ -500,6 +501,32 @@ protected:
 
 		return m_param1_v * drumkv1_max(m_param2_v, m_param3_v);
 	}
+};
+
+
+// common phasor (LFO sync)
+
+class drumkv1_phasor
+{
+public:
+
+	drumkv1_phasor(uint32_t nsize = 128)
+		: m_nsize(nsize), m_nframes(0) {}
+
+	void process(uint32_t nframes)
+	{
+		m_nframes += nframes;
+		while (m_nframes >= m_nsize)
+			m_nframes -= m_nsize;
+	}
+
+	float pshift() const
+		{ return float(m_nframes) / float(m_nsize); }
+
+private:
+
+	uint32_t m_nsize;
+	uint32_t m_nframes;
 };
 
 
@@ -764,6 +791,7 @@ private:
 	drumkv1_fx_comp    *m_comp;
 
 	drumkv1_reverb m_reverb;
+	drumkv1_phasor m_phasor;
 };
 
 
@@ -1320,7 +1348,9 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				elem->lfo1.env.start(&pv->lfo1_env);
 				elem->dca1.env.start(&pv->dca1_env);
 				// lfos
-				pv->lfo1_sample = pv->lfo1.start();
+				const float pshift1
+					= (*elem->lfo1.sync > 0.0f ? m_phasor.pshift() : 0.0f);
+				pv->lfo1_sample = pv->lfo1.start(pshift1);
 				// allocated
 				m_notes[key] = pv;
 				// group management
@@ -1799,6 +1829,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 	}
 
 	// post-processing
+	m_phasor.process(nframes);
 
 	elem = m_elem_list.next();
 	while (elem) {
@@ -2082,6 +2113,7 @@ void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::LFO1_SHAPE:    m_pElem->lfo1.shape       = pfParam; break;
 	case drumkv1::LFO1_WIDTH:    m_pElem->lfo1.width       = pfParam; break;
 	case drumkv1::LFO1_RATE:     m_pElem->lfo1.rate        = pfParam; break;
+	case drumkv1::LFO1_SYNC:     m_pElem->lfo1.sync        = pfParam; break;
 	case drumkv1::LFO1_SWEEP:    m_pElem->lfo1.sweep       = pfParam; break;
 	case drumkv1::LFO1_PITCH:    m_pElem->lfo1.pitch       = pfParam; break;
 	case drumkv1::LFO1_CUTOFF:   m_pElem->lfo1.cutoff      = pfParam; break;
@@ -2132,6 +2164,7 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::LFO1_SHAPE:    pfParam = m_pElem->lfo1.shape;      break;
 	case drumkv1::LFO1_WIDTH:    pfParam = m_pElem->lfo1.width;      break;
 	case drumkv1::LFO1_RATE:     pfParam = m_pElem->lfo1.rate;       break;
+	case drumkv1::LFO1_SYNC:     pfParam = m_pElem->lfo1.sync;       break;
 	case drumkv1::LFO1_SWEEP:    pfParam = m_pElem->lfo1.sweep;      break;
 	case drumkv1::LFO1_PITCH:    pfParam = m_pElem->lfo1.pitch;      break;
 	case drumkv1::LFO1_CUTOFF:   pfParam = m_pElem->lfo1.cutoff;     break;
