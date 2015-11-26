@@ -232,11 +232,11 @@ void drumkv1_lv2::run ( uint32_t nframes )
 					if (atom && atom->type == m_urids.atom_Float) {
 						const float bpm_sync = drumkv1::paramValue(drumkv1::DEL1_BPMSYNC);
 						if (bpm_sync > 0.0f) {
-							const float bpm_host = drumkv1::paramValue(drumkv1::DEL1_BPMHOST);
-							if (bpm_host > 0.0f) {
-								const float bpm	= ((LV2_Atom_Float *) atom)->body;
+							const float bpm = drumkv1::paramValue(drumkv1::DEL1_BPM);
+							if (bpm > 0.0f) {
+								const float bpm_host = ((LV2_Atom_Float *) atom)->body;
 								if (::fabs(bpm_host - bpm) > 0.01f)
-									drumkv1::setParamValue(drumkv1::DEL1_BPMHOST, bpm);
+									drumkv1::setParamValue(drumkv1::DEL1_BPM, bpm_host);
 							}
 						}
 					}

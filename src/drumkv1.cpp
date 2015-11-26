@@ -433,9 +433,8 @@ struct drumkv1_del
 	float *wet;
 	float *delay;
 	float *feedb;
-	float *bpm, *bpm0;
-	float *bpmsync, bpmsync0;
-	float *bpmhost;
+	float *bpm;
+	float *bpmsync;
 };
 
 
@@ -831,10 +830,6 @@ drumkv1_impl::drumkv1_impl (
 	// compressors none yet
 	m_comp = 0;
 
-	// no delay sync yet
-	m_del.bpmsync0 = 0.0f;
-	m_del.bpm0 = 0;
-
 	// load controllers & programs database...
 	m_config.loadControls(&m_controls);
 	m_config.loadPrograms(&m_programs);
@@ -1154,7 +1149,6 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DEL1_FEEDB:     m_del.feedb     = pfParam; break;
 	case drumkv1::DEL1_BPM:       m_del.bpm       = pfParam; break;
 	case drumkv1::DEL1_BPMSYNC:   m_del.bpmsync   = pfParam; break;
-	case drumkv1::DEL1_BPMHOST:   m_del.bpmhost   = pfParam; break;
 	case drumkv1::REV1_WET:       m_rev.wet       = pfParam; break;
 	case drumkv1::REV1_ROOM:      m_rev.room      = pfParam; break;
 	case drumkv1::REV1_DAMP:      m_rev.damp      = pfParam; break;
@@ -1223,7 +1217,6 @@ float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index ) const
 	case drumkv1::DEL1_FEEDB:     pfParam = m_del.feedb;     break;
 	case drumkv1::DEL1_BPM:       pfParam = m_del.bpm;       break;
 	case drumkv1::DEL1_BPMSYNC:   pfParam = m_del.bpmsync;   break;
-	case drumkv1::DEL1_BPMHOST:   pfParam = m_del.bpmhost;   break;
 	case drumkv1::REV1_WET:       pfParam = m_rev.wet;       break;
 	case drumkv1::REV1_ROOM:      pfParam = m_rev.room;      break;
 	case drumkv1::REV1_DAMP:      pfParam = m_rev.damp;      break;
@@ -1527,10 +1520,6 @@ void drumkv1_impl::reset (void)
 		*m_del.bpm *= 100.0f;
 #endif
 
-	// make sure dangling states aren't...
-	m_del.bpmsync0 = 0.0f;
-	m_del.bpm0 = m_del.bpm;
-
 	// reset all elements
 	drumkv1_elem *elem = m_elem_list.next();
 	while (elem) {
@@ -1775,12 +1764,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		pv = pv_next;
 	}
 
-	// delay sync toggle
-	if (int(*m_del.bpmsync) != int(m_del.bpmsync0)) {
-		m_del.bpmsync0 = *m_del.bpmsync;
-		m_del.bpm0 = (m_del.bpmsync0 > 0.0f ? m_del.bpmhost : m_del.bpm);
-	}
-
 	// chorus
 	if (m_nchannels > 1) {
 		m_chorus.process(m_sfxs[0], m_sfxs[1], nframes, *m_cho.wet,
@@ -1798,7 +1781,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			*m_pha.rate, *m_pha.feedb, *m_pha.depth, *m_pha.daft * float(k));
 		// delay
 		m_delay[k].process(in, nframes, *m_del.wet,
-			*m_del.delay, *m_del.feedb, *m_del.bpm0);
+			*m_del.delay, *m_del.feedb, *m_del.bpm);
 	}
 
 	// reverb
