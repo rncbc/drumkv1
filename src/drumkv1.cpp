@@ -353,6 +353,8 @@ struct drumkv1_lfo
 	float *volume;
 
 	drumkv1_env env;
+
+	float *bpmsync;
 };
 
 
@@ -363,6 +365,8 @@ struct drumkv1_dca
 	float *volume;
 
 	drumkv1_env env;
+
+	float *bpmsync;
 };
 
 
@@ -2107,6 +2111,7 @@ void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::LFO1_DECAY1:   m_pElem->lfo1.env.decay1  = pfParam; break;
 	case drumkv1::LFO1_LEVEL2:   m_pElem->lfo1.env.level2  = pfParam; break;
 	case drumkv1::LFO1_DECAY2:   m_pElem->lfo1.env.decay2  = pfParam; break;
+	case drumkv1::LFO1_BPMSYNC:  m_pElem->lfo1.bpmsync     = pfParam; break;
 	case drumkv1::DCA1_VOLUME:   m_pElem->dca1.volume      = pfParam; break;
 	case drumkv1::DCA1_ATTACK:   m_pElem->dca1.env.attack  = pfParam; break;
 	case drumkv1::DCA1_DECAY1:   m_pElem->dca1.env.decay1  = pfParam; break;
@@ -2158,6 +2163,7 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::LFO1_DECAY1:   pfParam = m_pElem->lfo1.env.decay1; break;
 	case drumkv1::LFO1_LEVEL2:   pfParam = m_pElem->lfo1.env.level2; break;
 	case drumkv1::LFO1_DECAY2:   pfParam = m_pElem->lfo1.env.decay2; break;
+	case drumkv1::LFO1_BPMSYNC:  pfParam = m_pElem->lfo1.bpmsync;    break;
 	case drumkv1::DCA1_VOLUME:   pfParam = m_pElem->dca1.volume;     break;
 	case drumkv1::DCA1_ATTACK:   pfParam = m_pElem->dca1.env.attack; break;
 	case drumkv1::DCA1_DECAY1:   pfParam = m_pElem->dca1.env.decay1; break;
@@ -2203,6 +2209,15 @@ void drumkv1_element::resetParamValues ( bool bSwap )
 		else
 			m_pElem->params[0][index] = fOldValue;
 	}
+}
+
+
+// scalar converter helpers (static)
+
+float drumkv1::lfo_rate_bpm ( float bpm )
+{
+	const float freq_bpm = ::fmaxf(LFO_FREQ_MIN, (bpm / 60.f));
+	return ::sqrtf((freq_bpm - LFO_FREQ_MIN) / (LFO_FREQ_MAX - LFO_FREQ_MIN));
 }
 
 

@@ -201,17 +201,20 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 			::jack_port_get_buffer(m_audio_outs[k], nframes));
 	}
 
-	const float bpm_sync = paramValue(drumkv1::DEL1_BPMSYNC);
-	if (bpm_sync > 0.0f) {
-		const float bpm = paramValue(drumkv1::DEL1_BPM);
-		if (bpm > 0.0f) {
-			jack_position_t pos;
-			jack_transport_query(m_client, &pos);
-			if (pos.valid & JackPositionBBT) {
-				const float bpm_host = float(pos.beats_per_minute);
-				if (::fabs(bpm_host - bpm) > 0.01f)
-					setParamValue(drumkv1::DEL1_BPM, bpm_host);
-			}
+	jack_position_t pos;
+	jack_transport_query(m_client, &pos);
+	if (pos.valid & JackPositionBBT) {
+		const float bpm_host = float(pos.beats_per_minute);
+		if (paramValue(drumkv1::LFO1_BPMSYNC) > 0.0f) {
+			const float rate_bpm = lfo_rate_bpm(bpm_host);
+			const float rate = paramValue(drumkv1::LFO1_RATE);
+			if (::fabsf(rate_bpm - rate) > 0.01f)
+				setParamValue(drumkv1::LFO1_RATE, rate_bpm);
+		}
+		if (paramValue(drumkv1::DEL1_BPMSYNC) > 0.0f) {
+			const float bpm = paramValue(drumkv1::DEL1_BPM);
+			if (bpm > 0.0f && ::fabsf(bpm_host - bpm) > 0.01f)
+				setParamValue(drumkv1::DEL1_BPM, bpm_host);
 		}
 	}
 

@@ -61,7 +61,7 @@ drumkv1widget_env::~drumkv1widget_env (void)
 // Parameter accessors.
 void drumkv1widget_env::setAttack ( float fAttack )
 {
-	if (::fabs(m_fAttack - fAttack) > 0.001f) {
+	if (::fabsf(m_fAttack - fAttack) > 0.001f) {
 		m_fAttack = safe_value(fAttack);
 		update();
 		emit attackChanged(attack());
@@ -76,7 +76,7 @@ float drumkv1widget_env::attack (void) const
 
 void drumkv1widget_env::setDecay1 ( float fDecay1 )
 {
-	if (::fabs(m_fDecay1 - fDecay1) > 0.001f) {
+	if (::fabsf(m_fDecay1 - fDecay1) > 0.001f) {
 		m_fDecay1 = safe_value(fDecay1);
 		update();
 		emit decay1Changed(decay1());
@@ -91,7 +91,7 @@ float drumkv1widget_env::decay1 (void) const
 
 void drumkv1widget_env::setLevel2 ( float fLevel2 )
 {
-	if (::fabs(m_fLevel2 - fLevel2) > 0.001f) {
+	if (::fabsf(m_fLevel2 - fLevel2) > 0.001f) {
 		m_fLevel2 = safe_value(fLevel2);
 		update();
 		emit level2Changed(level2());
@@ -106,7 +106,7 @@ float drumkv1widget_env::level2 (void) const
 
 void drumkv1widget_env::setDecay2 ( float fDecay2 )
 {
-	if (::fabs(m_fDecay2 - fDecay2) > 0.001f) {
+	if (::fabsf(m_fDecay2 - fDecay2) > 0.001f) {
 		m_fDecay2 = safe_value(fDecay2);
 		update();
 		emit decay2Changed(decay2());

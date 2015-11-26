@@ -149,6 +149,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	const QString& sAuto = tr("Auto");
 	m_ui.Gen1EnvTimeKnob->setSpecialValueText(sAuto);
+	m_ui.Lfo1RateKnob->setSpecialValueText(sAuto);
 	m_ui.Del1BpmKnob->setSpecialValueText(sAuto);
 
 	// Wave integer widths.
@@ -326,6 +327,10 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Lfo1Decay2Knob, SIGNAL(valueChanged(float)),
 		m_ui.Lfo1Env, SLOT(setDecay2(float)));
 
+	QObject::connect(m_ui.Lfo1RateKnob,
+		SIGNAL(valueChanged(float)),
+		SLOT(lfo1BpmSyncChanged()));
+
 	// DCA1
 	setParamKnob(drumkv1::DCA1_VOLUME, m_ui.Dca1VolumeKnob);
 	setParamKnob(drumkv1::DCA1_ATTACK, m_ui.Dca1AttackKnob);
@@ -404,7 +409,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	QObject::connect(m_ui.Del1BpmKnob,
 		SIGNAL(valueChanged(float)),
-		SLOT(bpmSyncChanged()));
+		SLOT(del1BpmSyncChanged()));
 
 	// Reverb
 	setParamKnob(drumkv1::REV1_WET,   m_ui.Rev1WetKnob);
@@ -631,6 +636,10 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 #endif
 	case drumkv1::DCF1_SLOPE:
 		m_ui.Dcf1TypeKnob->setEnabled(int(fValue) != 3); // !Formant
+		break;
+	case drumkv1::LFO1_BPMSYNC:
+		if (fValue > 0.0f)
+			m_ui.Lfo1RateKnob->setValue(0.0f);
 		break;
 	case drumkv1::DEL1_BPMSYNC:
 		if (fValue > 0.0f)
@@ -1238,8 +1247,9 @@ void drumkv1widget::activateParamKnobsGroupBox (
 }
 
 
-// Delay BPM change.
-void drumkv1widget::bpmSyncChanged (void)
+// Common BPM sync change.
+void drumkv1widget::bpmSyncChanged (
+	drumkv1widget_spin *pKnob, drumkv1::ParamIndex index )
 {
 	if (m_iUpdate > 0)
 		return;
@@ -1247,12 +1257,26 @@ void drumkv1widget::bpmSyncChanged (void)
 	++m_iUpdate;
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi) {
-		const bool bBpmSync0 = (pDrumkUi->paramValue(drumkv1::DEL1_BPMSYNC) > 0.0f);
-		const bool bBpmSync1 = m_ui.Del1BpmKnob->isSpecialValue();
+		const bool bBpmSync0 = (pDrumkUi->paramValue(index) > 0.0f);
+		const bool bBpmSync1 = pKnob->isSpecialValue();
 		if ((bBpmSync1 && !bBpmSync0) || (!bBpmSync1 && bBpmSync0))
-			pDrumkUi->setParamValue(drumkv1::DEL1_BPMSYNC, (bBpmSync1 ? 1.0f : 0.0f));
+			pDrumkUi->setParamValue(index, (bBpmSync1 ? 1.0f : 0.0f));
 	}
 	--m_iUpdate;
+}
+
+
+// LFO1 BPM sync change.
+void drumkv1widget::lfo1BpmSyncChanged (void)
+{
+	bpmSyncChanged(m_ui.Lfo1RateKnob, drumkv1::LFO1_BPMSYNC);
+}
+
+
+// Delay BPM sync change.
+void drumkv1widget::del1BpmSyncChanged (void)
+{
+	bpmSyncChanged(m_ui.Del1BpmKnob, drumkv1::DEL1_BPMSYNC);
 }
 
 
