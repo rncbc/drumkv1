@@ -508,7 +508,7 @@ private:
 
 
 //-------------------------------------------------------------------------
-// drumkv1_fx_allpass_delay - All-pass delay implementation.
+// drumkv1_fx_allpass - All-pass delay implementation.
 
 class drumkv1_fx_allpass
 {
