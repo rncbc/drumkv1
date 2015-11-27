@@ -239,7 +239,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 						}
 						if (drumkv1::paramValue(drumkv1::DEL1_BPMSYNC) > 0.0f) {
 							const float bpm = drumkv1::paramValue(drumkv1::DEL1_BPM);
-							if (bpm > 0.0f && ::fabs(bpm_host - bpm) > 0.01f)
+							if (bpm > 0.0f && ::fabsf(bpm_host - bpm) > 0.01f)
 								drumkv1::setParamValue(drumkv1::DEL1_BPM, bpm_host);
 						}
 					}
