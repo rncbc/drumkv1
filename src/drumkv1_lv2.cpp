@@ -230,17 +230,23 @@ void drumkv1_lv2::run ( uint32_t nframes )
 					lv2_atom_object_get(object,
 						m_urids.time_beatsPerMinute, &atom, NULL);
 					if (atom && atom->type == m_urids.atom_Float) {
-						const float bpm_host = ((LV2_Atom_Float *) atom)->body;
+						const float host_bpm = ((LV2_Atom_Float *) atom)->body;
 						if (drumkv1::paramValue(drumkv1::LFO1_BPMSYNC) > 0.0f) {
-							const float rate_bpm = drumkv1::lfo_rate_bpm(bpm_host);
+						#if 1//LFO_BPMRATEX
+							const float bpm = drumkv1::paramValue(drumkv1::LFO1_BPM);
+							if (::fabsf(host_bpm - bpm) > 0.01f)
+								drumkv1::setParamValue(drumkv1::LFO1_BPM, host_bpm);
+						#else
+							const float rate_bpm = drumkv1::lfo_rate_bpm(host_bpm);
 							const float rate = drumkv1::paramValue(drumkv1::LFO1_RATE);
 							if (::fabsf(rate_bpm - rate) > 0.01f)
 								drumkv1::setParamValue(drumkv1::LFO1_RATE, rate_bpm);
+						#endif
 						}
 						if (drumkv1::paramValue(drumkv1::DEL1_BPMSYNC) > 0.0f) {
 							const float bpm = drumkv1::paramValue(drumkv1::DEL1_BPM);
-							if (bpm > 0.0f && ::fabsf(bpm_host - bpm) > 0.01f)
-								drumkv1::setParamValue(drumkv1::DEL1_BPM, bpm_host);
+							if (bpm > 0.0f && ::fabsf(host_bpm - bpm) > 0.01f)
+								drumkv1::setParamValue(drumkv1::DEL1_BPM, host_bpm);
 						}
 					}
 				}

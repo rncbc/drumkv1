@@ -343,6 +343,7 @@ struct drumkv1_lfo
 {
 	float *shape;
 	float *width;
+	float *bpm;
 	float *rate;
 	float *sync;
 	float *sweep;
@@ -1622,11 +1623,14 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		// controls
 		drumkv1_elem *elem = pv->elem;
 
+	#if 1//LFO_BPMRATEX
+		const float lfo1_freq
+			= *elem->lfo1.bpm / (60.0f * (*elem->lfo1.rate + 0.001f));
+	#else
 		const float lfo1_rate = *elem->lfo1.rate * *elem->lfo1.rate;
-
 		const float lfo1_freq
 			= LFO_FREQ_MIN + lfo1_rate * (LFO_FREQ_MAX - LFO_FREQ_MIN);
-
+	#endif
 		const float modwheel1
 			= m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch;
 
@@ -2099,6 +2103,7 @@ void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 	case drumkv1::DCF1_DECAY2:   m_pElem->dcf1.env.decay2  = pfParam; break;
 	case drumkv1::LFO1_SHAPE:    m_pElem->lfo1.shape       = pfParam; break;
 	case drumkv1::LFO1_WIDTH:    m_pElem->lfo1.width       = pfParam; break;
+	case drumkv1::LFO1_BPM:      m_pElem->lfo1.bpm         = pfParam; break;
 	case drumkv1::LFO1_RATE:     m_pElem->lfo1.rate        = pfParam; break;
 	case drumkv1::LFO1_SYNC:     m_pElem->lfo1.sync        = pfParam; break;
 	case drumkv1::LFO1_SWEEP:    m_pElem->lfo1.sweep       = pfParam; break;
@@ -2151,6 +2156,7 @@ float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DCF1_DECAY2:   pfParam = m_pElem->dcf1.env.decay2; break;
 	case drumkv1::LFO1_SHAPE:    pfParam = m_pElem->lfo1.shape;      break;
 	case drumkv1::LFO1_WIDTH:    pfParam = m_pElem->lfo1.width;      break;
+	case drumkv1::LFO1_BPM:      pfParam = m_pElem->lfo1.bpm;        break;
 	case drumkv1::LFO1_RATE:     pfParam = m_pElem->lfo1.rate;       break;
 	case drumkv1::LFO1_SYNC:     pfParam = m_pElem->lfo1.sync;       break;
 	case drumkv1::LFO1_SWEEP:    pfParam = m_pElem->lfo1.sweep;      break;

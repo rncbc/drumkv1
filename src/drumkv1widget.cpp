@@ -149,7 +149,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	const QString& sAuto = tr("Auto");
 	m_ui.Gen1EnvTimeKnob->setSpecialValueText(sAuto);
+#if 1//LFO_BPMRATEX
+	m_ui.Lfo1BpmKnob->setSpecialValueText(sAuto);
+#else
 	m_ui.Lfo1RateKnob->setSpecialValueText(sAuto);
+#endif
 	m_ui.Del1BpmKnob->setSpecialValueText(sAuto);
 
 	// Wave integer widths.
@@ -188,6 +192,14 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Lfo1PanningKnob->setMaximum(+1.0f);
 	m_ui.Lfo1VolumeKnob->setMinimum(-1.0f);
 	m_ui.Lfo1VolumeKnob->setMaximum(+1.0f);
+#if 1//LFO_BPMRATEX
+	m_ui.Lfo1BpmKnob->setScale(1.0f);
+	m_ui.Lfo1BpmKnob->setMinimum(3.6f);
+	m_ui.Lfo1BpmKnob->setMaximum(360.0f);
+	m_ui.Lfo1BpmKnob->setSingleStep(1.0f);
+#else
+	m_ui.Lfo1BpmKnob->hide();
+#endif
 
 	// Output (stereo-)width limits.
 	m_ui.Out1WidthKnob->setMinimum(-1.0f);
@@ -285,7 +297,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::LFO1_DECAY1,  m_ui.Lfo1Decay1Knob);
 	setParamKnob(drumkv1::LFO1_LEVEL2,  m_ui.Lfo1Level2Knob);
 	setParamKnob(drumkv1::LFO1_DECAY2,  m_ui.Lfo1Decay2Knob);
-
+#if 1//LFO_BPMRATEX
+	setParamKnob(drumkv1::LFO1_BPM,     m_ui.Lfo1BpmKnob);
+#endif
 	QObject::connect(
 		m_ui.Lfo1ShapeKnob, SIGNAL(valueChanged(float)),
 		m_ui.Lfo1Wave, SLOT(setWaveShape(float)));
@@ -327,9 +341,15 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Lfo1Decay2Knob, SIGNAL(valueChanged(float)),
 		m_ui.Lfo1Env, SLOT(setDecay2(float)));
 
+#if 1//LFO_BPMRATEX
+	QObject::connect(m_ui.Lfo1BpmKnob,
+		SIGNAL(valueChanged(float)),
+		SLOT(lfo1BpmSyncChanged()));
+#else
 	QObject::connect(m_ui.Lfo1RateKnob,
 		SIGNAL(valueChanged(float)),
 		SLOT(lfo1BpmSyncChanged()));
+#endif
 
 	// DCA1
 	setParamKnob(drumkv1::DCA1_VOLUME, m_ui.Dca1VolumeKnob);
@@ -638,8 +658,13 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 		m_ui.Dcf1TypeKnob->setEnabled(int(fValue) != 3); // !Formant
 		break;
 	case drumkv1::LFO1_BPMSYNC:
+	#if 1//LFO_BPMRATEX
+		if (fValue > 0.0f)
+			m_ui.Lfo1BpmKnob->setValue(0.0f);
+	#else
 		if (fValue > 0.0f)
 			m_ui.Lfo1RateKnob->setValue(0.0f);
+	#endif
 		break;
 	case drumkv1::DEL1_BPMSYNC:
 		if (fValue > 0.0f)
@@ -1269,7 +1294,11 @@ void drumkv1widget::bpmSyncChanged (
 // LFO1 BPM sync change.
 void drumkv1widget::lfo1BpmSyncChanged (void)
 {
+#if 1//LFO_BPMRATEX
+	bpmSyncChanged(m_ui.Lfo1BpmKnob, drumkv1::LFO1_BPMSYNC);
+#else
 	bpmSyncChanged(m_ui.Lfo1RateKnob, drumkv1::LFO1_BPMSYNC);
+#endif
 }
 
 
