@@ -285,6 +285,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// LFO1
 	setParamKnob(drumkv1::LFO1_SHAPE,   m_ui.Lfo1ShapeKnob);
 	setParamKnob(drumkv1::LFO1_WIDTH,   m_ui.Lfo1WidthKnob);
+#if 1//LFO_BPMRATEX
+	setParamKnob(drumkv1::LFO1_BPM,     m_ui.Lfo1BpmKnob);
+#endif
 	setParamKnob(drumkv1::LFO1_RATE,    m_ui.Lfo1RateKnob);
 	setParamKnob(drumkv1::LFO1_SYNC,    m_ui.Lfo1SyncKnob);
 	setParamKnob(drumkv1::LFO1_PANNING, m_ui.Lfo1PanningKnob);
@@ -297,9 +300,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::LFO1_DECAY1,  m_ui.Lfo1Decay1Knob);
 	setParamKnob(drumkv1::LFO1_LEVEL2,  m_ui.Lfo1Level2Knob);
 	setParamKnob(drumkv1::LFO1_DECAY2,  m_ui.Lfo1Decay2Knob);
-#if 1//LFO_BPMRATEX
-	setParamKnob(drumkv1::LFO1_BPM,     m_ui.Lfo1BpmKnob);
-#endif
+
 	QObject::connect(
 		m_ui.Lfo1ShapeKnob, SIGNAL(valueChanged(float)),
 		m_ui.Lfo1Wave, SLOT(setWaveShape(float)));
