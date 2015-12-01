@@ -1623,7 +1623,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		// controls
 		drumkv1_elem *elem = pv->elem;
 
-	#if 1//LFO_BPMRATEX
+	#ifdef CONFIG_LFO_BPMRATEX
 		const float lfo1_freq
 			= *elem->lfo1.bpm / (60.0f * (*elem->lfo1.rate + 0.001f));
 	#else

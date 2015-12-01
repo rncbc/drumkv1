@@ -204,7 +204,7 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 	if (pos.valid & JackPositionBBT) {
 		const float host_bpm = float(pos.beats_per_minute);
 		if (paramValue(drumkv1::LFO1_BPMSYNC) > 0.0f) {
-		#if 1//LFO_BPMRATEX
+		#ifdef CONFIG_LFO_BPMRATEX
 			const float bpm = paramValue(drumkv1::LFO1_BPM);
 			if (::fabsf(host_bpm - bpm) > 0.01f)
 				setParamValue(drumkv1::LFO1_BPM, host_bpm);
