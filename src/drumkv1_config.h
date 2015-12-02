@@ -33,7 +33,7 @@
 
 #define DRUMKV1_DOMAIN	"rncbc.org"
 
-#define CONFIG_LFO_BPMRATEX 1
+
 //-------------------------------------------------------------------------
 // drumkv1_config - Prototype settings class (singleton).
 //
