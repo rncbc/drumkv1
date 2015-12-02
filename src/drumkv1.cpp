@@ -1630,12 +1630,10 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		const float lfo1_freq
 			= LFO_FREQ_MIN + lfo1_rate2 * (LFO_FREQ_MAX - LFO_FREQ_MIN);
 	#else
-		const float lfo1_rate = *elem->lfo1.rate;
-	//	const float lfo1_freq
-	//		= *elem->lfo1.bpm / (60.0f * (lfo1_rate + 0.001f));
-		const float lfo1_freq = *elem->lfo1.bpm
-			* (1.0f + lfo1_rate * lfo1_rate) / (60.0f + 45.0f * lfo1_rate);
+		const float lfo1_freq
+			= *elem->lfo1.bpm / (60.01f - *elem->lfo1.rate * 60.0f);
 	#endif
+
 		const float modwheel1
 			= m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch;
 
