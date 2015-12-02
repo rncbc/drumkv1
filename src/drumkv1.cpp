@@ -67,8 +67,10 @@ const float FINE_SCALE    = 1.0f;
 const float SWEEP_SCALE   = 0.5f;
 const float PITCH_SCALE   = 0.5f;
 
+#ifdef CONFIG_LFO_BPMRATEX_0
 const float LFO_FREQ_MIN  = 0.4f;
 const float LFO_FREQ_MAX  = 40.0f;
+#endif
 
 
 // maximum helper
@@ -1624,15 +1626,15 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		drumkv1_elem *elem = pv->elem;
 
 	#ifdef CONFIG_LFO_BPMRATEX_0
-		const float lfo1_rate = *elem->lfo1.rate * *elem->lfo1.rate;
+		const float lfo1_rate2 = *elem->lfo1.rate * *elem->lfo1.rate;
 		const float lfo1_freq
-			= LFO_FREQ_MIN + lfo1_rate * (LFO_FREQ_MAX - LFO_FREQ_MIN);
+			= LFO_FREQ_MIN + lfo1_rate2 * (LFO_FREQ_MAX - LFO_FREQ_MIN);
 	#else
 		const float lfo1_rate = *elem->lfo1.rate;
 	//	const float lfo1_freq
 	//		= *elem->lfo1.bpm / (60.0f * (lfo1_rate + 0.001f));
 		const float lfo1_freq = *elem->lfo1.bpm
-			* (1.0f + 0.5f * lfo1_rate) / (60.0f + 45.0f * lfo1_rate);
+			* (1.0f + lfo1_rate * lfo1_rate) / (60.0f + 45.0f * lfo1_rate);
 	#endif
 		const float modwheel1
 			= m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch;
@@ -2221,6 +2223,7 @@ void drumkv1_element::resetParamValues ( bool bSwap )
 }
 
 
+#ifdef CONFIG_LFO_BPMRATEX_0
 // scalar converter helpers (static)
 
 float drumkv1::lfo_rate_bpm ( float bpm )
@@ -2229,5 +2232,6 @@ float drumkv1::lfo_rate_bpm ( float bpm )
 	return ::sqrtf((freq_bpm - LFO_FREQ_MIN) / (LFO_FREQ_MAX - LFO_FREQ_MIN));
 }
 
+#endif
 
 // end of drumkv1.cpp
