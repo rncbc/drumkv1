@@ -516,7 +516,7 @@ class drumkv1_phasor
 {
 public:
 
-	drumkv1_phasor(uint32_t nsize = 128)
+	drumkv1_phasor(uint32_t nsize = 1024)
 		: m_nsize(nsize), m_nframes(0) {}
 
 	void process(uint32_t nframes)
