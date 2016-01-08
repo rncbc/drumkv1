@@ -1,7 +1,7 @@
 // drumkv1_config.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -29,7 +29,7 @@
 
 #define DRUMKV1_SUBTITLE     "an old-school drum-kit sampler."
 #define DRUMKV1_WEBSITE      "http://drumkv1.sourceforge.net"
-#define DRUMKV1_COPYRIGHT    "Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved."
+#define DRUMKV1_COPYRIGHT    "Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved."
 
 #define DRUMKV1_DOMAIN	"rncbc.org"
 
