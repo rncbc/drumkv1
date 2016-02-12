@@ -134,8 +134,10 @@ drumkv1_lv2::drumkv1_lv2 (
 					m_urid_map->handle, LV2_BUF_SIZE__minBlockLength);
 				m_urids.bufsz_maxBlockLength = m_urid_map->map(
 					m_urid_map->handle, LV2_BUF_SIZE__maxBlockLength);
+			#ifdef LV2_BUF_SIZE__nominalBlockLength
 				m_urids.bufsz_nominalBlockLength = m_urid_map->map(
 					m_urid_map->handle, LV2_BUF_SIZE__nominalBlockLength);
+			#endif
 			}
 		}
 		else
@@ -154,9 +156,11 @@ drumkv1_lv2::drumkv1_lv2 (
 			else
 			if (host_option->key == m_urids.bufsz_maxBlockLength)
 				block_length = *(int *) host_option->value;
+		#ifdef LV2_BUF_SIZE__nominalBlockLength
 			else
 			if (host_option->key == m_urids.bufsz_nominalBlockLength)
 				block_length = *(int *) host_option->value;
+		#endif
 			// choose the lengthier...
 			if (buffer_size < block_length)
 				buffer_size = block_length;
