@@ -275,7 +275,8 @@ void drumkv1_lv2::run ( uint32_t nframes )
 	//	m_atom_sequence = NULL;
 	}
 
-	drumkv1::process(ins, outs, nframes - ndelta);
+	if (nframes > ndelta)
+		drumkv1::process(ins, outs, nframes - ndelta);
 }
 
 
