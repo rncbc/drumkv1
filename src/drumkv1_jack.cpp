@@ -482,17 +482,6 @@ void drumkv1_jack::close (void)
 }
 
 
-void drumkv1_jack::setParamValue ( drumkv1::ParamIndex index, float fValue )
-{
-	m_params[index] = fValue;
-}
-
-float drumkv1_jack::paramValue ( drumkv1::ParamIndex index ) const
-{
-	return m_params[index];
-}
-
-
 #ifdef CONFIG_ALSA_MIDI
 
 // alsa sequencer client.

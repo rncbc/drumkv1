@@ -28,6 +28,7 @@
 
 // forward declarations
 class drumkv1_impl;
+class drumkv1_port;
 class drumkv1_elem;
 class drumkv1_element;
 class drumkv1_sample;
@@ -156,9 +157,9 @@ public:
 	};
 
 	void setParamPort(ParamIndex index, float *pfParam);
-	float *paramPort(ParamIndex index) const;
+	drumkv1_port *paramPort(ParamIndex index) const;
 
-	void setParamValue(ParamIndex index, float fValue);
+	void setParamValue(ParamIndex index, float fValue, bool bCache = false);
 	float paramValue(ParamIndex index) const;
 
 	void resetParamValues(bool bSwap);
@@ -200,8 +201,8 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
-	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
-	float *paramPort(drumkv1::ParamIndex index);
+	void setParamPort(drumkv1::ParamIndex index, float *pfParam);
+	drumkv1_port *paramPort(drumkv1::ParamIndex index);
 
 	void setParamValue(drumkv1::ParamIndex index, float fValue, int pset = 1);
 	float paramValue(drumkv1::ParamIndex index, int pset = 1);

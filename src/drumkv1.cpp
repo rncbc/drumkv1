@@ -147,6 +147,42 @@ inline float drumkv1_freq ( float note )
 }
 
 
+// parameter port
+
+class drumkv1_port
+{
+public:
+
+	drumkv1_port() : m_port(NULL), m_cache(false), m_value(0.0f) {}
+
+	void set_port(float *port)
+		{ m_port = port; m_cache = false; }
+	float *port() const
+		{ return m_port; }
+
+	void set_value(float value, bool cache)
+		{ m_value = value; m_cache = cache; if (!cache) set_port_value(value); }
+	float value() const
+		{ return (m_cache ? m_value : port_value()); }
+
+	float operator *() const
+		{ return value(); }
+
+protected:
+
+	void  set_port_value(float value)
+		{ if (m_port) *m_port = value; }
+	float port_value() const
+		{ return (m_port ? *m_port : m_value); }
+
+private:
+
+	float *m_port;
+	bool   m_cache;
+	float  m_value;
+};
+
+
 // envelope
 
 struct drumkv1_env
@@ -262,10 +298,10 @@ struct drumkv1_env
 
 	// parameters
 
-	float *attack;
-	float *decay1;
-	float *level2;
-	float *decay2;
+	drumkv1_port attack;
+	drumkv1_port decay1;
+	drumkv1_port level2;
+	drumkv1_port decay2;
 
 	uint32_t min_frames;
 	uint32_t max_frames;
@@ -316,12 +352,14 @@ struct drumkv1_aux
 
 struct drumkv1_gen
 {
-	float *sample, sample0;
-	float *reverse;
-	float *group;
-	float *coarse;
-	float *fine;
-	float *envtime, envtime0;
+	drumkv1_port sample;
+	drumkv1_port reverse;
+	drumkv1_port group;
+	drumkv1_port coarse;
+	drumkv1_port fine;
+	drumkv1_port envtime;
+
+	float sample0, envtime0;
 };
 
 
@@ -329,11 +367,11 @@ struct drumkv1_gen
 
 struct drumkv1_dcf
 {
-	float *cutoff;
-	float *reso;
-	float *type;
-	float *slope;
-	float *envelope;
+	drumkv1_port cutoff;
+	drumkv1_port reso;
+	drumkv1_port type;
+	drumkv1_port slope;
+	drumkv1_port envelope;
 
 	drumkv1_env env;
 };
@@ -343,21 +381,21 @@ struct drumkv1_dcf
 
 struct drumkv1_lfo
 {
-	float *shape;
-	float *width;
-	float *bpm;
-	float *rate;
-	float *sync;
-	float *sweep;
-	float *pitch;
-	float *cutoff;
-	float *reso;
-	float *panning;
-	float *volume;
+	drumkv1_port shape;
+	drumkv1_port width;
+	drumkv1_port bpm;
+	drumkv1_port rate;
+	drumkv1_port sync;
+	drumkv1_port sweep;
+	drumkv1_port pitch;
+	drumkv1_port cutoff;
+	drumkv1_port reso;
+	drumkv1_port panning;
+	drumkv1_port volume;
 
 	drumkv1_env env;
 
-	float *bpmsync;
+	drumkv1_port bpmsync;
 };
 
 
@@ -365,11 +403,9 @@ struct drumkv1_lfo
 
 struct drumkv1_dca
 {
-	float *volume;
+	drumkv1_port volume;
 
 	drumkv1_env env;
-
-	float *bpmsync;
 };
 
 
@@ -378,12 +414,12 @@ struct drumkv1_dca
 
 struct drumkv1_def
 {
-	float *pitchbend;
-	float *modwheel;
-	float *pressure;
-	float *velocity;
-	float *channel;
-	float *noteoff;
+	drumkv1_port pitchbend;
+	drumkv1_port modwheel;
+	drumkv1_port pressure;
+	drumkv1_port velocity;
+	drumkv1_port channel;
+	drumkv1_port noteoff;
 };
 
 
@@ -391,10 +427,10 @@ struct drumkv1_def
 
 struct drumkv1_out
 {
-	float *width;
-	float *panning;
-	float *fxsend;
-	float *volume;
+	drumkv1_port width;
+	drumkv1_port panning;
+	drumkv1_port fxsend;
+	drumkv1_port volume;
 };
 
 
@@ -402,11 +438,11 @@ struct drumkv1_out
 
 struct drumkv1_cho
 {
-	float *wet;
-	float *delay;
-	float *feedb;
-	float *rate;
-	float *mod;
+	drumkv1_port wet;
+	drumkv1_port delay;
+	drumkv1_port feedb;
+	drumkv1_port rate;
+	drumkv1_port mod;
 };
 
 
@@ -414,10 +450,10 @@ struct drumkv1_cho
 
 struct drumkv1_fla
 {
-	float *wet;
-	float *delay;
-	float *feedb;
-	float *daft;
+	drumkv1_port wet;
+	drumkv1_port delay;
+	drumkv1_port feedb;
+	drumkv1_port daft;
 };
 
 
@@ -425,11 +461,11 @@ struct drumkv1_fla
 
 struct drumkv1_pha
 {
-	float *wet;
-	float *rate;
-	float *feedb;
-	float *depth;
-	float *daft;
+	drumkv1_port wet;
+	drumkv1_port rate;
+	drumkv1_port feedb;
+	drumkv1_port depth;
+	drumkv1_port daft;
 };
 
 
@@ -437,11 +473,11 @@ struct drumkv1_pha
 
 struct drumkv1_del
 {
-	float *wet;
-	float *delay;
-	float *feedb;
-	float *bpm;
-	float *bpmsync;
+	drumkv1_port wet;
+	drumkv1_port delay;
+	drumkv1_port feedb;
+	drumkv1_port bpm;
+	drumkv1_port bpmsync;
 };
 
 
@@ -449,11 +485,11 @@ struct drumkv1_del
 
 struct drumkv1_rev
 {
-	float *wet;
-	float *room;
-	float *damp;
-	float *feedb;
-	float *width;
+	drumkv1_port wet;
+	drumkv1_port room;
+	drumkv1_port damp;
+	drumkv1_port feedb;
+	drumkv1_port width;
 };
 
 
@@ -461,8 +497,8 @@ struct drumkv1_rev
 
 struct drumkv1_dyn
 {
-	float *compress;
-	float *limiter;
+	drumkv1_port compress;
+	drumkv1_port limiter;
 };
 
 
@@ -573,9 +609,11 @@ public:
 drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, float srate, int key )
 	: element(this), gen1_sample(pDrumk)
 {
-	// element parameter value set
-	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
+	// element parameter port/value set
+	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 		for (int j = 0; j < 3; ++j) params[j][i] = 0.0f;
+		element.setParamPort(drumkv1::ParamIndex(i), &(params[1][i]));
+	}
 
 	// element key (sample note)
 	gen1.sample0 = float(key);
@@ -627,7 +665,7 @@ void drumkv1_elem::updateEnvTimes ( float srate )
 
 struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 {
-	drumkv1_voice(drumkv1_elem *pElem = 0) { reset(pElem); }
+	drumkv1_voice(drumkv1_elem *pElem = NULL) { reset(pElem); }
 
 	void reset(drumkv1_elem *pElem)
 	{
@@ -704,11 +742,11 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
-	void setParamPort(drumkv1::ParamIndex index, float *pfParam = 0);
-	float *paramPort(drumkv1::ParamIndex index) const;
+	void setParamPort(drumkv1::ParamIndex index, float *pfParam);
+	drumkv1_port *paramPort(drumkv1::ParamIndex index);
 
-	void setParamValue(drumkv1::ParamIndex index, float fValue);
-	float paramValue(drumkv1::ParamIndex index) const;
+	void setParamValue(drumkv1::ParamIndex index, float fValue, bool bCache);
+	float paramValue(drumkv1::ParamIndex index);
 
 	drumkv1_controls *controls();
 	drumkv1_programs *programs();
@@ -729,7 +767,7 @@ protected:
 
 	drumkv1_voice *alloc_voice ( int key )
 	{
-		drumkv1_voice *pv = 0;
+		drumkv1_voice *pv = NULL;
 		drumkv1_elem *elem = m_elems[key];
 		if (elem) {
 			pv = m_free_list.next();
@@ -776,11 +814,12 @@ private:
 	drumkv1_voice **m_voices;
 	drumkv1_voice  *m_notes[MAX_NOTES];
 	drumkv1_voice  *m_group[MAX_GROUP];
+
 	drumkv1_elem   *m_elems[MAX_NOTES];
 
 	drumkv1_elem   *m_elem;
 
-	float *m_params[drumkv1::NUM_ELEMENT_PARAMS];
+	drumkv1_port    m_params[drumkv1::NUM_ELEMENT_PARAMS];
 
 	drumkv1_list<drumkv1_voice> m_free_list;
 	drumkv1_list<drumkv1_voice> m_play_list;
@@ -816,26 +855,26 @@ drumkv1_impl::drumkv1_impl (
 	}
 
 	for (int note = 0; note < MAX_NOTES; ++note)
-		m_notes[note] = 0;
+		m_notes[note] = NULL;
 
 	for (int group = 0; group < MAX_GROUP; ++group)
-		m_group[group] = 0;
+		m_group[group] = NULL;
 
 	// local buffers none yet
 	m_sfxs = NULL;
 	m_nsize = 0;
 
 	// flangers none yet
-	m_flanger = 0;
+	m_flanger = NULL;
 
 	// phasers none yet
-	m_phaser = 0;
+	m_phaser = NULL;
 
 	// delays none yet
-	m_delay = 0;
+	m_delay = NULL;
 
 	// compressors none yet
-	m_comp = 0;
+	m_comp = NULL;
 
 	// load controllers & programs database...
 	m_config.loadControls(&m_controls);
@@ -849,14 +888,6 @@ drumkv1_impl::drumkv1_impl (
 
 	// init default element (eg. 36=Bass Drum 1)
 	clearElements();
-
-	// element parameter ports (default)
-	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
-		m_params[i] = 0;
-
-	// parameter ports
-	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
-		setParamPort(drumkv1::ParamIndex(i));
 
 	// reset all voices
 	allControllersOff();
@@ -901,25 +932,25 @@ void drumkv1_impl::setChannels ( uint16_t nchannels )
 	// deallocate flangers
 	if (m_flanger) {
 		delete [] m_flanger;
-		m_flanger = 0;
+		m_flanger = NULL;
 	}
 
 	// deallocate phasers
 	if (m_phaser) {
 		delete [] m_phaser;
-		m_phaser = 0;
+		m_phaser = NULL;
 	}
 
 	// deallocate delays
 	if (m_delay) {
 		delete [] m_delay;
-		m_delay = 0;
+		m_delay = NULL;
 	}
 
 	// deallocate compressors
 	if (m_comp) {
 		delete [] m_comp;
-		m_comp = 0;
+		m_comp = NULL;
 	}
 }
 
@@ -978,25 +1009,25 @@ void drumkv1_impl::alloc_sfxs ( uint32_t nsize )
 
 drumkv1_element *drumkv1_impl::addElement ( int key )
 {
-	drumkv1_elem *elem = 0;
+	drumkv1_elem *elem = NULL;
 	if (key >= 0 && key < MAX_NOTES) {
 		elem = m_elems[key];
-		if (elem == 0) {
+		if (elem == NULL) {
 			elem = new drumkv1_elem(m_pDrumk, m_srate, key);
 			m_elem_list.append(elem);
 			m_elems[key] = elem;
 		}
 	}
-	return (elem ? &(elem->element) : 0);
+	return (elem ? &(elem->element) : NULL);
 }
 
 
 drumkv1_element *drumkv1_impl::element ( int key ) const
 {
-	drumkv1_elem *elem = 0;
+	drumkv1_elem *elem = NULL;
 	if (key >= 0 && key < MAX_NOTES)
 		elem = m_elems[key];
-	return (elem ? &(elem->element) : 0);
+	return (elem ? &(elem->element) : NULL);
 }
 
 
@@ -1004,14 +1035,14 @@ void drumkv1_impl::removeElement ( int key )
 {
 	allNotesOff();
 
-	drumkv1_elem *elem = 0;
+	drumkv1_elem *elem = NULL;
 	if (key >= 0 && key < MAX_NOTES)
 		elem = m_elems[key];
 	if (elem) {
 		if (m_elem == elem)
-			m_elem = 0;
+			m_elem = NULL;
 		m_elem_list.remove(elem);
-		m_elems[key] = 0;
+		m_elems[key] = NULL;
 		delete elem;
 	}
 }
@@ -1028,9 +1059,9 @@ void drumkv1_impl::setCurrentElement ( int key )
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				float *pfParam = m_params[i];
-				if (pfParam) {
-					elem->params[1][i] = *pfParam;
+				drumkv1_port *pParamPort = &m_params[i];
+				if (pParamPort) {
+					elem->params[1][i] = pParamPort->value();
 					element->setParamPort(index, &(elem->params[1][i]));
 				}
 			}
@@ -1044,10 +1075,10 @@ void drumkv1_impl::setCurrentElement ( int key )
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				float *pfParam = m_params[i];
-				if (pfParam) {
-					*pfParam = elem->params[1][i]; // LV2:BUG?
-					element->setParamPort(index, pfParam);
+				drumkv1_port *pParamPort = &m_params[i];
+				if (pParamPort) {
+					element->setParamPort(index, pParamPort->port());
+					pParamPort->set_value(elem->params[1][i], true);
 				}
 			}
 			resetElement(elem);
@@ -1055,7 +1086,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 		// set new current element
 		m_elem = elem;
 	}
-	else m_elem = 0;
+	else m_elem = NULL;
 }
 
 
@@ -1069,10 +1100,10 @@ void drumkv1_impl::clearElements (void)
 {
 	// reset element map
 	for (int note = 0; note < MAX_NOTES; ++note)
-		m_elems[note] = 0;
+		m_elems[note] = NULL;
 
 	// reset current element
-	m_elem = 0;
+	m_elem = NULL;
 
 	// deallocate elements
 	drumkv1_elem *elem = m_elem_list.next();
@@ -1127,60 +1158,31 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 {
 	static float s_fDummy = 0.0f;
 
-	if (pfParam == 0)
+	if (pfParam == NULL)
 		pfParam = &s_fDummy;
 
-	switch (index) {
-	case drumkv1::DEF1_PITCHBEND: m_def.pitchbend = pfParam; break;
-	case drumkv1::DEF1_MODWHEEL:  m_def.modwheel  = pfParam; break;
-	case drumkv1::DEF1_PRESSURE:  m_def.pressure  = pfParam; break;
-	case drumkv1::DEF1_VELOCITY:  m_def.velocity  = pfParam; break;
-	case drumkv1::DEF1_CHANNEL:   m_def.channel   = pfParam; break;
-	case drumkv1::DEF1_NOTEOFF:   m_def.noteoff   = pfParam; break;
-	case drumkv1::CHO1_WET:       m_cho.wet       = pfParam; break;
-	case drumkv1::CHO1_DELAY:     m_cho.delay     = pfParam; break;
-	case drumkv1::CHO1_FEEDB:     m_cho.feedb     = pfParam; break;
-	case drumkv1::CHO1_RATE:      m_cho.rate      = pfParam; break;
-	case drumkv1::CHO1_MOD:       m_cho.mod       = pfParam; break;
-	case drumkv1::FLA1_WET:       m_fla.wet       = pfParam; break;
-	case drumkv1::FLA1_DELAY:     m_fla.delay     = pfParam; break;
-	case drumkv1::FLA1_FEEDB:     m_fla.feedb     = pfParam; break;
-	case drumkv1::FLA1_DAFT:      m_fla.daft      = pfParam; break;
-	case drumkv1::PHA1_WET:       m_pha.wet       = pfParam; break;
-	case drumkv1::PHA1_RATE:      m_pha.rate      = pfParam; break;
-	case drumkv1::PHA1_FEEDB:     m_pha.feedb     = pfParam; break;
-	case drumkv1::PHA1_DEPTH:     m_pha.depth     = pfParam; break;
-	case drumkv1::PHA1_DAFT:      m_pha.daft      = pfParam; break;
-	case drumkv1::DEL1_WET:       m_del.wet       = pfParam; break;
-	case drumkv1::DEL1_DELAY:     m_del.delay     = pfParam; break;
-	case drumkv1::DEL1_FEEDB:     m_del.feedb     = pfParam; break;
-	case drumkv1::DEL1_BPM:       m_del.bpm       = pfParam; break;
-	case drumkv1::DEL1_BPMSYNC:   m_del.bpmsync   = pfParam; break;
-	case drumkv1::REV1_WET:       m_rev.wet       = pfParam; break;
-	case drumkv1::REV1_ROOM:      m_rev.room      = pfParam; break;
-	case drumkv1::REV1_DAMP:      m_rev.damp      = pfParam; break;
-	case drumkv1::REV1_FEEDB:     m_rev.feedb     = pfParam; break;
-	case drumkv1::REV1_WIDTH:     m_rev.width     = pfParam; break;
-	case drumkv1::DYN1_COMPRESS:  m_dyn.compress  = pfParam; break;
-	case drumkv1::DYN1_LIMITER:   m_dyn.limiter   = pfParam; break;
-	default:
+	drumkv1_port *pParamPort = paramPort(index);
+	if (pParamPort) {
+		pParamPort->set_port(pfParam);
 		if (m_elem) {
-			m_elem->element.setParamPort(index, pfParam);
 			// check null connections.
 			if (pfParam != &s_fDummy)
 			switch (index) {
 			case drumkv1::DCA1_VOLUME:
 			case drumkv1::OUT1_VOLUME:
-				m_elem->vol1.reset(m_elem->out1.volume,
-					m_elem->dca1.volume,
+				m_elem->vol1.reset(
+					m_elem->out1.volume.port(),
+					m_elem->dca1.volume.port(),
 					&m_ctl.volume,
 					&m_elem->aux1.volume);
 				break;
 			case drumkv1::OUT1_WIDTH:
-				m_elem->wid1.reset(m_elem->out1.width);
+				m_elem->wid1.reset(
+					m_elem->out1.width.port());
 				break;
 			case drumkv1::OUT1_PANNING:
-				m_elem->pan1.reset(m_elem->out1.panning,
+				m_elem->pan1.reset(
+					m_elem->out1.panning.port(),
 					&m_ctl.panning,
 					&m_elem->aux1.panning);
 				break;
@@ -1188,70 +1190,70 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 				break;
 			}
 		}
-		m_params[index] = pfParam;
-		break;
 	}
 }
 
 
-float *drumkv1_impl::paramPort ( drumkv1::ParamIndex index ) const
+drumkv1_port *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 {
-	float *pfParam = 0;
+	drumkv1_port *pParamPort = NULL;
 
 	switch (index) {
-	case drumkv1::DEF1_PITCHBEND: pfParam = m_def.pitchbend; break;
-	case drumkv1::DEF1_MODWHEEL:  pfParam = m_def.modwheel;  break;
-	case drumkv1::DEF1_PRESSURE:  pfParam = m_def.pressure;  break;
-	case drumkv1::DEF1_VELOCITY:  pfParam = m_def.velocity;  break;
-	case drumkv1::DEF1_CHANNEL:   pfParam = m_def.channel;   break;
-	case drumkv1::DEF1_NOTEOFF:   pfParam = m_def.noteoff;   break;
-	case drumkv1::CHO1_WET:       pfParam = m_cho.wet;       break;
-	case drumkv1::CHO1_DELAY:     pfParam = m_cho.delay;	 break;
-	case drumkv1::CHO1_FEEDB:     pfParam = m_cho.feedb;     break;
-	case drumkv1::CHO1_RATE:      pfParam = m_cho.rate;      break;
-	case drumkv1::CHO1_MOD:       pfParam = m_cho.mod;       break;
-	case drumkv1::FLA1_WET:       pfParam = m_fla.wet;       break;
-	case drumkv1::FLA1_DELAY:     pfParam = m_fla.delay;     break;
-	case drumkv1::FLA1_FEEDB:     pfParam = m_fla.feedb;     break;
-	case drumkv1::FLA1_DAFT:      pfParam = m_fla.daft;      break;
-	case drumkv1::PHA1_WET:       pfParam = m_pha.wet;       break;
-	case drumkv1::PHA1_RATE:      pfParam = m_pha.rate;      break;
-	case drumkv1::PHA1_FEEDB:     pfParam = m_pha.feedb;     break;
-	case drumkv1::PHA1_DEPTH:     pfParam = m_pha.depth;     break;
-	case drumkv1::PHA1_DAFT:      pfParam = m_pha.daft;      break;
-	case drumkv1::DEL1_WET:       pfParam = m_del.wet;       break;
-	case drumkv1::DEL1_DELAY:     pfParam = m_del.delay;     break;
-	case drumkv1::DEL1_FEEDB:     pfParam = m_del.feedb;     break;
-	case drumkv1::DEL1_BPM:       pfParam = m_del.bpm;       break;
-	case drumkv1::DEL1_BPMSYNC:   pfParam = m_del.bpmsync;   break;
-	case drumkv1::REV1_WET:       pfParam = m_rev.wet;       break;
-	case drumkv1::REV1_ROOM:      pfParam = m_rev.room;      break;
-	case drumkv1::REV1_DAMP:      pfParam = m_rev.damp;      break;
-	case drumkv1::REV1_FEEDB:     pfParam = m_rev.feedb;     break;
-	case drumkv1::REV1_WIDTH:     pfParam = m_rev.width;     break;
-	case drumkv1::DYN1_COMPRESS:  pfParam = m_dyn.compress;  break;
-	case drumkv1::DYN1_LIMITER:   pfParam = m_dyn.limiter;   break;
+	case drumkv1::DEF1_PITCHBEND: pParamPort = &m_def.pitchbend; break;
+	case drumkv1::DEF1_MODWHEEL:  pParamPort = &m_def.modwheel;  break;
+	case drumkv1::DEF1_PRESSURE:  pParamPort = &m_def.pressure;  break;
+	case drumkv1::DEF1_VELOCITY:  pParamPort = &m_def.velocity;  break;
+	case drumkv1::DEF1_CHANNEL:   pParamPort = &m_def.channel;   break;
+	case drumkv1::DEF1_NOTEOFF:   pParamPort = &m_def.noteoff;   break;
+	case drumkv1::CHO1_WET:       pParamPort = &m_cho.wet;       break;
+	case drumkv1::CHO1_DELAY:     pParamPort = &m_cho.delay;	 break;
+	case drumkv1::CHO1_FEEDB:     pParamPort = &m_cho.feedb;     break;
+	case drumkv1::CHO1_RATE:      pParamPort = &m_cho.rate;      break;
+	case drumkv1::CHO1_MOD:       pParamPort = &m_cho.mod;       break;
+	case drumkv1::FLA1_WET:       pParamPort = &m_fla.wet;       break;
+	case drumkv1::FLA1_DELAY:     pParamPort = &m_fla.delay;     break;
+	case drumkv1::FLA1_FEEDB:     pParamPort = &m_fla.feedb;     break;
+	case drumkv1::FLA1_DAFT:      pParamPort = &m_fla.daft;      break;
+	case drumkv1::PHA1_WET:       pParamPort = &m_pha.wet;       break;
+	case drumkv1::PHA1_RATE:      pParamPort = &m_pha.rate;      break;
+	case drumkv1::PHA1_FEEDB:     pParamPort = &m_pha.feedb;     break;
+	case drumkv1::PHA1_DEPTH:     pParamPort = &m_pha.depth;     break;
+	case drumkv1::PHA1_DAFT:      pParamPort = &m_pha.daft;      break;
+	case drumkv1::DEL1_WET:       pParamPort = &m_del.wet;       break;
+	case drumkv1::DEL1_DELAY:     pParamPort = &m_del.delay;     break;
+	case drumkv1::DEL1_FEEDB:     pParamPort = &m_del.feedb;     break;
+	case drumkv1::DEL1_BPM:       pParamPort = &m_del.bpm;       break;
+	case drumkv1::DEL1_BPMSYNC:   pParamPort = &m_del.bpmsync;   break;
+	case drumkv1::REV1_WET:       pParamPort = &m_rev.wet;       break;
+	case drumkv1::REV1_ROOM:      pParamPort = &m_rev.room;      break;
+	case drumkv1::REV1_DAMP:      pParamPort = &m_rev.damp;      break;
+	case drumkv1::REV1_FEEDB:     pParamPort = &m_rev.feedb;     break;
+	case drumkv1::REV1_WIDTH:     pParamPort = &m_rev.width;     break;
+	case drumkv1::DYN1_COMPRESS:  pParamPort = &m_dyn.compress;  break;
+	case drumkv1::DYN1_LIMITER:   pParamPort = &m_dyn.limiter;   break;
 	default:
-		pfParam = m_params[index];
+		if (index < drumkv1::NUM_ELEMENT_PARAMS)
+			pParamPort = &m_params[index];
 		break;
 	}
 
-	return pfParam;
+	return pParamPort;
 }
 
 
-void drumkv1_impl::setParamValue ( drumkv1::ParamIndex index, float fValue )
+void drumkv1_impl::setParamValue (
+	drumkv1::ParamIndex index, float fValue, bool bCache )
 {
-	float *pfParamPort = paramPort(index);
-	if (pfParamPort)
-		*pfParamPort = fValue; // LV2:BUG?
+	drumkv1_port *pParamPort = paramPort(index);
+	if (pParamPort)
+		pParamPort->set_value(fValue, bCache);
 }
 
 
-float drumkv1_impl::paramValue ( drumkv1::ParamIndex index ) const
+float drumkv1_impl::paramValue ( drumkv1::ParamIndex index )
 {
-	float *pfParamPort = paramPort(index);
-	return (pfParamPort ? *pfParamPort : 0.0f);
+	drumkv1_port *pParamPort = paramPort(index);
+	return (pParamPort ? pParamPort->value() : 0.0f);
 }
 
 
@@ -1310,7 +1312,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				elem->dcf1.env.note_off_fast(&pv->dcf1_env);
 				elem->lfo1.env.note_off_fast(&pv->lfo1_env);
 				elem->dca1.env.note_off_fast(&pv->dca1_env);
-				m_notes[key] = 0;
+				m_notes[key] = NULL;
 				pv->note = -1;
 			}
 			// find free voice
@@ -1325,7 +1327,9 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				pv->vel  = drumkv1_velocity(vel * vel, *m_def.velocity);
 				// pressure/aftertouch
 				pv->pre = 0.0f;
-				pv->dca1_pre.reset(m_def.pressure, &m_ctl.pressure, &pv->pre);
+				pv->dca1_pre.reset(
+					m_def.pressure.port(),
+					&m_ctl.pressure, &pv->pre);
 				// generate
 				pv->gen1.start();
 				// frequencies
@@ -1366,7 +1370,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 						elem_group->dcf1.env.note_off_fast(&pv_group->dcf1_env);
 						elem_group->lfo1.env.note_off_fast(&pv_group->lfo1_env);
 						elem_group->dca1.env.note_off_fast(&pv_group->dca1_env);
-						m_notes[pv_group->note] = 0;
+						m_notes[pv_group->note] = NULL;
 						pv_group->note = -1;
 					}
 					m_group[pv->group] = pv;
@@ -1482,9 +1486,9 @@ void drumkv1_impl::allNotesOff (void)
 	drumkv1_voice *pv = m_play_list.next();
 	while (pv) {
 		if (pv->note >= 0)
-			m_notes[pv->note] = 0;
+			m_notes[pv->note] = NULL;
 		if (pv->group >= 0)
-			m_group[pv->group] = 0;
+			m_group[pv->group] = NULL;
 		free_voice(pv);
 		pv = m_play_list.next();
 	}
@@ -1501,11 +1505,17 @@ void drumkv1_impl::allNotesOff (void)
 
 void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 {
-	elem->vol1.reset(elem->out1.volume, elem->dca1.volume,
-		&m_ctl.volume, &elem->aux1.volume);
-	elem->pan1.reset(elem->out1.panning,
-		&m_ctl.panning, &elem->aux1.panning);
-	elem->wid1.reset(elem->out1.width);
+	elem->vol1.reset(
+		elem->out1.volume.port(),
+		elem->dca1.volume.port(),
+		&m_ctl.volume,
+		&elem->aux1.volume);
+	elem->pan1.reset(
+		elem->out1.panning.port(),
+		&m_ctl.panning,
+		&elem->aux1.panning);
+	elem->wid1.reset(
+		elem->out1.width.port());
 }
 
 
@@ -1539,19 +1549,19 @@ void drumkv1_impl::reset (void)
 	}
 
 	// flangers
-	if (m_flanger == 0)
+	if (m_flanger == NULL)
 		m_flanger = new drumkv1_fx_flanger [m_nchannels];
 
 	// phasers
-	if (m_phaser == 0)
+	if (m_phaser == NULL)
 		m_phaser = new drumkv1_fx_phaser [m_nchannels];
 
 	// delays
-	if (m_delay == 0)
+	if (m_delay == NULL)
 		m_delay = new drumkv1_fx_delay [m_nchannels];
 
 	// compressors
-	if (m_comp == 0)
+	if (m_comp == NULL)
 		m_comp = new drumkv1_fx_comp [m_nchannels];
 
 	// reverbs
@@ -1760,9 +1770,9 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 			if (pv->dca1_env.stage == drumkv1_env::Idle || pv->gen1.isOver()) {
 				if (pv->note >= 0)
-					m_notes[pv->note] = 0;
+					m_notes[pv->note] = NULL;
 				if (pv->group >= 0 && m_group[pv->group] == pv)
-					m_group[pv->group] = 0;
+					m_group[pv->group] = NULL;
 				free_voice(pv);
 				nblock = 0;
 			} else {
@@ -1959,15 +1969,15 @@ void drumkv1::setParamPort ( ParamIndex index, float *pfParam )
 	m_pImpl->setParamPort(index, pfParam);
 }
 
-float *drumkv1::paramPort ( ParamIndex index ) const
+drumkv1_port *drumkv1::paramPort ( ParamIndex index ) const
 {
 	return m_pImpl->paramPort(index);
 }
 
 
-void drumkv1::setParamValue ( ParamIndex index, float fValue )
+void drumkv1::setParamValue ( ParamIndex index, float fValue, bool bCache )
 {
-	m_pImpl->setParamValue(index, fValue);
+	m_pImpl->setParamValue(index, fValue, bCache);
 }
 
 float drumkv1::paramValue ( ParamIndex index ) const
@@ -2034,10 +2044,6 @@ void drumkv1::reset (void)
 drumkv1_element::drumkv1_element ( drumkv1_elem *pElem )
 	: m_pElem(pElem)
 {
-	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		setParamPort(index, &(m_pElem->params[1][i]));
-	}
 }
 
 
@@ -2088,107 +2094,64 @@ bool drumkv1_element::isReverse (void) const
 
 void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 {
-	if (m_pElem == 0)
-		return;
-
-	switch (index) {
-//	case drumkv1::GEN1_SAMPLE:   m_pElem->gen1.sample      = pfParam; break;
-	case drumkv1::GEN1_REVERSE:  m_pElem->gen1.reverse     = pfParam; break;
-	case drumkv1::GEN1_GROUP:    m_pElem->gen1.group       = pfParam; break;
-	case drumkv1::GEN1_COARSE:   m_pElem->gen1.coarse      = pfParam; break;
-	case drumkv1::GEN1_FINE:     m_pElem->gen1.fine        = pfParam; break;
-	case drumkv1::GEN1_ENVTIME:  m_pElem->gen1.envtime     = pfParam; break;
-	case drumkv1::DCF1_CUTOFF:   m_pElem->dcf1.cutoff      = pfParam; break;
-	case drumkv1::DCF1_RESO:     m_pElem->dcf1.reso        = pfParam; break;
-	case drumkv1::DCF1_TYPE:     m_pElem->dcf1.type        = pfParam; break;
-	case drumkv1::DCF1_SLOPE:    m_pElem->dcf1.slope       = pfParam; break;
-	case drumkv1::DCF1_ENVELOPE: m_pElem->dcf1.envelope    = pfParam; break;
-	case drumkv1::DCF1_ATTACK:   m_pElem->dcf1.env.attack  = pfParam; break;
-	case drumkv1::DCF1_DECAY1:   m_pElem->dcf1.env.decay1  = pfParam; break;
-	case drumkv1::DCF1_LEVEL2:   m_pElem->dcf1.env.level2  = pfParam; break;
-	case drumkv1::DCF1_DECAY2:   m_pElem->dcf1.env.decay2  = pfParam; break;
-	case drumkv1::LFO1_SHAPE:    m_pElem->lfo1.shape       = pfParam; break;
-	case drumkv1::LFO1_WIDTH:    m_pElem->lfo1.width       = pfParam; break;
-	case drumkv1::LFO1_BPM:      m_pElem->lfo1.bpm         = pfParam; break;
-	case drumkv1::LFO1_RATE:     m_pElem->lfo1.rate        = pfParam; break;
-	case drumkv1::LFO1_SYNC:     m_pElem->lfo1.sync        = pfParam; break;
-	case drumkv1::LFO1_SWEEP:    m_pElem->lfo1.sweep       = pfParam; break;
-	case drumkv1::LFO1_PITCH:    m_pElem->lfo1.pitch       = pfParam; break;
-	case drumkv1::LFO1_CUTOFF:   m_pElem->lfo1.cutoff      = pfParam; break;
-	case drumkv1::LFO1_RESO:     m_pElem->lfo1.reso        = pfParam; break;
-	case drumkv1::LFO1_PANNING:  m_pElem->lfo1.panning     = pfParam; break;
-	case drumkv1::LFO1_VOLUME:   m_pElem->lfo1.volume      = pfParam; break;
-	case drumkv1::LFO1_ATTACK:   m_pElem->lfo1.env.attack  = pfParam; break;
-	case drumkv1::LFO1_DECAY1:   m_pElem->lfo1.env.decay1  = pfParam; break;
-	case drumkv1::LFO1_LEVEL2:   m_pElem->lfo1.env.level2  = pfParam; break;
-	case drumkv1::LFO1_DECAY2:   m_pElem->lfo1.env.decay2  = pfParam; break;
-	case drumkv1::LFO1_BPMSYNC:  m_pElem->lfo1.bpmsync     = pfParam; break;
-	case drumkv1::DCA1_VOLUME:   m_pElem->dca1.volume      = pfParam; break;
-	case drumkv1::DCA1_ATTACK:   m_pElem->dca1.env.attack  = pfParam; break;
-	case drumkv1::DCA1_DECAY1:   m_pElem->dca1.env.decay1  = pfParam; break;
-	case drumkv1::DCA1_LEVEL2:   m_pElem->dca1.env.level2  = pfParam; break;
-	case drumkv1::DCA1_DECAY2:   m_pElem->dca1.env.decay2  = pfParam; break;
-	case drumkv1::OUT1_WIDTH:    m_pElem->out1.width       = pfParam; break;
-	case drumkv1::OUT1_PANNING:  m_pElem->out1.panning     = pfParam; break;
-	case drumkv1::OUT1_FXSEND:   m_pElem->out1.fxsend      = pfParam; break;
-	case drumkv1::OUT1_VOLUME:   m_pElem->out1.volume      = pfParam; break;
-	default: break;
-	}
+	drumkv1_port *pParamPort = paramPort(index);
+	if (pParamPort)
+		pParamPort->set_port(pfParam);
 }
 
 
-float *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
+drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 {
-	if (m_pElem == 0)
-		return 0;
+	if (m_pElem == NULL)
+		return NULL;
 
-	float *pfParam = 0;
+	drumkv1_port *pParamPort = NULL;
 
 	switch (index) {
-//	case drumkv1::GEN1_SAMPLE:   pfParam = m_pElem->gen1.sample;     break;
-	case drumkv1::GEN1_REVERSE:  pfParam = m_pElem->gen1.reverse;    break;
-	case drumkv1::GEN1_GROUP:    pfParam = m_pElem->gen1.group;      break;
-	case drumkv1::GEN1_COARSE:   pfParam = m_pElem->gen1.coarse;     break;
-	case drumkv1::GEN1_FINE:     pfParam = m_pElem->gen1.fine;       break;
-	case drumkv1::GEN1_ENVTIME:  pfParam = m_pElem->gen1.envtime;    break;
-	case drumkv1::DCF1_CUTOFF:   pfParam = m_pElem->dcf1.cutoff;     break;
-	case drumkv1::DCF1_RESO:     pfParam = m_pElem->dcf1.reso;       break;
-	case drumkv1::DCF1_TYPE:     pfParam = m_pElem->dcf1.type;       break;
-	case drumkv1::DCF1_SLOPE:    pfParam = m_pElem->dcf1.slope;      break;
-	case drumkv1::DCF1_ENVELOPE: pfParam = m_pElem->dcf1.envelope;   break;
-	case drumkv1::DCF1_ATTACK:   pfParam = m_pElem->dcf1.env.attack; break;
-	case drumkv1::DCF1_DECAY1:   pfParam = m_pElem->dcf1.env.decay1; break;
-	case drumkv1::DCF1_LEVEL2:   pfParam = m_pElem->dcf1.env.level2; break;
-	case drumkv1::DCF1_DECAY2:   pfParam = m_pElem->dcf1.env.decay2; break;
-	case drumkv1::LFO1_SHAPE:    pfParam = m_pElem->lfo1.shape;      break;
-	case drumkv1::LFO1_WIDTH:    pfParam = m_pElem->lfo1.width;      break;
-	case drumkv1::LFO1_BPM:      pfParam = m_pElem->lfo1.bpm;        break;
-	case drumkv1::LFO1_RATE:     pfParam = m_pElem->lfo1.rate;       break;
-	case drumkv1::LFO1_SYNC:     pfParam = m_pElem->lfo1.sync;       break;
-	case drumkv1::LFO1_SWEEP:    pfParam = m_pElem->lfo1.sweep;      break;
-	case drumkv1::LFO1_PITCH:    pfParam = m_pElem->lfo1.pitch;      break;
-	case drumkv1::LFO1_CUTOFF:   pfParam = m_pElem->lfo1.cutoff;     break;
-	case drumkv1::LFO1_RESO:     pfParam = m_pElem->lfo1.reso;       break;
-	case drumkv1::LFO1_PANNING:  pfParam = m_pElem->lfo1.panning;    break;
-	case drumkv1::LFO1_VOLUME:   pfParam = m_pElem->lfo1.volume;     break;
-	case drumkv1::LFO1_ATTACK:   pfParam = m_pElem->lfo1.env.attack; break;
-	case drumkv1::LFO1_DECAY1:   pfParam = m_pElem->lfo1.env.decay1; break;
-	case drumkv1::LFO1_LEVEL2:   pfParam = m_pElem->lfo1.env.level2; break;
-	case drumkv1::LFO1_DECAY2:   pfParam = m_pElem->lfo1.env.decay2; break;
-	case drumkv1::LFO1_BPMSYNC:  pfParam = m_pElem->lfo1.bpmsync;    break;
-	case drumkv1::DCA1_VOLUME:   pfParam = m_pElem->dca1.volume;     break;
-	case drumkv1::DCA1_ATTACK:   pfParam = m_pElem->dca1.env.attack; break;
-	case drumkv1::DCA1_DECAY1:   pfParam = m_pElem->dca1.env.decay1; break;
-	case drumkv1::DCA1_LEVEL2:   pfParam = m_pElem->dca1.env.level2; break;
-	case drumkv1::DCA1_DECAY2:   pfParam = m_pElem->dca1.env.decay2; break;
-	case drumkv1::OUT1_WIDTH:    pfParam = m_pElem->out1.width;      break;
-	case drumkv1::OUT1_PANNING:  pfParam = m_pElem->out1.panning;    break;
-	case drumkv1::OUT1_FXSEND:   pfParam = m_pElem->out1.fxsend;     break;
-	case drumkv1::OUT1_VOLUME:   pfParam = m_pElem->out1.volume;     break;
+//	case drumkv1::GEN1_SAMPLE:   pParamPort = &m_pElem->gen1.sample;     break;
+	case drumkv1::GEN1_REVERSE:  pParamPort = &m_pElem->gen1.reverse;    break;
+	case drumkv1::GEN1_GROUP:    pParamPort = &m_pElem->gen1.group;      break;
+	case drumkv1::GEN1_COARSE:   pParamPort = &m_pElem->gen1.coarse;     break;
+	case drumkv1::GEN1_FINE:     pParamPort = &m_pElem->gen1.fine;       break;
+	case drumkv1::GEN1_ENVTIME:  pParamPort = &m_pElem->gen1.envtime;    break;
+	case drumkv1::DCF1_CUTOFF:   pParamPort = &m_pElem->dcf1.cutoff;     break;
+	case drumkv1::DCF1_RESO:     pParamPort = &m_pElem->dcf1.reso;       break;
+	case drumkv1::DCF1_TYPE:     pParamPort = &m_pElem->dcf1.type;       break;
+	case drumkv1::DCF1_SLOPE:    pParamPort = &m_pElem->dcf1.slope;      break;
+	case drumkv1::DCF1_ENVELOPE: pParamPort = &m_pElem->dcf1.envelope;   break;
+	case drumkv1::DCF1_ATTACK:   pParamPort = &m_pElem->dcf1.env.attack; break;
+	case drumkv1::DCF1_DECAY1:   pParamPort = &m_pElem->dcf1.env.decay1; break;
+	case drumkv1::DCF1_LEVEL2:   pParamPort = &m_pElem->dcf1.env.level2; break;
+	case drumkv1::DCF1_DECAY2:   pParamPort = &m_pElem->dcf1.env.decay2; break;
+	case drumkv1::LFO1_SHAPE:    pParamPort = &m_pElem->lfo1.shape;      break;
+	case drumkv1::LFO1_WIDTH:    pParamPort = &m_pElem->lfo1.width;      break;
+	case drumkv1::LFO1_BPM:      pParamPort = &m_pElem->lfo1.bpm;        break;
+	case drumkv1::LFO1_RATE:     pParamPort = &m_pElem->lfo1.rate;       break;
+	case drumkv1::LFO1_SYNC:     pParamPort = &m_pElem->lfo1.sync;       break;
+	case drumkv1::LFO1_SWEEP:    pParamPort = &m_pElem->lfo1.sweep;      break;
+	case drumkv1::LFO1_PITCH:    pParamPort = &m_pElem->lfo1.pitch;      break;
+	case drumkv1::LFO1_CUTOFF:   pParamPort = &m_pElem->lfo1.cutoff;     break;
+	case drumkv1::LFO1_RESO:     pParamPort = &m_pElem->lfo1.reso;       break;
+	case drumkv1::LFO1_PANNING:  pParamPort = &m_pElem->lfo1.panning;    break;
+	case drumkv1::LFO1_VOLUME:   pParamPort = &m_pElem->lfo1.volume;     break;
+	case drumkv1::LFO1_ATTACK:   pParamPort = &m_pElem->lfo1.env.attack; break;
+	case drumkv1::LFO1_DECAY1:   pParamPort = &m_pElem->lfo1.env.decay1; break;
+	case drumkv1::LFO1_LEVEL2:   pParamPort = &m_pElem->lfo1.env.level2; break;
+	case drumkv1::LFO1_DECAY2:   pParamPort = &m_pElem->lfo1.env.decay2; break;
+	case drumkv1::LFO1_BPMSYNC:  pParamPort = &m_pElem->lfo1.bpmsync;    break;
+	case drumkv1::DCA1_VOLUME:   pParamPort = &m_pElem->dca1.volume;     break;
+	case drumkv1::DCA1_ATTACK:   pParamPort = &m_pElem->dca1.env.attack; break;
+	case drumkv1::DCA1_DECAY1:   pParamPort = &m_pElem->dca1.env.decay1; break;
+	case drumkv1::DCA1_LEVEL2:   pParamPort = &m_pElem->dca1.env.level2; break;
+	case drumkv1::DCA1_DECAY2:   pParamPort = &m_pElem->dca1.env.decay2; break;
+	case drumkv1::OUT1_WIDTH:    pParamPort = &m_pElem->out1.width;      break;
+	case drumkv1::OUT1_PANNING:  pParamPort = &m_pElem->out1.panning;    break;
+	case drumkv1::OUT1_FXSEND:   pParamPort = &m_pElem->out1.fxsend;     break;
+	case drumkv1::OUT1_VOLUME:   pParamPort = &m_pElem->out1.volume;     break;
 	default: break;
 	}
 
-	return pfParam;
+	return pParamPort;
 }
 
 
