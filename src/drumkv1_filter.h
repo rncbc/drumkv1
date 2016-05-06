@@ -286,6 +286,3 @@ private:
 
 
 // end of drumkv1_filter.h
-
-
-
