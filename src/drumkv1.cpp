@@ -1073,7 +1073,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 				drumkv1_port *pParamPort = &m_params[i];
 				if (pParamPort) {
 					element->setParamPort(index, pParamPort->port());
-					pParamPort->set_value(elem->params[1][i], true);
+					pParamPort->set_value(elem->params[1][i], false);
 				}
 			}
 			resetElement(elem);
