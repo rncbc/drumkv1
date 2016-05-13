@@ -142,39 +142,90 @@ inline float drumkv1_freq ( float note )
 }
 
 
-// parameter port
+// parameter port (basic)
 
 class drumkv1_port
 {
 public:
 
-	drumkv1_port() : m_port(NULL), m_cache(false), m_value(0.0f) {}
+	drumkv1_port() : m_port(NULL), m_value(0.0f) {}
 
 	void set_port(float *port)
-		{ m_port = port; m_cache = false; }
+		{ m_port = port; }
 	float *port() const
 		{ return m_port; }
 
-	void set_value(float value, bool cache)
-		{ m_value = value; m_cache = cache; if (!cache) set_port_value(value); }
-	float value() const
-		{ return (m_cache ? m_value : port_value()); }
+	void set_value(float value, bool cache = false)
+		{ m_value = value; if (!cache) update(); }
 
-	float operator *() const
-		{ return value(); }
+	virtual float value(uint32_t /*nstep*/ = 1)
+	{
+		if (changed())
+			set_value(*m_port, true);
+
+		return m_value;
+	}
+
+	float operator *() { return value(1); }
 
 protected:
 
-	void  set_port_value(float value)
-		{ if (m_port) *m_port = value; }
-	float port_value() const
-		{ return (m_port ? *m_port : m_value); }
+	bool changed() const
+		{ return (m_port && ::fabsf(*m_port - m_value) > 0.001f); }
+
+	void update()
+		{ if (m_port) *m_port = m_value; }
+
+	float *m_port;
+	float  m_value;
+};
+
+
+// parameter port (smoothed)
+
+class drumkv1_port2 : public drumkv1_port
+{
+public:
+
+	drumkv1_port2() : m_vstep(0.0f), m_nstep(0) {}
+
+	void set_value(float value, bool cache = false)
+	{
+		if (cache) {
+			m_nstep = NSTEP;
+			m_vstep = (value - m_value) / float(m_nstep);
+		} else {
+			m_nstep = 0;
+			m_value = value;
+			update();
+		}
+	}
+
+	float value(uint32_t nstep = NSTEP)
+	{
+		if (m_nstep == 0 && changed())
+			set_value(*m_port, true);
+
+		if (m_nstep > 0) {
+			if (m_nstep >= nstep) {
+				m_value += m_vstep * float(nstep);
+				m_nstep -= nstep;
+			} else {
+				m_value += m_vstep * float(m_nstep);
+				m_nstep  = 0;
+			}
+			update();
+		}
+
+		return m_value;
+	}
 
 private:
 
-	float *m_port;
-	bool   m_cache;
-	float  m_value;
+	static const uint32_t NSTEP = 32;
+
+	float    m_vstep;
+	uint32_t m_nstep;
 };
 
 
@@ -347,12 +398,12 @@ struct drumkv1_aux
 
 struct drumkv1_gen
 {
-	drumkv1_port sample;
-	drumkv1_port reverse;
-	drumkv1_port group;
-	drumkv1_port coarse;
-	drumkv1_port fine;
-	drumkv1_port envtime;
+	drumkv1_port  sample;
+	drumkv1_port  reverse;
+	drumkv1_port  group;
+	drumkv1_port2 coarse;
+	drumkv1_port2 fine;
+	drumkv1_port  envtime;
 
 	float sample0, envtime0;
 };
@@ -362,11 +413,11 @@ struct drumkv1_gen
 
 struct drumkv1_dcf
 {
-	drumkv1_port cutoff;
-	drumkv1_port reso;
-	drumkv1_port type;
-	drumkv1_port slope;
-	drumkv1_port envelope;
+	drumkv1_port2 cutoff;
+	drumkv1_port2 reso;
+	drumkv1_port  type;
+	drumkv1_port  slope;
+	drumkv1_port2 envelope;
 
 	drumkv1_env env;
 };
@@ -376,21 +427,20 @@ struct drumkv1_dcf
 
 struct drumkv1_lfo
 {
-	drumkv1_port shape;
-	drumkv1_port width;
-	drumkv1_port bpm;
-	drumkv1_port rate;
-	drumkv1_port sync;
-	drumkv1_port sweep;
-	drumkv1_port pitch;
-	drumkv1_port cutoff;
-	drumkv1_port reso;
-	drumkv1_port panning;
-	drumkv1_port volume;
+	drumkv1_port  shape;
+	drumkv1_port  width;
+	drumkv1_port2 bpm;
+	drumkv1_port  bpmsync;
+	drumkv1_port2 rate;
+	drumkv1_port  sync;
+	drumkv1_port2 sweep;
+	drumkv1_port2 pitch;
+	drumkv1_port2 cutoff;
+	drumkv1_port2 reso;
+	drumkv1_port2 panning;
+	drumkv1_port2 volume;
 
 	drumkv1_env env;
-
-	drumkv1_port bpmsync;
 };
 
 
@@ -398,7 +448,7 @@ struct drumkv1_lfo
 
 struct drumkv1_dca
 {
-	drumkv1_port volume;
+	drumkv1_port2 volume;
 
 	drumkv1_env env;
 };
@@ -422,10 +472,10 @@ struct drumkv1_def
 
 struct drumkv1_out
 {
-	drumkv1_port width;
-	drumkv1_port panning;
-	drumkv1_port fxsend;
-	drumkv1_port volume;
+	drumkv1_port2 width;
+	drumkv1_port2 panning;
+	drumkv1_port2 fxsend;
+	drumkv1_port2 volume;
 };
 
 
@@ -433,11 +483,11 @@ struct drumkv1_out
 
 struct drumkv1_cho
 {
-	drumkv1_port wet;
-	drumkv1_port delay;
-	drumkv1_port feedb;
-	drumkv1_port rate;
-	drumkv1_port mod;
+	drumkv1_port2 wet;
+	drumkv1_port2 delay;
+	drumkv1_port2 feedb;
+	drumkv1_port2 rate;
+	drumkv1_port2 mod;
 };
 
 
@@ -445,10 +495,10 @@ struct drumkv1_cho
 
 struct drumkv1_fla
 {
-	drumkv1_port wet;
-	drumkv1_port delay;
-	drumkv1_port feedb;
-	drumkv1_port daft;
+	drumkv1_port2 wet;
+	drumkv1_port2 delay;
+	drumkv1_port2 feedb;
+	drumkv1_port2 daft;
 };
 
 
@@ -456,11 +506,11 @@ struct drumkv1_fla
 
 struct drumkv1_pha
 {
-	drumkv1_port wet;
-	drumkv1_port rate;
-	drumkv1_port feedb;
-	drumkv1_port depth;
-	drumkv1_port daft;
+	drumkv1_port2 wet;
+	drumkv1_port2 rate;
+	drumkv1_port2 feedb;
+	drumkv1_port2 depth;
+	drumkv1_port2 daft;
 };
 
 
@@ -468,11 +518,11 @@ struct drumkv1_pha
 
 struct drumkv1_del
 {
-	drumkv1_port wet;
-	drumkv1_port delay;
-	drumkv1_port feedb;
-	drumkv1_port bpm;
-	drumkv1_port bpmsync;
+	drumkv1_port2 wet;
+	drumkv1_port2 delay;
+	drumkv1_port2 feedb;
+	drumkv1_port2 bpm;
+	drumkv1_port  bpmsync;
 };
 
 
@@ -480,11 +530,11 @@ struct drumkv1_del
 
 struct drumkv1_rev
 {
-	drumkv1_port wet;
-	drumkv1_port room;
-	drumkv1_port damp;
-	drumkv1_port feedb;
-	drumkv1_port width;
+	drumkv1_port2 wet;
+	drumkv1_port2 room;
+	drumkv1_port2 damp;
+	drumkv1_port2 feedb;
+	drumkv1_port2 width;
 };
 
 
@@ -881,7 +931,7 @@ drumkv1_impl::drumkv1_impl (
 	// set default sample rate
 	setSampleRate(srate);
 
-	// init default element (eg. 36=Bass Drum 1)
+	// start clean empty
 	clearElements();
 
 	// reset all voices
