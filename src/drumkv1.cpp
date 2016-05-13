@@ -148,36 +148,38 @@ class drumkv1_port
 {
 public:
 
-	drumkv1_port() : m_port(NULL), m_value(0.0f) {}
+	drumkv1_port() : m_port(NULL), m_value(0.0f), m_cache(false) {}
 
 	void set_port(float *port)
 		{ m_port = port; }
 	float *port() const
 		{ return m_port; }
 
-	void set_value(float value, bool cache = false)
-		{ m_value = value; if (!cache) update(); }
+	virtual void set_value(float value, bool cache)
+		{ m_value = value; m_cache = cache; if (!m_cache) update(); }
 
 	virtual float value(uint32_t /*nstep*/ = 1)
-	{
-		if (changed())
-			set_value(*m_port, true);
-
-		return m_value;
-	}
+		{ probe(); return m_value; }
 
 	float operator *() { return value(1); }
 
 protected:
 
-	bool changed() const
-		{ return (m_port && ::fabsf(*m_port - m_value) > 0.001f); }
+	void probe()
+	{
+		if (m_port && ::fabsf(*m_port - m_value) > 0.001f) {
+			if (m_cache)
+				update();
+			else
+				set_value(*m_port, true);
+		}
+	}
 
-	void update()
-		{ if (m_port) *m_port = m_value; }
+	void update() { if (m_port) *m_port = m_value; m_cache = false; }
 
 	float *m_port;
 	float  m_value;
+	bool   m_cache;
 };
 
 
@@ -189,9 +191,11 @@ public:
 
 	drumkv1_port2() : m_vstep(0.0f), m_nstep(0) {}
 
-	void set_value(float value, bool cache = false)
+	void set_value(float value, bool cache)
 	{
-		if (cache) {
+		m_cache = cache;
+
+		if (m_cache) {
 			m_nstep = NSTEP;
 			m_vstep = (value - m_value) / float(m_nstep);
 		} else {
@@ -203,8 +207,8 @@ public:
 
 	float value(uint32_t nstep = NSTEP)
 	{
-		if (m_nstep == 0 && changed())
-			set_value(*m_port, true);
+		if (m_nstep == 0)
+			probe();
 
 		if (m_nstep > 0) {
 			if (m_nstep >= nstep) {
