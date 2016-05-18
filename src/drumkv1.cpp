@@ -379,7 +379,6 @@ struct drumkv1_lfo
 	drumkv1_port shape;
 	drumkv1_port width;
 	drumkv1_port bpm;
-	drumkv1_port bpmsync;
 	drumkv1_port rate;
 	drumkv1_port sync;
 	drumkv1_port sweep;
@@ -471,7 +470,6 @@ struct drumkv1_del
 	drumkv1_port delay;
 	drumkv1_port feedb;
 	drumkv1_port bpm;
-	drumkv1_port bpmsync;
 };
 
 
@@ -735,6 +733,9 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
+	void setTempo(float bpm);
+	float tempo() const;
+
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam);
 	drumkv1_port *paramPort(drumkv1::ParamIndex index);
 
@@ -757,6 +758,9 @@ protected:
 	void allNotesOff();
 
 	void resetElement(drumkv1_elem *elem);
+
+	float get_bpm ( float bpm ) const
+		{ return (bpm > 0.0f ? bpm : m_bpm); }
 
 	drumkv1_voice *alloc_voice ( int key )
 	{
@@ -792,6 +796,7 @@ private:
 
 	uint16_t m_nchannels;
 	float    m_srate;
+	float    m_bpm;
 
 	drumkv1_ctl m_ctl;
 
@@ -837,7 +842,7 @@ private:
 
 drumkv1_impl::drumkv1_impl (
 	drumkv1 *pDrumk, uint16_t nchannels, float srate )
-	: m_pDrumk(pDrumk), m_controls(pDrumk), m_programs(pDrumk)
+	: m_pDrumk(pDrumk), m_controls(pDrumk), m_programs(pDrumk), m_bpm(180.0f)
 {
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
@@ -977,6 +982,19 @@ void drumkv1_impl::setBufferSize ( uint32_t nsize )
 uint32_t drumkv1_impl::bufferSize (void) const
 {
 	return m_nsize;
+}
+
+
+void drumkv1_impl::setTempo ( float bpm )
+{
+	// set nominal tempo (BPM)
+	m_bpm = bpm;
+}
+
+
+float drumkv1_impl::tempo (void) const
+{
+	return m_bpm;
 }
 
 
@@ -1216,7 +1234,6 @@ drumkv1_port *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DEL1_DELAY:     pParamPort = &m_del.delay;     break;
 	case drumkv1::DEL1_FEEDB:     pParamPort = &m_del.feedb;     break;
 	case drumkv1::DEL1_BPM:       pParamPort = &m_del.bpm;       break;
-	case drumkv1::DEL1_BPMSYNC:   pParamPort = &m_del.bpmsync;   break;
 	case drumkv1::REV1_WET:       pParamPort = &m_rev.wet;       break;
 	case drumkv1::REV1_ROOM:      pParamPort = &m_rev.room;      break;
 	case drumkv1::REV1_DAMP:      pParamPort = &m_rev.damp;      break;
@@ -1627,7 +1644,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		drumkv1_elem *elem = pv->elem;
 
 		const float lfo1_freq
-			= *elem->lfo1.bpm / (60.01f - *elem->lfo1.rate * 60.0f);
+			= get_bpm(*elem->lfo1.bpm) / (60.01f - *elem->lfo1.rate * 60.0f);
 
 		const float modwheel1
 			= m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch;
@@ -1787,7 +1804,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			*m_pha.rate, *m_pha.feedb, *m_pha.depth, *m_pha.daft * float(k));
 		// delay
 		m_delay[k].process(in, nframes, *m_del.wet,
-			*m_del.delay, *m_del.feedb, *m_del.bpm);
+			*m_del.delay, *m_del.feedb, get_bpm(*m_del.bpm));
 	}
 
 	// reverb
@@ -1943,6 +1960,18 @@ void drumkv1::setReverse ( bool bReverse )
 bool drumkv1::isReverse (void) const
 {
 	return m_pImpl->isReverse();
+}
+
+
+void drumkv1::setTempo ( float bpm )
+{
+	m_pImpl->setTempo(bpm);
+}
+
+
+float drumkv1::tempo (void) const
+{
+	return m_pImpl->tempo();
 }
 
 
@@ -2120,7 +2149,6 @@ drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::LFO1_DECAY1:   pParamPort = &m_pElem->lfo1.env.decay1; break;
 	case drumkv1::LFO1_LEVEL2:   pParamPort = &m_pElem->lfo1.env.level2; break;
 	case drumkv1::LFO1_DECAY2:   pParamPort = &m_pElem->lfo1.env.decay2; break;
-	case drumkv1::LFO1_BPMSYNC:  pParamPort = &m_pElem->lfo1.bpmsync;    break;
 	case drumkv1::DCA1_VOLUME:   pParamPort = &m_pElem->dca1.volume;     break;
 	case drumkv1::DCA1_ATTACK:   pParamPort = &m_pElem->dca1.env.attack; break;
 	case drumkv1::DCA1_DECAY1:   pParamPort = &m_pElem->dca1.env.decay1; break;

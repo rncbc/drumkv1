@@ -74,6 +74,9 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
+	void setTempo(float bpm);
+	float tempo() const;
+
 	enum ParamIndex	 {
 
 		GEN1_SAMPLE = 0,
@@ -106,7 +109,6 @@ public:
 		LFO1_DECAY1,
 		LFO1_LEVEL2,
 		LFO1_DECAY2,
-		LFO1_BPMSYNC,
 		DCA1_VOLUME,
 		DCA1_ATTACK,
 		DCA1_DECAY1,
@@ -144,7 +146,6 @@ public:
 		DEL1_DELAY,
 		DEL1_FEEDB,
 		DEL1_BPM,
-		DEL1_BPMSYNC,
 		REV1_WET,
 		REV1_ROOM,
 		REV1_DAMP,

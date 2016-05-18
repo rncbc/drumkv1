@@ -177,7 +177,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// LFO parameter limits.
 	m_ui.Lfo1BpmKnob->setScale(1.0f);
-	m_ui.Lfo1BpmKnob->setMinimum(3.6f);
+	m_ui.Lfo1BpmKnob->setMinimum(0.0f);
 	m_ui.Lfo1BpmKnob->setMaximum(360.0f);
 	m_ui.Lfo1BpmKnob->setSingleStep(1.0f);
 	m_ui.Lfo1SweepKnob->setMinimum(-1.0f);
@@ -203,7 +203,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// Effects (delay BPM)
 	m_ui.Del1BpmKnob->setScale(1.0f);
-	m_ui.Del1BpmKnob->setMinimum(3.6f);
+	m_ui.Del1BpmKnob->setMinimum(0.0f);
 	m_ui.Del1BpmKnob->setMaximum(360.0f);
 	m_ui.Del1BpmKnob->setSingleStep(1.0f);
 
@@ -332,10 +332,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Lfo1Decay2Knob, SIGNAL(valueChanged(float)),
 		m_ui.Lfo1Env, SLOT(setDecay2(float)));
 
-	QObject::connect(m_ui.Lfo1BpmKnob,
-		SIGNAL(valueChanged(float)),
-		SLOT(lfo1BpmSyncChanged()));
-
 	// DCA1
 	setParamKnob(drumkv1::DCA1_VOLUME, m_ui.Dca1VolumeKnob);
 	setParamKnob(drumkv1::DCA1_ATTACK, m_ui.Dca1AttackKnob);
@@ -411,10 +407,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::DEL1_DELAY, m_ui.Del1DelayKnob);
 	setParamKnob(drumkv1::DEL1_FEEDB, m_ui.Del1FeedbKnob);
 	setParamKnob(drumkv1::DEL1_BPM,   m_ui.Del1BpmKnob);
-
-	QObject::connect(m_ui.Del1BpmKnob,
-		SIGNAL(valueChanged(float)),
-		SLOT(del1BpmSyncChanged()));
 
 	// Reverb
 	setParamKnob(drumkv1::REV1_WET,   m_ui.Rev1WetKnob);
@@ -641,14 +633,6 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 #endif
 	case drumkv1::DCF1_SLOPE:
 		m_ui.Dcf1TypeKnob->setEnabled(int(fValue) != 3); // !Formant
-		break;
-	case drumkv1::LFO1_BPMSYNC:
-		if (fValue > 0.0f)
-			m_ui.Lfo1BpmKnob->setValue(0.0f);
-		break;
-	case drumkv1::DEL1_BPMSYNC:
-		if (fValue > 0.0f)
-			m_ui.Del1BpmKnob->setValue(0.0f);
 		// Fall thru...
 	default:
 		break;
@@ -1249,39 +1233,6 @@ void drumkv1widget::activateParamKnobsGroupBox (
 	QListIterator<QWidget *> iter(children);
 	while (iter.hasNext())
 		iter.next()->setEnabled(bEnabled);
-}
-
-
-// Common BPM sync change.
-void drumkv1widget::bpmSyncChanged (
-	drumkv1widget_spin *pKnob, drumkv1::ParamIndex index )
-{
-	if (m_iUpdate > 0)
-		return;
-
-	++m_iUpdate;
-	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi) {
-		const bool bBpmSync0 = (pDrumkUi->paramValue(index) > 0.0f);
-		const bool bBpmSync1 = pKnob->isSpecialValue();
-		if ((bBpmSync1 && !bBpmSync0) || (!bBpmSync1 && bBpmSync0))
-			pDrumkUi->setParamValue(index, (bBpmSync1 ? 1.0f : 0.0f));
-	}
-	--m_iUpdate;
-}
-
-
-// LFO1 BPM sync change.
-void drumkv1widget::lfo1BpmSyncChanged (void)
-{
-	bpmSyncChanged(m_ui.Lfo1BpmKnob, drumkv1::LFO1_BPMSYNC);
-}
-
-
-// Delay BPM sync change.
-void drumkv1widget::del1BpmSyncChanged (void)
-{
-	bpmSyncChanged(m_ui.Del1BpmKnob, drumkv1::DEL1_BPMSYNC);
 }
 
 

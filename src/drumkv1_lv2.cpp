@@ -253,16 +253,8 @@ void drumkv1_lv2::run ( uint32_t nframes )
 						m_urids.time_beatsPerMinute, &atom, NULL);
 					if (atom && atom->type == m_urids.atom_Float) {
 						const float host_bpm = ((LV2_Atom_Float *) atom)->body;
-						if (drumkv1::paramValue(drumkv1::LFO1_BPMSYNC) > 0.0f) {
-							const float bpm = drumkv1::paramValue(drumkv1::LFO1_BPM);
-							if (::fabsf(host_bpm - bpm) > 0.01f)
-								drumkv1::setParamValue(drumkv1::LFO1_BPM, host_bpm, true); // Cached!;
-						}
-						if (drumkv1::paramValue(drumkv1::DEL1_BPMSYNC) > 0.0f) {
-							const float bpm = drumkv1::paramValue(drumkv1::DEL1_BPM);
-							if (bpm > 0.0f && ::fabsf(host_bpm - bpm) > 0.01f)
-								drumkv1::setParamValue(drumkv1::DEL1_BPM, host_bpm, true); // Cached!
-						}
+						if (::fabsf(host_bpm - drumkv1::tempo()) > 0.001f)
+							drumkv1::setTempo(host_bpm);
 					}
 				}
 			}
