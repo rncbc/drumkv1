@@ -100,7 +100,7 @@ bool drumkv1_ui::isReverse (void) const
 
 void drumkv1_ui::setParamValue ( drumkv1::ParamIndex index, float fValue )
 {
-	m_pDrumk->setParamValue(index, fValue);
+	m_pDrumk->setParamValue(index, fValue, true); // Cached!
 }
 
 float drumkv1_ui::paramValue ( drumkv1::ParamIndex index ) const
