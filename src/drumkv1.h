@@ -46,7 +46,7 @@ public:
 
 	drumkv1(uint16_t nchannels = 2, float srate = 44100.0f);
 
-	~drumkv1();
+	virtual ~drumkv1();
 
 	void setChannels(uint16_t nchannels);
 	uint16_t channels() const;
@@ -171,6 +171,8 @@ public:
 
 	void process_midi(uint8_t *data, uint32_t size);
 	void process(float **ins, float **outs, uint32_t nframes);
+
+	virtual void updateSample() = 0;
 
 private:
 

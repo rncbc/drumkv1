@@ -596,6 +596,12 @@ void drumkv1_jack::sessionEvent ( void *pvSessionArg )
 #endif	// CONFIG_JACK_SESSION
 
 
+void drumkv1_jack::updateSample (void)
+{
+	// nothing to do...
+}
+
+
 //-------------------------------------------------------------------------
 // drumkv1_jack_application -- Singleton application instance.
 //

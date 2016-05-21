@@ -2000,6 +2000,8 @@ void drumkv1::removeElement ( int key )
 void drumkv1::setCurrentElement ( int key )
 {
 	m_pImpl->setCurrentElement(key);
+
+	updateSample();
 }
 
 int drumkv1::currentElement (void) const
@@ -2017,6 +2019,8 @@ void drumkv1::clearElements (void)
 void drumkv1::setSampleFile ( const char *pszSampleFile )
 {
 	m_pImpl->setSampleFile(pszSampleFile);
+
+	updateSample();
 }
 
 const char *drumkv1::sampleFile (void) const

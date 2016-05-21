@@ -78,6 +78,8 @@ public:
 	void select_program(uint32_t bank, uint32_t program);
 #endif
 
+	void updateSample();
+
 	bool patch_put(uint32_t ndelta);
 
 	bool worker_work(const void *data, uint32_t size);
@@ -90,6 +92,7 @@ private:
 	struct lv2_urids
 	{
 		LV2_URID gen1_sample;
+		LV2_URID gen1_update;
 		LV2_URID atom_Blank;
 		LV2_URID atom_Object;
 		LV2_URID atom_Float;
