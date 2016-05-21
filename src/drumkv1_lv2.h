@@ -27,6 +27,9 @@
 #include "lv2.h"
 #include "lv2/lv2plug.in/ns/ext/urid/urid.h"
 #include "lv2/lv2plug.in/ns/ext/atom/atom.h"
+#include "lv2/lv2plug.in/ns/ext/atom/forge.h"
+
+#include "lv2/lv2plug.in/ns/ext/worker/worker.h"
 
 #define DRUMKV1_LV2_URI "http://drumkv1.sourceforge.net/lv2"
 #define DRUMKV1_LV2_PREFIX DRUMKV1_LV2_URI "#"
@@ -53,6 +56,7 @@ public:
 	enum PortIndex {
 
 		MidiIn = 0,
+		Notify,
 		AudioInL,
 		AudioInR,
 		AudioOutL,
@@ -74,26 +78,47 @@ public:
 	void select_program(uint32_t bank, uint32_t program);
 #endif
 
+	bool patch_put(uint32_t ndelta);
+
+	bool worker_work(const void *data, uint32_t size);
+	bool worker_response(const void *data, uint32_t size);
+
 private:
 
 	LV2_URID_Map *m_urid_map;
 
 	struct lv2_urids
 	{
+		LV2_URID gen1_sample;
 		LV2_URID atom_Blank;
 		LV2_URID atom_Object;
 		LV2_URID atom_Float;
 		LV2_URID atom_Int;
+		LV2_URID atom_Path;
 		LV2_URID time_Position;
 		LV2_URID time_beatsPerMinute;
 		LV2_URID midi_MidiEvent;
 		LV2_URID bufsz_minBlockLength;
 		LV2_URID bufsz_maxBlockLength;
 		LV2_URID bufsz_nominalBlockLength;
+		LV2_URID patch_Get;
+		LV2_URID patch_Set;
+		LV2_URID patch_Put;
+		LV2_URID patch_body;
+		LV2_URID patch_property;
+		LV2_URID patch_value;
 
 	} m_urids;
 
-	LV2_Atom_Sequence *m_atom_sequence;
+	LV2_Atom_Forge m_forge;
+	LV2_Atom_Forge_Frame m_notify_frame;
+
+	LV2_Worker_Schedule *m_schedule;
+
+	uint32_t m_ndelta;
+
+	LV2_Atom_Sequence *m_atom_in;
+	LV2_Atom_Sequence *m_atom_out;
 
 	float **m_ins;
 	float **m_outs;

@@ -23,6 +23,7 @@
 #include "drumkv1_config.h"
 
 #include "drumkv1_sched.h"
+#include "drumkv1_sample.h"
 #include "drumkv1_param.h"
 
 #include "drumkv1_programs.h"
@@ -33,6 +34,7 @@
 #include "lv2/lv2plug.in/ns/ext/atom/util.h"
 
 #include "lv2/lv2plug.in/ns/ext/state/state.h"
+#include "lv2/lv2plug.in/ns/ext/patch/patch.h"
 
 #include "lv2/lv2plug.in/ns/ext/options/options.h"
 #include "lv2/lv2plug.in/ns/ext/buf-size/buf-size.h"
@@ -107,7 +109,11 @@ drumkv1_lv2::drumkv1_lv2 (
 	: drumkv1(2, float(sample_rate))
 {
 	m_urid_map = NULL;
-	m_atom_sequence = NULL;
+	m_atom_in  = NULL;
+	m_atom_out = NULL;
+	m_schedule = NULL;
+
+	m_ndelta = 0;
 
 	const LV2_Options_Option *host_options = NULL;
 
@@ -116,6 +122,8 @@ drumkv1_lv2::drumkv1_lv2 (
 		if (::strcmp(host_feature->URI, LV2_URID_MAP_URI) == 0) {
 			m_urid_map = (LV2_URID_Map *) host_feature->data;
 			if (m_urid_map) {
+ 				m_urids.gen1_sample = m_urid_map->map(
+ 					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SAMPLE");
 				m_urids.atom_Blank = m_urid_map->map(
 					m_urid_map->handle, LV2_ATOM__Blank);
 				m_urids.atom_Object = m_urid_map->map(
@@ -124,6 +132,8 @@ drumkv1_lv2::drumkv1_lv2 (
 					m_urid_map->handle, LV2_ATOM__Float);
 				m_urids.atom_Int = m_urid_map->map(
 					m_urid_map->handle, LV2_ATOM__Int);
+				m_urids.atom_Path = m_urid_map->map(
+					m_urid_map->handle, LV2_ATOM__Path);
 				m_urids.time_Position = m_urid_map->map(
 					m_urid_map->handle, LV2_TIME__Position);
 				m_urids.time_beatsPerMinute = m_urid_map->map(
@@ -138,8 +148,23 @@ drumkv1_lv2::drumkv1_lv2 (
 				m_urids.bufsz_nominalBlockLength = m_urid_map->map(
 					m_urid_map->handle, LV2_BUF_SIZE__nominalBlockLength);
 			#endif
+				m_urids.patch_Get = m_urid_map->map(
+ 					m_urid_map->handle, LV2_PATCH__Get);
+				m_urids.patch_Set = m_urid_map->map(
+					m_urid_map->handle, LV2_PATCH__Set);
+				m_urids.patch_Put = m_urid_map->map(
+					m_urid_map->handle, LV2_PATCH__Put);
+				m_urids.patch_body = m_urid_map->map(
+					m_urid_map->handle, LV2_PATCH__body);
+				m_urids.patch_property = m_urid_map->map(
+ 					m_urid_map->handle, LV2_PATCH__property);
+				m_urids.patch_value = m_urid_map->map(
+ 					m_urid_map->handle, LV2_PATCH__value);
 			}
 		}
+		else
+		if (::strcmp(host_feature->URI, LV2_WORKER__schedule) == 0)
+			m_schedule = (LV2_Worker_Schedule *) host_feature->data;
 		else
 		if (::strcmp(host_feature->URI, LV2_OPTIONS__options) == 0)
 			host_options = (const LV2_Options_Option *) host_feature->data;
@@ -169,6 +194,8 @@ drumkv1_lv2::drumkv1_lv2 (
 
 	drumkv1::setBufferSize(buffer_size);
 
+	lv2_atom_forge_init(&m_forge, m_urid_map);
+
 	const uint16_t nchannels = drumkv1::channels();
 	m_ins  = new float * [nchannels];
 	m_outs = new float * [nchannels];
@@ -191,7 +218,10 @@ void drumkv1_lv2::connect_port ( uint32_t port, void *data )
 {
 	switch(PortIndex(port)) {
 	case MidiIn:
-		m_atom_sequence = (LV2_Atom_Sequence *) data;
+		m_atom_in = (LV2_Atom_Sequence *) data;
+		break;
+	case Notify:
+		m_atom_out = (LV2_Atom_Sequence *) data;
 		break;
 	case AudioInL:
 		m_ins[0] = (float *) data;
@@ -221,10 +251,16 @@ void drumkv1_lv2::run ( uint32_t nframes )
 		outs[k] = m_outs[k];
 	}
 
+	if (m_atom_out) {
+		const uint32_t capacity = m_atom_out->atom.size;
+		lv2_atom_forge_set_buffer(&m_forge, (uint8_t *) m_atom_out, capacity);
+		lv2_atom_forge_sequence_head(&m_forge, &m_notify_frame, 0);
+	}
+
 	uint32_t ndelta = 0;
 
-	if (m_atom_sequence) {
-		LV2_ATOM_SEQUENCE_FOREACH(m_atom_sequence, event) {
+	if (m_atom_in) {
+		LV2_ATOM_SEQUENCE_FOREACH(m_atom_in, event) {
 			if (event == NULL)
 				continue;
 			if (event->body.type == m_urids.midi_MidiEvent) {
@@ -257,9 +293,42 @@ void drumkv1_lv2::run ( uint32_t nframes )
 							drumkv1::setTempo(host_bpm);
 					}
 				}
+				else 
+				if (object->body.otype == m_urids.patch_Set) {
+					// set property value
+					const LV2_Atom *property = NULL;
+					const LV2_Atom *value = NULL;
+					lv2_atom_object_get(object,
+						m_urids.patch_property, &property,
+						m_urids.patch_value, &value, 0);
+					if (property && value && property->type == m_forge.URID) {
+						const uint32_t key = ((const LV2_Atom_URID *) property)->body;
+						const LV2_URID type = value->type;
+						if (key == m_urids.gen1_sample
+							&& type == m_urids.atom_Path) {
+							drumkv1_sample *pSample = drumkv1::sample();
+							if (pSample && m_schedule) {
+								const char *pszSampleFile
+									= (const char *) LV2_ATOM_BODY_CONST(value);
+								// schedule loading new sample
+								m_schedule->schedule_work(
+									m_schedule->handle,
+									::strlen(pszSampleFile) + 1,
+									pszSampleFile);
+							}
+						}
+					}
+				}
+				else
+				if (object->body.otype == m_urids.patch_Get) {
+					// put property values (probably to UI)
+					patch_put(ndelta);
+				}
 			}
 		}
-	//	m_atom_sequence = NULL;
+		// remember last time for worker response
+		m_ndelta = ndelta;
+	//	m_atom_in = NULL;
 	}
 
 	if (nframes > ndelta)
@@ -422,6 +491,53 @@ void drumkv1_lv2::select_program ( uint32_t bank, uint32_t program )
 #endif	// CONFIG_LV2_PROGRAMS
 
 
+bool drumkv1_lv2::patch_put ( uint32_t ndelta )
+{
+	drumkv1_sample *pSample = drumkv1::sample();
+	if (pSample == NULL)
+		return false;
+
+	const char *pszSampleFile = pSample->filename();
+	if (pszSampleFile == NULL)
+		return false;
+
+	lv2_atom_forge_frame_time(&m_forge, ndelta);
+
+	LV2_Atom_Forge_Frame patch_frame;
+	lv2_atom_forge_object(&m_forge, &patch_frame, 0, m_urids.patch_Put);
+	lv2_atom_forge_key(&m_forge, m_urids.patch_body);
+
+	LV2_Atom_Forge_Frame body_frame;
+	lv2_atom_forge_object(&m_forge, &body_frame, 0, 0);
+	lv2_atom_forge_key(&m_forge, m_urids.gen1_sample);
+	lv2_atom_forge_path(&m_forge, pszSampleFile, ::strlen(pszSampleFile) + 1);
+
+	lv2_atom_forge_pop(&m_forge, &body_frame);
+	lv2_atom_forge_pop(&m_forge, &patch_frame);
+
+	return true;
+}
+
+
+bool drumkv1_lv2::worker_work ( const void *data, uint32_t /*size*/ )
+{
+	const char *pszSampleFile = (const char *) data;
+	if (pszSampleFile == NULL)
+		return false;
+
+	drumkv1::setSampleFile(pszSampleFile);
+
+	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
+	return true;
+}
+
+
+bool drumkv1_lv2::worker_response ( const void */*data*/, uint32_t /*size*/ )
+{
+	return patch_put(m_ndelta);
+}
+
+
 //-------------------------------------------------------------------------
 // drumkv1_lv2 - LV2 desc.
 //
@@ -503,17 +619,54 @@ static const LV2_Programs_Interface drumkv1_lv2_programs_interface =
 
 #endif	// CONFIG_LV2_PROGRAMS
 
+
+static LV2_Worker_Status drumkv1_lv2_worker_work (
+	LV2_Handle instance, LV2_Worker_Respond_Function respond,
+	LV2_Worker_Respond_Handle handle, uint32_t size, const void *data )
+{
+	drumkv1_lv2 *pDrumk = static_cast<drumkv1_lv2 *> (instance);
+	if (pDrumk && pDrumk->worker_work(data, size)) {
+		respond(handle, size, data);
+		return LV2_WORKER_SUCCESS;
+	}
+
+	return LV2_WORKER_ERR_UNKNOWN;
+}
+
+
+static LV2_Worker_Status drumkv1_lv2_worker_response (
+	LV2_Handle instance, uint32_t size, const void *data )
+{
+	drumkv1_lv2 *pDrumk = static_cast<drumkv1_lv2 *> (instance);
+	if (pDrumk && pDrumk->worker_response(data, size))
+		return LV2_WORKER_SUCCESS;
+	else
+		return LV2_WORKER_SUCCESS;
+}
+
+
+static const LV2_Worker_Interface drumkv1_lv2_worker_interface =
+{
+	drumkv1_lv2_worker_work,
+	drumkv1_lv2_worker_response,
+	NULL
+};
+
+
 static const void *drumkv1_lv2_extension_data ( const char *uri )
 {
 #ifdef CONFIG_LV2_PROGRAMS
 	if (::strcmp(uri, LV2_PROGRAMS__Interface) == 0)
-		return (void *) &drumkv1_lv2_programs_interface;
+		return &drumkv1_lv2_programs_interface;
 	else
 #endif
-	if (::strcmp(uri, LV2_STATE__interface))
-		return NULL;
+	if (::strcmp(uri, LV2_WORKER__interface) == 0)
+		return &drumkv1_lv2_worker_interface;
+	else
+	if (::strcmp(uri, LV2_STATE__interface) == 0)
+		return &drumkv1_lv2_state_interface;
 
-	return &drumkv1_lv2_state_interface;
+	return NULL;
 }
 
 
