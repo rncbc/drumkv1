@@ -1151,8 +1151,37 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 
 	pDrumkUi->setCurrentElement(iCurrentNote);
 
+	updateElement(iCurrentNote);
+
+	const QString& sElementName = completeNoteName(iCurrentNote);
+	m_ui.StatusBar->showMessage(tr("Element: %1").arg(sElementName), 5000);
+
+	if (bOpenSample)
+		m_ui.Gen1Sample->openSample(sElementName);
+}
+
+
+// Element sample requester.
+void drumkv1widget::doubleClickElement (void)
+{
+	activateElement(true);
+}
+
+
+// Update element (as current).
+void drumkv1widget::updateElement ( int iNote )
+{
+#ifdef CONFIG_DEBUG
+	qDebug("DEBUG> drumkv1widget::updateElement(%d)", iNote);
+#endif
+
 	resetParamKnobs(drumkv1::NUM_ELEMENT_PARAMS);
 
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
+		return;
+
+	drumkv1_element *element = pDrumkUi->element(iNote);
 	if (element) {
 		activateParamKnobs(true);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -1171,20 +1200,6 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 		resetParamValues(drumkv1::NUM_ELEMENT_PARAMS);
 		activateParamKnobs(false);
 	}
-
-
-	const QString& sElementName = completeNoteName(iCurrentNote);
-	m_ui.StatusBar->showMessage(tr("Element: %1").arg(sElementName), 5000);
-
-	if (bOpenSample)
-		m_ui.Gen1Sample->openSample(sElementName);
-}
-
-
-// Element sample requester.
-void drumkv1widget::doubleClickElement (void)
-{
-	activateElement(true);
 }
 
 
@@ -1324,7 +1339,12 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 			updateParamValues(drumkv1::NUM_PARAMS);
 			updateDirtyPreset(false);
 		} else {
-			updateSample(pDrumkUi->sample());
+			const int iCurrentNote = pDrumkUi->currentElement();
+			const bool bBlockSignals = m_ui.Elements->blockSignals(true);
+			m_ui.Elements->setCurrentIndex(iCurrentNote);
+			m_ui.Elements->blockSignals(bBlockSignals);
+			updateElement(iCurrentNote);
+		//	updateSample(pDrumkUi->sample());
 		}
 		// Fall thru...
 	default:

@@ -145,6 +145,9 @@ protected:
 	// Reload all elements.
 	void refreshElements();
 
+	// Update element (as current).
+	void updateElement(int iNote);
+
 	// Reset swap params A/B group.
 	void resetSwapParams();
 
