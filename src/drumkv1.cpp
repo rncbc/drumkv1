@@ -1190,9 +1190,8 @@ int drumkv1_impl::currentElement (void) const
 int drumkv1_impl::currentElementTest (void) const
 {
 	const float *pfParam = m_params[drumkv1::GEN1_SAMPLE];
-	const int key1 = (pfParam ? int(*pfParam) : -1);
-	const int key0 = (m_elem ? int(m_elem->gen1.sample0) : -1);
-	return (key1 == key0 ? -1 : key1);
+	const int key = (pfParam ? int(*pfParam) : -1);
+	return (key == currentElement() ? -1 : key);
 }
 
 
@@ -1232,13 +1231,13 @@ void drumkv1_impl::setSampleFile ( const char *pszSampleFile )
 
 const char *drumkv1_impl::sampleFile (void) const
 {
-	return (m_elem ? m_elem->element.sampleFile() : 0);
+	return (m_elem ? m_elem->element.sampleFile() : NULL);
 }
 
 
 drumkv1_sample *drumkv1_impl::sample (void) const
 {
-	return (m_elem ? m_elem->element.sample() : 0);
+	return (m_elem ? m_elem->element.sample() : NULL);
 }
 
 
@@ -2182,13 +2181,13 @@ void drumkv1_element::setSampleFile ( const char *pszSampleFile )
 
 const char *drumkv1_element::sampleFile (void) const
 {
-	return (m_pElem ? m_pElem->gen1_sample.filename() : 0);
+	return (m_pElem ? m_pElem->gen1_sample.filename() : NULL);
 }
 
 
 drumkv1_sample *drumkv1_element::sample (void) const
 {
-	return (m_pElem ? &(m_pElem->gen1_sample) : 0);
+	return (m_pElem ? &(m_pElem->gen1_sample) : NULL);
 }
 
 
