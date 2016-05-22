@@ -795,6 +795,7 @@ public:
 
 	void setCurrentElement(int key);
 	int currentElement() const;
+	int currentElementTest() const;
 
 	void clearElements();
 
@@ -1160,10 +1161,12 @@ void drumkv1_impl::setCurrentElement ( int key )
 			drumkv1_element *element = &(elem->element);
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-				if (index == drumkv1::GEN1_SAMPLE)
-					continue;
-				drumkv1_port *pParamPort = element->paramPort(index);
 				float *pfParam = m_params[i];
+				if (index == drumkv1::GEN1_SAMPLE && pfParam) {
+					*pfParam = elem->gen1.sample0; // = float(key);
+					continue;
+				}
+				drumkv1_port *pParamPort = element->paramPort(index);
 				if (pParamPort && pfParam)
 					pParamPort->set_port(pfParam);
 				if (pParamPort)
@@ -1181,6 +1184,15 @@ void drumkv1_impl::setCurrentElement ( int key )
 int drumkv1_impl::currentElement (void) const
 {
 	return (m_elem ? int(m_elem->gen1.sample0) : -1);
+}
+
+
+int drumkv1_impl::currentElementTest (void) const
+{
+	const float *pfParam = m_params[drumkv1::GEN1_SAMPLE];
+	const int key1 = (pfParam ? int(*pfParam) : -1);
+	const int key0 = (m_elem ? int(m_elem->gen1.sample0) : -1);
+	return (key1 == key0 ? -1 : key1);
 }
 
 
@@ -2007,6 +2019,12 @@ void drumkv1::setCurrentElement ( int key )
 int drumkv1::currentElement (void) const
 {
 	return m_pImpl->currentElement();
+}
+
+
+int drumkv1::currentElementTest (void) const
+{
+	return m_pImpl->currentElementTest();
 }
 
 
