@@ -552,10 +552,8 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t /*size*/ )
 	const drumkv1_lv2_worker_message *mesg
 		= (const drumkv1_lv2_worker_message *) data;
 
-	if (mesg->atom.type == m_urids.gen1_update) {
-		drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
+	if (mesg->atom.type == m_urids.gen1_update)
 		return true;
-	}
 	else
 	if (mesg->atom.type == m_urids.gen1_sample) {
 		drumkv1::setSampleFile(mesg->sample_path);
@@ -568,7 +566,9 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t /*size*/ )
 
 bool drumkv1_lv2::worker_response ( const void */*data*/, uint32_t /*size*/ )
 {
-	// update all propeties...
+	// update all properties, and eventually, any observers...
+	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
+
 	return patch_put(m_ndelta);
 }
 
