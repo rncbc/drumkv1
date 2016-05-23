@@ -552,12 +552,13 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t /*size*/ )
 	const drumkv1_lv2_worker_message *mesg
 		= (const drumkv1_lv2_worker_message *) data;
 
-	if (mesg->atom.type == m_urids.gen1_update)
+	if (mesg->atom.type == m_urids.gen1_update) {
+		drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
 		return true;
+	}
 	else
 	if (mesg->atom.type == m_urids.gen1_sample) {
 		drumkv1::setSampleFile(mesg->sample_path);
-		drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
 		return true;
 	}
 

@@ -1346,13 +1346,10 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 			updateDirtyPreset(false);
 		} else {
 			const int iCurrentNote = pDrumkUi->currentElement();
-			if (iCurrentNote >= 0) {
-				const bool bBlockSignals = m_ui.Elements->blockSignals(true);
-				m_ui.Elements->setCurrentIndex(iCurrentNote);
-				m_ui.Elements->blockSignals(bBlockSignals);
-			}
+			const bool bBlockSignals = m_ui.Elements->blockSignals(true);
+			m_ui.Elements->setCurrentIndex(iCurrentNote);
+			m_ui.Elements->blockSignals(bBlockSignals);
 			updateElement(iCurrentNote);
-		//	updateSample(pDrumkUi->sample());
 		}
 		// Fall thru...
 	default:
