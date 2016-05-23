@@ -521,13 +521,13 @@ void drumkv1_lv2::updateSample (void)
 
 bool drumkv1_lv2::patch_put ( uint32_t ndelta )
 {
+	static char s_szNull[1] = {'\0'};
+	const char *pszSampleFile = NULL;
 	drumkv1_sample *pSample = drumkv1::sample();
-	if (pSample == NULL)
-		return false;
-
-	const char *pszSampleFile = pSample->filename();
+	if (pSample)
+		pszSampleFile = pSample->filename();
 	if (pszSampleFile == NULL)
-		return false;
+		pszSampleFile = s_szNull;
 
 	lv2_atom_forge_frame_time(&m_forge, ndelta);
 
