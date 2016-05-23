@@ -780,6 +780,8 @@ void drumkv1widget::resetParamValues ( uint32_t nparams )
 
 	for (uint32_t i = 0; i < nparams; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		if (index == drumkv1::GEN1_SAMPLE)
+			continue;
 		const float fValue = drumkv1_param::paramDefaultValue(index);
 		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
@@ -1095,10 +1097,15 @@ void drumkv1widget::refreshElements (void)
 {
 	const bool bBlockSignals = m_ui.Elements->blockSignals(true);
 
+	drumkv1_ui *pDrumkUi = ui_instance();
 	if (m_ui.Elements->instance() == NULL)
-		m_ui.Elements->setInstance(ui_instance());
+		m_ui.Elements->setInstance(pDrumkUi);
 
 	int iCurrentNote = currentNote();
+	if (iCurrentNote < 0 && pDrumkUi)
+		iCurrentNote = pDrumkUi->currentElement();
+	if (iCurrentNote < 0)
+		iCurrentNote = 36; // Bass Drum 1 (default)
 
 #ifdef CONFIG_DEBUG_0
 	qDebug("drumkv1widget::refreshElements(%d)", iCurrentNote);
@@ -1106,7 +1113,6 @@ void drumkv1widget::refreshElements (void)
 
 	m_ui.Elements->refresh();
 
-	if (iCurrentNote < 0) iCurrentNote = 36; // Bass Drum 1 (default)
 	m_ui.Elements->setCurrentIndex(iCurrentNote);
 	m_ui.Gen1Sample->setSampleName(completeNoteName(iCurrentNote));
 

@@ -1176,10 +1176,12 @@ void drumkv1_impl::setCurrentElement ( int key )
 		}
 		// set new current element
 		m_elem = elem;
+		m_key  = key;
+	} else {
+		// null default element
+		m_elem = NULL;
+		m_key  = int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
 	}
-	else m_elem = NULL;
-
-	m_key = (m_elem ? key : 36);
 
 	float *pfParam = m_params[drumkv1::GEN1_SAMPLE];
 	if (pfParam)
@@ -1189,7 +1191,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 
 int drumkv1_impl::currentElement (void) const
 {
-	return (m_elem ? int(m_elem->gen1.sample0) : -1);
+	return m_key;
 }
 
 
@@ -1209,7 +1211,7 @@ void drumkv1_impl::clearElements (void)
 
 	// reset current element
 	m_elem = NULL;
-	m_key = -1;
+	m_key  = int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
 
 	// deallocate elements
 	drumkv1_elem *elem = m_elem_list.next();
@@ -2283,6 +2285,8 @@ void drumkv1_element::resetParamValues ( bool bSwap )
 {
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		if (index == drumkv1::GEN1_SAMPLE)
+			continue;
 		const float	fOldValue = m_pElem->params[1][index];
 		const float fNewValue = m_pElem->params[2][index];
 		m_pElem->params[2][index] = fOldValue;
