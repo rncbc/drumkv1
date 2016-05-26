@@ -888,9 +888,10 @@ private:
 
 	drumkv1_elem   *m_elem;
 
-	drumkv1_port   *m_params[drumkv1::NUM_ELEMENT_PARAMS];
+	float *m_params[drumkv1::NUM_ELEMENT_PARAMS];
 
-	int    m_key;
+	drumkv1_port   *m_sample;
+	int             m_key;
 
 	drumkv1_list<drumkv1_voice> m_free_list;
 	drumkv1_list<drumkv1_voice> m_play_list;
@@ -935,7 +936,8 @@ drumkv1_impl::drumkv1_impl (
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
 		m_params[i] = NULL;
 
-	m_params[drumkv1::GEN1_SAMPLE] = new drumkv1_port();
+	// special case for sample element switching
+	m_sample = new drumkv1_port();
 
 	// local buffers none yet
 	m_sfxs = NULL;
@@ -985,7 +987,8 @@ drumkv1_impl::~drumkv1_impl (void)
 	// deallocate sample filenames
 	setSampleFile(0);
 
-	delete m_params[drumkv1::GEN1_SAMPLE];
+	// deallocate special sample element port
+	delete m_sample;
 
 	// deallocate voice pool.
 	for (int i = 0; i < MAX_VOICES; ++i)
@@ -1151,10 +1154,12 @@ void drumkv1_impl::setCurrentElement ( int key )
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				drumkv1_port *pParamPort = m_params[i];
+				drumkv1_port *pParamPort = element->paramPort(index);
+				float *pfParam = m_params[i];
+				if (pParamPort && pfParam)
+					elem->params[1][i] = *pfParam;
 				if (pParamPort)
-					elem->params[1][i] = pParamPort->tick();
-				element->setParamPort(index, &(elem->params[1][i]));
+					pParamPort->set_port(&(elem->params[1][i]));
 			}
 			resetElement(elem);
 		}
@@ -1168,8 +1173,9 @@ void drumkv1_impl::setCurrentElement ( int key )
 					continue;
 				drumkv1_port *pParamPort = element->paramPort(index);
 				if (pParamPort) {
-					pParamPort->set_value(elem->params[1][i], false);
-					m_params[i] = pParamPort;
+					pParamPort->set_port(m_params[i]);
+					pParamPort->set_value(elem->params[1][i], true);
+					pParamPort->tick();
 				}
 			}
 			resetElement(elem);
@@ -1183,11 +1189,8 @@ void drumkv1_impl::setCurrentElement ( int key )
 		m_key  = int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
 	}
 
-	drumkv1_port *pParamPort = m_params[drumkv1::GEN1_SAMPLE];
-	if (pParamPort) {
-		pParamPort->set_value(float(m_key), true);
-		pParamPort->tick();
-	}
+	m_sample->set_value(float(m_key), true);
+	m_sample->tick();
 }
 
 
@@ -1199,8 +1202,7 @@ int drumkv1_impl::currentElement (void) const
 
 int drumkv1_impl::currentElementTest (void) const
 {
-	drumkv1_port *pParamPort = m_params[drumkv1::GEN1_SAMPLE];
-	const int key = (pParamPort ? int(pParamPort->tick()) : -1);
+	const int key = int(m_sample->tick());
 	return (key == m_key ? -1 : key);
 }
 
@@ -1295,10 +1297,11 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 		}
 	}
 
-	if (index == drumkv1::GEN1_SAMPLE) {
-		pParamPort = m_params[index];
-		if (pParamPort)
-			pParamPort->set_port(pfParam);
+	if (index < drumkv1::NUM_ELEMENT_PARAMS) {
+		if (index == drumkv1::GEN1_SAMPLE)
+			m_sample->set_port(pfParam);
+		else
+			m_params[index] = pfParam;
 	}
 }
 
