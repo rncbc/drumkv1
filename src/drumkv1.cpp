@@ -792,7 +792,6 @@ public:
 
 	void setCurrentElement(int key);
 	int currentElement() const;
-
 	int currentElementTest();
 
 	void clearElements();
@@ -893,7 +892,7 @@ private:
 
 	drumkv1_port *m_key;
 
-	int m_key0, m_key1;
+	int m_key0;
 
 	drumkv1_list<drumkv1_voice> m_free_list;
 	drumkv1_list<drumkv1_voice> m_play_list;
@@ -1192,6 +1191,10 @@ void drumkv1_impl::setCurrentElement ( int key )
 		m_elem = NULL;
 		m_key0 = int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
 	}
+
+	// set current element key parameter port
+	m_key->set_value(float(m_key0), true);
+	m_key->tick();
 }
 
 
@@ -1204,13 +1207,7 @@ int drumkv1_impl::currentElement (void) const
 int drumkv1_impl::currentElementTest (void)
 {
 	const int key = int(m_key->tick());
-	if (m_key1 == key)
-		return -1;
-
-	m_key->set_value(float(key), true);
-	m_key1 = key;
-
-	return key;
+	return (m_key0 == key ? -1 : key);
 }
 
 
@@ -1223,7 +1220,6 @@ void drumkv1_impl::clearElements (void)
 	// reset current element
 	m_elem = NULL;
 	m_key0 = int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
-	m_key1 = m_key0;
 
 	// deallocate elements
 	drumkv1_elem *elem = m_elem_list.next();
@@ -2038,8 +2034,7 @@ int drumkv1::currentElement (void) const
 	return m_pImpl->currentElement();
 }
 
-
-int drumkv1::currentElementTest (void)
+int drumkv1::currentElementTest (void) const
 {
 	return m_pImpl->currentElementTest();
 }

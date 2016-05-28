@@ -63,8 +63,7 @@ public:
 
 	void setCurrentElement(int key);
 	int currentElement() const;
-
-	int currentElementTest();
+	int currentElementTest() const;
 
 	void clearElements();
 
