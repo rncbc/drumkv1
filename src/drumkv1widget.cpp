@@ -1177,7 +1177,7 @@ void drumkv1widget::doubleClickElement (void)
 // Update element (as current).
 void drumkv1widget::updateElement ( int iNote )
 {
-#ifdef CONFIG_DEBUG//_0
+#ifdef CONFIG_DEBUG_0
 	qDebug("drumkv1widget::updateElement(%d)", iNote);
 #endif
 
