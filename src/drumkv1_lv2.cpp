@@ -346,9 +346,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 
 #if 0
 	// test for current element key changes
-	const int key = currentElementTest();
-	if (key >= 0)
-		setCurrentElement(key);
+	currentElementTest();
 #endif
 }
 
