@@ -83,7 +83,11 @@ public:
 
 protected:
 
+	void selectSample(int key);
 	void updateSample();
+
+	void setCurrentElementTest(int key);
+	void currentElementTest();
 
 	bool patch_put(uint32_t ndelta);
 
@@ -94,6 +98,7 @@ private:
 	struct lv2_urids
 	{
 		LV2_URID gen1_sample;
+		LV2_URID gen1_select;
 		LV2_URID gen1_update;
 		LV2_URID atom_Blank;
 		LV2_URID atom_Object;

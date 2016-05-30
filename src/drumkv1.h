@@ -62,9 +62,11 @@ public:
 	void removeElement(int key);
 
 	void setCurrentElement(int key);
+	void setCurrentElementEx(int key);
 	int currentElement() const;
 
-	void currentElementTest();
+	void setCurrentElementTest(int key);
+	int currentElementTest() const;
 
 	void clearElements();
 
@@ -176,6 +178,7 @@ public:
 
 protected:
 
+	virtual void selectSample(int key) = 0;
 	virtual void updateSample() = 0;
 
 private:

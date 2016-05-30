@@ -596,6 +596,13 @@ void drumkv1_jack::sessionEvent ( void *pvSessionArg )
 #endif	// CONFIG_JACK_SESSION
 
 
+void drumkv1_jack::selectSample ( int key )
+{
+	// something to do...
+	drumkv1::setCurrentElementEx(key);
+}
+
+
 void drumkv1_jack::updateSample (void)
 {
 	// nothing to do...

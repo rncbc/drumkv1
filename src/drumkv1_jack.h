@@ -69,6 +69,7 @@ public:
 
 protected:
 
+	void selectSample(int key);
 	void updateSample();
 
 private:

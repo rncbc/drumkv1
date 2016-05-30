@@ -1208,9 +1208,7 @@ int drumkv1_impl::currentElement (void) const
 
 void drumkv1_impl::setCurrentElementTest ( int key )
 {
-	setCurrentElement(key);
-
-	m_key1 = m_key0;
+	m_key1 = key;
 }
 
 
@@ -2035,10 +2033,14 @@ void drumkv1::removeElement ( int key )
 
 void drumkv1::setCurrentElement ( int key )
 {
-	m_pImpl->setCurrentElement(key);
-
-	updateSample();
+	selectSample(key);
 }
+
+void drumkv1::setCurrentElementEx ( int key )
+{
+	m_pImpl->setCurrentElement(key);
+}
+
 
 int drumkv1::currentElement (void) const
 {
@@ -2046,14 +2048,14 @@ int drumkv1::currentElement (void) const
 }
 
 
-
-void drumkv1::currentElementTest (void)
+void drumkv1::setCurrentElementTest ( int key )
 {
-	const int key = m_pImpl->currentElementTest();
-	if (key >= 0) {
-		m_pImpl->setCurrentElementTest(key);
-		updateSample();
-	}
+	m_pImpl->setCurrentElementTest(key);
+}
+
+int drumkv1::currentElementTest (void) const
+{
+	return m_pImpl->currentElementTest();
 }
 
 

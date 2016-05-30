@@ -106,8 +106,14 @@ private:
 
 // atom-like message used internally with worker/schedule
 typedef struct {
+
 	LV2_Atom atom;
-	const char *sample_path;
+
+	union {
+		int key;
+		const char *path;
+	} sample;
+
 } drumkv1_lv2_worker_message;
 
 
@@ -131,6 +137,8 @@ drumkv1_lv2::drumkv1_lv2 (
 			if (m_urid_map) {
  				m_urids.gen1_sample = m_urid_map->map(
  					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SAMPLE");
+				m_urids.gen1_select = m_urid_map->map(
+				    m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SELECT");
 				m_urids.gen1_update = m_urid_map->map(
 					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_UPDATE");
 				m_urids.atom_Blank = m_urid_map->map(
@@ -319,8 +327,8 @@ void drumkv1_lv2::run ( uint32_t nframes )
 							if (pSample && m_schedule) {
 								drumkv1_lv2_worker_message mesg;
 								mesg.atom.type = key;
-								mesg.atom.size = sizeof(mesg.sample_path);
-								mesg.sample_path
+								mesg.atom.size = sizeof(mesg.sample);
+								mesg.sample.path
 									= (const char *) LV2_ATOM_BODY_CONST(value);
 								// schedule loading new sample
 								m_schedule->schedule_work(
@@ -506,16 +514,45 @@ void drumkv1_lv2::select_program ( uint32_t bank, uint32_t program )
 #endif	// CONFIG_LV2_PROGRAMS
 
 
+void drumkv1_lv2::selectSample ( int key )
+{
+	if (m_schedule) {
+		drumkv1_lv2_worker_message mesg;
+		mesg.atom.type = m_urids.gen1_select;
+		mesg.atom.size = sizeof(mesg.sample);
+		mesg.sample.key = key;
+		m_schedule->schedule_work(
+		    m_schedule->handle, sizeof(mesg), &mesg);
+	}
+}
+
+
 void drumkv1_lv2::updateSample (void)
 {
 	if (m_schedule) {
 		drumkv1_lv2_worker_message mesg;
 		mesg.atom.type = m_urids.gen1_update;
-		mesg.atom.size = sizeof(mesg.sample_path);
-		mesg.sample_path = drumkv1::sampleFile();
+		mesg.atom.size = sizeof(mesg.sample);
+		mesg.sample.path = drumkv1::sampleFile();
 		m_schedule->schedule_work(
 			m_schedule->handle, sizeof(mesg), &mesg);
 	}
+}
+
+
+void drumkv1_lv2::setCurrentElementTest ( int key )
+{
+	drumkv1::setCurrentElementTest(key);
+
+	selectSample(key);
+}
+
+
+void drumkv1_lv2::currentElementTest (void)
+{
+	const int key = drumkv1::currentElementTest();
+	if (key >= 0)
+		setCurrentElementTest(key);
 }
 
 
@@ -555,8 +592,13 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t /*size*/ )
 	if (mesg->atom.type == m_urids.gen1_update)
 		return true;
 	else
+	if (mesg->atom.type == m_urids.gen1_select) {
+		drumkv1::setCurrentElementEx(mesg->sample.key);
+		return true;
+	}
+	else
 	if (mesg->atom.type == m_urids.gen1_sample) {
-		drumkv1::setSampleFile(mesg->sample_path);
+		drumkv1::setSampleFile(mesg->sample.path);
 		return true;
 	}
 
