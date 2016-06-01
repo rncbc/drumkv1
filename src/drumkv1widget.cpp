@@ -675,6 +675,8 @@ void drumkv1widget::resetParams (void)
 
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		if (index == drumkv1::GEN1_SAMPLE)
+			continue;
 		float fValue = drumkv1_param::paramDefaultValue(index);
 		drumkv1widget_knob *pKnob = paramKnob(index);
 		if (pKnob)
@@ -768,6 +770,8 @@ void drumkv1widget::updateParamValues ( uint32_t nparams )
 
 	for (uint32_t i = 0; i < nparams; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		if (index == drumkv1::GEN1_SAMPLE)
+			continue;
 		const float fValue = (pDrumkUi
 			? pDrumkUi->paramValue(index)
 			: drumkv1_param::paramDefaultValue(index));
@@ -791,6 +795,7 @@ void drumkv1widget::resetParamValues ( uint32_t nparams )
 		const float fValue = drumkv1_param::paramDefaultValue(index);
 		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
+	//	updateParamEx(index, fValue);
 		m_params_ab[index] = fValue;
 	}
 }
@@ -800,7 +805,10 @@ void drumkv1widget::resetParamValues ( uint32_t nparams )
 void drumkv1widget::resetParamKnobs ( uint32_t nparams )
 {
 	for (uint32_t i = 0; i < nparams; ++i) {
-		drumkv1widget_knob *pKnob = paramKnob(drumkv1::ParamIndex(i));
+		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		if (index == drumkv1::GEN1_SAMPLE)
+			continue;
+		drumkv1widget_knob *pKnob = paramKnob(index);
 		if (pKnob)
 			pKnob->resetDefaultValue();
 	}
@@ -829,7 +837,6 @@ void drumkv1widget::newPreset (void)
 #endif
 
 	clearElements();
-
 	clearSampleFile();
 
 	resetParamKnobs(drumkv1::NUM_PARAMS);
@@ -855,7 +862,6 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 #endif
 
 	clearElements();
-
 	clearSampleFile();
 
 	resetParamKnobs(drumkv1::NUM_PARAMS);
@@ -1215,9 +1221,10 @@ void drumkv1widget::updateElement ( int iNote )
 		resetParamValues(drumkv1::NUM_ELEMENT_PARAMS);
 		activateParamKnobs(false);
 	}
-
+#if 0
 	m_ui.StatusBar->showMessage(
 	    tr("Element: %1").arg(completeNoteName(iNote)), 5000);
+#endif
 }
 
 
