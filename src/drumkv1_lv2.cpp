@@ -352,10 +352,8 @@ void drumkv1_lv2::run ( uint32_t nframes )
 	if (nframes > ndelta)
 		drumkv1::process(ins, outs, nframes - ndelta);
 
-#if 0
 	// test for current element key changes
 	currentElementTest();
-#endif
 }
 
 

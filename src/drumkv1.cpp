@@ -1157,13 +1157,9 @@ void drumkv1_impl::setCurrentElement ( int key )
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				float *pfParam = m_params[i];
 				drumkv1_port *pParamPort = element->paramPort(index);
-				if (pParamPort && pfParam) {
+				if (pParamPort)
 					pParamPort->set_port(&(elem->params[1][i]));
-					pParamPort->set_value(*pfParam, true);
-					pParamPort->tick();
-				}
 			}
 			resetElement(elem);
 		}

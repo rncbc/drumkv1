@@ -708,6 +708,8 @@ void drumkv1widget::swapParams ( bool bOn )
 		if (element) {
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				if (index == drumkv1::GEN1_SAMPLE)
+					continue;
 				drumkv1widget_knob *pKnob = paramKnob(index);
 				if (pKnob) {
 					pKnob->setDefaultValue(element->paramValue(index, 0));
@@ -721,6 +723,8 @@ void drumkv1widget::swapParams ( bool bOn )
 		if (element) {
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+				if (index == drumkv1::GEN1_SAMPLE)
+					continue;
 				m_params_ab[index] = element->paramValue(index);
 			}
 		}
@@ -728,6 +732,8 @@ void drumkv1widget::swapParams ( bool bOn )
 
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		if (index == drumkv1::GEN1_SAMPLE)
+			continue;
 		drumkv1widget_knob *pKnob = paramKnob(index);
 		if (pKnob) {
 			const float fOldValue = pKnob->value();
@@ -943,12 +949,16 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 		element = pDrumkUi->addElement(note);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			if (index == drumkv1::GEN1_SAMPLE)
+				continue;
 			const float fValue = drumkv1_param::paramDefaultValue(index);
 			element->setParamValue(index, fValue);
 		}
 		pDrumkUi->setCurrentElement(note);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			if (index == drumkv1::GEN1_SAMPLE)
+				continue;
 			setParamValue(index, element->paramValue(index));
 		}
 		activateParamKnobs(true);
@@ -1149,6 +1159,8 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 		element = pDrumkUi->addElement(iCurrentNote);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			if (index == drumkv1::GEN1_SAMPLE)
+				continue;
 			const float fValue = drumkv1_param::paramDefaultValue(index);
 			element->setParamValue(index, fValue, 0);
 			element->setParamValue(index, fValue);
@@ -1157,13 +1169,8 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 
 	pDrumkUi->setCurrentElement(iCurrentNote);
 
-	updateElement(iCurrentNote);
-
-	const QString& sElementName = completeNoteName(iCurrentNote);
-	m_ui.StatusBar->showMessage(tr("Element: %1").arg(sElementName), 5000);
-
 	if (bOpenSample)
-		m_ui.Gen1Sample->openSample(sElementName);
+		m_ui.Gen1Sample->openSample(completeNoteName(iCurrentNote));
 }
 
 
@@ -1192,12 +1199,14 @@ void drumkv1widget::updateElement ( int iNote )
 		activateParamKnobs(true);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			if (index == drumkv1::GEN1_SAMPLE)
+				continue;
 			drumkv1widget_knob *pKnob = paramKnob(index);
 			if (pKnob)
 				pKnob->setDefaultValue(element->paramValue(index, 0));
 			const float fValue = element->paramValue(index);
 			setParamValue(index, fValue);
-			updateParam(index, fValue);
+		//	updateParam(index, fValue);
 		}
 		updateSample(pDrumkUi->sample());
 		refreshElements();
@@ -1206,6 +1215,9 @@ void drumkv1widget::updateElement ( int iNote )
 		resetParamValues(drumkv1::NUM_ELEMENT_PARAMS);
 		activateParamKnobs(false);
 	}
+
+	m_ui.StatusBar->showMessage(
+	    tr("Element: %1").arg(completeNoteName(iNote)), 5000);
 }
 
 

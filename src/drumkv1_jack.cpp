@@ -600,6 +600,8 @@ void drumkv1_jack::selectSample ( int key )
 {
 	// something to do...
 	drumkv1::setCurrentElementEx(key);
+
+	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
 }
 
 
