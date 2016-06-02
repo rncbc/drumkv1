@@ -146,13 +146,10 @@ protected:
 	void refreshElements();
 
 	// Update element (as current).
-	void updateElement(int iNote);
+	void updateElement();
 
 	// Reset swap params A/B group.
 	void resetSwapParams();
-
-	// Initialize param values.
-	void updateParamValues(uint32_t nparams);
 
 	// Reset all param/knob default values.
 	void resetParamValues(uint32_t nparams);

@@ -683,7 +683,7 @@ void drumkv1widget::resetParams (void)
 			fValue = pKnob->defaultValue();
 		setParamValue(index, fValue);
 		updateParam(index, fValue);
-		m_params_ab[index] = fValue;
+		m_params_ab[i] = fValue;
 	}
 
 	m_ui.StatusBar->showMessage(tr("Reset preset"), 5000);
@@ -727,7 +727,7 @@ void drumkv1widget::swapParams ( bool bOn )
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				m_params_ab[index] = element->paramValue(index);
+				m_params_ab[i] = element->paramValue(index);
 			}
 		}
 	}
@@ -739,10 +739,10 @@ void drumkv1widget::swapParams ( bool bOn )
 		drumkv1widget_knob *pKnob = paramKnob(index);
 		if (pKnob) {
 			const float fOldValue = pKnob->value();
-			const float fNewValue = m_params_ab[index];
+			const float fNewValue = m_params_ab[i];
 			setParamValue(index, fNewValue);
 			updateParam(index, fNewValue);
-			m_params_ab[index] = fOldValue;
+			m_params_ab[i] = fOldValue;
 		}
 	}
 
@@ -761,28 +761,6 @@ void drumkv1widget::resetSwapParams (void)
 }
 
 
-// Initialize param values.
-void drumkv1widget::updateParamValues ( uint32_t nparams )
-{
-	resetSwapParams();
-
-	drumkv1_ui *pDrumkUi = ui_instance();
-
-	for (uint32_t i = 0; i < nparams; ++i) {
-		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		if (index == drumkv1::GEN1_SAMPLE)
-			continue;
-		const float fValue = (pDrumkUi
-			? pDrumkUi->paramValue(index)
-			: drumkv1_param::paramDefaultValue(index));
-		setParamValue(index, fValue, true);
-		updateParam(index, fValue);
-	//	updateParamEx(index, fValue);
-		m_params_ab[index] = fValue;
-	}
-}
-
-
 // Reset all param default values.
 void drumkv1widget::resetParamValues ( uint32_t nparams )
 {
@@ -796,7 +774,7 @@ void drumkv1widget::resetParamValues ( uint32_t nparams )
 		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
 	//	updateParamEx(index, fValue);
-		m_params_ab[index] = fValue;
+		m_params_ab[i] = fValue;
 	}
 }
 
@@ -1188,19 +1166,24 @@ void drumkv1widget::doubleClickElement (void)
 
 
 // Update element (as current).
-void drumkv1widget::updateElement ( int iNote )
+void drumkv1widget::updateElement (void)
 {
-#ifdef CONFIG_DEBUG_0
-	qDebug("drumkv1widget::updateElement(%d)", iNote);
-#endif
-
 	resetParamKnobs(drumkv1::NUM_ELEMENT_PARAMS);
 
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi == NULL)
 		return;
 
-	drumkv1_element *element = pDrumkUi->element(iNote);
+	const int iCurrentNote = pDrumkUi->currentElement();
+	const bool bBlockSignals = m_ui.Elements->blockSignals(true);
+	m_ui.Elements->setCurrentIndex(iCurrentNote);
+	m_ui.Elements->blockSignals(bBlockSignals);
+
+#ifdef CONFIG_DEBUG_0
+	qDebug("drumkv1widget::updateElement(%d)", iCurrentNote);
+#endif
+
+	drumkv1_element *element = pDrumkUi->element(iCurrentNote);
 	if (element) {
 		activateParamKnobs(true);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -1213,6 +1196,7 @@ void drumkv1widget::updateElement ( int iNote )
 			const float fValue = element->paramValue(index);
 			setParamValue(index, fValue);
 		//	updateParam(index, fValue);
+			m_params_ab[i] = fValue;
 		}
 		updateSample(pDrumkUi->sample());
 		refreshElements();
@@ -1221,9 +1205,18 @@ void drumkv1widget::updateElement ( int iNote )
 		resetParamValues(drumkv1::NUM_ELEMENT_PARAMS);
 		activateParamKnobs(false);
 	}
+
+	for (uint32_t i = drumkv1::NUM_ELEMENT_PARAMS; i < drumkv1::NUM_PARAMS; ++i) {
+		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		const float fValue = pDrumkUi->paramValue(index);
+		setParamValue(index, fValue);
+	//	updateParam(index, fValue);
+		m_params_ab[i] = fValue;
+	}
+
 #if 0
 	m_ui.StatusBar->showMessage(
-	    tr("Element: %1").arg(completeNoteName(iNote)), 5000);
+		tr("Element: %1").arg(completeNoteName(iNote)), 5000);
 #endif
 }
 
@@ -1314,10 +1307,10 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 // Preset status updater.
 void drumkv1widget::updateLoadPreset ( const QString& sPreset )
 {
+	resetSwapParams();
+
 //	refreshElements();
 	activateElement();
-
-	updateParamValues(drumkv1::NUM_PARAMS);
 
 	m_ui.Preset->setPreset(sPreset);
 	m_ui.StatusBar->showMessage(tr("Load preset: %1").arg(sPreset), 5000);
@@ -1359,16 +1352,12 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 	}
 	case drumkv1_sched::Sample:
 		if (sid > 0) {
+			resetSwapParams();
 		//	refreshElements();
 			activateElement();
-			updateParamValues(drumkv1::NUM_PARAMS);
 			updateDirtyPreset(false);
 		} else {
-			const int iCurrentNote = pDrumkUi->currentElement();
-			const bool bBlockSignals = m_ui.Elements->blockSignals(true);
-			m_ui.Elements->setCurrentIndex(iCurrentNote);
-			m_ui.Elements->blockSignals(bBlockSignals);
-			updateElement(iCurrentNote);
+			updateElement();
 		}
 		// Fall thru...
 	default:
