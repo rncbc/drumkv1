@@ -151,6 +151,9 @@ protected:
 	// Reset swap params A/B group.
 	void resetSwapParams();
 
+	// Initialize param values.
+	void updateParamValues(uint32_t nparams);
+
 	// Reset all param/knob default values.
 	void resetParamValues(uint32_t nparams);
 	void resetParamKnobs(uint32_t nparams);

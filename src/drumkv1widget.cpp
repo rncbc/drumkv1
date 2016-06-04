@@ -683,6 +683,7 @@ void drumkv1widget::resetParams (void)
 			fValue = pKnob->defaultValue();
 		setParamValue(index, fValue);
 		updateParam(index, fValue);
+	//	updateParamEx(index, fValue);
 		m_params_ab[i] = fValue;
 	}
 
@@ -758,6 +759,28 @@ void drumkv1widget::resetSwapParams (void)
 	++m_iUpdate;
 	m_ui.SwapParamsAButton->setChecked(true);
 	--m_iUpdate;
+}
+
+
+// Initialize param values.
+void drumkv1widget::updateParamValues ( uint32_t nparams )
+{
+	resetSwapParams();
+
+	drumkv1_ui *pDrumkUi = ui_instance();
+
+	for (uint32_t i = 0; i < nparams; ++i) {
+		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		if (index == drumkv1::GEN1_SAMPLE)
+			continue;
+		const float fValue = (pDrumkUi
+		    ? pDrumkUi->paramValue(index)
+		    : drumkv1_param::paramDefaultValue(index));
+		setParamValue(index, fValue, true);
+		updateParam(index, fValue);
+//		updateParamEx(index, fValue);
+		m_params_ab[i] = fValue;
+	}
 }
 
 
@@ -1206,14 +1229,6 @@ void drumkv1widget::updateElement (void)
 		activateParamKnobs(false);
 	}
 
-	for (uint32_t i = drumkv1::NUM_ELEMENT_PARAMS; i < drumkv1::NUM_PARAMS; ++i) {
-		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		const float fValue = pDrumkUi->paramValue(index);
-		setParamValue(index, fValue);
-	//	updateParam(index, fValue);
-		m_params_ab[i] = fValue;
-	}
-
 #if 0
 	m_ui.StatusBar->showMessage(
 		tr("Element: %1").arg(completeNoteName(iNote)), 5000);
@@ -1312,6 +1327,8 @@ void drumkv1widget::updateLoadPreset ( const QString& sPreset )
 //	refreshElements();
 	activateElement();
 
+	updateParamValues(drumkv1::NUM_PARAMS);
+
 	m_ui.Preset->setPreset(sPreset);
 	m_ui.StatusBar->showMessage(tr("Load preset: %1").arg(sPreset), 5000);
 	updateDirtyPreset(false);
@@ -1352,9 +1369,9 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 	}
 	case drumkv1_sched::Sample:
 		if (sid > 0) {
-			resetSwapParams();
 		//	refreshElements();
 			activateElement();
+			updateParamValues(drumkv1::NUM_PARAMS);
 			updateDirtyPreset(false);
 		} else {
 			updateElement();

@@ -79,6 +79,8 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 	//initPreset();
 	refreshElements();
 	activateElement();
+
+	updateParamValues(drumkv1::NUM_PARAMS);
 }
 
 
