@@ -1148,6 +1148,9 @@ void drumkv1_impl::removeElement ( int key )
 
 void drumkv1_impl::setCurrentElement ( int key )
 {
+	if (m_elem && key == m_key0)
+		return;
+
 	if (key >= 0 && key < MAX_NOTES) {
 		// swap old element parameter port values
 		drumkv1_elem *elem = m_elem;
@@ -1159,7 +1162,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 					continue;
 				drumkv1_port *pParamPort = element->paramPort(index);
 				if (pParamPort)
-					pParamPort->set_port(&(elem->params[1][i]));
+					pParamPort->set_port(NULL);
 			}
 			resetElement(elem);
 		}
@@ -1171,10 +1174,9 @@ void drumkv1_impl::setCurrentElement ( int key )
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				float *pfParam = m_params[i];
 				drumkv1_port *pParamPort = element->paramPort(index);
-				if (pParamPort && pfParam) {
-					pParamPort->set_port(pfParam);
+				if (pParamPort) {
+					pParamPort->set_port(m_params[i]);
 					pParamPort->set_value(elem->params[1][i], true);
 					pParamPort->tick();
 				}
