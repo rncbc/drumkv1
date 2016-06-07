@@ -148,7 +148,7 @@ class drumkv1_port
 {
 public:
 
-	drumkv1_port() : m_port(NULL), m_value(0.0f), m_changed(0) {}
+	drumkv1_port() : m_port(NULL), m_value(0.0f), m_vport(0.0f) {}
 
 	virtual ~drumkv1_port() {}
 
@@ -157,33 +157,16 @@ public:
 	float *port() const
 		{ return m_port; }
 
-	virtual void set_value(float value, bool cached)
-	{
-		m_value = value;
-
-		if (!cached && m_port) {
-			*m_port = m_value;
-			m_changed = 0;
-		}
-		else ++m_changed;
-	}
+	virtual void set_value(float value)
+		{ m_value = value; if (m_port) m_vport = *m_port; }
 
 	float value() const
 		{ return m_value; }
 
 	virtual float tick(uint32_t /*nstep*/ = 1)
 	{
-		if (m_port) {
-			if (m_changed > 0) {
-				*m_port = m_value;
-				m_changed = 0;
-			}
-			else
-			if (::fabsf(*m_port - m_value) > 0.001f) {
-				set_value(*m_port, true);
-				m_changed = 0;
-			}
-		}
+		if (m_port && ::fabsf(*m_port - m_vport) > 0.001f)
+			set_value(*m_port);
 
 		return m_value;
 	}
@@ -193,9 +176,9 @@ public:
 
 private:
 
-	float   *m_port;
-	float    m_value;
-	uint32_t m_changed;
+	float *m_port;
+	float  m_value;
+	float  m_vport;
 };
 
 
@@ -207,19 +190,14 @@ public:
 
 	drumkv1_port2() : m_vtick(0.0f), m_vstep(0.0f), m_nstep(0) {}
 
-	void set_value(float value, bool cached)
+	void set_value(float value)
 	{
 		m_vtick = drumkv1_port::value();
 
-		if (cached) {
-			m_nstep = NSTEP;
-			m_vstep = (value - m_vtick) / float(m_nstep);
-		} else {
-			m_nstep = 0;
-			m_vstep = 0.0f;
-		}
+		m_nstep = NSTEP;
+		m_vstep = (value - m_vtick) / float(m_nstep);
 
-		drumkv1_port::set_value(value, cached);
+		drumkv1_port::set_value(value);
 	}
 
 	float tick(uint32_t nstep = NSTEP)
@@ -812,7 +790,7 @@ public:
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam);
 	drumkv1_port *paramPort(drumkv1::ParamIndex index);
 
-	void setParamValue(drumkv1::ParamIndex index, float fValue, bool bCache);
+	void setParamValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index);
 
 	drumkv1_controls *controls();
@@ -1161,10 +1139,8 @@ void drumkv1_impl::setCurrentElement ( int key )
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
 				drumkv1_port *pParamPort = element->paramPort(index);
-				if (pParamPort) {
-				//	elem->params[1][i] = pParamPort->value();
+				if (pParamPort)
 					pParamPort->set_port(NULL);
-				}
 			}
 			resetElement(elem);
 		}
@@ -1177,11 +1153,8 @@ void drumkv1_impl::setCurrentElement ( int key )
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
 				drumkv1_port *pParamPort = element->paramPort(index);
-				if (pParamPort) {
+				if (pParamPort)
 					pParamPort->set_port(m_params[i]);
-					pParamPort->set_value(elem->params[1][i], false);
-					pParamPort->tick();
-				}
 			}
 			resetElement(elem);
 		}
@@ -1195,7 +1168,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 	}
 
 	// set current element key parameter port
-	m_key->set_value(float(m_key0), true);
+	m_key->set_value(float(m_key0));
 	m_key->tick();
 }
 
@@ -1364,12 +1337,11 @@ drumkv1_port *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 }
 
 
-void drumkv1_impl::setParamValue (
-	drumkv1::ParamIndex index, float fValue, bool bCache )
+void drumkv1_impl::setParamValue ( drumkv1::ParamIndex index, float fValue )
 {
 	drumkv1_port *pParamPort = paramPort(index);
 	if (pParamPort)
-		pParamPort->set_value(fValue, bCache);
+		pParamPort->set_value(fValue);
 }
 
 
@@ -2118,9 +2090,9 @@ drumkv1_port *drumkv1::paramPort ( ParamIndex index ) const
 }
 
 
-void drumkv1::setParamValue ( ParamIndex index, float fValue, bool bCache )
+void drumkv1::setParamValue ( ParamIndex index, float fValue )
 {
-	m_pImpl->setParamValue(index, fValue, bCache);
+	m_pImpl->setParamValue(index, fValue);
 }
 
 float drumkv1::paramValue ( ParamIndex index ) const
