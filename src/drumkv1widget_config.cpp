@@ -1,7 +1,7 @@
 // drumkv1widget_config.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -170,8 +170,6 @@ void drumkv1widget_config::setControls ( drumkv1_controls *pControls )
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig && m_pControls) {
 		m_ui.ControlsTreeWidget->loadControls(m_pControls);
-		const bool bControlsOptional = m_pControls->optional();
-		m_ui.ControlsEnabledCheckBox->setEnabled(bControlsOptional);
 		m_ui.ControlsEnabledCheckBox->setChecked(m_pControls->enabled());
 	}
 
@@ -257,7 +255,7 @@ void drumkv1widget_config::controlsContextMenuRequested ( const QPoint& pos )
 
 void drumkv1widget_config::controlsEnabled ( bool bOn )
 {
-	if (m_pControls && m_pControls->optional())
+	if (m_pControls)
 		m_pControls->enabled(bOn);
 
 	controlsChanged();
@@ -281,9 +279,6 @@ void drumkv1widget_config::setPrograms ( drumkv1_programs *pPrograms )
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig && m_pPrograms) {
 		m_ui.ProgramsTreeWidget->loadPrograms(m_pPrograms);
-		const bool bProgramsOptional = m_pPrograms->optional();
-		m_ui.ProgramsEnabledCheckBox->setEnabled(bProgramsOptional);
-		m_ui.ProgramsPreviewCheckBox->setEnabled(!bProgramsOptional);
 		m_ui.ProgramsEnabledCheckBox->setChecked(m_pPrograms->enabled());
 	}
 
@@ -381,7 +376,7 @@ void drumkv1widget_config::programsContextMenuRequested ( const QPoint& pos )
 
 void drumkv1widget_config::programsEnabled ( bool bOn )
 {
-	if (m_pPrograms && m_pPrograms->optional())
+	if (m_pPrograms)
 		m_pPrograms->enabled(bOn);
 
 	programsChanged();

@@ -1,7 +1,7 @@
 // drumkv1_programs.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -28,7 +28,7 @@
 
 // ctor.
 drumkv1_programs::drumkv1_programs ( drumkv1 *pDrumk )
-	: m_mode(0), m_sched(pDrumk),
+	: m_enabled(false), m_sched(pDrumk),
 		m_bank_msb(0), m_bank_lsb(0), m_bank(0), m_prog(0)
 {
 }
