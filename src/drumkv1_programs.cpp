@@ -28,7 +28,7 @@
 
 // ctor.
 drumkv1_programs::drumkv1_programs ( drumkv1 *pDrumk )
-	: m_enabled(false), m_sched(pDrumk),
+	: m_mode(0), m_sched(pDrumk),
 		m_bank_msb(0), m_bank_lsb(0), m_bank(0), m_prog(0)
 {
 }
