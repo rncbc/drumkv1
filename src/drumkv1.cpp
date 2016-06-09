@@ -400,12 +400,12 @@ struct drumkv1_aux
 
 struct drumkv1_gen
 {
-	drumkv1_port  sample;
-	drumkv1_port  reverse;
-	drumkv1_port  group;
-	drumkv1_port2 coarse;
-	drumkv1_port2 fine;
-	drumkv1_port  envtime;
+	drumkv1_port sample;
+	drumkv1_port reverse;
+	drumkv1_port group;
+	drumkv1_port coarse;
+	drumkv1_port fine;
+	drumkv1_port envtime;
 
 	float sample0, envtime0;
 };
@@ -430,7 +430,7 @@ struct drumkv1_dcf
 struct drumkv1_lfo
 {
 	drumkv1_port  shape;
-	drumkv1_port2 width;
+	drumkv1_port  width;
 	drumkv1_port2 bpm;
 	drumkv1_port2 rate;
 	drumkv1_port  sync;
