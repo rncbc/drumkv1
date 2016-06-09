@@ -153,7 +153,7 @@ public:
 	virtual ~drumkv1_port() {}
 
 	void set_port(float *port)
-		{ m_port = port; update_port(); }
+		{ m_port = port; }
 	float *port() const
 		{ return m_port; }
 
@@ -1144,8 +1144,11 @@ void drumkv1_impl::setCurrentElement ( int key )
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
 				drumkv1_port *pParamPort = element->paramPort(index);
-				if (pParamPort)
-					pParamPort->set_port(&(elem->params[1][i]));
+				if (pParamPort) {
+					float *pfParam = &(elem->params[1][i]);
+					pParamPort->set_port(pfParam);
+					pParamPort->set_value(*pfParam);
+				}
 			}
 			resetElement(elem);
 		}
