@@ -353,7 +353,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 		drumkv1::process(ins, outs, nframes - ndelta);
 
 	// test for current element key changes
-	currentElementTest();
+	drumkv1::currentElementTest();
 }
 
 
@@ -535,22 +535,6 @@ void drumkv1_lv2::updateSample (void)
 		m_schedule->schedule_work(
 			m_schedule->handle, sizeof(mesg), &mesg);
 	}
-}
-
-
-void drumkv1_lv2::setCurrentElementTest ( int key )
-{
-	drumkv1::setCurrentElementTest(key);
-
-	selectSample(key);
-}
-
-
-void drumkv1_lv2::currentElementTest (void)
-{
-	const int key = drumkv1::currentElementTest();
-	if (key >= 0)
-		setCurrentElementTest(key);
 }
 
 

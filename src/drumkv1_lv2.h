@@ -86,9 +86,6 @@ protected:
 	void selectSample(int key);
 	void updateSample();
 
-	void setCurrentElementTest(int key);
-	void currentElementTest();
-
 	bool patch_put(uint32_t ndelta);
 
 private:

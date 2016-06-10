@@ -947,13 +947,13 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 	if (pDrumkUi == NULL)
 		return;
 
-	const int note = currentNote();
-	if (note < 0)
+	const int iCurrentNote = currentNote();
+	if (iCurrentNote < 0)
 		return;
 
-	drumkv1_element *element = pDrumkUi->element(note);
+	drumkv1_element *element = pDrumkUi->element(iCurrentNote);
 	if (element == NULL) {
-		element = pDrumkUi->addElement(note);
+		element = pDrumkUi->addElement(iCurrentNote);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			if (index == drumkv1::GEN1_SAMPLE)
@@ -961,14 +961,7 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 			const float fValue = drumkv1_param::paramDefaultValue(index);
 			element->setParamValue(index, fValue);
 		}
-		pDrumkUi->setCurrentElement(note);
-		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-			if (index == drumkv1::GEN1_SAMPLE)
-				continue;
-			setParamValue(index, element->paramValue(index));
-		}
-		activateParamKnobs(true);
+		pDrumkUi->setCurrentElement(iCurrentNote);
 	}
 
 	pDrumkUi->setSampleFile(sFilename.toUtf8().constData());
