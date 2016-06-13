@@ -162,6 +162,8 @@ public:
 
 	float value() const
 		{ return m_value; }
+	float *value_ptr()
+		{ return &m_value; }
 
 	virtual float tick(uint32_t /*nstep*/ = 1)
 	{
@@ -1262,18 +1264,18 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 			case drumkv1::DCA1_VOLUME:
 			case drumkv1::OUT1_VOLUME:
 				m_elem->vol1.reset(
-					m_elem->out1.volume.port(),
-					m_elem->dca1.volume.port(),
+					m_elem->out1.volume.value_ptr(),
+					m_elem->dca1.volume.value_ptr(),
 					&m_ctl.volume,
 					&m_elem->aux1.volume);
 				break;
 			case drumkv1::OUT1_WIDTH:
 				m_elem->wid1.reset(
-					m_elem->out1.width.port());
+					m_elem->out1.width.value_ptr());
 				break;
 			case drumkv1::OUT1_PANNING:
 				m_elem->pan1.reset(
-					m_elem->out1.panning.port(),
+					m_elem->out1.panning.value_ptr(),
 					&m_ctl.panning,
 					&m_elem->aux1.panning);
 				break;
@@ -1423,7 +1425,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				// pressure/aftertouch
 				pv->pre = 0.0f;
 				pv->dca1_pre.reset(
-					m_def.pressure.port(),
+					m_def.pressure.value_ptr(),
 					&m_ctl.pressure, &pv->pre);
 				// generate
 				pv->gen1.start();
@@ -1601,16 +1603,16 @@ void drumkv1_impl::allNotesOff (void)
 void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 {
 	elem->vol1.reset(
-		elem->out1.volume.port(),
-		elem->dca1.volume.port(),
+		elem->out1.volume.value_ptr(),
+		elem->dca1.volume.value_ptr(),
 		&m_ctl.volume,
 		&elem->aux1.volume);
 	elem->pan1.reset(
-		elem->out1.panning.port(),
+		elem->out1.panning.value_ptr(),
 		&m_ctl.panning,
 		&elem->aux1.panning);
 	elem->wid1.reset(
-		elem->out1.width.port());
+		elem->out1.width.value_ptr());
 }
 
 
