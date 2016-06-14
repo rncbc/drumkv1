@@ -652,8 +652,10 @@ drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, float srate, int key )
 {
 	// element parameter port/value set
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-		for (int j = 0; j < 3; ++j) params[j][i] = 0.0f;
-		element.setParamPort(drumkv1::ParamIndex(i), &(params[1][i]));
+		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		for (int j = 0; j < 3; ++j)
+			params[j][i] = drumkv1_param::paramDefaultValue(index);
+		element.setParamPort(index, &(params[1][i]));
 	}
 
 	// element key (sample note)

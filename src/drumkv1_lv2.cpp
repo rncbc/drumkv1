@@ -323,8 +323,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 						const LV2_URID type = value->type;
 						if (key == m_urids.gen1_sample
 							&& type == m_urids.atom_Path) {
-							drumkv1_sample *pSample = drumkv1::sample();
-							if (pSample && m_schedule) {
+							if (m_schedule) {
 								drumkv1_lv2_worker_message mesg;
 								mesg.atom.type = key;
 								mesg.atom.size = sizeof(mesg.sample);
@@ -580,6 +579,11 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t /*size*/ )
 	}
 	else
 	if (mesg->atom.type == m_urids.gen1_sample) {
+		const int key = drumkv1::currentElement();
+		if (drumkv1::element(key) == NULL) {
+			drumkv1::addElement(key);
+			drumkv1::setCurrentElementEx(key);
+		}
 		drumkv1::setSampleFile(mesg->sample.path);
 		return true;
 	}
