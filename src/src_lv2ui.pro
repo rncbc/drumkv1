@@ -10,7 +10,6 @@ include(src_lv2.pri)
 
 HEADERS = \
 	config.h \
-	drumkv1_lv2.h \
 	drumkv1_lv2ui.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
