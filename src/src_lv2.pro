@@ -2,7 +2,7 @@
 #
 NAME = drumkv1
 
-TARGET = $${NAME}
+TARGET = $${NAME}_lv2
 TEMPLATE = lib
 CONFIG += shared plugin
 
@@ -11,34 +11,10 @@ include(src_lv2.pri)
 HEADERS = \
 	config.h \
 	drumkv1.h \
-	drumkv1_ui.h \
-	drumkv1_lv2.h \
-	drumkv1_config.h \
-	drumkv1_filter.h \
-	drumkv1_formant.h \
-	drumkv1_sample.h \
-	drumkv1_wave.h \
-	drumkv1_ramp.h \
-	drumkv1_list.h \
-	drumkv1_fx.h \
-	drumkv1_reverb.h \
-	drumkv1_param.h \
-	drumkv1_sched.h \
-	drumkv1_programs.h \
-	drumkv1_controls.h
+	drumkv1_lv2.h
 
 SOURCES = \
-	drumkv1.cpp \
-	drumkv1_ui.cpp \
-	drumkv1_lv2.cpp \
-	drumkv1_config.cpp \
-	drumkv1_formant.cpp \
-	drumkv1_sample.cpp \
-	drumkv1_wave.cpp \
-	drumkv1_param.cpp \
-	drumkv1_sched.cpp \
-	drumkv1_programs.cpp \
-	drumkv1_controls.cpp
+	drumkv1_lv2.cpp
 
 
 unix {
@@ -61,13 +37,13 @@ unix {
 		}
 	}
 
-	TARGET_LV2 = $${NAME}.lv2/$${TARGET}
+	TARGET_LV2 = $${NAME}.lv2/$${NAME}
 
 	!exists($${TARGET_LV2}.so) {
 		system(touch $${TARGET_LV2}.so)
 	}
 
-	TARGET_LIB = $${NAME}.lv2/lib$${TARGET}.a
+	TARGET_LIB = $${NAME}.lv2/lib$${NAME}.a
 
 	!exists($${TARGET_LIB}) {
 		system(touch $${TARGET_LIB})
@@ -85,6 +61,8 @@ unix {
 		$${NAME}.lv2/manifest.ttl
 
 	QMAKE_CLEAN += $${TARGET_LV2}.so $${TARGET_LIB}
+
+	LIBS += -L. -l$${NAME}
 }
 
 QT -= gui

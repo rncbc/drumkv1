@@ -2,7 +2,7 @@
 #
 NAME = drumkv1
 
-TARGET = $${NAME}_ui
+TARGET = $${NAME}_lv2ui
 TEMPLATE = lib
 CONFIG += shared plugin
 
@@ -10,13 +10,8 @@ include(src_lv2.pri)
 
 HEADERS = \
 	config.h \
-	drumkv1.h \
-	drumkv1_ui.h \
 	drumkv1_lv2.h \
 	drumkv1_lv2ui.h \
-	drumkv1_config.h \
-	drumkv1_param.h \
-	drumkv1_sched.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
 	drumkv1widget_filt.h \
@@ -77,7 +72,7 @@ unix {
 		}
 	}
 
-	TARGET_LV2UI = $${NAME}.lv2/$${TARGET}
+	TARGET_LV2UI = $${NAME}.lv2/$${NAME}_ui
 
 	!exists($${TARGET_LV2UI}.so) {
 		system(touch $${TARGET_LV2UI}.so)
@@ -104,7 +99,7 @@ unix {
 
 	QMAKE_CLEAN += $${TARGET_LV2UI}.so $${TARGET_LV2UI}.ttl
 
-	LIBS += -L$${NAME}.lv2 -l$${NAME} -Wl,-rpath,$${LV2DIR}/$${NAME}.lv2
+	LIBS += -L. -l$${NAME} -L$${NAME}.lv2 -Wl,-rpath,$${LV2DIR}/$${NAME}.lv2
 }
 
 QT += xml

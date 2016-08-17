@@ -10,22 +10,8 @@ include(src_jack.pri)
 HEADERS = \
 	config.h \
 	drumkv1.h \
-	drumkv1_ui.h \
 	drumkv1_jack.h \
-	drumkv1_config.h \
-	drumkv1_filter.h \
-	drumkv1_formant.h \
-	drumkv1_sample.h \
-	drumkv1_wave.h \
-	drumkv1_ramp.h \
-	drumkv1_list.h \
-	drumkv1_fx.h \
 	drumkv1_nsm.h \
-	drumkv1_reverb.h \
-	drumkv1_param.h \
-	drumkv1_sched.h \
-	drumkv1_programs.h \
-	drumkv1_controls.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
 	drumkv1widget_filt.h \
@@ -42,18 +28,8 @@ HEADERS = \
 	drumkv1widget_jack.h
 
 SOURCES = \
-	drumkv1.cpp \
-	drumkv1_ui.cpp \
 	drumkv1_jack.cpp \
-	drumkv1_config.cpp \
-	drumkv1_formant.cpp \
-	drumkv1_sample.cpp \
-	drumkv1_wave.cpp \
 	drumkv1_nsm.cpp \
-	drumkv1_param.cpp \
-	drumkv1_sched.cpp \
-	drumkv1_programs.cpp \
-	drumkv1_controls.cpp \
 	drumkv1widget.cpp \
 	drumkv1widget_env.cpp \
 	drumkv1widget_filt.cpp \
@@ -117,10 +93,11 @@ unix {
 
 	mimetypes_scalable.path = $${DATADIR}/icons/hicolor/scalable/mimetypes
 	mimetypes_scalable.files += mimetypes/application-x-$${NAME}-preset.svg
+
+	LIBS += -L. -l$${NAME}
 }
 
 QT += xml
-
 
 # QT5 support
 !lessThan(QT_MAJOR_VERSION, 5) {
