@@ -9,6 +9,12 @@ include(src_jack.pri)
 
 HEADERS = \
 	config.h \
+	drumkv1.h \
+	drumkv1_ui.h \
+	drumkv1_config.h \
+	drumkv1_param.h \
+	drumkv1_programs.h \
+	drumkv1_controls.h \
 	drumkv1_nsm.h \
 	drumkv1_jack.h \
 	drumkv1widget.h \
