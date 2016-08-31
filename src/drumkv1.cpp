@@ -981,14 +981,14 @@ drumkv1_impl::~drumkv1_impl (void)
 
 	delete [] m_voices;
 
+	// deallocate local buffers
+	alloc_sfxs(0);
+
 	// deallocate channels
 	setChannels(0);
 
 	// deallocate elements
 	clearElements();
-
-	// deallocate local buffers
-	alloc_sfxs(0);
 }
 
 
