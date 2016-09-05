@@ -163,9 +163,9 @@ public:
 	float value() const
 		{ return m_value; }
 	float *value_ptr()
-		{ tick(); return &m_value; }
+		{ tick(1); return &m_value; }
 
-	virtual float tick(uint32_t /*nstep*/ = 1)
+	virtual float tick(uint32_t /*nstep*/)
 	{
 		if (m_port && ::fabsf(*m_port - m_vport) > 0.001f)
 			set_value(*m_port);
@@ -202,7 +202,7 @@ public:
 		drumkv1_port::set_value(value);
 	}
 
-	float tick(uint32_t nstep = NSTEP)
+	float tick(uint32_t nstep)
 	{
 		if (m_nstep == 0)
 			return drumkv1_port::tick(nstep);
@@ -1173,7 +1173,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 
 	// set current element key parameter port
 	m_key->set_value(float(m_key0));
-	m_key1 = m_key->tick();
+	m_key1 = m_key->tick(1);
 }
 
 
@@ -1191,7 +1191,7 @@ void drumkv1_impl::setCurrentElementTest ( int key )
 
 int drumkv1_impl::currentElementTest (void)
 {
-	const int key = int(m_key->tick());
+	const int key = int(m_key->tick(1));
 	return (m_key1 == key ? -1 : key);
 }
 
