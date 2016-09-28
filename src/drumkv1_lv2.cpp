@@ -540,10 +540,9 @@ void drumkv1_lv2::updateSample (void)
 }
 
 
-#ifdef CONFIG_LV2_PATCH
-
 void drumkv1_lv2::selectSample ( int key )
 {
+#ifdef CONFIG_LV2_PATCH
 	if (m_schedule) {
 		drumkv1_lv2_worker_message mesg;
 		mesg.atom.type = m_urids.gen1_select;
@@ -552,8 +551,14 @@ void drumkv1_lv2::selectSample ( int key )
 		m_schedule->schedule_work(
 		    m_schedule->handle, sizeof(mesg), &mesg);
 	}
+#else
+	drumkv1::setCurrentElementEx(key);
+	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
+#endif
 }
 
+
+#ifdef CONFIG_LV2_PATCH
 
 bool drumkv1_lv2::patch_put ( uint32_t ndelta )
 {

@@ -85,10 +85,10 @@ public:
 
 protected:
 
+	void selectSample(int key);
 	void updateSample();
 
 #ifdef CONFIG_LV2_PATCH
-	void selectSample(int key);
 	bool patch_put(uint32_t ndelta);
 #endif
 
