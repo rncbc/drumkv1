@@ -34,10 +34,13 @@
 #include "lv2/lv2plug.in/ns/ext/atom/util.h"
 
 #include "lv2/lv2plug.in/ns/ext/state/state.h"
-#include "lv2/lv2plug.in/ns/ext/patch/patch.h"
 
 #include "lv2/lv2plug.in/ns/ext/options/options.h"
 #include "lv2/lv2plug.in/ns/ext/buf-size/buf-size.h"
+
+#ifdef CONFIG_LV2_PATCH
+#include "lv2/lv2plug.in/ns/ext/patch/patch.h"
+#endif
 
 #include <stdlib.h>
 #include <math.h>
@@ -124,9 +127,10 @@ drumkv1_lv2::drumkv1_lv2 (
 	m_urid_map = NULL;
 	m_atom_in  = NULL;
 	m_atom_out = NULL;
+#ifdef CONFIG_LV2_PATCH
 	m_schedule = NULL;
-
 	m_ndelta = 0;
+#endif
 
 	const LV2_Options_Option *host_options = NULL;
 
@@ -135,12 +139,14 @@ drumkv1_lv2::drumkv1_lv2 (
 		if (::strcmp(host_feature->URI, LV2_URID_MAP_URI) == 0) {
 			m_urid_map = (LV2_URID_Map *) host_feature->data;
 			if (m_urid_map) {
+			#ifdef CONFIG_LV2_PATCH
  				m_urids.gen1_sample = m_urid_map->map(
  					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SAMPLE");
 				m_urids.gen1_select = m_urid_map->map(
 				    m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SELECT");
 				m_urids.gen1_update = m_urid_map->map(
 					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_UPDATE");
+			#endif
 				m_urids.atom_Blank = m_urid_map->map(
 					m_urid_map->handle, LV2_ATOM__Blank);
 				m_urids.atom_Object = m_urid_map->map(
@@ -165,6 +171,7 @@ drumkv1_lv2::drumkv1_lv2 (
 				m_urids.bufsz_nominalBlockLength = m_urid_map->map(
 					m_urid_map->handle, LV2_BUF_SIZE__nominalBlockLength);
 			#endif
+			#ifdef CONFIG_LV2_PATCH
 				m_urids.patch_Get = m_urid_map->map(
  					m_urid_map->handle, LV2_PATCH__Get);
 				m_urids.patch_Set = m_urid_map->map(
@@ -177,11 +184,14 @@ drumkv1_lv2::drumkv1_lv2 (
  					m_urid_map->handle, LV2_PATCH__property);
 				m_urids.patch_value = m_urid_map->map(
  					m_urid_map->handle, LV2_PATCH__value);
+			#endif
 			}
 		}
+	#ifdef CONFIG_LV2_PATCH
 		else
 		if (::strcmp(host_feature->URI, LV2_WORKER__schedule) == 0)
 			m_schedule = (LV2_Worker_Schedule *) host_feature->data;
+	#endif
 		else
 		if (::strcmp(host_feature->URI, LV2_OPTIONS__options) == 0)
 			host_options = (const LV2_Options_Option *) host_feature->data;
@@ -310,6 +320,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 							drumkv1::setTempo(host_bpm);
 					}
 				}
+			#ifdef CONFIG_LV2_PATCH
 				else 
 				if (object->body.otype == m_urids.patch_Set) {
 					// set property value
@@ -341,10 +352,13 @@ void drumkv1_lv2::run ( uint32_t nframes )
 					// put property values (probably to UI)
 					patch_put(ndelta);
 				}
+			#endif	// CONFIG_LV2_PATCH
 			}
 		}
+	#ifdef CONFIG_LV2_PATCH
 		// remember last time for worker response
 		m_ndelta = ndelta;
+	#endif
 	//	m_atom_in = NULL;
 	}
 
@@ -511,6 +525,8 @@ void drumkv1_lv2::select_program ( uint32_t bank, uint32_t program )
 #endif	// CONFIG_LV2_PROGRAMS
 
 
+#ifdef CONFIG_LV2_PATCH
+
 void drumkv1_lv2::selectSample ( int key )
 {
 	if (m_schedule) {
@@ -599,6 +615,9 @@ bool drumkv1_lv2::worker_response ( const void */*data*/, uint32_t /*size*/ )
 
 	return patch_put(m_ndelta);
 }
+
+#endif	// CONFIG_LV2_PATCH
+
 
 
 //-------------------------------------------------------------------------
