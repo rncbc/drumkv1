@@ -704,6 +704,8 @@ static const LV2_Programs_Interface drumkv1_lv2_programs_interface =
 #endif	// CONFIG_LV2_PROGRAMS
 
 
+#ifdef CONFIG_LV2_PATCH
+
 static LV2_Worker_Status drumkv1_lv2_worker_work (
 	LV2_Handle instance, LV2_Worker_Respond_Function respond,
 	LV2_Worker_Respond_Handle handle, uint32_t size, const void *data )
@@ -736,6 +738,8 @@ static const LV2_Worker_Interface drumkv1_lv2_worker_interface =
 	NULL
 };
 
+#endif	// CONFIG_LV2_PATCH
+
 
 static const void *drumkv1_lv2_extension_data ( const char *uri )
 {
@@ -744,9 +748,11 @@ static const void *drumkv1_lv2_extension_data ( const char *uri )
 		return &drumkv1_lv2_programs_interface;
 	else
 #endif
+#ifdef CONFIG_LV2_PATCH
 	if (::strcmp(uri, LV2_WORKER__interface) == 0)
 		return &drumkv1_lv2_worker_interface;
 	else
+#endif
 	if (::strcmp(uri, LV2_STATE__interface) == 0)
 		return &drumkv1_lv2_state_interface;
 
