@@ -24,14 +24,14 @@
 
 #include "config.h"
 
-#define DRUMKV1_TITLE	PACKAGE_NAME
-#define DRUMKV1_VERSION	PACKAGE_VERSION
+#define DRUMKV1_TITLE       PACKAGE_NAME
+#define DRUMKV1_VERSION     PACKAGE_VERSION
 
-#define DRUMKV1_SUBTITLE     "an old-school drum-kit sampler."
-#define DRUMKV1_WEBSITE      "http://drumkv1.sourceforge.net"
-#define DRUMKV1_COPYRIGHT    "Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved."
+#define DRUMKV1_SUBTITLE    "an old-school drum-kit sampler."
+#define DRUMKV1_WEBSITE     "http://drumkv1.sourceforge.net"
+#define DRUMKV1_COPYRIGHT   "Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved."
 
-#define DRUMKV1_DOMAIN	"rncbc.org"
+#define DRUMKV1_DOMAIN      "rncbc.org"
 
 
 //-------------------------------------------------------------------------

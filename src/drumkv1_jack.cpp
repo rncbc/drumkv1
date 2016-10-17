@@ -686,8 +686,12 @@ bool drumkv1_jack_application::parse_args (void)
 		}
 		else
 		if (sArg == "-v" || sArg == "-V" || sArg == "--version") {
-			out << QObject::tr("Qt: %1\n").arg(qVersion());
-			out << QObject::tr(DRUMKV1_TITLE ": %1\n").arg(DRUMKV1_VERSION);
+			out << QObject::tr("Qt: %1\n")
+				.arg(qVersion());
+			out << QObject::tr("%1: %2  (%3)\n")
+				.arg(DRUMKV1_TITLE)
+				.arg(DRUMKV1_VERSION)
+				.arg(CONFIG_BUILD_DATE);
 			return false;
 		}
 	}
