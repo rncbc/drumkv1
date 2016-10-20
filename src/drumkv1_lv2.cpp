@@ -123,14 +123,11 @@ private:
 
 // atom-like message used internally with worker/schedule
 typedef struct {
-
 	LV2_Atom atom;
-
 	union {
 		int key;
 		const char *path;
 	} sample;
-
 } drumkv1_lv2_worker_message;
 
 
@@ -138,13 +135,13 @@ drumkv1_lv2::drumkv1_lv2 (
 	double sample_rate, const LV2_Feature *const *host_features )
 	: drumkv1(2, float(sample_rate))
 {
+	::memset(&m_urids, 0, sizeof(m_urids));
+
 	m_urid_map = NULL;
 	m_atom_in  = NULL;
 	m_atom_out = NULL;
-#ifdef CONFIG_LV2_PATCH
 	m_schedule = NULL;
-	m_ndelta = 0;
-#endif
+	m_ndelta   = 0;
 
 	const LV2_Options_Option *host_options = NULL;
 
@@ -153,14 +150,12 @@ drumkv1_lv2::drumkv1_lv2 (
 		if (::strcmp(host_feature->URI, LV2_URID_MAP_URI) == 0) {
 			m_urid_map = (LV2_URID_Map *) host_feature->data;
 			if (m_urid_map) {
-			#ifdef CONFIG_LV2_PATCH
  				m_urids.gen1_sample = m_urid_map->map(
  					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SAMPLE");
 				m_urids.gen1_select = m_urid_map->map(
 				    m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SELECT");
 				m_urids.gen1_update = m_urid_map->map(
 					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_UPDATE");
-			#endif
 				m_urids.atom_Blank = m_urid_map->map(
 					m_urid_map->handle, LV2_ATOM__Blank);
 				m_urids.atom_Object = m_urid_map->map(
@@ -185,6 +180,8 @@ drumkv1_lv2::drumkv1_lv2 (
 				m_urids.bufsz_nominalBlockLength = m_urid_map->map(
 					m_urid_map->handle, LV2_BUF_SIZE__nominalBlockLength);
 			#endif
+				m_urids.state_StateChanged = m_urid_map->map(
+					m_urid_map->handle, LV2_STATE__StateChanged);
 			#ifdef CONFIG_LV2_PATCH
 				m_urids.patch_Get = m_urid_map->map(
  					m_urid_map->handle, LV2_PATCH__Get);
@@ -199,15 +196,11 @@ drumkv1_lv2::drumkv1_lv2 (
 				m_urids.patch_value = m_urid_map->map(
  					m_urid_map->handle, LV2_PATCH__value);
 			#endif
-				m_urids.state_StateChanged = m_urid_map->map(
-					m_urid_map->handle, LV2_STATE__StateChanged);
 			}
 		}
-	#ifdef CONFIG_LV2_PATCH
 		else
 		if (::strcmp(host_feature->URI, LV2_WORKER__schedule) == 0)
 			m_schedule = (LV2_Worker_Schedule *) host_feature->data;
-	#endif
 		else
 		if (::strcmp(host_feature->URI, LV2_OPTIONS__options) == 0)
 			host_options = (const LV2_Options_Option *) host_feature->data;
@@ -371,10 +364,8 @@ void drumkv1_lv2::run ( uint32_t nframes )
 			#endif	// CONFIG_LV2_PATCH
 			}
 		}
-	#ifdef CONFIG_LV2_PATCH
 		// remember last time for worker response
 		m_ndelta = ndelta;
-	#endif
 	//	m_atom_in = NULL;
 	}
 
@@ -543,7 +534,6 @@ void drumkv1_lv2::select_program ( uint32_t bank, uint32_t program )
 
 void drumkv1_lv2::updateSample (void)
 {
-#ifdef CONFIG_LV2_PATCH
 	if (m_schedule) {
 		drumkv1_lv2_worker_message mesg;
 		mesg.atom.type = m_urids.gen1_update;
@@ -552,13 +542,11 @@ void drumkv1_lv2::updateSample (void)
 		m_schedule->schedule_work(
 			m_schedule->handle, sizeof(mesg), &mesg);
 	}
-#endif
 }
 
 
 void drumkv1_lv2::selectSample ( int key )
 {
-#ifdef CONFIG_LV2_PATCH
 	if (m_schedule) {
 		drumkv1_lv2_worker_message mesg;
 		mesg.atom.type = m_urids.gen1_select;
@@ -567,40 +555,6 @@ void drumkv1_lv2::selectSample ( int key )
 		m_schedule->schedule_work(
 		    m_schedule->handle, sizeof(mesg), &mesg);
 	}
-#else
-	drumkv1::setCurrentElementEx(key);
-	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
-#endif
-}
-
-
-#ifdef CONFIG_LV2_PATCH
-
-bool drumkv1_lv2::patch_put ( uint32_t ndelta )
-{
-	static char s_szNull[1] = {'\0'};
-	const char *pszSampleFile = NULL;
-	drumkv1_sample *pSample = drumkv1::sample();
-	if (pSample)
-		pszSampleFile = pSample->filename();
-	if (pszSampleFile == NULL)
-		pszSampleFile = s_szNull;
-
-	lv2_atom_forge_frame_time(&m_forge, ndelta);
-
-	LV2_Atom_Forge_Frame patch_frame;
-	lv2_atom_forge_object(&m_forge, &patch_frame, 0, m_urids.patch_Put);
-	lv2_atom_forge_key(&m_forge, m_urids.patch_body);
-
-	LV2_Atom_Forge_Frame body_frame;
-	lv2_atom_forge_object(&m_forge, &body_frame, 0, 0);
-	lv2_atom_forge_key(&m_forge, m_urids.gen1_sample);
-	lv2_atom_forge_path(&m_forge, pszSampleFile, ::strlen(pszSampleFile) + 1);
-
-	lv2_atom_forge_pop(&m_forge, &body_frame);
-	lv2_atom_forge_pop(&m_forge, &patch_frame);
-
-	return true;
 }
 
 
@@ -636,10 +590,12 @@ bool drumkv1_lv2::worker_response ( const void */*data*/, uint32_t /*size*/ )
 	// update all properties, and eventually, any observers...
 	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
 
+#ifdef CONFIG_LV2_PATCH
 	return patch_put(m_ndelta);
+#else
+	return true;
+#endif
 }
-
-#endif	// CONFIG_LV2_PATCH
 
 
 void drumkv1_lv2::state_changed (void)
@@ -650,6 +606,38 @@ void drumkv1_lv2::state_changed (void)
 	lv2_atom_forge_object(&m_forge, &frame, 0, m_urids.state_StateChanged);
 	lv2_atom_forge_pop(&m_forge, &frame);
 }
+
+
+#ifdef CONFIG_LV2_PATCH
+
+bool drumkv1_lv2::patch_put ( uint32_t ndelta )
+{
+	static char s_szNull[1] = {'\0'};
+	const char *pszSampleFile = NULL;
+	drumkv1_sample *pSample = drumkv1::sample();
+	if (pSample)
+		pszSampleFile = pSample->filename();
+	if (pszSampleFile == NULL)
+		pszSampleFile = s_szNull;
+
+	lv2_atom_forge_frame_time(&m_forge, ndelta);
+
+	LV2_Atom_Forge_Frame patch_frame;
+	lv2_atom_forge_object(&m_forge, &patch_frame, 0, m_urids.patch_Put);
+	lv2_atom_forge_key(&m_forge, m_urids.patch_body);
+
+	LV2_Atom_Forge_Frame body_frame;
+	lv2_atom_forge_object(&m_forge, &body_frame, 0, 0);
+	lv2_atom_forge_key(&m_forge, m_urids.gen1_sample);
+	lv2_atom_forge_path(&m_forge, pszSampleFile, ::strlen(pszSampleFile) + 1);
+
+	lv2_atom_forge_pop(&m_forge, &body_frame);
+	lv2_atom_forge_pop(&m_forge, &patch_frame);
+
+	return true;
+}
+
+#endif	// CONFIG_LV2_PATCH
 
 
 //-------------------------------------------------------------------------
@@ -734,8 +722,6 @@ static const LV2_Programs_Interface drumkv1_lv2_programs_interface =
 #endif	// CONFIG_LV2_PROGRAMS
 
 
-#ifdef CONFIG_LV2_PATCH
-
 static LV2_Worker_Status drumkv1_lv2_worker_work (
 	LV2_Handle instance, LV2_Worker_Respond_Function respond,
 	LV2_Worker_Respond_Handle handle, uint32_t size, const void *data )
@@ -768,8 +754,6 @@ static const LV2_Worker_Interface drumkv1_lv2_worker_interface =
 	NULL
 };
 
-#endif	// CONFIG_LV2_PATCH
-
 
 static const void *drumkv1_lv2_extension_data ( const char *uri )
 {
@@ -778,11 +762,9 @@ static const void *drumkv1_lv2_extension_data ( const char *uri )
 		return &drumkv1_lv2_programs_interface;
 	else
 #endif
-#ifdef CONFIG_LV2_PATCH
 	if (::strcmp(uri, LV2_WORKER__interface) == 0)
 		return &drumkv1_lv2_worker_interface;
 	else
-#endif
 	if (::strcmp(uri, LV2_STATE__interface) == 0)
 		return &drumkv1_lv2_state_interface;
 
