@@ -69,6 +69,8 @@ public:
 
 protected:
 
+	void updatePreset(bool bDirty);
+
 	void selectSample(int key);
 	void updateSample();
 

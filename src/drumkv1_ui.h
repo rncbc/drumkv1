@@ -63,6 +63,8 @@ public:
 	void resetParamValues(bool bSwap);
 	void reset();
 
+	void updatePreset(bool bDirty);
+
 private:
 
 	drumkv1 *m_pDrumk;

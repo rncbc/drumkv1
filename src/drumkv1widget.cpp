@@ -1442,6 +1442,10 @@ void drumkv1widget::helpAboutQt (void)
 // Dirty flag (overridable virtual) methods.
 void drumkv1widget::updateDirtyPreset ( bool bDirtyPreset )
 {
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi)
+		pDrumkUi->updatePreset(bDirtyPreset);
+
 	m_ui.StatusBar->setModified(bDirtyPreset);
 	m_ui.Preset->setDirtyPreset(bDirtyPreset);
 }

@@ -605,9 +605,15 @@ void drumkv1_jack::selectSample ( int key )
 }
 
 
+void drumkv1_jack::updatePreset ( bool /*bDirty*/ )
+{
+	// nothing to do here...
+}
+
+
 void drumkv1_jack::updateSample (void)
 {
-	// nothing to do...
+	// nothing to do here...
 }
 
 

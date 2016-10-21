@@ -133,4 +133,10 @@ void drumkv1_ui::reset (void)
 }
 
 
+void drumkv1_ui::updatePreset ( bool bDirty )
+{
+	m_pDrumk->updatePreset(bDirty);
+}
+
+
 // end of drumkv1_ui.cpp
