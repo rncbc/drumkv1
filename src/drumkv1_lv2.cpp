@@ -532,9 +532,9 @@ void drumkv1_lv2::select_program ( uint32_t bank, uint32_t program )
 #endif	// CONFIG_LV2_PROGRAMS
 
 
-void drumkv1_lv2::updatePreset ( bool bDirty )
+void drumkv1_lv2::updatePreset ( bool /*bDirty*/ )
 {
-	if (m_schedule && bDirty) {
+	if (m_schedule /*&& bDirty*/) {
 		drumkv1_lv2_worker_message mesg;
 		mesg.atom.type = m_urids.state_StateChanged;
 		mesg.atom.size = 0; // nothing else matters.
