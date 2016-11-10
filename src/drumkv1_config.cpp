@@ -331,7 +331,7 @@ void drumkv1_config::load (void)
 void drumkv1_config::save (void)
 {
 	QSettings::beginGroup("/Program");
-	QSettings::setValue("/Version", DRUMKV1_VERSION);
+	QSettings::setValue("/Version", CONFIG_BUILD_VERSION);
 	QSettings::endGroup();
 
 	QSettings::beginGroup("/Default");

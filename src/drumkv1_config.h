@@ -25,7 +25,6 @@
 #include "config.h"
 
 #define DRUMKV1_TITLE       PACKAGE_NAME
-#define DRUMKV1_VERSION     PACKAGE_VERSION
 
 #define DRUMKV1_SUBTITLE    "an old-school drum-kit sampler."
 #define DRUMKV1_WEBSITE     "http://drumkv1.sourceforge.net"

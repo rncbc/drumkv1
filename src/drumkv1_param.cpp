@@ -392,7 +392,7 @@ void drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
 	QDomDocument doc(DRUMKV1_TITLE);
 	QDomElement ePreset = doc.createElement("preset");
 	ePreset.setAttribute("name", fi.completeBaseName());
-	ePreset.setAttribute("version", DRUMKV1_VERSION);
+	ePreset.setAttribute("version", CONFIG_BUILD_VERSION);
 
 	QDomElement eElements = doc.createElement("elements");
 	drumkv1_param::saveElements(pDrumk, doc, eElements);

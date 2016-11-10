@@ -696,7 +696,7 @@ bool drumkv1_jack_application::parse_args (void)
 				.arg(qVersion());
 			out << QObject::tr("%1: %2  (%3)\n")
 				.arg(DRUMKV1_TITLE)
-				.arg(DRUMKV1_VERSION)
+				.arg(CONFIG_BUILD_VERSION)
 				.arg(CONFIG_BUILD_DATE);
 			return false;
 		}

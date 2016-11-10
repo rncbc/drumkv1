@@ -1409,7 +1409,7 @@ void drumkv1widget::helpAbout (void)
 	QString sText = "<p>\n";
 	sText += "<b>" DRUMKV1_TITLE "</b> - " + tr(DRUMKV1_SUBTITLE) + "<br />\n";
 	sText += "<br />\n";
-	sText += tr("Version") + ": <b>" DRUMKV1_VERSION "</b><br />\n";
+	sText += tr("Version") + ": <b>" CONFIG_BUILD_VERSION "</b><br />\n";
 	sText += "<small>" + tr("Build") + ": " CONFIG_BUILD_DATE "</small><br />\n";
 	QStringListIterator iter(list);
 	while (iter.hasNext()) {
