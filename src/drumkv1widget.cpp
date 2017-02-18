@@ -1,7 +1,7 @@
 // drumkv1widget.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -679,7 +679,7 @@ void drumkv1widget::resetParams (void)
 			continue;
 		float fValue = drumkv1_param::paramDefaultValue(index);
 		drumkv1widget_knob *pKnob = paramKnob(index);
-		if (pKnob)
+		if (pKnob && pKnob->isDefaultValue())
 			fValue = pKnob->defaultValue();
 		setParamValue(index, fValue);
 		updateParam(index, fValue);
