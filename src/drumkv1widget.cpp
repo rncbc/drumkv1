@@ -161,7 +161,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Gen1GroupKnob->setMinimum(0.0f);
 	m_ui.Gen1GroupKnob->setMaximum(128.0f);
 	m_ui.Gen1GroupKnob->setDecimals(0);
-	m_ui.Gen1GroupKnob->setSingleStep(10.0f);
+//	m_ui.Gen1GroupKnob->setSingleStep(10.0f);
 
 	// GEN octave limits.
 	m_ui.Gen1CoarseKnob->setMinimum(-4.0f);
@@ -179,7 +179,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Lfo1BpmKnob->setScale(1.0f);
 	m_ui.Lfo1BpmKnob->setMinimum(0.0f);
 	m_ui.Lfo1BpmKnob->setMaximum(360.0f);
-	m_ui.Lfo1BpmKnob->setSingleStep(1.0f);
+//	m_ui.Lfo1BpmKnob->setSingleStep(1.0f);
 	m_ui.Lfo1SweepKnob->setMinimum(-1.0f);
 	m_ui.Lfo1SweepKnob->setMaximum(+1.0f);
 	m_ui.Lfo1CutoffKnob->setMinimum(-1.0f);
@@ -205,7 +205,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.Del1BpmKnob->setScale(1.0f);
 	m_ui.Del1BpmKnob->setMinimum(0.0f);
 	m_ui.Del1BpmKnob->setMaximum(360.0f);
-	m_ui.Del1BpmKnob->setSingleStep(1.0f);
+//	m_ui.Del1BpmKnob->setSingleStep(1.0f);
 
 	// GEN1
 	setParamKnob(drumkv1::GEN1_REVERSE, m_ui.Gen1ReverseKnob);
