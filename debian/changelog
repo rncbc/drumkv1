@@ -4,6 +4,12 @@ drumkv1 (0.8.1-27) unstable; urgency=low
 
  -- Rui Nuno Capela <rncbc@rncbc.org>  Tue, 21 Mar 2017 12:00:00 +0000
 
+drumkv1 (0.8.0-26) unstable; urgency=low
+
+  * A Fall'16 release.
+
+ -- Rui Nuno Capela <rncbc@rncbc.org>  Thu, 17 Nov 2016 12:00:00 +0000
+
 drumkv1 (0.7.6-25) unstable; urgency=low
 
   * The eleventh official beta.
