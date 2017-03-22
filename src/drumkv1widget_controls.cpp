@@ -207,6 +207,7 @@ const drumkv1widget_controls::Names& drumkv1widget_controls::nrpnNames (void)
 
 	} s_drums[] = {
 
+		/*
 		// GM Drum note map...
 		{ 35, QT_TR_NOOP("Acoustic Bass Drum") },
 		{ 36, QT_TR_NOOP("Bass Drum 1") },
@@ -255,7 +256,8 @@ const drumkv1widget_controls::Names& drumkv1widget_controls::nrpnNames (void)
 		{ 79, QT_TR_NOOP("Open Cuica") },
 		{ 80, QT_TR_NOOP("Mute Triangle") },
 		{ 81, QT_TR_NOOP("Open Triangle") },
-
+		*/
+		
 		{  0, NULL }
 	};
 
