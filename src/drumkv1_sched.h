@@ -1,7 +1,7 @@
 // drumkv1_sched.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -37,7 +37,7 @@ class drumkv1_sched
 public:
 
 	// plausible sched types.
-	enum Type { Sample, Programs, Controls, Controller };
+	enum Type { Sample, Programs, Controls, Controller, MidiIn };
 
 	// ctor.
 	drumkv1_sched(drumkv1 *pDrumk, Type stype, uint32_t nsize = 8);

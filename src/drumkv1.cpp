@@ -38,6 +38,8 @@
 #include "drumkv1_controls.h"
 #include "drumkv1_programs.h"
 
+#include "drumkv1_sched.h"
+
 
 #ifdef CONFIG_DEBUG_0
 #include <stdio.h>
@@ -1686,6 +1688,7 @@ drumkv1_programs *drumkv1_impl::programs (void)
 }
 
 
+
 // synthesize
 
 void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
@@ -1942,7 +1945,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 }
 
 
-
 //-------------------------------------------------------------------------
 // drumkv1 - decl.
 //
@@ -1950,6 +1952,9 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 drumkv1::drumkv1 ( uint16_t nchannels, float srate )
 {
 	m_pImpl = new drumkv1_impl(this, nchannels, srate);
+
+	// MIDI input event count...
+	midiInCountOn(false);
 }
 
 
@@ -2120,6 +2125,10 @@ void drumkv1::process_midi ( uint8_t *data, uint32_t size )
 #endif
 
 	m_pImpl->process_midi(data, size);
+
+	// rogue MIDi input count...
+	if (m_midiInCountOn && ++m_midiInCount < 2)
+		drumkv1_sched::sync_notify(this, drumkv1_sched::MidiIn, 0);
 }
 
 
@@ -2306,6 +2315,22 @@ void drumkv1_element::resetParamValues ( bool bSwap )
 		else
 			m_pElem->params[0][index] = fOldValue;
 	}
+}
+
+
+// MIDI input event count
+
+void drumkv1::midiInCountOn ( bool bMidiInCountOn )
+{
+	m_midiInCountOn = bMidiInCountOn;
+	m_midiInCount = 0;
+}
+
+uint32_t drumkv1::midiInCount (void)
+{
+	const uint32_t ret = m_midiInCount;
+	m_midiInCount = 0;
+	return ret;
 }
 
 
