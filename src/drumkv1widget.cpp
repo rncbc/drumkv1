@@ -527,8 +527,6 @@ void drumkv1widget::initSchedNotifier (void)
 	QObject::connect(m_sched_notifier,
 		SIGNAL(notify(int, int)),
 		SLOT(updateSchedNotify(int, int)));
-
-	pDrumkUi->midiInCountOn(true);
 }
 
 
