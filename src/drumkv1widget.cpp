@@ -516,6 +516,9 @@ drumkv1widget::~drumkv1widget (void)
 // Open/close the scheduler/work notifier.
 void drumkv1widget::openSchedNotifier (void)
 {
+	if (m_sched_notifier)
+		return;
+
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi == NULL)
 		return;
