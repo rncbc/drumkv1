@@ -48,22 +48,15 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
 		m_params_def[i] = true;
 
-	// May initialize the scheduler/work notifier.
-	initSchedNotifier();
-
 	// Initial update, always...
 	refreshElements();
 	activateElement();
-
-	m_pDrumkUi->midiInCountOn(true);
 }
 
 
 // Destructor.
 drumkv1widget_lv2::~drumkv1widget_lv2 (void)
 {
-	m_pDrumkUi->midiInCountOn(false);
-
 	delete m_pDrumkUi;
 }
 

@@ -32,6 +32,9 @@
 #include <QDir>
 #include <QTimer>
 
+#include <QShowEvent>
+#include <QHideEvent>
+
 
 //-------------------------------------------------------------------------
 // drumkv1widget - impl.
@@ -510,14 +513,9 @@ drumkv1widget::~drumkv1widget (void)
 }
 
 
-// Create/initialize the scheduler/work notifier.
-void drumkv1widget::initSchedNotifier (void)
+// Open/close the scheduler/work notifier.
+void drumkv1widget::openSchedNotifier (void)
 {
-	if (m_sched_notifier) {
-		delete m_sched_notifier;
-		m_sched_notifier = NULL;
-	}
-
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi == NULL)
 		return;
@@ -527,6 +525,38 @@ void drumkv1widget::initSchedNotifier (void)
 	QObject::connect(m_sched_notifier,
 		SIGNAL(notify(int, int)),
 		SLOT(updateSchedNotify(int, int)));
+
+	pDrumkUi->midiInCountOn(true);
+}
+
+
+void drumkv1widget::closeSchedNotifier (void)
+{
+	if (m_sched_notifier) {
+		delete m_sched_notifier;
+		m_sched_notifier = NULL;
+	}
+
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi)
+		pDrumkUi->midiInCountOn(false);
+}
+
+
+// Show/hide widget handlers.
+void drumkv1widget::showEvent ( QShowEvent *pShowEvent )
+{
+	QWidget::showEvent(pShowEvent);
+
+	openSchedNotifier();
+}
+
+
+void drumkv1widget::hideEvent ( QHideEvent *pHideEvent )
+{
+	closeSchedNotifier();
+
+	QWidget::hideEvent(pHideEvent);
 }
 
 

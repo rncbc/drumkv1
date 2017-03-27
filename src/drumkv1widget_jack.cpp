@@ -72,25 +72,18 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 	// Initialize (user) interface stuff...
 	m_pDrumkUi = new drumkv1_ui(m_pDrumk);
 
-	// May initialize the scheduler/work notifier.
-	initSchedNotifier();
-
 	// Initialize preset stuff...
 	//initPreset();
 	refreshElements();
 	activateElement();
 
 	updateParamValues(drumkv1::NUM_PARAMS);
-
-	m_pDrumkUi->midiInCountOn(true);
 }
 
 
 // Destructor.
 drumkv1widget_jack::~drumkv1widget_jack (void)
 {
-	m_pDrumkUi->midiInCountOn(false);
-
 	delete m_pDrumkUi;
 }
 
