@@ -191,11 +191,9 @@ drumkv1_ui *drumkv1widget_elements_model::instance (void) const
 
 void drumkv1widget_elements_model::midiInNote ( int note )
 {
-qDebug("DEBUG> drumkv1widget_elements_model[%p]::midiInNote(%d)", this, note);
-	const QModelIndex& index = createIndex(note, 0);
+	const QModelIndex& index = drumkv1widget_elements_model::index(note, 0);
 	emit dataChanged(index, index, QVector<int>() << Qt::DecorationRole);
 }
-
 
 
 void drumkv1widget_elements_model::reset (void)
@@ -212,7 +210,6 @@ void drumkv1widget_elements_model::reset (void)
 QString drumkv1widget_elements_model::itemDisplay (
 	const QModelIndex& index ) const
 {
-	const QString sDash('-');
 	switch (index.column()) {
 	case 0: // Element.
 		return drumkv1widget::completeNoteName(index.row());
@@ -226,7 +223,7 @@ QString drumkv1widget_elements_model::itemDisplay (
 				return tr("(None)");
 		}
 	}
-	return sDash;
+	return QString('-');
 }
 
 
