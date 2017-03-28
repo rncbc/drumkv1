@@ -1,7 +1,7 @@
 // drumkv1widget_elements.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -33,6 +33,7 @@
 #include <QMimeData>
 #include <QDrag>
 #include <QUrl>
+#include <QIcon>
 
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
@@ -66,6 +67,8 @@ public:
 	// Accessor specific.
 	drumkv1_ui *instance() const;
 
+	void midiInNote(int note);
+
 protected:
 
 	// Other specifics
@@ -79,9 +82,11 @@ protected:
 private:
 
 	// Model variables.
+	QIcon       m_icons;
 	QStringList m_headers;
 
 	drumkv1_ui *m_pDrumkUi;
+
 };
 
 
@@ -90,6 +95,11 @@ drumkv1widget_elements_model::drumkv1widget_elements_model (
 	drumkv1_ui *pDrumkUi, QObject *pParent )
 	: QAbstractItemModel(pParent), m_pDrumkUi(pDrumkUi)
 {
+	m_icons.addPixmap(
+		QPixmap(":/images/ledOff.png"), QIcon::Normal, QIcon::Off);
+	m_icons.addPixmap(
+		QPixmap(":/images/ledOn.png"), QIcon::Normal, QIcon::On);
+
 	m_headers
 		<< tr("Element")
 		<< tr("Sample");
@@ -133,6 +143,13 @@ QVariant drumkv1widget_elements_model::data (
 	const QModelIndex& index, int role ) const
 {
 	switch (role) {
+	case Qt::DecorationRole:
+		if (index.column() == 0) {
+			return m_icons.pixmap(12, 12, QIcon::Normal,
+				m_pDrumkUi->midiInNote(index.row())
+					? QIcon::On : QIcon::Off);
+		}
+		break;
 	case Qt::DisplayRole:
 		return itemDisplay(index);
 	case Qt::TextAlignmentRole:
@@ -170,6 +187,15 @@ drumkv1_ui *drumkv1widget_elements_model::instance (void) const
 {
 	return m_pDrumkUi;
 }
+
+
+void drumkv1widget_elements_model::midiInNote ( int note )
+{
+qDebug("DEBUG> drumkv1widget_elements_model[%p]::midiInNote(%d)", this, note);
+	const QModelIndex& index = createIndex(note, 0);
+	emit dataChanged(index, index, QVector<int>() << Qt::DecorationRole);
+}
+
 
 
 void drumkv1widget_elements_model::reset (void)
@@ -442,6 +468,15 @@ QSize drumkv1widget_elements::sizeHint (void) const
 {
 	return QSize(360, 80);
 }
+
+
+// MIDI input status update
+void drumkv1widget_elements::midiInNote ( int note )
+{
+	if (m_pModel)
+		m_pModel->midiInNote(note);
+}
+
 
 
 // end of drumkv1widget_elements.cpp

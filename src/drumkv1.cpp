@@ -625,6 +625,12 @@ public:
 
 	drumkv1_element element;
 
+	void reset();
+
+	void midiInEnabled(bool on);
+	bool midiInNote(int note) const;
+	uint32_t midiInCount();
+
 	drumkv1_sample  gen1_sample;
 	drumkv1_wave_lf lfo1_wave;
 
@@ -751,6 +757,47 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 };
 
 
+// MIDI input asynchronous status notification
+
+class drumkv1_midi_in : public drumkv1_sched
+{
+public:
+
+	drumkv1_midi_in (drumkv1 *pDrumk)
+		: drumkv1_sched(pDrumk, MidiIn),
+			m_enabled(false), m_count(0)
+		{ for (int i = 0; i < MAX_NOTES; ++i) m_notes[i] = false; }
+
+	void schedule_event()
+		{ if (m_enabled && ++m_count < 2) schedule(-1); }
+	void schedule_note_on(int note)
+		{ m_notes[note] = true;  if (m_enabled) schedule(note); }
+	void schedule_note_off(int note)
+		{ m_notes[note] = false; if (m_enabled) schedule(note); }
+
+	void process(int) {}
+
+	void enabled(bool on)
+		{ m_enabled = on; m_count = 0; }
+
+	uint32_t count()
+	{
+		const uint32_t ret = m_count;
+		m_count = 0;
+		return ret;
+	}
+
+	bool note_on (int note) const
+		{ return m_notes [note]; }
+
+private:
+
+	bool     m_enabled;
+	uint32_t m_count;
+	bool     m_notes[MAX_NOTES];
+};
+
+
 // synth engine implementation
 
 class drumkv1_impl
@@ -808,6 +855,10 @@ public:
 	void resetParamValues(bool bSwap);
 	void reset();
 
+	void midiInEnabled(bool on);
+	bool midiInNote(int note) const;
+	uint32_t midiInCount();
+
 protected:
 
 	void allSoundOff();
@@ -850,6 +901,7 @@ private:
 	drumkv1_config   m_config;
 	drumkv1_controls m_controls;
 	drumkv1_programs m_programs;
+	drumkv1_midi_in  m_midi_in;
 
 	uint16_t m_nchannels;
 	float    m_srate;
@@ -902,8 +954,8 @@ private:
 // synth engine constructor
 
 drumkv1_impl::drumkv1_impl (
-	drumkv1 *pDrumk, uint16_t nchannels, float srate )
-	: m_pDrumk(pDrumk), m_controls(pDrumk), m_programs(pDrumk), m_bpm(180.0f)
+	drumkv1 *pDrumk, uint16_t nchannels, float srate ) : m_pDrumk(pDrumk),
+		m_controls(pDrumk), m_programs(pDrumk), m_midi_in(pDrumk), m_bpm(180.0f)
 {
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
@@ -1477,6 +1529,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 					m_group[pv->group] = pv;
 				}
 			}
+			m_midi_in.schedule_note_on(key);
 		}
 		// note off
 		else if (status == 0x80 || (status == 0x90 && value == 0)) {
@@ -1491,6 +1544,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 					}
 				}
 			}
+			m_midi_in.schedule_note_off(key);
 		}
 		// key pressure/poly.aftertouch
 		else if (status == 0xa0) {
@@ -1547,6 +1601,9 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 
 	// process pending controllers...
 	m_controls.process_dequeue();
+
+	// asynchronous event notification...
+	m_midi_in.schedule_event();
 }
 
 
@@ -1632,6 +1689,22 @@ void drumkv1_impl::resetParamValues ( bool bSwap )
 }
 
 
+// controllers accessor
+
+drumkv1_controls *drumkv1_impl::controls (void)
+{
+	return &m_controls;
+}
+
+
+// programs accessor
+
+drumkv1_programs *drumkv1_impl::programs (void)
+{
+	return &m_programs;
+}
+
+
 // all reset clear
 
 void drumkv1_impl::reset (void)
@@ -1672,23 +1745,24 @@ void drumkv1_impl::reset (void)
 }
 
 
-// controllers accessor
+// MIDI input asynchronous status notification accessors
 
-drumkv1_controls *drumkv1_impl::controls (void)
+void drumkv1_impl::midiInEnabled ( bool on )
 {
-	return &m_controls;
+	m_midi_in.enabled(on);
 }
 
-
-// programs accessor
-
-drumkv1_programs *drumkv1_impl::programs (void)
+bool drumkv1_impl::midiInNote ( int note ) const
 {
-	return &m_programs;
+	return m_midi_in.note_on(note);
 }
 
+uint32_t drumkv1_impl::midiInCount (void)
+{
+	return m_midi_in.count();
+}
 
-
+ 
 // synthesize
 
 void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
@@ -1952,9 +2026,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 drumkv1::drumkv1 ( uint16_t nchannels, float srate )
 {
 	m_pImpl = new drumkv1_impl(this, nchannels, srate);
-
-	// MIDI input event count...
-	midiInCountOn(false);
 }
 
 
@@ -2125,10 +2196,6 @@ void drumkv1::process_midi ( uint8_t *data, uint32_t size )
 #endif
 
 	m_pImpl->process_midi(data, size);
-
-	// rogue MIDi input count...
-	if (m_midiInCountOn && ++m_midiInCount < 2)
-		drumkv1_sched::sync_notify(this, drumkv1_sched::MidiIn, 0);
 }
 
 
@@ -2318,19 +2385,21 @@ void drumkv1_element::resetParamValues ( bool bSwap )
 }
 
 
-// MIDI input event count
+// MIDI input asynchronous status notification accessors
 
-void drumkv1::midiInCountOn ( bool bMidiInCountOn )
+void drumkv1::midiInEnabled ( bool on )
 {
-	m_midiInCountOn = bMidiInCountOn;
-	m_midiInCount = 0;
+	m_pImpl->midiInEnabled(on);
+}
+
+bool drumkv1::midiInNote ( int note ) const
+{
+	return m_pImpl->midiInNote(note);
 }
 
 uint32_t drumkv1::midiInCount (void)
 {
-	const uint32_t ret = m_midiInCount;
-	m_midiInCount = 0;
-	return ret;
+	return m_pImpl->midiInCount();
 }
 
 

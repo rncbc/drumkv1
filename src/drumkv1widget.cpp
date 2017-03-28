@@ -529,7 +529,7 @@ void drumkv1widget::openSchedNotifier (void)
 		SIGNAL(notify(int, int)),
 		SLOT(updateSchedNotify(int, int)));
 
-	pDrumkUi->midiInCountOn(true);
+	pDrumkUi->midiInEnabled(true);
 }
 
 
@@ -542,7 +542,7 @@ void drumkv1widget::closeSchedNotifier (void)
 
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
-		pDrumkUi->midiInCountOn(false);
+		pDrumkUi->midiInEnabled(false);
 }
 
 
@@ -1365,6 +1365,9 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 
 	switch (drumkv1_sched::Type(stype)) {
 	case drumkv1_sched::MidiIn:
+		if (sid >= 0)
+			m_ui.Elements->midiInNote(sid);
+		else
 		if (pDrumkUi->midiInCount() > 0) {
 			m_ui.StatusBar->midiInLed(true);
 			QTimer::singleShot(200, this, SLOT(midiInLedTimeout()));

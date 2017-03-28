@@ -177,7 +177,8 @@ public:
 
 	virtual void updatePreset(bool bDirty) = 0;
 
-	void midiInCountOn(bool bMidiInCountOn);
+	void midiInEnabled(bool on);
+	bool midiInNote(int note) const;
 	uint32_t midiInCount();
 
 protected:
@@ -188,9 +189,6 @@ protected:
 private:
 
 	drumkv1_impl *m_pImpl;
-
-	bool     m_midiInCountOn;
-	uint32_t m_midiInCount;
 };
 
 
