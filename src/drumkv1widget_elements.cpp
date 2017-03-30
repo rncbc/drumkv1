@@ -192,7 +192,11 @@ drumkv1_ui *drumkv1widget_elements_model::instance (void) const
 void drumkv1widget_elements_model::midiInNote ( int note )
 {
 	const QModelIndex& index = drumkv1widget_elements_model::index(note, 0);
+#if QT_VERSION >= 0x050100
 	emit dataChanged(index, index, QVector<int>() << Qt::DecorationRole);
+#else
+	emit dataChanged(index, index);
+#endif
 }
 
 
