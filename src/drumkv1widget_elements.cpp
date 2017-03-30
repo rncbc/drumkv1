@@ -294,12 +294,7 @@ void drumkv1widget_elements::setInstance ( drumkv1_ui *pDrumkUi )
 	QTreeView::setAcceptDrops(true);
 
 	QHeaderView *pHeader = QTreeView::header();
-	//	pHeader->setDefaultAlignment(Qt::AlignLeft);
-#if QT_VERSION >= 0x050000
-	pHeader->setSectionResizeMode(QHeaderView::ResizeToContents);
-#else
-	pHeader->setResizeMode(QHeaderView::ResizeToContents);
-#endif
+	pHeader->setDefaultAlignment(Qt::AlignLeft);
 	pHeader->setStretchLastSection(true);
 
 	// Element selectors
@@ -455,6 +450,8 @@ void drumkv1widget_elements::refresh (void)
 	const QModelIndex& index = pSelectionModel->currentIndex();
 
 	m_pModel->reset();
+
+	QTreeView::header()->resizeSections(QHeaderView::ResizeToContents);
 
 	pSelectionModel->setCurrentIndex(index, QItemSelectionModel::NoUpdate);
 }

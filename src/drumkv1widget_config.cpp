@@ -482,7 +482,7 @@ void drumkv1widget_config::accept (void)
 		pConfig->bUseGMDrumNames = m_ui.UseGMDrumNamesCheckBox->isChecked();
 		// Show restart needed message...
 		if ((pConfig->sCustomStyleTheme != sOldCustomStyleTheme) ||
-			(pConfig->bUseGMDrumNames && !bOldUseGMDrumNames)) {
+			(!pConfig->bUseGMDrumNames && bOldUseGMDrumNames)) {
 			QMessageBox::information(this,
 				tr("Information") + " - " DRUMKV1_TITLE,
 				tr("Some settings may be only effective\n"
