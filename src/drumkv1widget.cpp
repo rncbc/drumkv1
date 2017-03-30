@@ -1102,13 +1102,17 @@ QString drumkv1widget::noteName ( int note )
 
 	// Pre-load drum-names hash table...
 	if (s_names.isEmpty()) {
-		for (int i = 12; s_notes[i].name; ++i) {
-			s_names.insert(s_notes[i].note,
-				QObject::tr(s_notes[i].name, "noteName"));
+		drumkv1_config *pConfig = drumkv1_config::getInstance();
+		if (pConfig && pConfig->bUseGMDrumNames) {
+			for (int i = 12; s_notes[i].name; ++i) {
+				s_names.insert(s_notes[i].note,
+					QObject::tr(s_notes[i].name, "noteName"));
+			}
 		}
 	}
+
 	// Check whether the drum note exists...
-	QHash<int, QString>::ConstIterator iter = s_names.constFind(note);
+	const QHash<int, QString>::ConstIterator& iter = s_names.constFind(note);
 	if (iter != s_names.constEnd())
 		return iter.value();
 

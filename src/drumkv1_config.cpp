@@ -313,6 +313,7 @@ void drumkv1_config::load (void)
 	iKnobDialMode = QSettings::value("/KnobDialMode", 0).toInt();
 	bControlsEnabled = QSettings::value("/ControlsEnabled", false).toBool();
 	bProgramsEnabled = QSettings::value("/ProgramsEnabled", false).toBool();
+	bUseGMDrumNames = QSettings::value("/UseGMDrumNames", true).toBool();
 	QSettings::endGroup();
 
 	QSettings::beginGroup("/Dialogs");
@@ -341,6 +342,7 @@ void drumkv1_config::save (void)
 	QSettings::setValue("/KnobDialMode", iKnobDialMode);
 	QSettings::setValue("/ControlsEnabled", bControlsEnabled);
 	QSettings::setValue("/ProgramsEnabled", bProgramsEnabled);
+	QSettings::setValue("/UseGMDrumNames", bUseGMDrumNames);
 	QSettings::endGroup();
 
 	QSettings::beginGroup("/Dialogs");

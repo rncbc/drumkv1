@@ -1,7 +1,7 @@
 // drumkv1widget_config.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -57,6 +57,7 @@ drumkv1widget_config::drumkv1widget_config (
 			iCustomStyleTheme = m_ui.CustomStyleThemeComboBox->findText(
 				pConfig->sCustomStyleTheme);
 		m_ui.CustomStyleThemeComboBox->setCurrentIndex(iCustomStyleTheme);
+		m_ui.UseGMDrumNamesCheckBox->setChecked(pConfig->bUseGMDrumNames);
 	}
 
 	// Signal/slots connections...
@@ -131,6 +132,9 @@ drumkv1widget_config::drumkv1widget_config (
 		SLOT(optionsChanged()));
 	QObject::connect(m_ui.CustomStyleThemeComboBox,
 		SIGNAL(activated(int)),
+		SLOT(optionsChanged()));
+	QObject::connect(m_ui.UseGMDrumNamesCheckBox,
+		SIGNAL(toggled(bool)),
 		SLOT(optionsChanged()));
 
 	// Dialog commands...
@@ -474,8 +478,11 @@ void drumkv1widget_config::accept (void)
 			pConfig->sCustomStyleTheme = m_ui.CustomStyleThemeComboBox->currentText();
 		else
 			pConfig->sCustomStyleTheme.clear();
+		const bool bOldUseGMDrumNames = pConfig->bUseGMDrumNames;
+		pConfig->bUseGMDrumNames = m_ui.UseGMDrumNamesCheckBox->isChecked();
 		// Show restart needed message...
-		if (pConfig->sCustomStyleTheme != sOldCustomStyleTheme) {
+		if ((pConfig->sCustomStyleTheme != sOldCustomStyleTheme) ||
+			(pConfig->bUseGMDrumNames && !bOldUseGMDrumNames)) {
 			QMessageBox::information(this,
 				tr("Information") + " - " DRUMKV1_TITLE,
 				tr("Some settings may be only effective\n"

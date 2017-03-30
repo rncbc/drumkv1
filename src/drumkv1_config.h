@@ -74,6 +74,9 @@ public:
 	// Custom widget style theme.
 	QString sCustomStyleTheme;
 
+	// Whether to display GM Standard drum-note/key names.
+	bool bUseGMDrumNames;
+
 	// Singleton instance accessor.
 	static drumkv1_config *getInstance();
 
