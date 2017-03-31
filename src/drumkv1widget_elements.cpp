@@ -27,13 +27,12 @@
 
 #include "drumkv1_sample.h"
 
-#include <QAbstractItemModel>
 #include <QHeaderView>
 #include <QFileInfo>
 #include <QMimeData>
 #include <QDrag>
 #include <QUrl>
-#include <QIcon>
+#include <QTimer>
 
 #include <QDragEnterEvent>
 #include <QDragMoveEvent>
@@ -42,53 +41,6 @@
 
 //----------------------------------------------------------------------------
 // drumkv1widget_elements_model -- List model.
-
-class drumkv1widget_elements_model : public QAbstractItemModel
-{
-public:
-
-	// Constructor.
-	drumkv1widget_elements_model(drumkv1_ui *pDrumkUi, QObject *pParent = NULL);
-
-	// Concretizers (virtual).
-	int rowCount(const QModelIndex& parent = QModelIndex()) const;
-	int columnCount(const QModelIndex& parent = QModelIndex()) const;
-
-	QVariant headerData(int section, Qt::Orientation orient, int role) const;
-	QVariant data(const QModelIndex& index, int role) const;
-
-	QModelIndex index(int row, int column,
-		const QModelIndex& parent = QModelIndex()) const;
-
-	QModelIndex parent(const QModelIndex&) const;
-
-	void reset();
-
-	// Accessor specific.
-	drumkv1_ui *instance() const;
-
-	void midiInNote(int note);
-
-protected:
-
-	// Other specifics
-	drumkv1_element *elementFromIndex(const QModelIndex& index) const;
-
-	QString itemDisplay(const QModelIndex& index) const;
-	QString itemToolTip(const QModelIndex& index) const;
-
-	int columnAlignment(int column) const;
-
-private:
-
-	// Model variables.
-	QIcon       m_icons;
-	QStringList m_headers;
-
-	drumkv1_ui *m_pDrumkUi;
-
-};
-
 
 // Constructor.
 drumkv1widget_elements_model::drumkv1widget_elements_model (
@@ -104,6 +56,9 @@ drumkv1widget_elements_model::drumkv1widget_elements_model (
 		<< tr("Element")
 		<< tr("Sample");
 
+	for (int i = 0; i < MAX_NOTES; ++i)
+		m_notes_on[i] = 0;
+
 	reset();
 }
 
@@ -111,7 +66,7 @@ drumkv1widget_elements_model::drumkv1widget_elements_model (
 int drumkv1widget_elements_model::rowCount (
 	const QModelIndex& /*parent*/ ) const
 {
-	return 128;
+	return MAX_NOTES;
 }
 
 
@@ -146,8 +101,7 @@ QVariant drumkv1widget_elements_model::data (
 	case Qt::DecorationRole:
 		if (index.column() == 0) {
 			return m_icons.pixmap(12, 12, QIcon::Normal,
-				m_pDrumkUi->midiInNote(index.row())
-					? QIcon::On : QIcon::Off);
+				m_notes_on[index.row()] > 0 ? QIcon::On : QIcon::Off);
 		}
 		break;
 	case Qt::DisplayRole:
@@ -189,9 +143,36 @@ drumkv1_ui *drumkv1widget_elements_model::instance (void) const
 }
 
 
-void drumkv1widget_elements_model::midiInNote ( int note )
+void drumkv1widget_elements_model::midiInLedNote ( int key, int vel )
 {
-	const QModelIndex& index = drumkv1widget_elements_model::index(note, 0);
+	if (vel > 0) {
+		m_notes_on[key] = vel;
+		midiInLedUpdate(key);
+	}
+	else
+	if (m_notes_on[key] > 0) {
+		m_notes_off.append(key);
+		QTimer::singleShot(200, this, SLOT(midiInLedTimeout()));
+	}
+}
+
+
+void drumkv1widget_elements_model::midiInLedTimeout (void)
+{
+	QListIterator<int> iter(m_notes_off);
+	while (iter.hasNext()) {
+		const int key = iter.next();
+		midiInLedUpdate(key);
+		m_notes_on[key] = 0;
+	}
+
+	m_notes_off.clear();
+}
+
+
+void drumkv1widget_elements_model::midiInLedUpdate ( int key )
+{
+	const QModelIndex& index = drumkv1widget_elements_model::index(key, 0);
 #if QT_VERSION >= 0x050100
 	emit dataChanged(index, index, QVector<int>() << Qt::DecorationRole);
 #else
@@ -469,10 +450,10 @@ QSize drumkv1widget_elements::sizeHint (void) const
 
 
 // MIDI input status update
-void drumkv1widget_elements::midiInNote ( int note )
+void drumkv1widget_elements::midiInLedNote ( int key, int vel )
 {
 	if (m_pModel)
-		m_pModel->midiInNote(note);
+		m_pModel->midiInLedNote(key, vel);
 }
 
 

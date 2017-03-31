@@ -178,7 +178,6 @@ public:
 	virtual void updatePreset(bool bDirty) = 0;
 
 	void midiInEnabled(bool on);
-	bool midiInNote(int note) const;
 	uint32_t midiInCount();
 
 protected:

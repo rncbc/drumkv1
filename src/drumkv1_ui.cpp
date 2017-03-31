@@ -144,10 +144,6 @@ void drumkv1_ui::midiInEnabled ( bool bEnabled )
 	m_pDrumk->midiInEnabled(bEnabled);
 }
 
-bool drumkv1_ui::midiInNote ( int note ) const
-{
-	return m_pDrumk->midiInNote(note);
-}
 
 uint32_t drumkv1_ui::midiInCount (void)
 {

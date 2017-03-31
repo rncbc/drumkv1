@@ -1370,7 +1370,7 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 	switch (drumkv1_sched::Type(stype)) {
 	case drumkv1_sched::MidiIn:
 		if (sid >= 0)
-			m_ui.Elements->midiInNote(sid);
+			m_ui.Elements->midiInLedNote(sid & 0x7f, (sid >> 7) & 0x7f);
 		else
 		if (pDrumkUi->midiInCount() > 0) {
 			m_ui.StatusBar->midiInLed(true);

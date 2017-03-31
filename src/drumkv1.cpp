@@ -628,7 +628,6 @@ public:
 	void reset();
 
 	void midiInEnabled(bool on);
-	bool midiInNote(int note) const;
 	uint32_t midiInCount();
 
 	drumkv1_sample  gen1_sample;
@@ -765,15 +764,12 @@ public:
 
 	drumkv1_midi_in (drumkv1 *pDrumk)
 		: drumkv1_sched(pDrumk, MidiIn),
-			m_enabled(false), m_count(0)
-		{ for (int i = 0; i < MAX_NOTES; ++i) m_notes[i] = false; }
+			m_enabled(false), m_count(0) {}
 
 	void schedule_event()
 		{ if (m_enabled && ++m_count < 2) schedule(-1); }
-	void schedule_note_on(int note)
-		{ m_notes[note] = true;  if (m_enabled) schedule(note); }
-	void schedule_note_off(int note)
-		{ m_notes[note] = false; if (m_enabled) schedule(note); }
+	void schedule_note(int key, int vel)
+		{ if (m_enabled) schedule((vel << 7) | key); }
 
 	void process(int) {}
 
@@ -787,14 +783,10 @@ public:
 		return ret;
 	}
 
-	bool note_on (int note) const
-		{ return m_notes [note]; }
-
 private:
 
 	bool     m_enabled;
 	uint32_t m_count;
-	bool     m_notes[MAX_NOTES];
 };
 
 
@@ -856,7 +848,6 @@ public:
 	void reset();
 
 	void midiInEnabled(bool on);
-	bool midiInNote(int note) const;
 	uint32_t midiInCount();
 
 protected:
@@ -1529,7 +1520,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 					m_group[pv->group] = pv;
 				}
 			}
-			m_midi_in.schedule_note_on(key);
+			m_midi_in.schedule_note(key, value);
 		}
 		// note off
 		else if (status == 0x80 || (status == 0x90 && value == 0)) {
@@ -1544,7 +1535,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 					}
 				}
 			}
-			m_midi_in.schedule_note_off(key);
+			m_midi_in.schedule_note(key, 0);
 		}
 		// key pressure/poly.aftertouch
 		else if (status == 0xa0) {
@@ -1750,11 +1741,6 @@ void drumkv1_impl::reset (void)
 void drumkv1_impl::midiInEnabled ( bool on )
 {
 	m_midi_in.enabled(on);
-}
-
-bool drumkv1_impl::midiInNote ( int note ) const
-{
-	return m_midi_in.note_on(note);
 }
 
 uint32_t drumkv1_impl::midiInCount (void)
@@ -2392,10 +2378,6 @@ void drumkv1::midiInEnabled ( bool on )
 	m_pImpl->midiInEnabled(on);
 }
 
-bool drumkv1::midiInNote ( int note ) const
-{
-	return m_pImpl->midiInNote(note);
-}
 
 uint32_t drumkv1::midiInCount (void)
 {
