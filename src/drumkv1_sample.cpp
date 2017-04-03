@@ -1,7 +1,7 @@
 // drumkv1_sample.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -37,29 +37,16 @@ public:
 
 	// ctor.
 	drumkv1_reverse_sched (drumkv1 *pDrumk, drumkv1_sample *sample)
-		: drumkv1_sched(pDrumk, Sample),
-			m_sample(sample), m_reverse(false) {}
-
-	// schedule reverse.
-	void reverse_sched(bool reverse)
-	{
-		m_reverse = reverse;
-
-		schedule();
-	}
+		: drumkv1_sched(pDrumk, Sample), m_sample(sample) {}
 
 	// process reverse (virtual).
 	void process(int)
-	{
-		m_sample->setReverse(m_reverse);
-	}
+		{ m_sample->reverse_sync(); }
 
 private:
 
 	// instance variables.
 	drumkv1_sample *m_sample;
-
-	bool m_reverse;
 };
 
 
@@ -131,7 +118,7 @@ bool drumkv1_sample::open ( const char *filename, float freq0 )
 	::sf_close(file);
 
 	if (m_reverse)
-		reverse_sample();
+		reverse_sync();
 
 	reset(freq0);
 
@@ -162,14 +149,14 @@ void drumkv1_sample::close (void)
 
 
 // schedule sample reverse.
-void drumkv1_sample::reverse_sched ( bool reverse )
+void drumkv1_sample::reverse_sched (void)
 {
-	m_reverse_sched->reverse_sched(reverse);
+	m_reverse_sched->schedule();
 }
 
 
 // reverse sample buffer.
-void drumkv1_sample::reverse_sample (void)
+void drumkv1_sample::reverse_sync (void)
 {
 	if (m_nframes > 0 && m_pframes) {
 		const uint32_t nsize1 = (m_nframes - 1);
