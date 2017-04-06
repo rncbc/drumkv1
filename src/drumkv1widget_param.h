@@ -1,4 +1,4 @@
-// drumkv1widget_knob.h
+// drumkv1widget_param.h
 //
 /****************************************************************************
    Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
@@ -19,8 +19,8 @@
 
 *****************************************************************************/
 
-#ifndef __drumkv1widget_knob_h
-#define __drumkv1widget_knob_h
+#ifndef __drumkv1widget_param_h
+#define __drumkv1widget_param_h
 
 #include <QWidget>
 #include <QDial>
@@ -79,16 +79,16 @@ private:
 
 
 //-------------------------------------------------------------------------
-// drumkv1widget_knob - Custom composite widget.
+// drumkv1widget_param - Custom composite widget.
 
-class drumkv1widget_knob : public QWidget
+class drumkv1widget_param : public QWidget
 {
 	Q_OBJECT
 
 public:
 
 	// Constructor.
-	drumkv1widget_knob(QWidget *pParent = 0);
+	drumkv1widget_param(QWidget *pParent = 0);
 
 	// Accessors.
 	virtual void setText(const QString& sText);
@@ -164,7 +164,7 @@ private:
 //-------------------------------------------------------------------------
 // drumkv1widget_spin - Custom knob/spin-box widget.
 
-class drumkv1widget_spin : public drumkv1widget_knob
+class drumkv1widget_spin : public drumkv1widget_param
 {
 	Q_OBJECT
 
@@ -208,7 +208,7 @@ private:
 //-------------------------------------------------------------------------
 // drumkv1widget_combo - Custom knob/combo-box widget.
 
-class drumkv1widget_combo : public drumkv1widget_knob
+class drumkv1widget_combo : public drumkv1widget_param
 {
 	Q_OBJECT
 
@@ -246,6 +246,6 @@ private:
 };
 
 
-#endif  // __drumkv1widget_knob_h
+#endif  // __drumkv1widget_param_h
 
-// end of drumkv1widget_knob.h
+// end of drumkv1widget_param.h

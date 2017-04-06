@@ -20,7 +20,7 @@
 *****************************************************************************/
 
 #include "drumkv1widget_config.h"
-#include "drumkv1widget_knob.h"
+#include "drumkv1widget_param.h"
 
 #include <QPushButton>
 #include <QMessageBox>

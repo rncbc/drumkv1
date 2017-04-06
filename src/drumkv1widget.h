@@ -60,8 +60,8 @@ public:
 	float paramValue(drumkv1::ParamIndex index) const;
 
 	// Param kbob (widget) mapper.
-	void setParamKnob(drumkv1::ParamIndex index, drumkv1widget_knob *pKnob);
-	drumkv1widget_knob *paramKnob(drumkv1::ParamIndex index) const;
+	void setParamKnob(drumkv1::ParamIndex index, drumkv1widget_param *pKnob);
+	drumkv1widget_param *paramKnob(drumkv1::ParamIndex index) const;
 
 	// Preset init.
 	void initPreset();
@@ -201,8 +201,8 @@ private:
 
 	drumkv1widget_sched *m_sched_notifier;
 
-	QHash<drumkv1::ParamIndex, drumkv1widget_knob *> m_paramKnobs;
-	QHash<drumkv1widget_knob *, drumkv1::ParamIndex> m_knobParams;
+	QHash<drumkv1::ParamIndex, drumkv1widget_param *> m_paramKnobs;
+	QHash<drumkv1widget_param *, drumkv1::ParamIndex> m_knobParams;
 
 	float m_params_ab[drumkv1::NUM_PARAMS];
 
