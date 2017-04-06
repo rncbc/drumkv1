@@ -564,20 +564,20 @@ void drumkv1widget::hideEvent ( QHideEvent *pHideEvent )
 
 
 // Param kbob (widget) map accesors.
-void drumkv1widget::setParamKnob ( drumkv1::ParamIndex index, drumkv1widget_param *pKnob )
+void drumkv1widget::setParamKnob ( drumkv1::ParamIndex index, drumkv1widget_param *pParam )
 {
-	pKnob->setDefaultValue(drumkv1_param::paramDefaultValue(index));
+	pParam->setDefaultValue(drumkv1_param::paramDefaultValue(index));
 
-	m_paramKnobs.insert(index, pKnob);
-	m_knobParams.insert(pKnob, index);
+	m_paramKnobs.insert(index, pParam);
+	m_knobParams.insert(pParam, index);
 
-	QObject::connect(pKnob,
+	QObject::connect(pParam,
 		SIGNAL(valueChanged(float)),
 		SLOT(paramChanged(float)));
 
-	pKnob->setContextMenuPolicy(Qt::CustomContextMenu);
+	pParam->setContextMenuPolicy(Qt::CustomContextMenu);
 
-	QObject::connect(pKnob,
+	QObject::connect(pParam,
 		SIGNAL(customContextMenuRequested(const QPoint&)),
 		SLOT(paramContextMenu(const QPoint&)));
 }
@@ -594,9 +594,9 @@ void drumkv1widget::setParamValue (
 {
 	++m_iUpdate;
 
-	drumkv1widget_param *pKnob = paramKnob(index);
-	if (pKnob)
-		pKnob->setValue(fValue, bDefault);
+	drumkv1widget_param *pParam = paramKnob(index);
+	if (pParam)
+		pParam->setValue(fValue, bDefault);
 
 	updateParamEx(index, fValue);
 
@@ -607,9 +607,9 @@ float drumkv1widget::paramValue ( drumkv1::ParamIndex index ) const
 {
 	float fValue = 0.0f;
 
-	drumkv1widget_param *pKnob = paramKnob(index);
-	if (pKnob) {
-		fValue = pKnob->value();
+	drumkv1widget_param *pParam = paramKnob(index);
+	if (pParam) {
+		fValue = pParam->value();
 	} else {
 		drumkv1_ui *pDrumkUi = ui_instance();
 		if (pDrumkUi)
@@ -626,9 +626,9 @@ void drumkv1widget::paramChanged ( float fValue )
 	if (m_iUpdate > 0)
 		return;
 
-	drumkv1widget_param *pKnob = qobject_cast<drumkv1widget_param *> (sender());
-	if (pKnob) {
-		const drumkv1::ParamIndex index = m_knobParams.value(pKnob);
+	drumkv1widget_param *pParam = qobject_cast<drumkv1widget_param *> (sender());
+	if (pParam) {
+		const drumkv1::ParamIndex index = m_knobParams.value(pParam);
 		// Save current element param value...
 		drumkv1_ui *pDrumkUi = ui_instance();
 		if (pDrumkUi) {
@@ -641,8 +641,8 @@ void drumkv1widget::paramChanged ( float fValue )
 		updateParam(index, fValue);
 		updateParamEx(index, fValue);
 		m_ui.StatusBar->showMessage(QString("%1: %2")
-			.arg(pKnob->toolTip())
-			.arg(pKnob->valueText()), 5000);
+			.arg(pParam->toolTip())
+			.arg(pParam->valueText()), 5000);
 		updateDirtyPreset(true);
 	}
 }
@@ -681,14 +681,14 @@ void drumkv1widget::updateSchedParam ( drumkv1::ParamIndex index, float fValue )
 {
 	++m_iUpdate;
 
-	drumkv1widget_param *pKnob = paramKnob(index);
-	if (pKnob) {
-		pKnob->setValue(fValue, false);
+	drumkv1widget_param *pParam = paramKnob(index);
+	if (pParam) {
+		pParam->setValue(fValue, false);
 		updateParam(index, fValue);
 		updateParamEx(index, fValue);
 		m_ui.StatusBar->showMessage(QString("%1: %2")
-			.arg(pKnob->toolTip())
-			.arg(pKnob->valueText()), 5000);
+			.arg(pParam->toolTip())
+			.arg(pParam->valueText()), 5000);
 		updateDirtyPreset(true);
 	}
 
@@ -712,9 +712,9 @@ void drumkv1widget::resetParams (void)
 		if (index == drumkv1::GEN1_SAMPLE)
 			continue;
 		float fValue = drumkv1_param::paramDefaultValue(index);
-		drumkv1widget_param *pKnob = paramKnob(index);
-		if (pKnob && pKnob->isDefaultValue())
-			fValue = pKnob->defaultValue();
+		drumkv1widget_param *pParam = paramKnob(index);
+		if (pParam && pParam->isDefaultValue())
+			fValue = pParam->defaultValue();
 		setParamValue(index, fValue);
 		updateParam(index, fValue);
 	//	updateParamEx(index, fValue);
@@ -747,10 +747,10 @@ void drumkv1widget::swapParams ( bool bOn )
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				drumkv1widget_param *pKnob = paramKnob(index);
-				if (pKnob) {
-					pKnob->setDefaultValue(element->paramValue(index, 0));
-					element->setParamValue(index, pKnob->value());
+				drumkv1widget_param *pParam = paramKnob(index);
+				if (pParam) {
+					pParam->setDefaultValue(element->paramValue(index, 0));
+					element->setParamValue(index, pParam->value());
 				}
 			}
 		}
@@ -771,9 +771,9 @@ void drumkv1widget::swapParams ( bool bOn )
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		if (index == drumkv1::GEN1_SAMPLE)
 			continue;
-		drumkv1widget_param *pKnob = paramKnob(index);
-		if (pKnob) {
-			const float fOldValue = pKnob->value();
+		drumkv1widget_param *pParam = paramKnob(index);
+		if (pParam) {
+			const float fOldValue = pParam->value();
 			const float fNewValue = m_params_ab[i];
 			setParamValue(index, fNewValue);
 			updateParam(index, fNewValue);
@@ -843,9 +843,9 @@ void drumkv1widget::resetParamKnobs ( uint32_t nparams )
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		if (index == drumkv1::GEN1_SAMPLE)
 			continue;
-		drumkv1widget_param *pKnob = paramKnob(index);
-		if (pKnob)
-			pKnob->resetDefaultValue();
+		drumkv1widget_param *pParam = paramKnob(index);
+		if (pParam)
+			pParam->resetDefaultValue();
 	}
 }
 
@@ -1237,10 +1237,10 @@ void drumkv1widget::updateElement (void)
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			const float fValue = element->paramValue(index);
-			drumkv1widget_param *pKnob = paramKnob(index);
-			if (pKnob) {
-				pKnob->setDefaultValue(element->paramValue(index, 0));
-				pKnob->setValue(fValue);
+			drumkv1widget_param *pParam = paramKnob(index);
+			if (pParam) {
+				pParam->setDefaultValue(element->paramValue(index, 0));
+				pParam->setValue(fValue);
 			}
 			updateParam(index, fValue);
 			m_params_ab[i] = fValue;
@@ -1507,9 +1507,9 @@ void drumkv1widget::updateDirtyPreset ( bool bDirtyPreset )
 // Param knob context menu.
 void drumkv1widget::paramContextMenu ( const QPoint& pos )
 {
-	drumkv1widget_param *pKnob
+	drumkv1widget_param *pParam
 		= qobject_cast<drumkv1widget_param *> (sender());
-	if (pKnob == NULL)
+	if (pParam == NULL)
 		return;
 
 	drumkv1_ui *pDrumkUi = ui_instance();
@@ -1529,9 +1529,9 @@ void drumkv1widget::paramContextMenu ( const QPoint& pos )
 		QIcon(":/images/drumkv1_control.png"),
 		tr("MIDI &Controller..."));
 
-	if (menu.exec(pKnob->mapToGlobal(pos)) == pAction) {
-		const drumkv1::ParamIndex index = m_knobParams.value(pKnob);
-		const QString& sTitle = pKnob->toolTip();
+	if (menu.exec(pParam->mapToGlobal(pos)) == pAction) {
+		const drumkv1::ParamIndex index = m_knobParams.value(pParam);
+		const QString& sTitle = pParam->toolTip();
 		drumkv1widget_control::showInstance(pControls, index, sTitle, this);
 	}
 }
