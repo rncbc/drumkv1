@@ -32,6 +32,8 @@
 #include <QMimeData>
 #include <QDrag>
 #include <QUrl>
+#include <QIcon>
+#include <QPixmap>
 #include <QTimer>
 
 #include <QDragEnterEvent>
@@ -47,10 +49,17 @@ drumkv1widget_elements_model::drumkv1widget_elements_model (
 	drumkv1_ui *pDrumkUi, QObject *pParent )
 	: QAbstractItemModel(pParent), m_pDrumkUi(pDrumkUi)
 {
-	m_icons.addPixmap(
+	QIcon icon;
+
+	icon.addPixmap(
 		QPixmap(":/images/ledOff.png"), QIcon::Normal, QIcon::Off);
-	m_icons.addPixmap(
+	icon.addPixmap(
 		QPixmap(":/images/ledOn.png"), QIcon::Normal, QIcon::On);
+
+	m_pixmaps[0] = new QPixmap(
+		icon.pixmap(12, 12, QIcon::Normal, QIcon::Off));
+	m_pixmaps[1] = new QPixmap(
+		icon.pixmap(12, 12, QIcon::Normal, QIcon::On));
 
 	m_headers
 		<< tr("Element")
@@ -60,6 +69,14 @@ drumkv1widget_elements_model::drumkv1widget_elements_model (
 		m_notes_on[i] = 0;
 
 	reset();
+}
+
+
+// Destructor.
+drumkv1widget_elements_model::~drumkv1widget_elements_model (void)
+{
+	delete m_pixmaps[1];
+	delete m_pixmaps[0];
 }
 
 
@@ -99,10 +116,8 @@ QVariant drumkv1widget_elements_model::data (
 {
 	switch (role) {
 	case Qt::DecorationRole:
-		if (index.column() == 0) {
-			return m_icons.pixmap(12, 12, QIcon::Normal,
-				m_notes_on[index.row()] > 0 ? QIcon::On : QIcon::Off);
-		}
+		if (index.column() == 0)
+			return *m_pixmaps[m_notes_on[index.row()] > 0 ? 1 : 0];
 		break;
 	case Qt::DisplayRole:
 		return itemDisplay(index);

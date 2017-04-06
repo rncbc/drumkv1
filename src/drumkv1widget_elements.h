@@ -24,7 +24,6 @@
 
 #include <QTreeView>
 #include <QAbstractItemModel>
-#include <QIcon>
 
 
 // Forwards.
@@ -32,6 +31,8 @@ class drumkv1_ui;
 
 class drumkv1_element;
 class drumkv1_sample;
+
+class QPixmap;
 
 class QDragEnterEvent;
 class QDragMoveEvent;
@@ -49,6 +50,9 @@ public:
 
 	// Constructor.
 	drumkv1widget_elements_model(drumkv1_ui *pDrumkUi, QObject *pParent = NULL);
+
+	// Destructor.
+	~drumkv1widget_elements_model();
 
 	// Concretizers (virtual).
 	int rowCount(const QModelIndex& parent = QModelIndex()) const;
@@ -88,7 +92,7 @@ protected:
 private:
 
 	// Model variables.
-	QIcon       m_icons;
+	QPixmap    *m_pixmaps[2];
 	QStringList m_headers;
 
 	drumkv1_ui *m_pDrumkUi;
