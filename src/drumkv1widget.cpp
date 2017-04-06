@@ -123,26 +123,26 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		channels << QString::number(iChannel + 1);
 
 	m_ui.Def1ChannelKnob->insertItems(0, channels);
-
+#if 0
 	// Noteoff modes.
 	QStringList modes;
 	modes << tr("Disabled");
 	modes << tr("Enabled");
 
 	m_ui.Def1NoteoffKnob->insertItems(0, modes);
-
+#endif
 	// Dynamic states.
 	QStringList states;
 	states << tr("Off");
 	states << tr("On");
-
+#if 0
 	m_ui.Gen1ReverseKnob->insertItems(0, states);
 
 	m_ui.Lfo1SyncKnob->insertItems(0, states);
 
 	m_ui.Dyn1CompressKnob->insertItems(0, states);
 	m_ui.Dyn1LimiterKnob->insertItems(0, states);
-
+#endif
 	// Special values
 	const QString& sOff = states.first();
 	m_ui.Cho1WetKnob->setSpecialValueText(sOff);
