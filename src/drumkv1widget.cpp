@@ -130,6 +130,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	modes << tr("Enabled");
 
 	m_ui.Def1NoteoffKnob->insertItems(0, modes);
+#else
+	m_ui.Def1NoteoffKnob->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
 #endif
 	// Dynamic states.
 	QStringList states;
@@ -142,6 +144,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	m_ui.Dyn1CompressKnob->insertItems(0, states);
 	m_ui.Dyn1LimiterKnob->insertItems(0, states);
+#else
+	m_ui.Lfo1SyncKnob->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
 #endif
 	// Special values
 	const QString& sOff = states.first();
