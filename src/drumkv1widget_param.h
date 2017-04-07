@@ -292,6 +292,9 @@ public:
 	// Constructor.
 	drumkv1widget_radio(QWidget *pParent = 0);
 
+	// Desstructor.
+	~drumkv1widget_radio();
+
 	// Virtual accessors.
 	QString valueText() const;
 
@@ -327,6 +330,9 @@ public:
 
 	// Constructor.
 	drumkv1widget_check(QWidget *pParent = 0);
+
+	// Desstructor.
+	~drumkv1widget_check();
 
 	// Accessors.
 	void setText(const QString& sText);
