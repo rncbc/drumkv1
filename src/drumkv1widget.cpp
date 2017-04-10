@@ -498,6 +498,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	if (pConfig) {
 		drumkv1widget_dial::setDialMode(
 			drumkv1widget_dial::DialMode(pConfig->iKnobDialMode));
+		drumkv1widget_edit::setEditMode(
+			drumkv1widget_edit::EditMode(pConfig->iKnobEditMode));
 	}
 
 	// Epilog.

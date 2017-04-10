@@ -1247,7 +1247,7 @@
   </customwidget>
   <customwidget>
    <class>drumkv1widget_check</class>
-   <extends>QDial</extends>
+   <extends>QCheckBox</extends>
    <header>drumkv1widget_param.h</header>
   </customwidget>
   <customwidget>

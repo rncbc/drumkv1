@@ -52,6 +52,7 @@ drumkv1widget_config::drumkv1widget_config (
 		m_ui.ProgramsPreviewCheckBox->setChecked(pConfig->bProgramsPreview);
 		m_ui.UseNativeDialogsCheckBox->setChecked(pConfig->bUseNativeDialogs);
 		m_ui.KnobDialModeComboBox->setCurrentIndex(pConfig->iKnobDialMode);
+		m_ui.KnobEditModeComboBox->setCurrentIndex(pConfig->iKnobEditMode);
 		int iCustomStyleTheme = 0;
 		if (!pConfig->sCustomStyleTheme.isEmpty())
 			iCustomStyleTheme = m_ui.CustomStyleThemeComboBox->findText(
@@ -128,6 +129,9 @@ drumkv1widget_config::drumkv1widget_config (
 		SIGNAL(toggled(bool)),
 		SLOT(optionsChanged()));
 	QObject::connect(m_ui.KnobDialModeComboBox,
+		SIGNAL(activated(int)),
+		SLOT(optionsChanged()));
+	QObject::connect(m_ui.KnobEditModeComboBox,
 		SIGNAL(activated(int)),
 		SLOT(optionsChanged()));
 	QObject::connect(m_ui.CustomStyleThemeComboBox,
@@ -473,6 +477,9 @@ void drumkv1widget_config::accept (void)
 		pConfig->iKnobDialMode = m_ui.KnobDialModeComboBox->currentIndex();
 		drumkv1widget_dial::setDialMode(
 			drumkv1widget_dial::DialMode(pConfig->iKnobDialMode));
+		pConfig->iKnobEditMode = m_ui.KnobEditModeComboBox->currentIndex();
+		drumkv1widget_edit::setEditMode(
+			drumkv1widget_edit::EditMode(pConfig->iKnobEditMode));
 		const QString sOldCustomStyleTheme = pConfig->sCustomStyleTheme;
 		if (m_ui.CustomStyleThemeComboBox->currentIndex() > 0)
 			pConfig->sCustomStyleTheme = m_ui.CustomStyleThemeComboBox->currentText();
