@@ -22,7 +22,7 @@
 #include "drumkv1widget_param.h"
 
 #include <QLabel>
-#include <QSpinBox>
+#include <QLineEdit>
 #include <QComboBox>
 #include <QRadioButton>
 #include <QCheckBox>
@@ -387,6 +387,60 @@ void drumkv1widget_knob::dialValueChanged ( int iDialValue )
 
 
 //-------------------------------------------------------------------------
+// drumkv1widget_edit - A better QDoubleSpinBox widget.
+
+drumkv1widget_edit::EditMode
+drumkv1widget_edit::g_editMode = drumkv1widget_edit::DefaultMode;
+
+// Set spin-box edit mode behavior.
+void drumkv1widget_edit::setEditMode ( EditMode editMode )
+	{ g_editMode = editMode; }
+
+drumkv1widget_edit::EditMode drumkv1widget_edit::editMode (void)
+	{ return g_editMode; }
+
+
+// Constructor.
+drumkv1widget_edit::drumkv1widget_edit ( QWidget *pParent )
+	: QDoubleSpinBox(pParent), m_iTextChanged(0)
+{
+	QObject::connect(lineEdit(),
+		SIGNAL(textChanged(const QString&)),
+		SLOT(lineEditTextChanged(const QString&)));
+	QObject::connect(this,
+		SIGNAL(editingFinished()),
+		SLOT(spinBoxEditingFinished()));
+	QObject::connect(this,
+		SIGNAL(valueChanged(double)),
+		SLOT(spinBoxValueChanged(double)));
+}
+
+
+// Alternate value change behavior handlers.
+void drumkv1widget_edit::lineEditTextChanged ( const QString& )
+{
+	if (g_editMode == DeferredMode)
+		++m_iTextChanged;
+}
+
+
+void drumkv1widget_edit::spinBoxEditingFinished (void)
+{
+	if (g_editMode == DeferredMode) {
+		m_iTextChanged = 0;
+		emit valueChangedEx(value());
+	}
+}
+
+
+void drumkv1widget_edit::spinBoxValueChanged ( double spinValue )
+{
+	if (g_editMode != DeferredMode || m_iTextChanged == 0)
+		emit valueChangedEx(spinValue);
+}
+
+
+//-------------------------------------------------------------------------
 // drumkv1widget_spin - Custom knob/spin-box widget.
 //
 
@@ -394,7 +448,7 @@ void drumkv1widget_knob::dialValueChanged ( int iDialValue )
 drumkv1widget_spin::drumkv1widget_spin ( QWidget *pParent )
 	: drumkv1widget_knob(pParent)
 {
-	m_pSpinBox = new QDoubleSpinBox();
+	m_pSpinBox = new drumkv1widget_edit();
 	m_pSpinBox->setAccelerated(true);
 	m_pSpinBox->setAlignment(Qt::AlignCenter);
 
@@ -413,7 +467,7 @@ drumkv1widget_spin::drumkv1widget_spin ( QWidget *pParent )
 	setDecimals(1);
 
 	QObject::connect(m_pSpinBox,
-		SIGNAL(valueChanged(double)),
+		SIGNAL(valueChangedEx(double)),
 		SLOT(spinBoxValueChanged(double)));
 }
 
