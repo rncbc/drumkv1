@@ -1052,6 +1052,7 @@ QString drumkv1widget::noteName ( int note )
 		{ 10, QT_TR_NOOP("A#/Bb") },
 		{ 11, QT_TR_NOOP("B")     },
 
+		/*
 		// GM Drum note map...
 		{ 35, QT_TR_NOOP("Acoustic Bass Drum") },
 		{ 36, QT_TR_NOOP("Bass Drum 1") },
@@ -1100,6 +1101,7 @@ QString drumkv1widget::noteName ( int note )
 		{ 79, QT_TR_NOOP("Open Cuica") },
 		{ 80, QT_TR_NOOP("Mute Triangle") },
 		{ 81, QT_TR_NOOP("Open Triangle") },
+		*/
 
 		{  0, NULL }
 	};
