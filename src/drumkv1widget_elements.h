@@ -176,6 +176,9 @@ private:
 	QPoint m_posDrag;
 
 	drumkv1_sample *m_pDragSample;
+
+	int m_directNoteOn;
+	int m_directNoteVel;
 };
 
 

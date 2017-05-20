@@ -180,6 +180,8 @@ public:
 	void midiInEnabled(bool on);
 	uint32_t midiInCount();
 
+	void directNoteOn(int note, int vel);
+
 protected:
 
 	virtual void selectSample(int key) = 0;

@@ -254,7 +254,7 @@ int drumkv1widget_elements_model::columnAlignment( int /*column*/ ) const
 
 // Constructor.
 drumkv1widget_elements::drumkv1widget_elements ( QWidget *pParent )
-	: QTreeView(pParent), m_pModel(NULL)
+	: QTreeView(pParent), m_pModel(NULL), m_directNoteOn(-1), m_directNoteVel(64)
 {
 	m_pDragSample = NULL;
 
@@ -343,8 +343,14 @@ void drumkv1widget_elements::doubleClicked ( const QModelIndex& index )
 void drumkv1widget_elements::mousePressEvent ( QMouseEvent *pMouseEvent )
 {
 	if (pMouseEvent->button() == Qt::LeftButton) {
-		m_dragState = DragStart;
-		m_posDrag = pMouseEvent->pos();
+		const QPoint& pos = pMouseEvent->pos();
+		if (pos.x() > 0 && pos.x() < 12) {
+			m_directNoteOn = QTreeView::indexAt(pos).row();
+			m_pModel->instance()->directNoteOn(m_directNoteOn, m_directNoteVel);
+		} else {
+			m_dragState = DragStart;
+			m_posDrag = pos;
+		}
 	}
 
 	QTreeView::mousePressEvent(pMouseEvent);
@@ -380,6 +386,11 @@ void drumkv1widget_elements::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 void drumkv1widget_elements::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 {
 	QTreeView::mouseReleaseEvent(pMouseEvent);
+
+	if (m_directNoteOn >= 0) {
+		m_pModel->instance()->directNoteOn(m_directNoteOn, 0);
+		m_directNoteOn = -1;
+	}
 
 	m_pDragSample = NULL;
 	resetDragState();

@@ -151,4 +151,10 @@ uint32_t drumkv1_ui::midiInCount (void)
 }
 
 
+void drumkv1_ui::directNoteOn ( int note, int vel )
+{
+	m_pDrumk->directNoteOn(note, vel);
+}
+
+
 // end of drumkv1_ui.cpp

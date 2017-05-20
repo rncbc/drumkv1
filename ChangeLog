@@ -4,6 +4,12 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
+GIT HEAD
+
+- Left-clicking on each element fake-LED now triggers it as
+  an internal MIDI note-on/off event. (EXPERIMENTAL)
+
+
 0.8.2  2017-05-02  Pre-LAC2017 release frenzy.
 
 - A custom knob/spin-box behavioral option have been added:
