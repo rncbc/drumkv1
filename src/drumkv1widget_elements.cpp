@@ -254,10 +254,9 @@ int drumkv1widget_elements_model::columnAlignment( int /*column*/ ) const
 
 // Constructor.
 drumkv1widget_elements::drumkv1widget_elements ( QWidget *pParent )
-	: QTreeView(pParent), m_pModel(NULL), m_directNoteOn(-1), m_directNoteVel(64)
+	: QTreeView(pParent), m_pModel(NULL), m_pDragSample(NULL),
+		m_iDirectNoteOn(-1), m_iDirectNoteVel(64)
 {
-	m_pDragSample = NULL;
-
 	resetDragState();
 }
 
@@ -344,9 +343,9 @@ void drumkv1widget_elements::mousePressEvent ( QMouseEvent *pMouseEvent )
 {
 	if (pMouseEvent->button() == Qt::LeftButton) {
 		const QPoint& pos = pMouseEvent->pos();
-		if (pos.x() > 0 && pos.x() < 12) {
-			m_directNoteOn = QTreeView::indexAt(pos).row();
-			m_pModel->instance()->directNoteOn(m_directNoteOn, m_directNoteVel);
+		if (pos.x() > 0 && pos.x() < 16) {
+			m_iDirectNoteOn = QTreeView::indexAt(pos).row();
+			m_pModel->instance()->directNoteOn(m_iDirectNoteOn, m_iDirectNoteVel);
 		} else {
 			m_dragState = DragStart;
 			m_posDrag = pos;
@@ -387,9 +386,9 @@ void drumkv1widget_elements::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 {
 	QTreeView::mouseReleaseEvent(pMouseEvent);
 
-	if (m_directNoteOn >= 0) {
-		m_pModel->instance()->directNoteOn(m_directNoteOn, 0);
-		m_directNoteOn = -1;
+	if (m_iDirectNoteOn >= 0) {
+		m_pModel->instance()->directNoteOn(m_iDirectNoteOn, 0);
+		m_iDirectNoteOn = -1;
 	}
 
 	m_pDragSample = NULL;
@@ -482,6 +481,19 @@ void drumkv1widget_elements::midiInLedNote ( int key, int vel )
 		m_pModel->midiInLedNote(key, vel);
 }
 
+
+
+// Direct note on/off velocity accessors.
+void drumkv1widget_elements::setDirectNoteVel ( int iDirectNoteVel )
+{
+	m_iDirectNoteVel = iDirectNoteVel;
+}
+
+
+int drumkv1widget_elements::directNoteVel (void) const
+{
+	return m_iDirectNoteVel;
+}
 
 
 // end of drumkv1widget_elements.cpp

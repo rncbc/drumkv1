@@ -132,6 +132,10 @@ public:
 	// MIDI input status update
 	void midiInLedNote(int key, int vel);
 
+	// Direct note on/off velocity accessors.
+	void setDirectNoteVel(int iDirectNodeVel);
+	int directNoteVel() const;
+
 signals:
 
 	// Emitted signals.
@@ -177,8 +181,8 @@ private:
 
 	drumkv1_sample *m_pDragSample;
 
-	int m_directNoteOn;
-	int m_directNoteVel;
+	int m_iDirectNoteOn;
+	int m_iDirectNoteVel;
 };
 
 
