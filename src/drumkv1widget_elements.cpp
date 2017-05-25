@@ -343,15 +343,9 @@ void drumkv1widget_elements::mousePressEvent ( QMouseEvent *pMouseEvent )
 {
 	if (pMouseEvent->button() == Qt::LeftButton) {
 		const QPoint& pos = pMouseEvent->pos();
-		if (pos.x() > 0 && pos.x() < 16 && m_pModel) {
-			drumkv1_ui *pDrumkUi = m_pModel->instance();
-			if (pDrumkUi) {
-				m_iDirectNoteOn = QTreeView::indexAt(pos).row();
-				const float v = pDrumkUi->paramValue(drumkv1::DEF1_VELOCITY);
-				const int vel = int(79.375f * v + 47.625f) & 0x7f;
-				pDrumkUi->directNoteOn(m_iDirectNoteOn, vel);
-				return; // avoid double-clicks...
-			}
+		if (pos.x() > 0 && pos.x() < 16) {
+			directNoteOn(QTreeView::indexAt(pos).row());
+			return; // avoid double-clicks...
 		} else {
 			m_dragState = DragStart;
 			m_posDrag = pos;
@@ -392,13 +386,7 @@ void drumkv1widget_elements::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 {
 	QTreeView::mouseReleaseEvent(pMouseEvent);
 
-	if (m_iDirectNoteOn >= 0 && m_pModel) {
-		drumkv1_ui *pDrumkUi = m_pModel->instance();
-		if (pDrumkUi) {
-			pDrumkUi->directNoteOn(m_iDirectNoteOn, 0);
-			m_iDirectNoteOn = -1;
-		}
-	}
+	directNoteOff();
 
 	m_pDragSample = NULL;
 	resetDragState();
@@ -488,6 +476,46 @@ void drumkv1widget_elements::midiInLedNote ( int key, int vel )
 {
 	if (m_pModel)
 		m_pModel->midiInLedNote(key, vel);
+}
+
+
+// Direct note-on/off methods.
+void drumkv1widget_elements::directNoteOn ( int key )
+{
+	if (m_pModel == NULL || key < 0)
+		return;
+
+	drumkv1_ui *pDrumkUi = m_pModel->instance();
+	if (pDrumkUi == NULL)
+		return;
+
+	drumkv1_sample *pSample = pDrumkUi->sample();
+	if (pSample == NULL)
+		return;
+
+	const float v = pDrumkUi->paramValue(drumkv1::DEF1_VELOCITY);
+	const int vel = int(79.375f * v + 47.625f) & 0x7f;
+	pDrumkUi->directNoteOn(key, vel); // note-on!
+	m_iDirectNoteOn = key;
+
+	const float srate_ms = 0.001f * pSample->sampleRate();
+	const int timeout_ms = int(float(pSample->length() >> 1) / srate_ms);
+	QTimer::singleShot(timeout_ms, this, SLOT(directNoteOff()));
+}
+
+
+void drumkv1widget_elements::directNoteOff (void)
+{
+	if (m_pModel == NULL || m_iDirectNoteOn < 0)
+		return;
+
+	drumkv1_ui *pDrumkUi = m_pModel->instance();
+	if (pDrumkUi == NULL)
+		return;
+
+	pDrumkUi->directNoteOn(m_iDirectNoteOn, 0); // note-off!
+
+	m_iDirectNoteOn = -1;
 }
 
 

@@ -114,6 +114,9 @@ protected slots:
 	// Element sample loader.
 	void loadSampleElement(const QString& sFilename);
 
+	// Element playback (direct note-on/off).
+	void playElement(void);
+
 	// Element deactivation.
 	void resetElement(void);
 
