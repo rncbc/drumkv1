@@ -7,7 +7,9 @@ ChangeLog
 GIT HEAD
 
 - Left-clicking on each element fake-LED now triggers it as
-  an internal MIDI note-on/off event. (EXPERIMENTAL)
+  an internal MIDI note-on/off event. Play (current element)
+  menu item has been also added to the the element list and
+  sample display right-click context-menu. (EXPERIMENTAL)
 
 
 0.8.2  2017-05-02  Pre-LAC2017 release frenzy.
