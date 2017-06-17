@@ -4,14 +4,14 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-GIT HEAD
+0.8.3  2017-06-21  A Summer'17 release.
 
-- Added StartupWMClass entry to desktop file. (EXPERIMENTAL)
+- Added StartupWMClass entry to desktop file.
 - Long overdue, some brand new and fundamental icons revamp.
 - Left-clicking on each element fake-LED now triggers it as
   an internal MIDI note-on/off event. Play (current element)
   menu item has been also added to the the element list and
-  sample display right-click context-menu. (EXPERIMENTAL)
+  sample display right-click context-menu.
 
 
 0.8.2  2017-05-02  Pre-LAC2017 release frenzy.
