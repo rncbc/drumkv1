@@ -1,7 +1,7 @@
 // drumkv1widget_preset.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -375,6 +375,7 @@ void drumkv1widget_preset::resetPreset (void)
 	const QString& sPreset = m_pComboBox->currentText();
 	const bool bLoadPreset = (!sPreset.isEmpty()
 		&& m_pComboBox->findText(sPreset) >= 0);
+
 	if (bLoadPreset && !queryPreset())
 		return;
 
@@ -395,7 +396,9 @@ void drumkv1widget_preset::refreshPreset (void)
 
 	const QString sOldPreset = m_pComboBox->currentText();
 	const QIcon icon(":/images/drumkv1_preset.png");
+
 	m_pComboBox->clear();
+
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig) {
 		QStringListIterator iter(pConfig->presetList());
@@ -452,9 +455,9 @@ void drumkv1widget_preset::stabilizePreset (void)
 {
 	const QString& sPreset = m_pComboBox->currentText();
 
-	bool bEnabled = (!sPreset.isEmpty());
-	bool bExists  = (m_pComboBox->findText(sPreset) >= 0);
-	bool bDirty   = (m_iDirtyPreset > 0);
+	const bool bEnabled = (!sPreset.isEmpty());
+	const bool bExists  = (m_pComboBox->findText(sPreset) >= 0);
+	const bool bDirty   = (m_iDirtyPreset > 0);
 
 	m_pSaveButton->setEnabled(bEnabled && (!bExists || bDirty));
 	m_pDeleteButton->setEnabled(bEnabled && bExists);
