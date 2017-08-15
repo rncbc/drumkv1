@@ -560,7 +560,7 @@ private:
 #include <math.h>
 
 drumkv1_controls::drumkv1_controls ( drumkv1 *pDrumk )
-	: m_pImpl(new drumkv1_controls::Impl()), m_mode(0),
+	: m_pImpl(new drumkv1_controls::Impl()), m_enabled(false),
 		m_sched_in(pDrumk), m_sched_out(pDrumk),
 		m_timeout(0), m_timein(0)
 {

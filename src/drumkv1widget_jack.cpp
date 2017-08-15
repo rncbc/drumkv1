@@ -70,7 +70,7 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 		QApplication::setStyle(QStyleFactory::create(pConfig->sCustomStyleTheme));
 
 	// Initialize (user) interface stuff...
-	m_pDrumkUi = new drumkv1_ui(m_pDrumk);
+	m_pDrumkUi = new drumkv1_ui(m_pDrumk, false);
 
 	// May initialize the scheduler/work notifier.
 	openSchedNotifier();

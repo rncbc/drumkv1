@@ -33,7 +33,11 @@ class drumkv1_ui
 {
 public:
 
-	drumkv1_ui(drumkv1 *pDrumk);
+	drumkv1_ui(drumkv1 *pDrumk, bool bPlugin);
+
+	drumkv1 *instance() const;
+
+	bool isPlugin() const;
 
 	drumkv1_element *addElement(int key);
 	drumkv1_element *element(int key) const;
@@ -51,8 +55,6 @@ public:
 
 	void setReverse(bool bReverse);
 	bool isReverse() const;
-
-	drumkv1 *instance() const;
 
 	void setParamValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index) const;
@@ -73,6 +75,8 @@ public:
 private:
 
 	drumkv1 *m_pDrumk;
+
+	bool m_bPlugin;
 };
 
 

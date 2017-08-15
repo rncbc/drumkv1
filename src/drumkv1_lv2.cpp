@@ -237,9 +237,6 @@ drumkv1_lv2::drumkv1_lv2 (
 	m_outs = new float * [nchannels];
 	for (uint16_t k = 0; k < nchannels; ++k)
 		m_ins[k] = m_outs[k] = NULL;
-
-	drumkv1::programs()->optional(true);
-	drumkv1::controls()->optional(true);
 }
 
 

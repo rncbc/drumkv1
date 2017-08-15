@@ -26,7 +26,8 @@
 // drumkv1_ui - decl.
 //
 
-drumkv1_ui::drumkv1_ui ( drumkv1 *pDrumk ) : m_pDrumk(pDrumk)
+drumkv1_ui::drumkv1_ui ( drumkv1 *pDrumk, bool bPlugin )
+	: m_pDrumk(pDrumk), m_bPlugin(bPlugin)
 {
 }
 
@@ -67,6 +68,12 @@ int drumkv1_ui::currentElement (void) const
 void drumkv1_ui::clearElements (void)
 {
 	m_pDrumk->clearElements();
+}
+
+
+bool drumkv1_ui::isPlugin (void) const
+{
+	return m_bPlugin;
 }
 
 

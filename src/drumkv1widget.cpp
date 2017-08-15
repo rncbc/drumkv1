@@ -28,6 +28,9 @@
 #include "drumkv1widget_config.h"
 #include "drumkv1widget_control.h"
 
+#include "drumkv1_controls.h"
+#include "drumkv1_programs.h"
+
 #include <QMessageBox>
 #include <QDir>
 #include <QTimer>
@@ -1451,8 +1454,7 @@ void drumkv1widget::helpConfigure (void)
 	drumkv1widget_config form(this);
 
 	// Set controllers&&programs database...
-	form.setControls(pDrumkUi->controls());
-	form.setPrograms(pDrumkUi->programs());
+	form.setInstance(pDrumkUi);
 
 	form.exec();
 }

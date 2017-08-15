@@ -24,9 +24,11 @@
 
 #include "ui_drumkv1widget_config.h"
 
-#include "drumkv1_programs.h"
-#include "drumkv1_controls.h"
 #include "drumkv1_config.h"
+
+
+// forward decls.
+class drumkv1_ui;
 
 
 //----------------------------------------------------------------------------
@@ -44,13 +46,9 @@ public:
 	// dtor.
 	~drumkv1widget_config();
 
-	// controllers accessors.
-	void setControls(drumkv1_controls *pControls);
-	drumkv1_controls *controls() const;
-
-	// programs accessors.
-	void setPrograms(drumkv1_programs *pPrograms);
-	drumkv1_programs *programs() const;
+	// instance accessors.
+	void setInstance(drumkv1_ui *pDrumkUi);
+	drumkv1_ui *instance() const;
 
 protected slots:
 
@@ -93,11 +91,8 @@ private:
 	// UI struct.
 	Ui::drumkv1widget_config m_ui;
 
-	// Controllers database.
-	drumkv1_controls *m_pControls;
-
-	// Programs database.
-	drumkv1_programs *m_pPrograms;
+	// Instance reference.
+	drumkv1_ui *m_pDrumkUi;
 
 	// Dialog dirty flag.
 	int m_iDirtyControls;

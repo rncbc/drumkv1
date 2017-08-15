@@ -22,6 +22,12 @@
 #include "drumkv1widget_config.h"
 #include "drumkv1widget_param.h"
 
+#include "drumkv1_ui.h"
+
+#include "drumkv1_controls.h"
+#include "drumkv1_programs.h"
+
+
 #include <QPushButton>
 #include <QMessageBox>
 
@@ -40,6 +46,9 @@ drumkv1widget_config::drumkv1widget_config (
 {
 	// Setup UI struct...
 	m_ui.setupUi(this);
+
+	// UI instance reference.
+	m_pDrumkUi = NULL;
 
 	// Custom style themes...
 	//m_ui.CustomStyleThemeComboBox->clear();
@@ -149,10 +158,6 @@ drumkv1widget_config::drumkv1widget_config (
 		SIGNAL(rejected()),
 		SLOT(reject()));
 
-	// Controllers, Programs database.
-	m_pControls = NULL;
-	m_pPrograms = NULL;
-
 	// Dialog dirty flags.
 	m_iDirtyControls = 0;
 	m_iDirtyPrograms = 0;
@@ -169,30 +174,45 @@ drumkv1widget_config::~drumkv1widget_config (void)
 }
 
 
-// controllers accessors.
-void drumkv1widget_config::setControls ( drumkv1_controls *pControls )
+// instance accessors.
+void drumkv1widget_config::setInstance ( drumkv1_ui *pDrumkUi )
 {
-	m_pControls = pControls;
+	m_pDrumkUi = pDrumkUi;
 
-	// Load controllers database...
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig && m_pControls) {
-		m_ui.ControlsTreeWidget->loadControls(m_pControls);
-		const bool bControlsOptional = m_pControls->optional();
-		m_ui.ControlsEnabledCheckBox->setEnabled(bControlsOptional);
-		m_ui.ControlsEnabledCheckBox->setChecked(m_pControls->enabled());
+	if (pConfig && m_pDrumkUi) {
+		const bool bOptional = m_pDrumkUi->isPlugin();
+		// Load controllers database...
+		drumkv1_controls *pControls = pDrumkUi->controls();
+		if (pControls) {
+			m_ui.ControlsTreeWidget->loadControls(pControls);
+			m_ui.ControlsEnabledCheckBox->setEnabled(bOptional);
+			m_ui.ControlsEnabledCheckBox->setChecked(pControls->enabled());
+		}
+		// Load programs database...
+		drumkv1_programs *pPrograms = pDrumkUi->programs();
+		if (pPrograms) {
+			m_ui.ProgramsTreeWidget->loadPrograms(pPrograms);
+			m_ui.ProgramsEnabledCheckBox->setEnabled(bOptional);
+			m_ui.ProgramsPreviewCheckBox->setEnabled(!bOptional);
+			m_ui.ProgramsEnabledCheckBox->setChecked(pPrograms->enabled());
+		}
+		// Widget styles not available on plugin mode...
+		m_ui.CustomStyleThemeTextLabel->setEnabled(!bOptional);
+		m_ui.CustomStyleThemeComboBox->setEnabled(!bOptional);
 	}
 
 	// Reset dialog dirty flags.
 	m_iDirtyControls = 0;
+	m_iDirtyPrograms = 0;
 
 	stabilize();
 }
 
 
-drumkv1_controls *drumkv1widget_config::controls (void) const
+drumkv1_ui *drumkv1widget_config::instance (void) const
 {
-	return m_pControls;
+	return m_pDrumkUi;
 }
 
 
@@ -239,7 +259,7 @@ void drumkv1widget_config::controlsContextMenuRequested ( const QPoint& pos )
 	QMenu menu(this);
 	QAction *pAction;
 
-	bool bEnabled = (m_pControls != NULL);
+	bool bEnabled = (m_pDrumkUi && m_pDrumkUi->controls() != NULL);
 
 	pAction = menu.addAction(QIcon(":/images/drumkv1_preset.png"),
 		tr("&Add Controller"), this, SLOT(controlsAddItem()));
@@ -265,8 +285,11 @@ void drumkv1widget_config::controlsContextMenuRequested ( const QPoint& pos )
 
 void drumkv1widget_config::controlsEnabled ( bool bOn )
 {
-	if (m_pControls && m_pControls->optional())
-		m_pControls->enabled(bOn);
+	if (m_pDrumkUi) {
+		drumkv1_controls *pControls = m_pDrumkUi->controls();
+		if (pControls && m_pDrumkUi->isPlugin())
+			pControls->enabled(bOn);
+	}
 
 	controlsChanged();
 }
@@ -277,34 +300,6 @@ void drumkv1widget_config::controlsChanged (void)
 	++m_iDirtyControls;
 
 	stabilize();
-}
-
-
-// programs accessors.
-void drumkv1widget_config::setPrograms ( drumkv1_programs *pPrograms )
-{
-	m_pPrograms = pPrograms;
-
-	// Load programs database...
-	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig && m_pPrograms) {
-		m_ui.ProgramsTreeWidget->loadPrograms(m_pPrograms);
-		const bool bProgramsOptional = m_pPrograms->optional();
-		m_ui.ProgramsEnabledCheckBox->setEnabled(bProgramsOptional);
-		m_ui.ProgramsPreviewCheckBox->setEnabled(!bProgramsOptional);
-		m_ui.ProgramsEnabledCheckBox->setChecked(m_pPrograms->enabled());
-	}
-
-	// Reset dialog dirty flags.
-	m_iDirtyPrograms = 0;
-
-	stabilize();
-}
-
-
-drumkv1_programs *drumkv1widget_config::programs (void) const
-{
-	return m_pPrograms;
 }
 
 
@@ -359,7 +354,7 @@ void drumkv1widget_config::programsContextMenuRequested ( const QPoint& pos )
 	QMenu menu(this);
 	QAction *pAction;
 
-	bool bEnabled = (m_pPrograms != NULL);
+	bool bEnabled = (m_pDrumkUi && m_pDrumkUi->programs() != NULL);
 
 	pAction = menu.addAction(QIcon(":/images/presetBank.png"),
 		tr("Add &Bank"), this, SLOT(programsAddBankItem()));
@@ -389,8 +384,11 @@ void drumkv1widget_config::programsContextMenuRequested ( const QPoint& pos )
 
 void drumkv1widget_config::programsEnabled ( bool bOn )
 {
-	if (m_pPrograms && m_pPrograms->optional())
-		m_pPrograms->enabled(bOn);
+	if (m_pDrumkUi) {
+		drumkv1_programs *pPrograms = m_pDrumkUi->programs();
+		if (pPrograms && m_pDrumkUi->isPlugin())
+			pPrograms->enabled(bOn);
+	}
 
 	programsChanged();
 }
@@ -406,8 +404,11 @@ void drumkv1widget_config::programsChanged (void)
 
 void drumkv1widget_config::programsActivated (void)
 {
-	if (m_ui.ProgramsPreviewCheckBox->isChecked() && m_pPrograms)
-		m_ui.ProgramsTreeWidget->selectProgram(m_pPrograms);
+	if (m_pDrumkUi) {
+		drumkv1_programs *pPrograms = m_pDrumkUi->programs();
+		if (m_ui.ProgramsPreviewCheckBox->isChecked() && pPrograms)
+			m_ui.ProgramsTreeWidget->selectProgram(pPrograms);
+	}
 
 	stabilize();
 }
@@ -426,16 +427,16 @@ void drumkv1widget_config::optionsChanged (void)
 void drumkv1widget_config::stabilize (void)
 {
 	QTreeWidgetItem *pItem = m_ui.ControlsTreeWidget->currentItem();
-	bool bEnabled = (m_pControls != NULL);
+	bool bEnabled = (m_pDrumkUi && m_pDrumkUi->controls() != NULL);
 	m_ui.ControlsAddItemToolButton->setEnabled(bEnabled);
 	bEnabled = bEnabled && (pItem != NULL);
 	m_ui.ControlsEditToolButton->setEnabled(bEnabled);
 	m_ui.ControlsDeleteToolButton->setEnabled(bEnabled);
 
 	pItem = m_ui.ProgramsTreeWidget->currentItem();
-	bEnabled = (m_pPrograms != NULL);
+	bEnabled = (m_pDrumkUi && m_pDrumkUi->programs() != NULL);
 	m_ui.ProgramsPreviewCheckBox->setEnabled(
-		bEnabled && m_pPrograms->enabled());
+		bEnabled && m_ui.ProgramsEnabledCheckBox->isEnabled());
 	m_ui.ProgramsAddBankToolButton->setEnabled(bEnabled);
 	m_ui.ProgramsAddItemToolButton->setEnabled(bEnabled);
 	bEnabled = bEnabled && (pItem != NULL);
@@ -453,20 +454,26 @@ void drumkv1widget_config::accept (void)
 {
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 
-	if (m_iDirtyControls > 0 && pConfig && m_pControls) {
+	if (m_iDirtyControls > 0 && pConfig && m_pDrumkUi) {
 		// Save controls...
-		m_ui.ControlsTreeWidget->saveControls(m_pControls);
-		pConfig->saveControls(m_pControls);
-		// Reset dirty flag.
-		m_iDirtyControls = 0;
+		drumkv1_controls *pControls = m_pDrumkUi->controls();
+		if (pControls) {
+			m_ui.ControlsTreeWidget->saveControls(pControls);
+			pConfig->saveControls(pControls);
+			// Reset dirty flag.
+			m_iDirtyControls = 0;
+		}
 	}
 
-	if (m_iDirtyPrograms > 0 && pConfig && m_pPrograms) {
+	if (m_iDirtyPrograms > 0 && pConfig && m_pDrumkUi) {
 		// Save programs...
-		m_ui.ProgramsTreeWidget->savePrograms(m_pPrograms);
-		pConfig->savePrograms(m_pPrograms);
-		// Reset dirty flag.
-		m_iDirtyPrograms = 0;
+		drumkv1_programs *pPrograms = m_pDrumkUi->programs();
+		if (pPrograms) {
+			m_ui.ProgramsTreeWidget->savePrograms(pPrograms);
+			pConfig->savePrograms(pPrograms);
+			// Reset dirty flag.
+			m_iDirtyPrograms = 0;
+		}
 	}
 
 	if (m_iDirtyOptions > 0 && pConfig) {
@@ -487,9 +494,19 @@ void drumkv1widget_config::accept (void)
 			pConfig->sCustomStyleTheme.clear();
 		const bool bOldUseGMDrumNames = pConfig->bUseGMDrumNames;
 		pConfig->bUseGMDrumNames = m_ui.UseGMDrumNamesCheckBox->isChecked();
-		// Show restart needed message...
-		if ((pConfig->sCustomStyleTheme != sOldCustomStyleTheme) ||
-			(!pConfig->bUseGMDrumNames && bOldUseGMDrumNames)) {
+		int iNeedRestart = 0;
+		if (!pConfig->bUseGMDrumNames && bOldUseGMDrumNames)
+			++iNeedRestart;
+ 		if (pConfig->sCustomStyleTheme != sOldCustomStyleTheme) {
+			if (pConfig->sCustomStyleTheme.isEmpty()) {
+				++iNeedRestart;
+			} else {
+				QApplication::setStyle(
+					QStyleFactory::create(pConfig->sCustomStyleTheme));
+			}
+ 		}
+		// Show restart message if needed...
+ 		if (iNeedRestart > 0) {
 			QMessageBox::information(this,
 				tr("Information") + " - " DRUMKV1_TITLE,
 				tr("Some settings may be only effective\n"
