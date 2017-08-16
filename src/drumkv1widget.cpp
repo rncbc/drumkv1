@@ -1451,12 +1451,7 @@ void drumkv1widget::helpConfigure (void)
 	if (pDrumkUi == NULL)
 		return;
 
-	drumkv1widget_config form(this);
-
-	// Set controllers&&programs database...
-	form.setInstance(pDrumkUi);
-
-	form.exec();
+	drumkv1widget_config(pDrumkUi, this).exec();
 }
 
 

@@ -41,14 +41,11 @@
 
 // ctor.
 drumkv1widget_config::drumkv1widget_config (
-	QWidget *pParent, Qt::WindowFlags wflags )
-	: QDialog(pParent, wflags)
+	drumkv1_ui *pDrumkUi, QWidget *pParent, Qt::WindowFlags wflags )
+	: QDialog(pParent, wflags), m_pDrumkUi(pDrumkUi)
 {
 	// Setup UI struct...
 	m_ui.setupUi(this);
-
-	// UI instance reference.
-	m_pDrumkUi = NULL;
 
 	// Custom style themes...
 	//m_ui.CustomStyleThemeComboBox->clear();
@@ -57,7 +54,8 @@ drumkv1widget_config::drumkv1widget_config (
 
 	// Setup options...
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig) {
+	if (pConfig && m_pDrumkUi) {
+		const bool bPlugin = m_pDrumkUi->isPlugin();
 		m_ui.ProgramsPreviewCheckBox->setChecked(pConfig->bProgramsPreview);
 		m_ui.UseNativeDialogsCheckBox->setChecked(pConfig->bUseNativeDialogs);
 		m_ui.KnobDialModeComboBox->setCurrentIndex(pConfig->iKnobDialMode);
@@ -67,7 +65,24 @@ drumkv1widget_config::drumkv1widget_config (
 			iCustomStyleTheme = m_ui.CustomStyleThemeComboBox->findText(
 				pConfig->sCustomStyleTheme);
 		m_ui.CustomStyleThemeComboBox->setCurrentIndex(iCustomStyleTheme);
+		m_ui.CustomStyleThemeTextLabel->setEnabled(!bPlugin);
+		m_ui.CustomStyleThemeComboBox->setEnabled(!bPlugin);
 		m_ui.UseGMDrumNamesCheckBox->setChecked(pConfig->bUseGMDrumNames);
+		// Load controllers database...
+		drumkv1_controls *pControls = m_pDrumkUi->controls();
+		if (pControls) {
+			m_ui.ControlsTreeWidget->loadControls(pControls);
+			m_ui.ControlsEnabledCheckBox->setEnabled(bPlugin);
+			m_ui.ControlsEnabledCheckBox->setChecked(pControls->enabled());
+		}
+		// Load programs database...
+		drumkv1_programs *pPrograms = m_pDrumkUi->programs();
+		if (pPrograms) {
+			m_ui.ProgramsTreeWidget->loadPrograms(pPrograms);
+			m_ui.ProgramsEnabledCheckBox->setEnabled(bPlugin);
+			m_ui.ProgramsPreviewCheckBox->setEnabled(!bPlugin);
+			m_ui.ProgramsEnabledCheckBox->setChecked(pPrograms->enabled());
+		}
 	}
 
 	// Signal/slots connections...
@@ -174,43 +189,7 @@ drumkv1widget_config::~drumkv1widget_config (void)
 }
 
 
-// instance accessors.
-void drumkv1widget_config::setInstance ( drumkv1_ui *pDrumkUi )
-{
-	m_pDrumkUi = pDrumkUi;
-
-	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig && m_pDrumkUi) {
-		const bool bOptional = m_pDrumkUi->isPlugin();
-		// Load controllers database...
-		drumkv1_controls *pControls = pDrumkUi->controls();
-		if (pControls) {
-			m_ui.ControlsTreeWidget->loadControls(pControls);
-			m_ui.ControlsEnabledCheckBox->setEnabled(bOptional);
-			m_ui.ControlsEnabledCheckBox->setChecked(pControls->enabled());
-		}
-		// Load programs database...
-		drumkv1_programs *pPrograms = pDrumkUi->programs();
-		if (pPrograms) {
-			m_ui.ProgramsTreeWidget->loadPrograms(pPrograms);
-			m_ui.ProgramsEnabledCheckBox->setEnabled(bOptional);
-			m_ui.ProgramsPreviewCheckBox->setEnabled(!bOptional);
-			m_ui.ProgramsEnabledCheckBox->setChecked(pPrograms->enabled());
-		}
-		// Widget styles not available on plugin mode...
-		m_ui.CustomStyleThemeTextLabel->setEnabled(!bOptional);
-		m_ui.CustomStyleThemeComboBox->setEnabled(!bOptional);
-	}
-
-	// Reset dialog dirty flags.
-	m_iDirtyControls = 0;
-	m_iDirtyPrograms = 0;
-
-	stabilize();
-}
-
-
-drumkv1_ui *drumkv1widget_config::instance (void) const
+drumkv1_ui *drumkv1widget_config::ui_instance (void) const
 {
 	return m_pDrumkUi;
 }

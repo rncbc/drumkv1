@@ -41,14 +41,14 @@ class drumkv1widget_config : public QDialog
 public:
 
 	// ctor.
-	drumkv1widget_config(QWidget *pParent = 0, Qt::WindowFlags wflags = 0);
+	drumkv1widget_config(drumkv1_ui *pDrumkUi,
+		QWidget *pParent = 0, Qt::WindowFlags wflags = 0);
 
 	// dtor.
 	~drumkv1widget_config();
 
-	// instance accessors.
-	void setInstance(drumkv1_ui *pDrumkUi);
-	drumkv1_ui *instance() const;
+	// UI instance accessors.
+	drumkv1_ui *ui_instance() const;
 
 protected slots:
 
