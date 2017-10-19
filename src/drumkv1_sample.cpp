@@ -120,7 +120,7 @@ bool drumkv1_sample::open ( const char *filename, float freq0 )
 				delete [] inpb;
 				// identical rates now...
 				m_rate0 = float(rout);
-				m_nframes = nout;
+				m_nframes = (nout - resampler.out_count);
 			}
 		}
 		else m_nframes = ninp;
