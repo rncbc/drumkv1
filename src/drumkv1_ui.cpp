@@ -21,6 +21,8 @@
 
 #include "drumkv1_ui.h"
 
+#include "drumkv1_param.h"
+
 
 //-------------------------------------------------------------------------
 // drumkv1_ui - decl.
@@ -102,6 +104,17 @@ void drumkv1_ui::setReverse ( bool bReverse )
 bool drumkv1_ui::isReverse (void) const
 {
 	return m_pDrumk->isReverse();
+}
+
+
+bool drumkv1_ui::loadPreset ( const QString& sFilename )
+{
+	return drumkv1_param::loadPreset(m_pDrumk, sFilename);
+}
+
+bool drumkv1_ui::savePreset ( const QString& sFilename )
+{
+	return drumkv1_param::savePreset(m_pDrumk, sFilename);
 }
 
 

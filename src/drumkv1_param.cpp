@@ -298,10 +298,10 @@ bool drumkv1_param::paramFloat ( drumkv1::ParamIndex index )
 
 
 // Preset serialization methods.
-void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
+bool drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 {
 	if (pDrumk == NULL)
-		return;
+		return false;
 
 	QFileInfo fi(sFilename);
 	if (!fi.exists()) {
@@ -310,16 +310,16 @@ void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 			const QString& sPresetFile
 				= pConfig->presetFile(sFilename);
 			if (sPresetFile.isEmpty())
-				return;
+				return false;
 			fi.setFile(sPresetFile);
 			if (!fi.exists())
-				return;
+				return false;
 		}
 	}
 
 	QFile file(fi.filePath());
 	if (!file.open(QIODevice::ReadOnly))
-		return;
+		return false;
 
 	static QHash<QString, drumkv1::ParamIndex> s_hash;
 	if (s_hash.isEmpty()) {
@@ -377,13 +377,15 @@ void drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 	pDrumk->reset();
 
 	QDir::setCurrent(currentDir.absolutePath());
+
+	return true;
 }
 
 
-void drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
+bool drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
 {
 	if (pDrumk == NULL)
-		return;
+		return true;
 
 	const QFileInfo fi(sFilename);
 	const QDir currentDir(QDir::current());
@@ -412,12 +414,15 @@ void drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
 	doc.appendChild(ePreset);
 
 	QFile file(fi.filePath());
-	if (file.open(QIODevice::WriteOnly | QIODevice::Truncate)) {
-		QTextStream(&file) << doc.toString();
-		file.close();
-	}
+	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
+		return false;
+
+	QTextStream(&file) << doc.toString();
+	file.close();
 
 	QDir::setCurrent(currentDir.absolutePath());
+
+	return true;
 }
 
 

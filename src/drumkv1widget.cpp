@@ -913,7 +913,7 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
-		drumkv1_param::loadPreset(pDrumkUi->instance(), sFilename);
+		pDrumkUi->loadPreset(sFilename);
 
 	updateLoadPreset(QFileInfo(sFilename).completeBaseName());
 }
@@ -927,7 +927,7 @@ void drumkv1widget::savePreset ( const QString& sFilename )
 
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
-		drumkv1_param::savePreset(pDrumkUi->instance(), sFilename);
+		pDrumkUi->savePreset(sFilename);
 
 	const QString& sPreset
 		= QFileInfo(sFilename).completeBaseName();

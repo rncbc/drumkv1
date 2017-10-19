@@ -24,6 +24,8 @@
 
 #include "drumkv1.h"
 
+#include <QString>
+
 
 //-------------------------------------------------------------------------
 // drumkv1_ui - decl.
@@ -55,6 +57,9 @@ public:
 
 	void setReverse(bool bReverse);
 	bool isReverse() const;
+
+	bool loadPreset(const QString& sFilename);
+	bool savePreset(const QString& sFilename);
 
 	void setParamValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index) const;

@@ -55,10 +55,8 @@ namespace drumkv1_param
 		const map_path& mapPath = map_path());
 
 	// Preset serialization methods.
-	void loadPreset(drumkv1 *pDrumk,
-		const QString& sFilename);
-	void savePreset(drumkv1 *pDrumk,
-		const QString& sFilename);
+	bool loadPreset(drumkv1 *pDrumk, const QString& sFilename);
+	bool savePreset(drumkv1 *pDrumk, const QString& sFilename);
 
 	// Default parameter name/value helpers.
 	const char *paramName(drumkv1::ParamIndex index);
