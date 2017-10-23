@@ -250,9 +250,14 @@ void drumkv1_param::saveElements (
 			continue;
 		QFileInfo fi(QString::fromUtf8(pszSampleFile));
 		if (bSymLink) {
-			const QString& sLinkname = fi.fileName();
-			QFile(fi.absoluteFilePath()).link(sLinkname);
-			fi.setFile(QDir::current(), sLinkname);
+			const QString& sPath = fi.absoluteFilePath();
+			const QString& sName = fi.baseName();
+			const QString& sExt  = fi.completeSuffix();
+			const QString& sLink = sName
+				+ '-' + QString::number(qHash(sPath), 16)
+				+ '.' + sExt;
+			QFile(sPath).link(sLink);
+			fi.setFile(QDir::current(), sLink);
 		}
 		QDomElement eElement = doc.createElement("element");
 		eElement.setAttribute("index", QString::number(note));
