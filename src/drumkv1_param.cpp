@@ -1,7 +1,7 @@
 // drumkv1_param.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -205,7 +205,6 @@ void drumkv1_param::loadElements (
 				if (eChild.tagName() == "sample") {
 				//	int index = eChild.attribute("index").toInt();
 					const QString& sFilename = eChild.text();
-					//	= QFileInfo(eChild.text()).canonicalFilePath();
 					element->setSampleFile(
 						mapPath.absolutePath(sFilename).toUtf8().constData());
 				}
@@ -237,7 +236,7 @@ void drumkv1_param::loadElements (
 
 void drumkv1_param::saveElements (
 	drumkv1 *pDrumk, QDomDocument& doc, QDomElement& eElements,
-	const drumkv1_param::map_path& mapPath )
+	const drumkv1_param::map_path& mapPath, bool bSymLink )
 {
 	if (pDrumk == NULL)
 		return;
@@ -249,6 +248,12 @@ void drumkv1_param::saveElements (
 		const char *pszSampleFile = element->sampleFile();
 		if (pszSampleFile == NULL)
 			continue;
+		QFileInfo fi(QString::fromUtf8(pszSampleFile));
+		if (bSymLink) {
+			const QString& sLinkname = fi.fileName();
+			QFile(fi.absoluteFilePath()).link(sLinkname);
+			fi.setFile(QDir::current(), sLinkname);
+		}
 		QDomElement eElement = doc.createElement("element");
 		eElement.setAttribute("index", QString::number(note));
 	//	eElement.setAttribute("name", noteName(note));
@@ -256,7 +261,7 @@ void drumkv1_param::saveElements (
 		eSample.setAttribute("index", 0);
 		eSample.setAttribute("name", "GEN1_SAMPLE");
 		eSample.appendChild(doc.createTextNode(
-			mapPath.abstractPath(QString::fromUtf8(pszSampleFile))));
+			mapPath.abstractPath(fi.absoluteFilePath())));
 		eElement.appendChild(eSample);
 		QDomElement eParams = doc.createElement("params");
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -298,7 +303,8 @@ bool drumkv1_param::paramFloat ( drumkv1::ParamIndex index )
 
 
 // Preset serialization methods.
-bool drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
+bool drumkv1_param::loadPreset (
+	drumkv1 *pDrumk, const QString& sFilename )
 {
 	if (pDrumk == NULL)
 		return false;
@@ -382,10 +388,11 @@ bool drumkv1_param::loadPreset ( drumkv1 *pDrumk, const QString& sFilename )
 }
 
 
-bool drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
+bool drumkv1_param::savePreset (
+	drumkv1 *pDrumk, const QString& sFilename, bool bSymLink )
 {
 	if (pDrumk == NULL)
-		return true;
+		return false;
 
 	const QFileInfo fi(sFilename);
 	const QDir currentDir(QDir::current());
@@ -397,7 +404,7 @@ bool drumkv1_param::savePreset ( drumkv1 *pDrumk, const QString& sFilename )
 	ePreset.setAttribute("version", CONFIG_BUILD_VERSION);
 
 	QDomElement eElements = doc.createElement("elements");
-	drumkv1_param::saveElements(pDrumk, doc, eElements);
+	drumkv1_param::saveElements(pDrumk, doc, eElements, map_path(), bSymLink);
 	ePreset.appendChild(eElements);
 
 	QDomElement eParams = doc.createElement("params");

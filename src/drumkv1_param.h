@@ -1,7 +1,7 @@
 // drumkv1_param.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2016, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -52,11 +52,15 @@ namespace drumkv1_param
 		const map_path& mapPath = map_path());
 	void saveElements(drumkv1 *pDrumk,
 		QDomDocument& doc, QDomElement& eElements,
-		const map_path& mapPath = map_path());
+		const map_path& mapPath = map_path(),
+		bool bSymLink = false);
 
 	// Preset serialization methods.
-	bool loadPreset(drumkv1 *pDrumk, const QString& sFilename);
-	bool savePreset(drumkv1 *pDrumk, const QString& sFilename);
+	bool loadPreset(drumkv1 *pDrumk,
+		const QString& sFilename);
+	bool savePreset(drumkv1 *pDrumk,
+		const QString& sFilename,
+		bool bSymLink = false);
 
 	// Default parameter name/value helpers.
 	const char *paramName(drumkv1::ParamIndex index);
