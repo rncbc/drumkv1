@@ -11,7 +11,6 @@ include(src_core.pri)
 HEADERS = \
 	config.h \
 	drumkv1.h \
-	drumkv1_ui.h \
 	drumkv1_config.h \
 	drumkv1_filter.h \
 	drumkv1_formant.h \
@@ -29,7 +28,6 @@ HEADERS = \
 
 SOURCES = \
 	drumkv1.cpp \
-	drumkv1_ui.cpp \
 	drumkv1_config.cpp \
 	drumkv1_formant.cpp \
 	drumkv1_resampler.cpp \

@@ -11,11 +11,6 @@ include(src_lv2.pri)
 
 HEADERS = \
 	config.h \
-	drumkv1.h \
-	drumkv1_config.h \
-	drumkv1_param.h \
-	drumkv1_programs.h \
-	drumkv1_controls.h \
 	drumkv1_lv2.h
 
 SOURCES = \

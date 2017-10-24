@@ -11,10 +11,7 @@ include(src_ui.pri)
 
 HEADERS = \
 	config.h \
-	drumkv1_config.h \
-	drumkv1_param.h \
-	drumkv1_programs.h \
-	drumkv1_controls.h \
+	drumkv1_ui.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
 	drumkv1widget_filt.h \
@@ -30,6 +27,7 @@ HEADERS = \
 	drumkv1widget_config.h
 
 SOURCES = \
+	drumkv1_ui.cpp \
 	drumkv1widget.cpp \
 	drumkv1widget_env.cpp \
 	drumkv1widget_filt.cpp \

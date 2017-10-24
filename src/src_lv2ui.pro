@@ -11,21 +11,7 @@ include(src_lv2.pri)
 
 HEADERS = \
 	config.h \
-	drumkv1_ui.h \
 	drumkv1_lv2ui.h \
-	drumkv1widget.h \
-	drumkv1widget_env.h \
-	drumkv1widget_filt.h \
-	drumkv1widget_sample.h \
-	drumkv1widget_wave.h \
-	drumkv1widget_param.h \
-	drumkv1widget_preset.h \
-	drumkv1widget_status.h \
-	drumkv1widget_elements.h \
-	drumkv1widget_programs.h \
-	drumkv1widget_controls.h \
-	drumkv1widget_control.h \
-	drumkv1widget_config.h \
 	drumkv1widget_lv2.h
 
 SOURCES = \
