@@ -31,6 +31,8 @@
 #include "drumkv1_controls.h"
 #include "drumkv1_programs.h"
 
+#include "ui_drumkv1widget.h"
+
 #include <QMessageBox>
 #include <QDir>
 #include <QTimer>
@@ -45,7 +47,7 @@
 
 // Constructor.
 drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
-	: QWidget(pParent, wflags)
+	: QWidget(pParent, wflags), p_ui(new Ui::drumkv1widget), m_ui(*p_ui)
 {
 	Q_INIT_RESOURCE(drumkv1);
 
@@ -519,6 +521,8 @@ drumkv1widget::~drumkv1widget (void)
 {
 	if (m_sched_notifier)
 		delete m_sched_notifier;
+
+	delete p_ui;
 }
 
 

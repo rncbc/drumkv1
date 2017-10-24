@@ -22,12 +22,14 @@
 #ifndef __drumkv1widget_config_h
 #define __drumkv1widget_config_h
 
-#include "ui_drumkv1widget_config.h"
-
 #include "drumkv1_config.h"
+
+#include <QDialog>
 
 
 // forward decls.
+namespace Ui { class drumkv1widget_config; }
+
 class drumkv1_ui;
 
 
@@ -89,7 +91,8 @@ protected:
 private:
 
 	// UI struct.
-	Ui::drumkv1widget_config m_ui;
+	Ui::drumkv1widget_config *p_ui;
+	Ui::drumkv1widget_config& m_ui;
 
 	// Instance reference.
 	drumkv1_ui *m_pDrumkUi;

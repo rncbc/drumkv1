@@ -27,6 +27,7 @@
 
 #include "drumkv1_sample.h"
 
+#include <QApplication>
 #include <QHeaderView>
 #include <QFileInfo>
 #include <QMimeData>

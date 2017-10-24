@@ -22,16 +22,21 @@
 #ifndef __drumkv1widget_h
 #define __drumkv1widget_h
 
-#include "ui_drumkv1widget.h"
-
 #include "drumkv1_config.h"
 #include "drumkv1_sched.h"
 
 #include "drumkv1_ui.h"
 
+#include <QWidget>
+
 
 // forward decls.
+namespace Ui { class drumkv1widget; }
+
+class drumkv1widget_param;
 class drumkv1widget_sched;
+
+class QGroupBox;
 
 
 //-------------------------------------------------------------------------
@@ -200,7 +205,8 @@ protected:
 private:
 
 	// Instance variables.
-	Ui::drumkv1widget m_ui;
+	Ui::drumkv1widget *p_ui;
+	Ui::drumkv1widget& m_ui;
 
 	drumkv1widget_sched *m_sched_notifier;
 

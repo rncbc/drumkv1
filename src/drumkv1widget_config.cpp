@@ -27,6 +27,7 @@
 #include "drumkv1_controls.h"
 #include "drumkv1_programs.h"
 
+#include "ui_drumkv1widget_config.h"
 
 #include <QPushButton>
 #include <QMessageBox>
@@ -42,7 +43,8 @@
 // ctor.
 drumkv1widget_config::drumkv1widget_config (
 	drumkv1_ui *pDrumkUi, QWidget *pParent, Qt::WindowFlags wflags )
-	: QDialog(pParent, wflags), m_pDrumkUi(pDrumkUi)
+	: QDialog(pParent, wflags), p_ui(new Ui::drumkv1widget_config), m_ui(*p_ui),
+		m_pDrumkUi(pDrumkUi)
 {
 	// Setup UI struct...
 	m_ui.setupUi(this);
@@ -186,6 +188,7 @@ drumkv1widget_config::drumkv1widget_config (
 // dtor.
 drumkv1widget_config::~drumkv1widget_config (void)
 {
+	delete p_ui;
 }
 
 
