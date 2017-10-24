@@ -5,16 +5,13 @@ NAME = drumkv1
 TARGET = $${NAME}_lv2ui
 TEMPLATE = lib
 CONFIG += shared plugin
+LIBS += -L.
 
 include(src_lv2.pri)
 
 HEADERS = \
 	config.h \
 	drumkv1_ui.h \
-	drumkv1_config.h \
-	drumkv1_param.h \
-	drumkv1_programs.h \
-	drumkv1_controls.h \
 	drumkv1_lv2ui.h \
 	drumkv1widget.h \
 	drumkv1widget_env.h \
@@ -33,27 +30,7 @@ HEADERS = \
 
 SOURCES = \
 	drumkv1_lv2ui.cpp \
-	drumkv1widget.cpp \
-	drumkv1widget_env.cpp \
-	drumkv1widget_filt.cpp \
-	drumkv1widget_sample.cpp \
-	drumkv1widget_wave.cpp \
-	drumkv1widget_param.cpp \
-	drumkv1widget_preset.cpp \
-	drumkv1widget_status.cpp \
-	drumkv1widget_elements.cpp \
-	drumkv1widget_programs.cpp \
-	drumkv1widget_controls.cpp \
-	drumkv1widget_control.cpp \
-	drumkv1widget_config.cpp \
 	drumkv1widget_lv2.cpp
-
-FORMS = \
-	drumkv1widget.ui \
-	drumkv1widget_control.ui \
-	drumkv1widget_config.ui
-
-RESOURCES += drumkv1.qrc
 
 
 unix {
@@ -108,7 +85,7 @@ unix {
 
 	QMAKE_CLEAN += $${TARGET_LV2UI}.so $${TARGET_LV2UI}.ttl
 
-	LIBS += -L. -l$${NAME} -L$${NAME}.lv2 -Wl,-rpath,$${LIBDIR}:$${LV2DIR}/$${NAME}.lv2
+	LIBS += -l$${NAME} -l$${NAME}_ui -L$${NAME}.lv2 -Wl,-rpath,$${LIBDIR}:$${LV2DIR}/$${NAME}.lv2
 }
 
 QT += xml

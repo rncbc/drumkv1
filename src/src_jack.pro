@@ -36,27 +36,7 @@ HEADERS = \
 SOURCES = \
 	drumkv1_nsm.cpp \
 	drumkv1_jack.cpp \
-	drumkv1widget.cpp \
-	drumkv1widget_env.cpp \
-	drumkv1widget_filt.cpp \
-	drumkv1widget_sample.cpp \
-	drumkv1widget_wave.cpp \
-	drumkv1widget_param.cpp \
-	drumkv1widget_preset.cpp \
-	drumkv1widget_status.cpp \
-	drumkv1widget_elements.cpp \
-	drumkv1widget_programs.cpp \
-	drumkv1widget_controls.cpp \
-	drumkv1widget_control.cpp \
-	drumkv1widget_config.cpp \
 	drumkv1widget_jack.cpp
-
-FORMS = \
-	drumkv1widget.ui \
-	drumkv1widget_control.ui \
-	drumkv1widget_config.ui
-
-RESOURCES += drumkv1.qrc
 
 
 unix {
@@ -114,7 +94,7 @@ unix {
 	mimetypes_scalable.path = $${DATADIR}/icons/hicolor/scalable/mimetypes
 	mimetypes_scalable.files += mimetypes/application-x-$${NAME}-preset.svg
 
-	LIBS += -l$${NAME} -Wl,-rpath,$${LIBDIR}
+	LIBS += -l$${NAME} -l$${NAME}_ui -Wl,-rpath,$${LIBDIR}
 }
 
 QT += xml
