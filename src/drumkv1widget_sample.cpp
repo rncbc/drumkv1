@@ -550,7 +550,9 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 	if (pConfig == NULL)
 		return;
 
-	QString sFilename;
+	QString sFilename = pConfig->sSampleDir;
+	if (m_pSample && m_pSample->filename())
+		sFilename = QString::fromUtf8(m_pSample->filename());
 
 	// Cache supported file-types stuff from libsndfile...
 	static QStringList s_filters;
@@ -596,10 +598,9 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 	}
 #if 1//QT_VERSION < 0x040400
 	sFilename = QFileDialog::getOpenFileName(pParentWidget,
-		sTitle, pConfig->sSampleDir, sFilter, NULL, options);
+		sTitle, sFilename, sFilter, NULL, options);
 #else
-	QFileDialog fileDialog(pParentWidget,
-		sTitle, pConfig->sSampleDir, sFilter);
+	QFileDialog fileDialog(pParentWidget, sTitle, sFilename, sFilter);
 	fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
 	fileDialog.setFileMode(QFileDialog::ExistingFile);
 	QList<QUrl> urls(fileDialog.sidebarUrls());
