@@ -586,11 +586,7 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 
 	const QString& sTitle  = tr("Open Sample [%1]").arg(sName) + " - " DRUMKV1_TITLE;
 	const QString& sFilter = s_filters.join(";;");
-#if QT_VERSION < 0x040400
 	QWidget *pParentWidget = NULL;
-#else
-	QWidget *pParentWidget = nativeParentWidget();
-#endif
 	QFileDialog::Options options = 0;
 	if (pConfig->bDontUseNativeDialogs) {
 		options |= QFileDialog::DontUseNativeDialog;

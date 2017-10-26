@@ -237,11 +237,7 @@ void drumkv1widget_preset::openPreset (void)
 	const QString& sTitle  = tr("Open Preset") + " - " DRUMKV1_TITLE;
 	const QString& sFilter = tr("Preset files (*.%1)").arg(sExt);
 
-#if QT_VERSION < 0x040400
 	QWidget *pParentWidget = NULL;
-#else
-	QWidget *pParentWidget = nativeParentWidget();
-#endif
 	QFileDialog::Options options = 0;
 	if (pConfig->bDontUseNativeDialogs) {
 		options |= QFileDialog::DontUseNativeDialog;
@@ -309,11 +305,7 @@ void drumkv1widget_preset::savePreset ( const QString& sPreset )
 	if (!fi.exists()) {
 		const QString& sTitle  = tr("Save Preset") + " - " DRUMKV1_TITLE;
 		const QString& sFilter = tr("Preset files (*.%1)").arg(sExt);
-	#if QT_VERSION < 0x040400
 		QWidget *pParentWidget = NULL;
-	#else
-		QWidget *pParentWidget = nativeParentWidget();
-	#endif
 		QFileDialog::Options options = 0;
 		if (pConfig->bDontUseNativeDialogs) {
 			options |= QFileDialog::DontUseNativeDialog;

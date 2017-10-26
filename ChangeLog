@@ -12,7 +12,7 @@ GIT HEAD
   the preset drop-down listing, while only the first one is
   loaded effectively into the scene as usual. (EXPERIMENTAL)
 - Desktop entry specification file is now finally independent
-  from build/configure template chains.
+  from all build/configure template chains, whatever.
 - Updated target path for freedesktop.org's AppStream metainfo
   file (formerly AppData).
 
