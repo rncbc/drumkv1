@@ -59,7 +59,7 @@ const uint16_t MAX_VOICES = 32;			// polyphony
 const uint8_t  MAX_NOTES  = 128;
 const uint8_t  MAX_GROUP  = 128;
 
-const float MIN_ENV_MSECS = 2.0f;		// min 2 msec per stage
+const float MIN_ENV_MSECS = 0.5f;		// min 500 usec per stage
 const float MAX_ENV_MSECS = 2000.0f;	// max 2 sec per stage (default)
 
 const float DETUNE_SCALE  = 0.5f;
@@ -273,14 +273,11 @@ struct drumkv1_env
 		p->running = true;
 		p->stage = Attack;
 		p->frames = uint32_t(*attack * *attack * max_frames);
+		if (p->frames < min_frames1) // prevent click on too fast attack
+			p->frames = min_frames1;
 		p->phase = 0.0f;
-		if (p->frames > 0) {
-			p->delta = 1.0f / float(p->frames);
-			p->value = 0.0f;
-		} else {
-			p->delta = 0.0f;
-			p->value = 1.0f;
-		}
+		p->delta = 1.0f / float(p->frames);
+		p->value = 0.0f;
 		p->c1 = 1.0f;
 		p->c0 = 0.0f;
 	}
@@ -290,8 +287,8 @@ struct drumkv1_env
 		if (p->stage == Attack) {
 			p->stage = Decay1;
 			p->frames = uint32_t(*decay1 * *decay1 * max_frames);
-			if (p->frames < min_frames) // prevent click on too fast decay
-				p->frames = min_frames;
+			if (p->frames < min_frames2) // prevent click on too fast decay1
+				p->frames = min_frames2;
 			p->phase = 0.0f;
 			p->delta = 1.0f / float(p->frames);
 			p->c1 = *level2 - 1.0f;
@@ -300,8 +297,8 @@ struct drumkv1_env
 		else if (p->stage == Decay1) {
 			p->stage = Decay2;
 			p->frames = uint32_t(*decay2 * *decay2 * max_frames);
-			if (p->frames < min_frames) // prevent click on too fast decay
-				p->frames = min_frames;
+			if (p->frames < min_frames2) // prevent click on too fast decay2
+				p->frames = min_frames2;
 			p->phase = 0.0f;
 			p->delta = 1.0f / float(p->frames);
 			p->c1 = -(p->value);
@@ -324,8 +321,8 @@ struct drumkv1_env
 		p->running = true;
 		p->stage = Decay2;
 		p->frames = uint32_t(*decay2 * *decay2 * max_frames);
-		if (p->frames < min_frames) // prevent click on too fast release
-			p->frames = min_frames;
+		if (p->frames < min_frames2) // prevent click on too fast release
+			p->frames = min_frames2;
 		p->phase = 0.0f;
 		p->delta = 1.0f / float(p->frames);
 		p->c1 = -(p->value);
@@ -336,7 +333,7 @@ struct drumkv1_env
 	{
 		p->running = true;
 		p->stage = Decay2;
-		p->frames = min_frames;
+		p->frames = min_frames2;
 		p->phase = 0.0f;
 		p->delta = 1.0f / float(p->frames);
 		p->c1 = -(p->value);
@@ -350,7 +347,8 @@ struct drumkv1_env
 	drumkv1_port level2;
 	drumkv1_port decay2;
 
-	uint32_t min_frames;
+	uint32_t min_frames1;
+	uint32_t min_frames2;
 	uint32_t max_frames;
 };
 
@@ -695,19 +693,23 @@ void drumkv1_elem::updateEnvTimes ( float srate )
 	if (envtime_msecs < MIN_ENV_MSECS)
 		envtime_msecs = (gen1_sample.length() >> 1) / srate_ms;
 	if (envtime_msecs < MIN_ENV_MSECS)
-		envtime_msecs = MIN_ENV_MSECS * 2.0f;
+		envtime_msecs = MIN_ENV_MSECS * 4.0f;
 
-	const uint32_t min_frames = uint32_t(srate_ms * MIN_ENV_MSECS);
-	const uint32_t max_frames = uint32_t(srate_ms * envtime_msecs);
+	const uint32_t min_frames1 = uint32_t(srate_ms * MIN_ENV_MSECS);
+	const uint32_t min_frames2 = (min_frames1 << 2);
+	const uint32_t max_frames  = uint32_t(srate_ms * envtime_msecs);
 
-	dcf1.env.min_frames = min_frames;
-	dcf1.env.max_frames = max_frames;
+	dcf1.env.min_frames1 = min_frames1;
+	dcf1.env.min_frames2 = min_frames2;
+	dcf1.env.max_frames  = max_frames;
 
-	lfo1.env.min_frames = min_frames;
-	lfo1.env.max_frames = max_frames;
+	lfo1.env.min_frames1 = min_frames1;
+	lfo1.env.min_frames2 = min_frames2;
+	lfo1.env.max_frames  = max_frames;
 
-	dca1.env.min_frames = min_frames;
-	dca1.env.max_frames = max_frames;
+	dca1.env.min_frames1 = min_frames1;
+	dca1.env.min_frames2 = min_frames2;
+	dca1.env.max_frames  = max_frames;
 }
 
 
