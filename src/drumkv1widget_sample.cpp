@@ -1,7 +1,7 @@
 // drumkv1widget_sample.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2015, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -483,22 +483,6 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 
     painter.fillRect(rect, rgbDark);
 
-	QString sTitle = m_sName;
-	if (m_pSample && m_pSample->filename()) {
-		if (!sTitle.isEmpty()) {
-			sTitle += ' ';
-			sTitle += '-';
-			sTitle += ' ';
-		}
-		sTitle += QFileInfo(
-			QString::fromUtf8(m_pSample->filename())
-		).completeBaseName();
-	}
-	if (!sTitle.isEmpty()) {
-		painter.setPen(pal.midlight().color());
-		painter.drawText(rect.adjusted(2, 0, -2, -0), Qt::AlignLeft, sTitle);
-	}
-
 	if (m_pSample && m_ppPolyg) {
 		const int w2 = (w << 1);
 		painter.setRenderHint(QPainter::Antialiasing, true);
@@ -535,6 +519,22 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		painter.setPen(pal.midlight().color());
 		painter.drawText(rect, Qt::AlignCenter,
 			tr("(double-click or drop to load new sample...)"));
+	}
+
+	QString sTitle = m_sName;
+	if (m_pSample && m_pSample->filename()) {
+		if (!sTitle.isEmpty()) {
+			sTitle += ' ';
+			sTitle += '-';
+			sTitle += ' ';
+		}
+		sTitle += QFileInfo(
+			QString::fromUtf8(m_pSample->filename())
+		).completeBaseName();
+	}
+	if (!sTitle.isEmpty()) {
+		painter.setPen(pal.midlight().color());
+		painter.drawText(rect.adjusted(2, 0, -2, -0), Qt::AlignLeft, sTitle);
 	}
 
 	painter.end();
