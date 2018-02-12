@@ -259,6 +259,7 @@ void drumkv1_param::saveElements (
 			QFile(sPath).link(sLink);
 			fi.setFile(QDir::current(), sLink);
 		}
+		else if (fi.isSymLink()) fi.setFile(fi.symLinkTarget());
 		QDomElement eElement = doc.createElement("element");
 		eElement.setAttribute("index", QString::number(note));
 	//	eElement.setAttribute("name", noteName(note));
