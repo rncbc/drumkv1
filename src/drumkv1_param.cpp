@@ -1,7 +1,7 @@
 // drumkv1_param.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -249,7 +249,7 @@ void drumkv1_param::saveElements (
 		if (pszSampleFile == NULL)
 			continue;
 		QFileInfo fi(QString::fromUtf8(pszSampleFile));
-		if (bSymLink) {
+		if (bSymLink && fi.absolutePath() != QDir::current().absolutePath()) {
 			const QString& sPath = fi.absoluteFilePath();
 			const QString& sName = fi.baseName();
 			const QString& sExt  = fi.completeSuffix();
