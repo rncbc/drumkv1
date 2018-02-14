@@ -204,9 +204,11 @@ void drumkv1_param::loadElements (
 					continue;
 				if (eChild.tagName() == "sample") {
 				//	int index = eChild.attribute("index").toInt();
-					const QString& sFilename = eChild.text();
+					QFileInfo fi(eChild.text());
+					if (fi.isSymLink())
+						fi.setFile(fi.symLinkTarget());
 					element->setSampleFile(
-						mapPath.absolutePath(sFilename).toUtf8().constData());
+						mapPath.absolutePath(fi.filePath()).toUtf8().constData());
 				}
 				else
 				if (eChild.tagName() == "params") {
