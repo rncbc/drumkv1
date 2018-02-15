@@ -234,12 +234,10 @@ void drumkv1widget_preset::openPreset (void)
 	const QString& sTitle  = tr("Open Preset") + " - " DRUMKV1_TITLE;
 	const QString& sFilter = tr("Preset files (*.%1)").arg(sExt);
 
-	QWidget *pParentWidget = NULL;
+	QWidget *pParentWidget = QWidget::window();
 	QFileDialog::Options options = 0;
-	if (pConfig->bDontUseNativeDialogs) {
+	if (pConfig->bDontUseNativeDialogs)
 		options |= QFileDialog::DontUseNativeDialog;
-		pParentWidget = parentWidget();
-	}
 #if 1//QT_VERSION < 0x040400
 	files = QFileDialog::getOpenFileNames(pParentWidget,
 		sTitle, pConfig->sPresetDir, sFilter, NULL, options);
@@ -296,18 +294,16 @@ void drumkv1widget_preset::savePreset ( const QString& sPreset )
 	if (pConfig == NULL)
 		return;
 
+	QWidget *pParentWidget = QWidget::window();
 	const QString sExt(DRUMKV1_TITLE);
 	QFileInfo fi(QDir(pConfig->sPresetDir), sPreset + '.' + sExt);
 	QString sFilename = fi.absoluteFilePath();
 	if (!fi.exists()) {
 		const QString& sTitle  = tr("Save Preset") + " - " DRUMKV1_TITLE;
 		const QString& sFilter = tr("Preset files (*.%1)").arg(sExt);
-		QWidget *pParentWidget = NULL;
 		QFileDialog::Options options = 0;
-		if (pConfig->bDontUseNativeDialogs) {
+		if (pConfig->bDontUseNativeDialogs)
 			options |= QFileDialog::DontUseNativeDialog;
-			pParentWidget = parentWidget();
-		}
 	#if 1//QT_VERSION < 0x040400
 		sFilename = QFileDialog::getSaveFileName(pParentWidget,
 			sTitle, sFilename, sFilter, NULL, options);
@@ -325,7 +321,7 @@ void drumkv1widget_preset::savePreset ( const QString& sPreset )
 			sFilename = fileDialog.selectedFiles().first();
 	#endif
 	} else {
-		if (QMessageBox::warning(parentWidget(),
+		if (QMessageBox::warning(pParentWidget,
 			tr("Warning") + " - " DRUMKV1_TITLE,
 			tr("About to replace preset:\n\n"
 			"\"%1\"\n\n"
@@ -362,7 +358,8 @@ void drumkv1widget_preset::deletePreset (void)
 	if (pConfig == NULL)
 		return;
 
-	if (QMessageBox::warning(parentWidget(),
+	QWidget *pParentWidget = QWidget::window();
+	if (QMessageBox::warning(pParentWidget,
 		tr("Warning") + " - " DRUMKV1_TITLE,
 		tr("About to remove preset:\n\n"
 		"\"%1\"\n\n"

@@ -1,7 +1,7 @@
 // drumkv1widget_sample.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -586,12 +586,10 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 
 	const QString& sTitle  = tr("Open Sample [%1]").arg(sName) + " - " DRUMKV1_TITLE;
 	const QString& sFilter = s_filters.join(";;");
-	QWidget *pParentWidget = NULL;
+	QWidget *pParentWidget = window();
 	QFileDialog::Options options = 0;
-	if (pConfig->bDontUseNativeDialogs) {
+	if (pConfig->bDontUseNativeDialogs)
 		options |= QFileDialog::DontUseNativeDialog;
-		pParentWidget = parentWidget();
-	}
 #if 1//QT_VERSION < 0x040400
 	sFilename = QFileDialog::getOpenFileName(pParentWidget,
 		sTitle, sFilename, sFilter, NULL, options);
