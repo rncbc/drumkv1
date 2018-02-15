@@ -1,7 +1,7 @@
 // drumkv1widget_jack.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -104,10 +104,6 @@ drumkv1_ui *drumkv1widget_jack::ui_instance (void) const
 void drumkv1widget_jack::setNsmClient ( drumkv1_nsm *pNsmClient )
 {
 	m_pNsmClient = pNsmClient;
-
-	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig)
-		pConfig->bDontUseNativeDialogs = true;
 }
 
 drumkv1_nsm *drumkv1widget_jack::nsmClient (void) const
