@@ -1,7 +1,7 @@
 // drumkv1.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -138,9 +138,14 @@ inline float drumkv1_pow2f ( const float x )
 
 // convert note to frequency (hertz)
 
-inline float drumkv1_freq ( float note )
+inline float drumkv1_freq2 ( float delta )
 {
-	return (440.0f / 32.0f) * ::powf(2.0f, (note - 9.0f) / 12.0f);
+	return ::powf(2.0f, delta / 12.0f);
+}
+
+inline float drumkv1_freq ( int note )
+{
+	return (440.0f / 32.0f) * drumkv1_freq2(float(note - 9));
 }
 
 
@@ -902,6 +907,8 @@ private:
 	float    m_srate;
 	float    m_bpm;
 
+	float    m_freqs[MAX_NOTES];
+
 	drumkv1_ctl m_ctl;
 
 	drumkv1_def m_def;
@@ -964,8 +971,10 @@ drumkv1_impl::drumkv1_impl (
 		m_free_list.append(m_voices[i]);
 	}
 
-	for (int note = 0; note < MAX_NOTES; ++note)
+	for (int note = 0; note < MAX_NOTES; ++note) {
+		m_freqs[note] = drumkv1_freq(note);
 		m_notes[note] = NULL;
+	}
 
 	for (int group = 0; group < MAX_GROUP; ++group)
 		m_group[group] = NULL;
@@ -1485,10 +1494,10 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				// generate
 				pv->gen1.start();
 				// frequencies
-				const float freq1 = float(key)
-					+ *elem->gen1.coarse * COARSE_SCALE
+				const float tuning1
+					= *elem->gen1.coarse * COARSE_SCALE
 					+ *elem->gen1.fine * FINE_SCALE;
-				pv->gen1_freq = drumkv1_freq(freq1);
+				pv->gen1_freq = m_freqs[key] * drumkv1_freq2(tuning1);
 				// filters
 				const int type1 = int(*elem->dcf1.type);
 				pv->dcf11.reset(drumkv1_filter1::Type(type1));
