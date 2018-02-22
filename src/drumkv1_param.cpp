@@ -135,6 +135,25 @@ float drumkv1_param::paramDefaultValue ( drumkv1::ParamIndex index )
 }
 
 
+float drumkv1_param::paramSafeValue ( drumkv1::ParamIndex index, float fValue )
+{
+	const ParamInfo& param = drumkv1_params[index];
+
+	if (param.type == PARAM_BOOL)
+		return (fValue > 0.5f ? 1.0f : 0.0f);
+
+	if (fValue < param.min)
+		return param.min;
+	if (fValue > param.max)
+		return param.max;
+
+	if (param.type == PARAM_INT)
+		return ::rintf(fValue);
+	else
+		return fValue;
+}
+
+
 float drumkv1_param::paramValue ( drumkv1::ParamIndex index, float fScale )
 {
 	const ParamInfo& param = drumkv1_params[index];
@@ -224,7 +243,9 @@ void drumkv1_param::loadElements (
 							const QString& sName = eParam.attribute("name");
 							if (!sName.isEmpty() && s_hash.contains(sName))
 								index = s_hash.value(sName);
-							const float fValue = eParam.text().toFloat();
+							const float fValue
+								= drumkv1_param::paramSafeValue(index,
+									eParam.text().toFloat());
 							element->setParamValue(index, fValue, 0);
 							element->setParamValue(index, fValue);
 						}
@@ -378,7 +399,8 @@ bool drumkv1_param::loadPreset (
 								index = s_hash.value(sName);
 							}
 							const float fValue = eParam.text().toFloat();
-							pDrumk->setParamValue(index, fValue);
+							pDrumk->setParamValue(index,
+								drumkv1_param::paramSafeValue(index, fValue));
 						}
 					}
 				}

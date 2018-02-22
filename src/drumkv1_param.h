@@ -65,6 +65,7 @@ namespace drumkv1_param
 	// Default parameter name/value helpers.
 	const char *paramName(drumkv1::ParamIndex index);
 	float paramDefaultValue(drumkv1::ParamIndex index);
+	float paramSafeValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index, float fScale);
 	float paramScale(drumkv1::ParamIndex index, float fValue);
 	bool paramFloat(drumkv1::ParamIndex index);
