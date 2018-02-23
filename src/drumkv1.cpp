@@ -37,6 +37,7 @@
 #include "drumkv1_config.h"
 #include "drumkv1_controls.h"
 #include "drumkv1_programs.h"
+#include "drumkv1_tuning.h"
 
 #include "drumkv1_sched.h"
 
@@ -848,6 +849,8 @@ public:
 	drumkv1_controls *controls();
 	drumkv1_programs *programs();
 
+	void updateTuning();
+
 	void process_midi(uint8_t *data, uint32_t size);
 	void process(float **ins, float **outs, uint32_t nframes);
 
@@ -971,10 +974,8 @@ drumkv1_impl::drumkv1_impl (
 		m_free_list.append(m_voices[i]);
 	}
 
-	for (int note = 0; note < MAX_NOTES; ++note) {
-		m_freqs[note] = drumkv1_freq(note);
+	for (int note = 0; note < MAX_NOTES; ++note)
 		m_notes[note] = NULL;
-	}
 
 	for (int group = 0; group < MAX_GROUP; ++group)
 		m_group[group] = NULL;
@@ -1001,6 +1002,9 @@ drumkv1_impl::drumkv1_impl (
 
 	// compressors none yet
 	m_comp = NULL;
+
+	// Micro-tuning support, if any...
+	updateTuning();
 
 	// load controllers & programs database...
 	m_config.loadControls(&m_controls);
@@ -1729,6 +1733,31 @@ drumkv1_programs *drumkv1_impl::programs (void)
 }
 
 
+// Micro-tuning support
+void drumkv1_impl::updateTuning (void)
+{
+
+	if (m_config.bTuningEnabled) {
+		// Custom micro-tuning, possibly from Scala keymap and scale files...
+		drumkv1_tuning tuning(
+			m_config.fTuningRefPitch,
+			m_config.iTuningRefNote);
+		if (!m_config.sTuningKeyMapFile.isEmpty())
+			tuning.loadKeyMapFile(m_config.sTuningKeyMapFile);
+		if (!m_config.sTuningScaleFile.isEmpty())
+			tuning.loadScaleFile(m_config.sTuningScaleFile);
+		for (int note = 0; note < MAX_NOTES; ++note)
+			m_freqs[note] = tuning.noteToPitch(note);
+		// Done custom tuning.
+	} else {
+		// Native tuning, 12-tone equal temperament western standard...
+		for (int note = 0; note < MAX_NOTES; ++note)
+			m_freqs[note] = drumkv1_freq(note);
+		// Done native tuning.
+	}
+}
+
+
 // all reset clear
 
 void drumkv1_impl::reset (void)
@@ -2437,6 +2466,13 @@ uint32_t drumkv1::midiInCount (void)
 void drumkv1::directNoteOn ( int note, int vel )
 {
 	m_pImpl->directNoteOn(note, vel);
+}
+
+
+// Micro-tuning support
+void drumkv1::updateTuning (void)
+{
+	m_pImpl->updateTuning();
 }
 
 

@@ -52,9 +52,9 @@
 
 
 // Default ctor.
-drumkv1_tuning::drumkv1_tuning (void)
+drumkv1_tuning::drumkv1_tuning ( float refPitch, int refNote )
 {
-	reset();
+	reset(refPitch, refNote);
 }
 
 

@@ -78,6 +78,13 @@ public:
 	// Whether to display GM Standard drum-note/key names.
 	bool bUseGMDrumNames;
 
+	// Micro-tuning options.
+	bool    bTuningEnabled;
+	float   fTuningRefPitch;
+	int     iTuningRefNote;
+	QString sTuningScaleFile;
+	QString sTuningKeyMapFile;
+
 	// Singleton instance accessor.
 	static drumkv1_config *getInstance();
 

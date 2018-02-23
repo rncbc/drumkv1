@@ -1,7 +1,7 @@
 // drumkv1_ui.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -174,6 +174,12 @@ uint32_t drumkv1_ui::midiInCount (void)
 void drumkv1_ui::directNoteOn ( int note, int vel )
 {
 	m_pDrumk->directNoteOn(note, vel);
+}
+
+
+void drumkv1_ui::updateTuning (void)
+{
+	m_pDrumk->updateTuning();
 }
 
 

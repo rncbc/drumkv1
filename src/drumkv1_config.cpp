@@ -1,7 +1,7 @@
 // drumkv1_config.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -327,6 +327,15 @@ void drumkv1_config::load (void)
 	QSettings::beginGroup("/Custom");
 	sCustomStyleTheme = QSettings::value("/StyleTheme").toString();
 	QSettings::endGroup();
+
+	// Micro-tuning options.
+	QSettings::beginGroup("/Tuning");
+	bTuningEnabled = QSettings::value("/Enabled", false).toBool();
+	fTuningRefPitch = QSettings::value("/RefPitch", 440.0f).toFloat();
+	iTuningRefNote = QSettings::value("/RefNote", 69).toInt();
+	sTuningScaleFile  = QSettings::value("/ScaleFile").toString();
+	sTuningKeyMapFile = QSettings::value("/KeyMapFile").toString();
+	QSettings::endGroup();
 }
 
 
@@ -354,6 +363,15 @@ void drumkv1_config::save (void)
 
 	QSettings::beginGroup("/Custom");
 	QSettings::setValue("/StyleTheme", sCustomStyleTheme);
+	QSettings::endGroup();
+
+	// Micro-tuning options.
+	QSettings::beginGroup("/Tuning");
+	QSettings::setValue("/Enabled", bTuningEnabled);
+	QSettings::setValue("/RefPitch", fTuningRefPitch);
+	QSettings::setValue("/RefNote", iTuningRefNote);
+	QSettings::setValue("/ScaleFile", sTuningScaleFile);
+	QSettings::setValue("/KeyMapFile", sTuningKeyMapFile);
 	QSettings::endGroup();
 
 	QSettings::sync();
