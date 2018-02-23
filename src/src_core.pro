@@ -23,6 +23,7 @@ HEADERS = \
 	drumkv1_reverb.h \
 	drumkv1_param.h \
 	drumkv1_sched.h \
+	drumkv1_tuning.h \
 	drumkv1_programs.h \
 	drumkv1_controls.h
 
@@ -35,6 +36,7 @@ SOURCES = \
 	drumkv1_wave.cpp \
 	drumkv1_param.cpp \
 	drumkv1_sched.cpp \
+	drumkv1_tuning.cpp \
 	drumkv1_programs.cpp \
 	drumkv1_controls.cpp
 

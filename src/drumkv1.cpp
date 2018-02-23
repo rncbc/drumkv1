@@ -1485,7 +1485,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				// velocity
 				const float vel = float(value) / 127.0f;
 				// quadratic velocity law
-				pv->vel  = drumkv1_velocity(vel * vel, *m_def.velocity);
+				pv->vel = drumkv1_velocity(vel * vel, *m_def.velocity);
 				// pressure/aftertouch
 				pv->pre = 0.0f;
 				pv->dca1_pre.reset(
