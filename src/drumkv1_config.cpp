@@ -333,7 +333,9 @@ void drumkv1_config::load (void)
 	bTuningEnabled = QSettings::value("/Enabled", false).toBool();
 	fTuningRefPitch = QSettings::value("/RefPitch", 440.0f).toFloat();
 	iTuningRefNote = QSettings::value("/RefNote", 69).toInt();
-	sTuningScaleFile  = QSettings::value("/ScaleFile").toString();
+	bTuningScaleEnabled = QSettings::value("/ScaleEnabled", false).toBool();
+	sTuningScaleFile = QSettings::value("/ScaleFile").toString();
+	bTuningKeyMapEnabled= QSettings::value("/KeyMapEnabled", false).toBool();
 	sTuningKeyMapFile = QSettings::value("/KeyMapFile").toString();
 	QSettings::endGroup();
 }
@@ -370,7 +372,9 @@ void drumkv1_config::save (void)
 	QSettings::setValue("/Enabled", bTuningEnabled);
 	QSettings::setValue("/RefPitch", fTuningRefPitch);
 	QSettings::setValue("/RefNote", iTuningRefNote);
+	QSettings::setValue("/ScaleFileEnabled", bTuningScaleEnabled);
 	QSettings::setValue("/ScaleFile", sTuningScaleFile);
+	QSettings::setValue("/KeyMapEnabled", bTuningKeyMapEnabled);
 	QSettings::setValue("/KeyMapFile", sTuningKeyMapFile);
 	QSettings::endGroup();
 
