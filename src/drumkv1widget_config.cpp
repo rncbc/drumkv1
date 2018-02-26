@@ -30,9 +30,11 @@
 #include "ui_drumkv1widget_config.h"
 
 #include <QPushButton>
+#include <QComboBox>
 
 #include <QMessageBox>
 #include <QFileDialog>
+#include <QFileInfo>
 #include <QUrl>
 
 #include <QMenu>
@@ -101,10 +103,12 @@ drumkv1widget_config::drumkv1widget_config (
 		m_ui.TuningEnabledCheckBox->setChecked(pConfig->bTuningEnabled);
 		m_ui.TuningRefNoteComboBox->setCurrentIndex(pConfig->iTuningRefNote);
 		m_ui.TuningRefPitchSpinBox->setValue(double(pConfig->fTuningRefPitch));
-		m_ui.TuningScaleEnabledCheckBox->setChecked(pConfig->bTuningScaleEnabled);
-		m_ui.TuningScaleFileComboBox->setEditText(pConfig->sTuningScaleFile);
-		m_ui.TuningKeyMapEnabledCheckBox->setChecked(pConfig->bTuningKeyMapEnabled);
-		m_ui.TuningKeyMapFileComboBox->setEditText(pConfig->sTuningKeyMapFile);
+		setComboBoxCurrentItem(
+			m_ui.TuningScaleFileComboBox,
+			QFileInfo(pConfig->sTuningScaleFile));
+		setComboBoxCurrentItem(
+			m_ui.TuningKeyMapFileComboBox,
+			QFileInfo(pConfig->sTuningKeyMapFile));
 	}
 
 	// Signal/slots connections...
@@ -180,23 +184,17 @@ drumkv1widget_config::drumkv1widget_config (
 	QObject::connect(m_ui.TuningRefNotePushButton,
 		SIGNAL(clicked()),
 		SLOT(tuningRefNoteClicked()));
-	QObject::connect(m_ui.TuningScaleEnabledCheckBox,
-		SIGNAL(toggled(bool)),
-		SLOT(tuningChanged()));
 	QObject::connect(m_ui.TuningScaleFileComboBox,
-		SIGNAL(editTextChanged(const QString&)),
+		SIGNAL(activated(const QString&)),
 		SLOT(tuningChanged()));
 	QObject::connect(m_ui.TuningScaleFileToolButton,
 		SIGNAL(clicked()),
 		SLOT(tuningScaleFileClicked()));
-	QObject::connect(m_ui.TuningKeyMapEnabledCheckBox,
-		SIGNAL(toggled(bool)),
-		SLOT(tuningChanged()));
 	QObject::connect(m_ui.TuningKeyMapFileToolButton,
 		SIGNAL(clicked()),
 		SLOT(tuningKeyMapFileClicked()));
 	QObject::connect(m_ui.TuningKeyMapFileComboBox,
-		SIGNAL(editTextChanged(const QString&)),
+		SIGNAL(activated(const QString&)),
 		SLOT(tuningChanged()));
 
 	// Options slots...
@@ -488,7 +486,7 @@ void drumkv1widget_config::tuningScaleFileClicked (void)
 	}
 #if 1//QT_VERSION < 0x040400
 	sTuningScaleFile = QFileDialog::getOpenFileName(pParentWidget,
-		sTitle, sTuningScaleFile, sFilter, NULL, options);
+		sTitle, pConfig->sTuningScaleDir, sFilter, NULL, options);
 #else
 	QFileDialog fileDialog(pParentWidget,
 		sTitle, sTuningScaleFile, sFilter);
@@ -496,7 +494,7 @@ void drumkv1widget_config::tuningScaleFileClicked (void)
 	fileDialog.setFileMode(QFileDialog::ExistingFiles);
 	fileDialog.setDefaultSuffix(sExt);
 	QList<QUrl> urls(fileDialog.sidebarUrls());
-	urls.append(QUrl::fromLocalFile(pConfig->sTuningScaleFile));
+	urls.append(QUrl::fromLocalFile(pConfig->sTuningScaleDir));
 	fileDialog.setSidebarUrls(urls);
 	fileDialog.setOptions(options);
 	if (fileDialog.exec())
@@ -504,8 +502,11 @@ void drumkv1widget_config::tuningScaleFileClicked (void)
 #endif
 
 	if (!sTuningScaleFile.isEmpty()) {
-		m_ui.TuningScaleFileComboBox->setEditText(sTuningScaleFile);
-		tuningChanged();
+		const QFileInfo info(sTuningScaleFile);
+		if (setComboBoxCurrentItem(m_ui.TuningScaleFileComboBox, info)) {
+			pConfig->sTuningScaleDir = info.absolutePath();
+			tuningChanged();
+		}
 	}
 }
 
@@ -530,7 +531,7 @@ void drumkv1widget_config::tuningKeyMapFileClicked (void)
 	}
 #if 1//QT_VERSION < 0x040400
 	sTuningKeyMapFile = QFileDialog::getOpenFileName(pParentWidget,
-		sTitle, sTuningKeyMapFile, sFilter, NULL, options);
+		sTitle, pConfig->sTuningKeyMapDir, sFilter, NULL, options);
 #else
 	QFileDialog fileDialog(pParentWidget,
 		sTitle, sTuningScaleFile, sFilter);
@@ -538,7 +539,7 @@ void drumkv1widget_config::tuningKeyMapFileClicked (void)
 	fileDialog.setFileMode(QFileDialog::ExistingFiles);
 	fileDialog.setDefaultSuffix(sExt);
 	QList<QUrl> urls(fileDialog.sidebarUrls());
-	urls.append(QUrl::fromLocalFile(pConfig->sTuningKeyMapFile));
+	urls.append(QUrl::fromLocalFile(pConfig->sTuningKeyMapDir));
 	fileDialog.setSidebarUrls(urls);
 	fileDialog.setOptions(options);
 	if (fileDialog.exec())
@@ -546,8 +547,11 @@ void drumkv1widget_config::tuningKeyMapFileClicked (void)
 #endif
 
 	if (!sTuningKeyMapFile.isEmpty()) {
-		m_ui.TuningKeyMapFileComboBox->setEditText(sTuningKeyMapFile);
-		tuningChanged();
+		const QFileInfo info(sTuningKeyMapFile);
+		if (setComboBoxCurrentItem(m_ui.TuningKeyMapFileComboBox, info)) {
+			pConfig->sTuningKeyMapDir = info.absolutePath();
+			tuningChanged();
+		}
 	}
 }
 
@@ -589,22 +593,17 @@ void drumkv1widget_config::stabilize (void)
 	m_ui.ProgramsEditToolButton->setEnabled(bEnabled);
 	m_ui.ProgramsDeleteToolButton->setEnabled(bEnabled);
 
-	const bool bTuningEnabled
-		= m_ui.TuningEnabledCheckBox->isChecked();
-	m_ui.TuningRefNoteTextLabel->setEnabled(bTuningEnabled);
-	m_ui.TuningRefNoteComboBox->setEnabled(bTuningEnabled);
-	m_ui.TuningRefPitchSpinBox->setEnabled(bTuningEnabled);
-	m_ui.TuningRefNotePushButton->setEnabled(bTuningEnabled);
-	m_ui.TuningScaleEnabledCheckBox->setEnabled(bTuningEnabled);
-	const bool bTuningScaleEnabled
-		= bTuningEnabled && m_ui.TuningScaleEnabledCheckBox->isChecked();
-	m_ui.TuningScaleFileComboBox->setEnabled(bTuningScaleEnabled);
-	m_ui.TuningScaleFileToolButton->setEnabled(bTuningScaleEnabled);
-	m_ui.TuningKeyMapEnabledCheckBox->setEnabled(bTuningEnabled);
-	const bool bTuningKeyMapEnabled
-		= bTuningEnabled && m_ui.TuningKeyMapEnabledCheckBox->isChecked();
-	m_ui.TuningKeyMapFileComboBox->setEnabled(bTuningKeyMapEnabled);
-	m_ui.TuningKeyMapFileToolButton->setEnabled(bTuningKeyMapEnabled);
+	bEnabled = m_ui.TuningEnabledCheckBox->isChecked();
+	m_ui.TuningRefNoteTextLabel->setEnabled(bEnabled);
+	m_ui.TuningRefNoteComboBox->setEnabled(bEnabled);
+	m_ui.TuningRefPitchSpinBox->setEnabled(bEnabled);
+	m_ui.TuningRefNotePushButton->setEnabled(bEnabled);
+	m_ui.TuningScaleFileTextLabel->setEnabled(bEnabled);
+	m_ui.TuningScaleFileComboBox->setEnabled(bEnabled);
+	m_ui.TuningScaleFileToolButton->setEnabled(bEnabled);
+	m_ui.TuningKeyMapFileTextLabel->setEnabled(bEnabled);
+	m_ui.TuningKeyMapFileComboBox->setEnabled(bEnabled);
+	m_ui.TuningKeyMapFileToolButton->setEnabled(bEnabled);
 
 	const bool bValid
 		= (m_iDirtyTuning   > 0
@@ -625,10 +624,8 @@ void drumkv1widget_config::accept (void)
 		pConfig->bTuningEnabled = m_ui.TuningEnabledCheckBox->isChecked();
 		pConfig->iTuningRefNote = m_ui.TuningRefNoteComboBox->currentIndex();
 		pConfig->fTuningRefPitch = float(m_ui.TuningRefPitchSpinBox->value());
-		pConfig->bTuningScaleEnabled = m_ui.TuningScaleEnabledCheckBox->isChecked();
-		pConfig->sTuningScaleFile = m_ui.TuningScaleFileComboBox->currentText();
-		pConfig->bTuningKeyMapEnabled = m_ui.TuningKeyMapEnabledCheckBox->isChecked();
-		pConfig->sTuningKeyMapFile = m_ui.TuningKeyMapFileComboBox->currentText();
+		pConfig->sTuningScaleFile = comboBoxCurrentItem(m_ui.TuningScaleFileComboBox);
+		pConfig->sTuningKeyMapFile = comboBoxCurrentItem(m_ui.TuningKeyMapFileComboBox);
 		// Reset/update micro-tonal tuning...
 		m_pDrumkUi->updateTuning();
 		// Save other conveniency options...
@@ -739,73 +736,86 @@ void drumkv1widget_config::reject (void)
 
 
 // Combo box history persistence helper implementation.
-void drumkv1widget_config::loadComboBoxHistory ( QComboBox *pComboBox, int iLimit )
+void drumkv1widget_config::loadComboBoxHistory ( QComboBox *pComboBox )
 {
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig == NULL)
 		return;
 
-	const bool bBlockSignals = pComboBox->blockSignals(true);
-
 	// Load combobox list from configuration settings file...
-	pConfig->beginGroup("/History/" + pComboBox->objectName());
-
-	if (pConfig->childKeys().count() > 0) {
-		pComboBox->setUpdatesEnabled(false);
-		pComboBox->setDuplicatesEnabled(false);
-		pComboBox->clear();
-		for (int i = 0; i < iLimit; ++i) {
-			const QString& sText = pConfig->value(
-				"/Item" + QString::number(i + 1)).toString();
-			if (sText.isEmpty())
-				break;
-			pComboBox->addItem(sText);
+	const bool bBlockSignals = pComboBox->blockSignals(true);
+	pConfig->beginGroup("/History");
+	const QStringList& history
+		= pConfig->value('/' + pComboBox->objectName()).toStringList();
+	QStringListIterator iter(history);
+	while (iter.hasNext()) {
+		const QFileInfo info(iter.next());
+		if (info.exists() && info.isReadable()) {
+			const QString& sPath = info.canonicalFilePath();
+			pComboBox->insertItem(0, info.fileName(), sPath);
 		}
-		pComboBox->setUpdatesEnabled(true);
 	}
-
 	pConfig->endGroup();
-
 	pComboBox->blockSignals(bBlockSignals);
 }
 
 
-void drumkv1widget_config::saveComboBoxHistory ( QComboBox *pComboBox, int iLimit )
+void drumkv1widget_config::saveComboBoxHistory ( QComboBox *pComboBox )
 {
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig == NULL)
 		return;
 
-	const bool bBlockSignals = pComboBox->blockSignals(true);
-
-	// Add current text as latest item...
-	const QString sCurrentText = pComboBox->currentText();
-	int iCount = pComboBox->count();
-	for (int i = 0; i < iCount; i++) {
-		const QString& sText = pComboBox->itemText(i);
-		if (sText == sCurrentText) {
-			pComboBox->removeItem(i);
-			--iCount;
-			break;
-		}
-	}
-	while (iCount >= iLimit)
-		pComboBox->removeItem(--iCount);
-	pComboBox->insertItem(0, sCurrentText);
-	pComboBox->setCurrentIndex(0);
-	++iCount;
-
 	// Save combobox list to configuration settings file...
-	pConfig->beginGroup("/History/" + pComboBox->objectName());
+	const bool bBlockSignals = pComboBox->blockSignals(true);
+	pConfig->beginGroup("/History");
+	QStringList history;
+	const int iCount = pComboBox->count();
 	for (int i = 0; i < iCount; ++i) {
-		const QString& sText = pComboBox->itemText(i);
-		if (sText.isEmpty())
-			break;
-		pConfig->setValue("/Item" + QString::number(i + 1), sText);
+		const QString& sData = pComboBox->itemData(i).toString();
+		if (!sData.isEmpty())
+			history.prepend(sData);
 	}
+	pConfig->setValue('/' + pComboBox->objectName(), history);
 	pConfig->endGroup();
-
 	pComboBox->blockSignals(bBlockSignals);
+}
+
+
+// Combo box settter/gettter helper prototypes.
+bool drumkv1widget_config::setComboBoxCurrentItem (
+	QComboBox *pComboBox, const QFileInfo& info )
+{
+	const bool bBlockSignals = pComboBox->blockSignals(true);
+	const bool bResult = info.exists() && info.isReadable();
+	if (bResult) {
+		const QString& sData = info.canonicalFilePath();
+		int iIndex = pComboBox->findData(sData);
+		if (iIndex < 0) {
+			pComboBox->insertItem(0, info.fileName(), sData);
+			iIndex = 0;
+		}
+		pComboBox->setCurrentIndex(iIndex);
+		pComboBox->setToolTip(sData);
+	} else {
+		pComboBox->setCurrentIndex(pComboBox->count() - 1);
+		pComboBox->setToolTip(pComboBox->currentText());
+	}
+	pComboBox->blockSignals(bBlockSignals);
+
+	return bResult;
+}
+
+
+QString drumkv1widget_config::comboBoxCurrentItem ( QComboBox *pComboBox )
+{
+	QString sData;
+
+	const int iIndex = pComboBox->currentIndex();
+	if (iIndex >= 0)
+		sData = pComboBox->itemData(iIndex).toString();
+
+	return sData;
 }
 
 
