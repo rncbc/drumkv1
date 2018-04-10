@@ -467,7 +467,11 @@ void drumkv1widget_config::tuningScaleFileClicked (void)
 
 	const QString  sExt("scl");
 	const QString& sTitle  = tr("Open Scale File") + " - " DRUMKV1_TITLE;
-	const QString& sFilter = tr("Scale files (*.%1)").arg(sExt);
+
+	QStringList filters;
+	filters.append(tr("Scale files (*.%1)").arg(sExt));
+	filters.append(tr("All files (*.*)"));
+	const QString& sFilter = filters.join(";;");
 
 	QWidget *pParentWidget = NULL;
 	QFileDialog::Options options = 0;
@@ -512,7 +516,11 @@ void drumkv1widget_config::tuningKeyMapFileClicked (void)
 
 	const QString  sExt("kbm");
 	const QString& sTitle  = tr("Open Key Map File") + " - " DRUMKV1_TITLE;
-	const QString& sFilter = tr("Key Map files (*.%1)").arg(sExt);
+
+	QStringList filters;
+	filters.append(tr("Key Map files (*.%1)").arg(sExt));
+	filters.append(tr("All files (*.*)"));
+	const QString& sFilter = filters.join(";;");
 
 	QWidget *pParentWidget = NULL;
 	QFileDialog::Options options = 0;
