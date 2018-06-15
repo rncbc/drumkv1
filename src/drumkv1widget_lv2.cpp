@@ -1,7 +1,7 @@
 // drumkv1widget_lv2.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -38,7 +38,7 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 {
 	m_pDrumkUi = new drumkv1_lv2ui(pDrumk, controller, write_function);
 
-#ifdef CONFIG_LV2_EXTERNAL_UI
+#ifdef CONFIG_LV2_UI_EXTERNAL
 	m_external_host = NULL;
 #endif
 #ifdef CONFIG_LV2_UI_IDLE
@@ -71,7 +71,7 @@ drumkv1_ui *drumkv1widget_lv2::ui_instance (void) const
 }
 
 
-#ifdef CONFIG_LV2_EXTERNAL_UI
+#ifdef CONFIG_LV2_UI_EXTERNAL
 
 void drumkv1widget_lv2::setExternalHost ( LV2_External_UI_Host *external_host )
 {
@@ -86,7 +86,7 @@ const LV2_External_UI_Host *drumkv1widget_lv2::externalHost (void) const
 	return m_external_host;
 }
 
-#endif	// CONFIG_LV2_EXTERNAL_UI
+#endif	// CONFIG_LV2_UI_EXTERNAL
 
 
 #ifdef CONFIG_LV2_UI_IDLE
@@ -108,7 +108,7 @@ void drumkv1widget_lv2::closeEvent ( QCloseEvent *pCloseEvent )
 	if (pCloseEvent->isAccepted())
 		m_bIdleClosed = true;
 #endif
-#ifdef CONFIG_LV2_EXTERNAL_UI
+#ifdef CONFIG_LV2_UI_EXTERNAL
 	if (m_external_host && m_external_host->ui_closed) {
 		if (pCloseEvent->isAccepted())
 			m_external_host->ui_closed(m_pDrumkUi->controller());

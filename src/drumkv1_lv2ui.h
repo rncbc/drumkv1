@@ -35,7 +35,7 @@
 #define DRUMKV1_LV2UI_X11_URI DRUMKV1_LV2_PREFIX "ui_x11"
 #endif
 
-#ifdef CONFIG_LV2_EXTERNAL_UI
+#ifdef CONFIG_LV2_UI_EXTERNAL
 #include "lv2_external_ui.h"
 #define DRUMKV1_LV2UI_EXTERNAL_URI DRUMKV1_LV2_PREFIX "ui_external"
 #endif
