@@ -4,6 +4,14 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
+GIT HEAD
+
+- Process MIDI Controlllers even though the channel filter
+  is on (DEF Channel is set anything but "Omni").
+- AppData/AppStream metadata is now settled under an all
+  permisssive license (FSFAP).
+
+
 0.9.1  2018-06-26  An Early Summer'18 release.
 
 - Fixed for some g++ >= 8.1.1 warnings and quietness.
