@@ -178,7 +178,6 @@ static const LV2UI_Show_Interface drumkv1_lv2ui_show_interface =
 
 int drumkv1_lv2ui_resize ( LV2UI_Handle ui, int width, int height )
 {
-qDebug("DEBUG> drumkv1_lv2ui_resize(%p, %d, %d)", ui, width, height);
 	drumkv1widget_lv2 *pWidget = static_cast<drumkv1widget_lv2 *> (ui);
 	if (pWidget) {
 		pWidget->resize(width, height);
