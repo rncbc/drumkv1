@@ -685,7 +685,7 @@ void drumkv1widget_config::accept (void)
 			} else {
 				QApplication::setStyle(
 					QStyleFactory::create(pConfig->sCustomStyleTheme));
-			}
+			}0
  		}
 		// Show restart message if needed...
  		if (iNeedRestart > 0) {

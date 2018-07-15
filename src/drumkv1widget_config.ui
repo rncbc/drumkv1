@@ -176,7 +176,7 @@
          </property>
         </spacer>
        </item>
-       <item row="4" column="0" colspan="3">
+       <item row="5" column="0" colspan="3">
         <widget class="QCheckBox" name="UseGMDrumNamesCheckBox">
          <property name="toolTip">
           <string>Whether to use GM Standard drum names</string>
@@ -185,6 +185,19 @@
           <string>Use &amp;GM Standard drum names</string>
          </property>
         </widget>
+       </item>
+       <item row="6" colspan="3">
+        <spacer>
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
        </item>
       </layout>
      </widget>
