@@ -24,6 +24,8 @@
 #include "drumkv1_config.h"
 #include "drumkv1_sample.h"
 
+#include "drumkv1_ui.h"
+
 #include <sndfile.h>
 
 #include <QPainter>
@@ -47,7 +49,7 @@
 // Constructor.
 drumkv1widget_sample::drumkv1widget_sample (
 	QWidget *pParent, Qt::WindowFlags wflags )
-	: QFrame(pParent, wflags), m_pSample(0), m_iChannels(0), m_ppPolyg(0)
+	: QFrame(pParent, wflags), m_pSample(NULL), m_iChannels(0), m_ppPolyg(NULL)
 {
 	QFrame::setMouseTracking(true);
 	QFrame::setFocusPolicy(Qt::ClickFocus);
@@ -61,8 +63,7 @@ drumkv1widget_sample::drumkv1widget_sample (
 	QFrame::setFrameShape(QFrame::Panel);
 	QFrame::setFrameShadow(QFrame::Sunken);
 
-	m_bLoop = false;
-	m_iLoopStart = m_iLoopEnd = 0;
+	m_iOffset = 0;
 
 	m_dragCursor  = DragNone;
 	m_pDragSample = NULL;
@@ -90,6 +91,8 @@ void drumkv1widget_sample::setSample ( drumkv1_sample *pSample )
 	}
 
 	m_pSample = pSample;
+
+//	m_iOffset = 0;
 
 	m_pDragSample = NULL;
 
@@ -139,6 +142,7 @@ void drumkv1widget_sample::setSample ( drumkv1_sample *pSample )
 	update();
 }
 
+
 drumkv1_sample *drumkv1widget_sample::sample (void) const
 {
 	return m_pSample;
@@ -158,45 +162,17 @@ const QString& drumkv1widget_sample::sampleName (void) const
 }
 
 
-void drumkv1widget_sample::setLoop ( bool bLoop )
+void drumkv1widget_sample::setOffset ( uint32_t iOffset )
 {
-	m_bLoop = bLoop;
+	m_iOffset = iOffset;
 
 	updateToolTip();
 	update();
 }
 
-bool drumkv1widget_sample::isLoop (void) const
+uint32_t drumkv1widget_sample::offset (void) const
 {
-	return m_bLoop;
-}
-
-
-void drumkv1widget_sample::setLoopStart ( uint32_t iLoopStart )
-{
-	m_iLoopStart = iLoopStart;
-
-	updateToolTip();
-	update();
-}
-
-uint32_t drumkv1widget_sample::loopStart (void) const
-{
-	return m_iLoopStart;
-}
-
-
-void drumkv1widget_sample::setLoopEnd ( uint32_t iLoopEnd )
-{
-	m_iLoopEnd = iLoopEnd;
-
-	updateToolTip();
-	update();
-}
-
-uint32_t drumkv1widget_sample::loopEnd (void) const
-{
-	return m_iLoopEnd;
+	return m_iOffset;
 }
 
 
@@ -228,13 +204,12 @@ void drumkv1widget_sample::mousePressEvent ( QMouseEvent *pMouseEvent )
 		if (m_dragCursor == DragNone) {
 			m_dragState = DragStart;
 			m_posDrag = pMouseEvent->pos();
-		} else if (m_bLoop) {
+		} else {
 			const int w = QFrame::width();
 			const uint32_t nframes = m_pSample->length();
 			if (nframes > 0) {
-				m_iDragStartX = safeX((m_iLoopStart * w) / nframes);
-				m_iDragEndX   = safeX((m_iLoopEnd   * w) / nframes);
-				m_dragState   = m_dragCursor;
+				m_iDragOffsetX = safeX((m_iOffset * w) / nframes);
+				m_dragState = m_dragCursor;
 			}
 		}
 	}
@@ -249,69 +224,27 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 
 	switch (m_dragState) {
 	case DragNone: {
-		if (m_bLoop && m_pSample) {
+		if (m_pSample) {
 			const int w = QFrame::width();
 			const uint32_t nframes = m_pSample->length();
 			if (nframes > 0) {
-				const int x1 = (m_iLoopStart * w) / nframes;
-				const int x2 = (m_iLoopEnd   * w) / nframes;
-				if (abs(x1 - x) < QApplication::startDragDistance()) {
-					m_dragCursor = DragLoopStart;
-					QFrame::setCursor(QCursor(Qt::SizeHorCursor));
-				}
-				else
-				if (abs(x2 - x) < QApplication::startDragDistance()) {
-					m_dragCursor = DragLoopEnd;
+				const int dx = QApplication::startDragDistance();
+				const int x0 = (m_iOffset * w) / nframes;
+				if (abs(x0 - x) < dx) {
+					m_dragCursor = DragOffset;
 					QFrame::setCursor(QCursor(Qt::SizeHorCursor));
 				}
 				else
 				if (m_dragCursor != DragNone) {
-					m_dragCursor =  DragNone;
+					m_dragCursor  = DragNone;
 					QFrame::unsetCursor();
 				}
 			}
 		}
 		break;
 	}
-	case DragLoopStart: {
-		if (m_iDragEndX > x) {
-			m_iDragStartX = safeX(x);
-			update();
-			if (m_pSample) {
-				const int w = QFrame::width();
-				if (w > 0) {
-					const uint32_t nframes = m_pSample->length();
-					QToolTip::showText(
-						QCursor::pos(),
-						tr("Loop start: %1")
-							.arg((m_iDragStartX * nframes) / w), this);
-				}
-			}
-		}
-		break;
-	}
-	case DragLoopEnd: {
-		if (m_iDragStartX < x) {
-			m_iDragEndX = safeX(x);
-			update();
-			if (m_pSample) {
-				const int w = QFrame::width();
-				if (w > 0) {
-					const uint32_t nframes = m_pSample->length();
-					QToolTip::showText(
-						QCursor::pos(),
-						tr("Loop end: %1")
-							.arg((m_iDragEndX * nframes) / w), this);
-				}
-			}
-		}
-		break;
-	}
-	case DragSelect: {
-		// Rubber-band selection...
-		const QRect& rect = QRect(m_posDrag, pMouseEvent->pos()).normalized();
-		m_iDragStartX = safeX(rect.left());
-		m_iDragEndX   = safeX(rect.right());
+	case DragOffset: {
+		m_iDragOffsetX = safeX(x);
 		update();
 		if (m_pSample) {
 			const int w = QFrame::width();
@@ -319,9 +252,8 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 				const uint32_t nframes = m_pSample->length();
 				QToolTip::showText(
 					QCursor::pos(),
-					tr("Loop start: %1, end: %2")
-						.arg((m_iDragStartX * nframes) / w)
-						.arg((m_iDragEndX   * nframes) / w), this);
+					tr("Offset: %1")
+						.arg((m_iDragOffsetX * nframes) / w), this);
 			}
 		}
 		break;
@@ -331,12 +263,10 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 		if ((m_posDrag - pMouseEvent->pos()).manhattanLength()
 			> QApplication::startDragDistance()) {
 			// Start dragging alright...
-			if (m_bLoop && (pMouseEvent->modifiers()
-				& (Qt::ShiftModifier | Qt::ControlModifier))) {
-				m_dragState = m_dragCursor = DragSelect;
-				m_iDragStartX = m_iDragEndX = m_posDrag.x();
-				QFrame::setCursor(QCursor(Qt::SizeHorCursor));
-			} else if (m_pSample && m_pSample->filename()) {
+			if (m_dragCursor != DragNone)
+				m_dragState = m_dragCursor;
+			else
+			if (m_pSample && m_pSample->filename()) {
 				QList<QUrl> urls;
 				m_pDragSample = m_pSample;
 				urls.append(QUrl::fromLocalFile(m_pDragSample->filename()));
@@ -362,35 +292,12 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 	QFrame::mouseReleaseEvent(pMouseEvent);
 
 	switch (m_dragState) {
-	case DragSelect: {
+	case DragOffset: {
 		const int w = QFrame::width();
 		if (m_pSample && w > 0) {
 			const uint32_t nframes = m_pSample->length();
-			m_iLoopStart = (m_iDragStartX * nframes) / w;
-			m_iLoopEnd   = (m_iDragEndX   * nframes) / w;
-			emit loopRangeChanged();
-			updateToolTip();
-			update();
-		}
-		break;
-	}
-	case DragLoopStart: {
-		const int w = QFrame::width();
-		if (m_pSample && w > 0) {
-			const uint32_t nframes = m_pSample->length();
-			m_iLoopStart = (m_iDragStartX * nframes) / w;
-			emit loopRangeChanged();
-			updateToolTip();
-			update();
-		}
-		break;
-	}
-	case DragLoopEnd: {
-		const int w = QFrame::width();
-		if (m_pSample && w > 0) {
-			const uint32_t nframes = m_pSample->length();
-			m_iLoopEnd = (m_iDragEndX * nframes) / w;
-			emit loopRangeChanged();
+			m_iOffset = (m_iDragOffsetX * nframes) / w;
+			emit offsetChanged();
 			updateToolTip();
 			update();
 		}
@@ -460,7 +367,7 @@ void drumkv1widget_sample::resetDragState (void)
 	if (m_dragCursor != DragNone)
 		QFrame::unsetCursor();
 
-	m_iDragStartX = m_iDragEndX = 0;
+	m_iDragOffsetX = 0;
 
 	m_dragState = m_dragCursor = DragNone;
 }
@@ -484,29 +391,11 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
     painter.fillRect(rect, rgbDark);
 
 	if (m_pSample && m_ppPolyg) {
+		const bool bEnabled = isEnabled();
+		const uint32_t nframes = m_pSample->length();
 		const int w2 = (w << 1);
 		painter.setRenderHint(QPainter::Antialiasing, true);
-		if (m_bLoop && isEnabled()) {
-			int x1, x2;
-			if (m_iDragStartX < m_iDragEndX) {
-				x1 = m_iDragStartX;
-				x2 = m_iDragEndX;
-			} else {
-				const uint32_t nframes = m_pSample->length();
-				if (nframes > 0) {
-					x1 = (m_iLoopStart * w) / nframes;
-					x2 = (m_iLoopEnd   * w) / nframes;
-				}
-				else x1 = x2 = 0;
-			}
-			QLinearGradient grad1(0, 0, w2, h);
-			painter.setPen(pal.highlight().color());
-			grad1.setColorAt(0.0f, rgbLite.darker());
-			grad1.setColorAt(0.5f, pal.dark().color());
-			painter.fillRect(x1, 0, x2 - x1, h, grad1);
-			painter.drawLine(x1, 0, x1, h);
-			painter.drawLine(x2, 0, x2, h);
-		}
+		// Sample waveform...
 		QLinearGradient grad(0, 0, w2, h);
 		painter.setPen(bDark ? Qt::gray : Qt::darkGray);
 		grad.setColorAt(0.0f, rgbLite);
@@ -514,6 +403,28 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		painter.setBrush(grad);
 		for (unsigned short k = 0; k < m_iChannels; ++k)
 			painter.drawPolygon(*m_ppPolyg[k]);
+		// Offset line...
+		if (bEnabled) {
+			int x0 = 0;
+			if (m_iDragOffsetX > 0)
+				x0 = m_iDragOffsetX;
+			else
+			if (nframes > 0)
+				x0 = (m_iOffset * w) / nframes;
+			if (x0 > 0) {
+				painter.setPen(rgbLite);
+				QColor rgbOver = rgbDark.darker();
+				rgbOver.setAlpha(120);
+				painter.fillRect(0, 0, x0, h, rgbOver);
+				painter.drawLine(x0, 0, x0, h);
+			//	painter.setBrush(rgbDark);
+			//	QPolygon polyg(3);
+			//	polyg.putPoints(0, 3, x0 + 8, 0, x0, 8, x0, 0);
+			//	painter.drawPolygon(polyg);
+			//	polyg.putPoints(0, 3, x0 + 8, h, x0, h - 8, x0, h);
+			//	painter.drawPolygon(polyg);
+			}
+		}
 		painter.setRenderHint(QPainter::Antialiasing, false);
 	} else {
 		painter.setPen(pal.midlight().color());
@@ -638,11 +549,9 @@ void drumkv1widget_sample::updateToolTip (void)
 			.arg(m_pSample->rate());
 	}
 
-	if (m_bLoop && m_iLoopStart < m_iLoopEnd) {
+	if (m_iOffset > 0) {
 		if (!sToolTip.isEmpty()) sToolTip += '\n';
-		sToolTip += tr("Loop start: %1, end: %2")
-			.arg(m_iLoopStart)
-			.arg(m_iLoopEnd);
+		sToolTip += tr("Offset: %1").arg(m_iOffset);
 	}
 
 	setToolTip(sToolTip);

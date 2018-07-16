@@ -55,20 +55,16 @@ public:
 	void setSampleName(const QString& sName);
 	const QString& sampleName() const;
 
-	void setLoop(bool bLoop);
-	bool isLoop() const;
-
-	// Loop point getters.
-	uint32_t loopStart() const;
-	uint32_t loopEnd() const;
+	// Offset getter.
+	uint32_t offset() const;
 
 signals:
 
 	// Load new sample file.
 	void loadSampleFile(const QString&);
 
-	// Loop range changed.
-	void loopRangeChanged();
+	// Offset/loop range changed.
+	void offsetChanged();
 
 public slots:
 
@@ -78,9 +74,8 @@ public slots:
 	// Effective sample slot.
 	void loadSample(drumkv1_sample *pSample);
 
-	// Loop point setters.
-	void setLoopStart(uint32_t iLoopStart);
-	void setLoopEnd(uint32_t iLoopEnd);
+	// Offset point setters.
+	void setOffset(uint32_t iOffset);
 
 protected:
 
@@ -127,21 +122,17 @@ private:
 
 	// Drag state.
 	enum DragState {
-		DragNone = 0, DragStart, DragSelect,
-		DragLoopStart, DragLoopEnd,
+		DragNone = 0, DragStart, DragOffset
 	} m_dragState, m_dragCursor;
 
 	QPoint m_posDrag;
 
-	int m_iDragStartX;
-	int m_iDragEndX;
+	int m_iDragOffsetX;
 
 	drumkv1_sample *m_pDragSample;
 
-	// Loop state.
-	bool     m_bLoop;
-	uint32_t m_iLoopStart;
-	uint32_t m_iLoopEnd;
+	// Offset state.
+	uint32_t m_iOffset;
 };
 
 #endif	// __drumkv1widget_sample_h

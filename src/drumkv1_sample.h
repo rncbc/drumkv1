@@ -164,7 +164,7 @@ public:
 	// begin.
 	void start(void)
 	{
-		m_phase = float(m_sample->offset());
+		m_phase = float(m_sample ? m_sample->offset() : 0);
 		m_index = 0;
 		m_alpha = 0.0f;
 		m_frame = 0;
