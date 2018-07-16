@@ -107,6 +107,17 @@ bool drumkv1_ui::isReverse (void) const
 }
 
 
+void drumkv1_ui::setOffset ( uint32_t iOffset )
+{
+	m_pDrumk->setOffset(iOffset);
+}
+
+uint32_t drumkv1_ui::offset (void) const
+{
+	return m_pDrumk->offset();
+}
+
+
 bool drumkv1_ui::loadPreset ( const QString& sFilename )
 {
 	return drumkv1_param::loadPreset(m_pDrumk, sFilename);

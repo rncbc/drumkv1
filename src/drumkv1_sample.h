@@ -52,6 +52,12 @@ public:
 	float sampleRate() const
 		{ return m_srate; }
 
+	// sample start point (offset)
+	void setOffset(uint32_t offset);
+
+	uint32_t offset() const
+		{ return m_offset; }
+
 	// reverse mode.
 	void setReverse (bool reverse)
 		{ reverse_test(reverse); }
@@ -108,6 +114,12 @@ public:
 	bool isOver(uint32_t frame) const
 		{ return !m_pframes || (frame >= m_nframes); }
 
+protected:
+
+	// zero-crossing aliasing .
+	uint32_t zero_crossing_k(uint32_t i, uint16_t k, int *slope) const;
+	uint32_t zero_crossing(uint32_t i, int *slope) const;
+
 private:
 
 	// instance variables.
@@ -120,6 +132,8 @@ private:
 	uint32_t m_nframes;
 	float  **m_pframes;
 	bool     m_reverse;
+
+	uint32_t m_offset;
 
 	drumkv1_reverse_sched *m_reverse_sched;
 };
@@ -150,7 +164,7 @@ public:
 	// begin.
 	void start(void)
 	{
-		m_phase = 0.0f;
+		m_phase = float(m_sample->offset());
 		m_index = 0;
 		m_alpha = 0.0f;
 		m_frame = 0;

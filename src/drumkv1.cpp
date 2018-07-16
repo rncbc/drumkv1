@@ -837,6 +837,9 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
+	void setOffset(uint32_t iOffset);
+	uint32_t offset() const;
+
 	void setTempo(float bpm);
 	float tempo() const;
 
@@ -1312,6 +1315,17 @@ void drumkv1_impl::setReverse ( bool bReverse )
 bool drumkv1_impl::isReverse (void) const
 {
 	return (m_elem ? m_elem->element.isReverse() : false);
+}
+
+
+void drumkv1_impl::setOffset ( uint32_t iOffset )
+{
+	if (m_elem) m_elem->element.setOffset(iOffset);
+}
+
+uint32_t drumkv1_impl::offset (void) const
+{
+	return (m_elem ? m_elem->element.offset() : 0);
 }
 
 
@@ -2218,6 +2232,19 @@ bool drumkv1::isReverse (void) const
 }
 
 
+void drumkv1::setOffset ( uint32_t iOffset )
+{
+	m_pImpl->setOffset(iOffset);
+}
+
+
+uint32_t drumkv1::offset (void) const
+{
+	return m_pImpl->offset();
+}
+
+
+
 void drumkv1::setTempo ( float bpm )
 {
 	m_pImpl->setTempo(bpm);
@@ -2352,6 +2379,17 @@ void drumkv1_element::setReverse ( bool bReverse )
 bool drumkv1_element::isReverse (void) const
 {
 	return (m_pElem ? m_pElem->gen1_sample.isReverse() : false);
+}
+
+
+void drumkv1_element::setOffset ( uint32_t iOffset )
+{
+	if (m_pElem) m_pElem->gen1_sample.setOffset(iOffset);
+}
+
+uint32_t drumkv1_element::offset (void) const
+{
+	return (m_pElem ? m_pElem->gen1_sample.offset() : 0);
 }
 
 

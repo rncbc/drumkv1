@@ -20,6 +20,7 @@ HEADERS = \
 	drumkv1widget_param.h \
 	drumkv1widget_preset.h \
 	drumkv1widget_status.h \
+	drumkv1widget_spinbox.h \
 	drumkv1widget_elements.h \
 	drumkv1widget_programs.h \
 	drumkv1widget_controls.h \
@@ -36,6 +37,7 @@ SOURCES = \
 	drumkv1widget_param.cpp \
 	drumkv1widget_preset.cpp \
 	drumkv1widget_status.cpp \
+	drumkv1widget_spinbox.cpp \
 	drumkv1widget_elements.cpp \
 	drumkv1widget_programs.cpp \
 	drumkv1widget_controls.cpp \

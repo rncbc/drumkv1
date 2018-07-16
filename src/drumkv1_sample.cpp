@@ -60,7 +60,7 @@ private:
 drumkv1_sample::drumkv1_sample ( drumkv1 *pDrumk, float srate )
 	: m_srate(srate), m_filename(NULL), m_nchannels(0),
 		m_rate0(0.0f), m_freq0(1.0f), m_ratio(0.0f),
-		m_nframes(0), m_pframes(NULL), m_reverse(false)
+		m_nframes(0), m_pframes(NULL), m_reverse(false), m_offset(0)
 {
 	m_reverse_sched = new drumkv1_reverse_sched(pDrumk, this);
 }
@@ -197,6 +197,51 @@ void drumkv1_sample::reverse_sync (void)
 			}
 		}
 	}
+}
+
+
+// sample start point (offset)
+void drumkv1_sample::setOffset ( uint32_t offset )
+{
+	if (offset > m_nframes)
+		offset = 0;
+	if (offset > 0)
+		offset = zero_crossing(offset, NULL);
+
+	m_offset = offset;
+}
+
+
+// zero-crossing aliasing (single channel).
+uint32_t drumkv1_sample::zero_crossing_k (
+	uint32_t i, uint16_t k, int *slope ) const
+{
+	const float *frames = m_pframes[k];
+	const int s0 = (slope ? *slope : 0);
+
+	if (i > 0) --i;
+	float v0 = frames[i];
+	for (++i; i < m_nframes; ++i) {
+		const float v1 = frames[i];
+		if ((0 >= s0 && v0 >= 0.0f && 0.0f >= v1) ||
+			(s0 >= 0 && v1 >= 0.0f && 0.0f >= v0)) {
+			if (slope && s0 == 0) *slope = (v1 < v0 ? -1 : +1);
+			return i;
+		}
+		v0 = v1;
+	}
+
+	return m_nframes;
+}
+
+
+// zero-crossing aliasing (median).
+uint32_t drumkv1_sample::zero_crossing ( uint32_t i, int *slope ) const
+{
+	uint32_t sum = 0;
+	for (uint16_t k = 0; k < m_nchannels; ++k)
+		sum += zero_crossing_k(i, k, slope);
+	return (sum / m_nchannels);
 }
 
 

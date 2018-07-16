@@ -49,6 +49,7 @@ headers_ui = \
 	src/$(name)widget_param.h \
 	src/$(name)widget_preset.h \
 	src/$(name)widget_status.h \
+	src/$(name)widget_spinbox.h \
 	src/$(name)widget_elements.h \
 	src/$(name)widget_programs.h \
 	src/$(name)widget_controls.h \
@@ -66,6 +67,7 @@ sources_ui = \
 	src/$(name)widget_param.cpp \
 	src/$(name)widget_preset.cpp \
 	src/$(name)widget_status.cpp \
+	src/$(name)widget_spinbox.cpp \
 	src/$(name)widget_elements.cpp \
 	src/$(name)widget_programs.cpp \
 	src/$(name)widget_controls.cpp \

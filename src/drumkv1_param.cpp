@@ -222,12 +222,14 @@ void drumkv1_param::loadElements (
 				if (eChild.isNull())
 					continue;
 				if (eChild.tagName() == "sample") {
-				//	int index = eChild.attribute("index").toInt();
+				//	const int index = eChild.attribute("index").toInt();
+					const uint32_t offset = eChild.attribute("offset").toULong();
 					QFileInfo fi(eChild.text());
 					if (fi.isSymLink())
 						fi.setFile(fi.symLinkTarget());
 					element->setSampleFile(
 						mapPath.absolutePath(fi.filePath()).toUtf8().constData());
+					element->setOffset(offset);
 				}
 				else
 				if (eChild.tagName() == "params") {
@@ -289,6 +291,7 @@ void drumkv1_param::saveElements (
 		QDomElement eSample = doc.createElement("sample");
 		eSample.setAttribute("index", 0);
 		eSample.setAttribute("name", "GEN1_SAMPLE");
+		eSample.setAttribute("offset", element->offset());
 		eSample.appendChild(doc.createTextNode(
 			mapPath.abstractPath(fi.absoluteFilePath())));
 		eElement.appendChild(eSample);
