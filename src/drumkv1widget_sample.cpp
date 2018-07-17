@@ -223,7 +223,7 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 	const int x = pMouseEvent->pos().x();
 
 	switch (m_dragState) {
-	case DragNone: {
+	case DragNone:
 		if (m_pSample) {
 			const int w = QFrame::width();
 			const uint32_t nframes = m_pSample->length();
@@ -242,11 +242,10 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 			}
 		}
 		break;
-	}
-	case DragOffset: {
-		m_iDragOffsetX = safeX(x);
-		update();
+	case DragOffset:
 		if (m_pSample) {
+			m_iDragOffsetX = safeX(x);
+			update();
 			const int w = QFrame::width();
 			if (w > 0) {
 				const uint32_t nframes = m_pSample->length();
@@ -257,7 +256,6 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 			}
 		}
 		break;
-	}
 	case DragStart:
 		// Rubber-band starting...
 		if ((m_posDrag - pMouseEvent->pos()).manhattanLength()
@@ -406,7 +404,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		// Offset line...
 		if (bEnabled) {
 			int x0 = 0;
-			if (m_iDragOffsetX > 0)
+			if (m_dragState == DragOffset)
 				x0 = m_iDragOffsetX;
 			else
 			if (nframes > 0)
