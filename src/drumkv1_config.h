@@ -64,6 +64,12 @@ public:
 	int iKnobDialMode;
 	int iKnobEditMode;
 
+	// Special time-formatted spinbox option.
+	int iFrameTimeFormat;
+
+	// Whether to display GM Standard drum-note/key names.
+	bool bUseGMDrumNames;
+
 	// Special persistent options.
 	bool bControlsEnabled;
 	bool bProgramsEnabled;
@@ -74,9 +80,6 @@ public:
 
 	// Custom widget style theme.
 	QString sCustomStyleTheme;
-
-	// Whether to display GM Standard drum-note/key names.
-	bool bUseGMDrumNames;
 
 	// Micro-tuning options.
 	bool    bTuningEnabled;

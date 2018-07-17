@@ -86,6 +86,16 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	for (int iTab = 0; iTab < m_ui.StackedWidget->count(); ++iTab)
 		m_ui.TabBar->addTab(m_ui.StackedWidget->widget(iTab)->windowTitle());
 
+	// Offset/Loop range font.
+	const QFont& font = m_ui.Gen1ReverseKnob->font();
+	m_ui.Gen1OffsetLabel->setFont(font);
+	m_ui.Gen1OffsetSpinBox->setFont(font);
+
+	const QFontMetrics fm(font);
+	m_ui.Gen1OffsetSpinBox->setMaximumHeight(fm.height() + 6);
+	m_ui.Gen1OffsetSpinBox->setAccelerated(true);
+	m_ui.Gen1OffsetSpinBox->setMinimum(0);
+
 	// Swappable params A/B group.
 	QButtonGroup *pSwapParamsGroup = new QButtonGroup(this);
 	pSwapParamsGroup->addButton(m_ui.SwapParamsAButton);
@@ -463,9 +473,10 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(resetPresetFile()),
 		SLOT(resetParams()));
 
-	// Common context menu...
+	// Common context menu policies...
 	m_ui.Elements->setContextMenuPolicy(Qt::CustomContextMenu);
 	m_ui.Gen1Sample->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_ui.Gen1OffsetSpinBox->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	QObject::connect(m_ui.Elements,
 		SIGNAL(customContextMenuRequested(const QPoint&)),
@@ -474,6 +485,17 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(customContextMenuRequested(const QPoint&)),
 		SLOT(contextMenuRequest(const QPoint&)));
 
+	QObject::connect(m_ui.Gen1Sample,
+		SIGNAL(sampleChanged()),
+		SLOT(sampleChanged()));
+
+	QObject::connect(m_ui.Gen1OffsetSpinBox,
+		SIGNAL(valueChanged(uint32_t)),
+		SLOT(offsetChanged()));
+
+	QObject::connect(m_ui.Gen1OffsetSpinBox,
+		SIGNAL(customContextMenuRequested(const QPoint&)),
+		SLOT(spinboxContextMenu(const QPoint&)));
 
 	// Swap params A/B
 	QObject::connect(m_ui.SwapParamsAButton,
@@ -498,13 +520,16 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SIGNAL(triggered(bool)),
 		SLOT(helpAboutQt()));
 
-	// General knob/dial  behavior init...
+	// General knob/dial behavior init...
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig) {
 		drumkv1widget_dial::setDialMode(
 			drumkv1widget_dial::DialMode(pConfig->iKnobDialMode));
 		drumkv1widget_edit::setEditMode(
 			drumkv1widget_edit::EditMode(pConfig->iKnobEditMode));
+		const drumkv1widget_spinbox::Format format
+			= drumkv1widget_spinbox::Format(pConfig->iFrameTimeFormat);
+		m_ui.Gen1OffsetSpinBox->setFormat(format);
 	}
 
 	// Epilog.
@@ -1027,6 +1052,18 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 	m_ui.Gen1Sample->setSampleName(currentNoteName());
 	m_ui.Gen1Sample->setSample(pSample);
 
+	++m_iUpdate;
+	if (pSample) {
+		m_ui.Gen1Sample->setOffset(pSample->offset());
+		activateParamKnobs(pSample->filename() != NULL);
+		updateOffset(pSample);
+	} else {
+		m_ui.Gen1Sample->setOffset(0);
+		activateParamKnobs(false);
+		updateOffset(NULL);
+	}
+	--m_iUpdate;
+
 	if (pSample && bDirty)
 		updateDirtyPreset(true);
 }
@@ -1257,7 +1294,7 @@ void drumkv1widget::updateElement (void)
 
 	drumkv1_element *element = pDrumkUi->element(iCurrentNote);
 	if (element) {
-		activateParamKnobs(true);
+	//	activateParamKnobs(true);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			const float fValue = element->paramValue(index);
@@ -1274,7 +1311,7 @@ void drumkv1widget::updateElement (void)
 	} else {
 		updateSample(NULL);
 		resetParamValues(drumkv1::NUM_ELEMENT_PARAMS);
-		activateParamKnobs(false);
+	//	activateParamKnobs(false);
 	}
 
 	--m_iUpdate;
@@ -1302,6 +1339,64 @@ void drumkv1widget::resetElement (void)
 
 	refreshElements();
 	activateElement();
+}
+
+
+// Offset change.
+void drumkv1widget::offsetChanged (void)
+{
+	if (m_iUpdate > 0)
+		return;
+
+	++m_iUpdate;
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi) {
+		pDrumkUi->setOffset(m_ui.Gen1OffsetSpinBox->value());
+		updateOffset(pDrumkUi->sample(), true);
+	}
+	--m_iUpdate;
+}
+
+
+// Offset changed (from UI).
+void drumkv1widget::sampleChanged (void)
+{
+	if (m_iUpdate > 0)
+		return;
+
+	++m_iUpdate;
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi) {
+		pDrumkUi->setOffset(m_ui.Gen1Sample->offset());
+		updateOffset(pDrumkUi->sample(), true);
+	}
+	--m_iUpdate;
+}
+
+
+// Update offset change status.
+void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
+{
+	if (pSample) {
+		const uint32_t iOffset = pSample->offset();
+		const uint32_t nframes = pSample->length();
+		const float srate = pSample->sampleRate();
+		m_ui.Gen1OffsetLabel->setEnabled(pSample->filename() != NULL);
+		m_ui.Gen1OffsetSpinBox->setSampleRate(srate);
+		m_ui.Gen1OffsetSpinBox->setMaximum(nframes);
+		m_ui.Gen1OffsetSpinBox->setValue(iOffset);
+		m_ui.Gen1Sample->setOffset(iOffset);
+		if (bDirty) {
+			m_ui.StatusBar->showMessage(
+				tr("Offset: %1").arg(iOffset), 5000);
+			updateDirtyPreset(true);
+		}
+	} else {
+		m_ui.Gen1OffsetLabel->setEnabled(false);
+		m_ui.Gen1OffsetSpinBox->setMaximum(0);
+		m_ui.Gen1OffsetSpinBox->setValue(0);
+		m_ui.Gen1Sample->setOffset(0);
+	}
 }
 
 
@@ -1555,6 +1650,44 @@ void drumkv1widget::paramContextMenu ( const QPoint& pos )
 		const drumkv1::ParamIndex index = m_knobParams.value(pParam);
 		const QString& sTitle = pParam->toolTip();
 		drumkv1widget_control::showInstance(pControls, index, sTitle, this);
+	}
+}
+
+
+// Format changes (spinbox).
+void drumkv1widget::spinboxContextMenu ( const QPoint& pos )
+{
+	drumkv1widget_spinbox *pSpinBox
+		= qobject_cast<drumkv1widget_spinbox *> (sender());
+	if (pSpinBox == NULL)
+		return;
+
+	drumkv1widget_spinbox::Format format = pSpinBox->format();
+
+	QMenu menu(this);
+	QAction *pAction;
+
+	pAction = menu.addAction(tr("&Frames"));
+	pAction->setCheckable(true);
+	pAction->setChecked(format == drumkv1widget_spinbox::Frames);
+	pAction->setData(int(drumkv1widget_spinbox::Frames));
+
+	pAction = menu.addAction(tr("&Time"));
+	pAction->setCheckable(true);
+	pAction->setChecked(format == drumkv1widget_spinbox::Time);
+	pAction->setData(int(drumkv1widget_spinbox::Time));
+
+	pAction = menu.exec(pSpinBox->mapToGlobal(pos));
+	if (pAction == NULL)
+		return;
+
+	format = drumkv1widget_spinbox::Format(pAction->data().toInt());
+	if (format != pSpinBox->format()) {
+		drumkv1_config *pConfig = drumkv1_config::getInstance();
+		if (pConfig) {
+			pConfig->iFrameTimeFormat = int(format);
+			m_ui.Gen1OffsetSpinBox->setFormat(format);
+		}
 	}
 }
 

@@ -80,6 +80,7 @@ drumkv1widget_config::drumkv1widget_config (
 		m_ui.CustomStyleThemeComboBox->setCurrentIndex(iCustomStyleTheme);
 		m_ui.CustomStyleThemeTextLabel->setEnabled(!bPlugin);
 		m_ui.CustomStyleThemeComboBox->setEnabled(!bPlugin);
+		m_ui.FrameTimeFormatComboBox->setCurrentIndex(pConfig->iFrameTimeFormat);
 		m_ui.UseGMDrumNamesCheckBox->setChecked(pConfig->bUseGMDrumNames);
 		// Load controllers database...
 		drumkv1_controls *pControls = m_pDrumkUi->controls();
@@ -211,6 +212,9 @@ drumkv1widget_config::drumkv1widget_config (
 		SIGNAL(activated(int)),
 		SLOT(optionsChanged()));
 	QObject::connect(m_ui.CustomStyleThemeComboBox,
+		SIGNAL(activated(int)),
+		SLOT(optionsChanged()));
+	QObject::connect(m_ui.FrameTimeFormatComboBox,
 		SIGNAL(activated(int)),
 		SLOT(optionsChanged()));
 	QObject::connect(m_ui.UseGMDrumNamesCheckBox,
@@ -674,9 +678,13 @@ void drumkv1widget_config::accept (void)
 			pConfig->sCustomStyleTheme = m_ui.CustomStyleThemeComboBox->currentText();
 		else
 			pConfig->sCustomStyleTheme.clear();
+		const int iOldFrameTimeFormat = pConfig->iFrameTimeFormat;
 		const bool bOldUseGMDrumNames = pConfig->bUseGMDrumNames;
+		pConfig->iFrameTimeFormat = m_ui.FrameTimeFormatComboBox->currentIndex();
 		pConfig->bUseGMDrumNames = m_ui.UseGMDrumNamesCheckBox->isChecked();
 		int iNeedRestart = 0;
+		if (pConfig->iFrameTimeFormat != iOldFrameTimeFormat)
+			++iNeedRestart;
 		if (!pConfig->bUseGMDrumNames && bOldUseGMDrumNames)
 			++iNeedRestart;
  		if (pConfig->sCustomStyleTheme != sOldCustomStyleTheme) {

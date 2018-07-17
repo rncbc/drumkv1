@@ -297,7 +297,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 		if (m_pSample && w > 0) {
 			const uint32_t nframes = m_pSample->length();
 			m_iOffset = (m_iDragOffsetX * nframes) / w;
-			emit offsetChanged();
+			emit sampleChanged();
 			updateToolTip();
 			update();
 		}

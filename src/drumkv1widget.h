@@ -134,6 +134,12 @@ protected slots:
 	// Swap params A/B.
 	void swapParams(bool bOn);
 
+	// Offset point changed.
+	void offsetChanged();
+
+	// Offset changed (from UI).
+	void sampleChanged();
+
 	// Notification updater.
 	void updateSchedNotify(int stype, int sid);
 
@@ -142,6 +148,9 @@ protected slots:
 
 	// Param knob context menu.
 	void paramContextMenu(const QPoint& pos);
+
+	// Format changes (spinbox).
+	void spinboxContextMenu(const QPoint& pos);
 
 	// Menu actions.
 	void helpConfigure();
@@ -182,6 +191,9 @@ protected:
 
 	// Sample updater.
 	void updateSample(drumkv1_sample *pSample, bool bDirty = false);
+
+	// Update offset change status.
+	void updateOffset(drumkv1_sample *pSample, bool bDirty = false);
 
 	// Param port method.
 	virtual void updateParam(drumkv1::ParamIndex index, float fValue) const = 0;
