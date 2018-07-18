@@ -88,13 +88,19 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// Offset/Loop range font.
 	const QFont& font = m_ui.Gen1ReverseKnob->font();
-	m_ui.Gen1OffsetLabel->setFont(font);
-	m_ui.Gen1OffsetSpinBox->setFont(font);
+	m_ui.Gen1OffsetRangeLabel->setFont(font);
+	m_ui.Gen1OffsetStartSpinBox->setFont(font);
+	m_ui.Gen1OffsetEndSpinBox->setFont(font);
 
 	const QFontMetrics fm(font);
-	m_ui.Gen1OffsetSpinBox->setMaximumHeight(fm.height() + 6);
-	m_ui.Gen1OffsetSpinBox->setAccelerated(true);
-	m_ui.Gen1OffsetSpinBox->setMinimum(0);
+	m_ui.Gen1OffsetStartSpinBox->setMaximumHeight(fm.height() + 6);
+	m_ui.Gen1OffsetEndSpinBox->setMaximumHeight(fm.height() + 6);
+
+	m_ui.Gen1OffsetStartSpinBox->setAccelerated(true);
+	m_ui.Gen1OffsetEndSpinBox->setAccelerated(true);
+
+	m_ui.Gen1OffsetStartSpinBox->setMinimum(0);
+	m_ui.Gen1OffsetEndSpinBox->setMinimum(0);
 
 	// Swappable params A/B group.
 	QButtonGroup *pSwapParamsGroup = new QButtonGroup(this);
@@ -476,7 +482,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// Common context menu policies...
 	m_ui.Elements->setContextMenuPolicy(Qt::CustomContextMenu);
 	m_ui.Gen1Sample->setContextMenuPolicy(Qt::CustomContextMenu);
-	m_ui.Gen1OffsetSpinBox->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_ui.Gen1OffsetStartSpinBox->setContextMenuPolicy(Qt::CustomContextMenu);
+	m_ui.Gen1OffsetEndSpinBox->setContextMenuPolicy(Qt::CustomContextMenu);
 
 	QObject::connect(m_ui.Elements,
 		SIGNAL(customContextMenuRequested(const QPoint&)),
@@ -486,14 +493,20 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SLOT(contextMenuRequest(const QPoint&)));
 
 	QObject::connect(m_ui.Gen1Sample,
-		SIGNAL(offsetChanged()),
-		SLOT(sampleChanged()));
+		SIGNAL(offsetRangeChanged()),
+		SLOT(offsetRangeChanged()));
 
-	QObject::connect(m_ui.Gen1OffsetSpinBox,
+	QObject::connect(m_ui.Gen1OffsetStartSpinBox,
 		SIGNAL(valueChanged(uint32_t)),
-		SLOT(offsetChanged()));
+		SLOT(offsetStartChanged()));
+	QObject::connect(m_ui.Gen1OffsetEndSpinBox,
+		SIGNAL(valueChanged(uint32_t)),
+		SLOT(offsetEndChanged()));
 
-	QObject::connect(m_ui.Gen1OffsetSpinBox,
+	QObject::connect(m_ui.Gen1OffsetStartSpinBox,
+		SIGNAL(customContextMenuRequested(const QPoint&)),
+		SLOT(spinboxContextMenu(const QPoint&)));
+	QObject::connect(m_ui.Gen1OffsetEndSpinBox,
 		SIGNAL(customContextMenuRequested(const QPoint&)),
 		SLOT(spinboxContextMenu(const QPoint&)));
 
@@ -529,7 +542,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 			drumkv1widget_edit::EditMode(pConfig->iKnobEditMode));
 		const drumkv1widget_spinbox::Format format
 			= drumkv1widget_spinbox::Format(pConfig->iFrameTimeFormat);
-		m_ui.Gen1OffsetSpinBox->setFormat(format);
+		m_ui.Gen1OffsetStartSpinBox->setFormat(format);
+		m_ui.Gen1OffsetEndSpinBox->setFormat(format);
 	}
 
 	// Epilog.
@@ -1054,11 +1068,13 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 
 	++m_iUpdate;
 	if (pSample) {
-		m_ui.Gen1Sample->setOffset(pSample->offset());
+		m_ui.Gen1Sample->setOffsetStart(pSample->offsetStart());
+		m_ui.Gen1Sample->setOffsetEnd(pSample->offsetEnd());
 		activateParamKnobs(pSample->filename() != NULL);
 		updateOffset(pSample);
 	} else {
-		m_ui.Gen1Sample->setOffset(0);
+		m_ui.Gen1Sample->setOffsetStart(0);
+		m_ui.Gen1Sample->setOffsetEnd(0);
 		activateParamKnobs(false);
 		updateOffset(NULL);
 	}
@@ -1342,8 +1358,8 @@ void drumkv1widget::resetElement (void)
 }
 
 
-// Offset change.
-void drumkv1widget::offsetChanged (void)
+// Offset start change.
+void drumkv1widget::offsetStartChanged (void)
 {
 	if (m_iUpdate > 0)
 		return;
@@ -1351,15 +1367,14 @@ void drumkv1widget::offsetChanged (void)
 	++m_iUpdate;
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi) {
-		pDrumkUi->setOffset(m_ui.Gen1OffsetSpinBox->value());
+		pDrumkUi->setOffsetStart(m_ui.Gen1OffsetStartSpinBox->value());
 		updateOffset(pDrumkUi->sample(), true);
 	}
 	--m_iUpdate;
 }
 
 
-// Offset changed (from UI).
-void drumkv1widget::sampleChanged (void)
+void drumkv1widget::offsetEndChanged (void)
 {
 	if (m_iUpdate > 0)
 		return;
@@ -1367,7 +1382,24 @@ void drumkv1widget::sampleChanged (void)
 	++m_iUpdate;
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi) {
-		pDrumkUi->setOffset(m_ui.Gen1Sample->offset());
+		pDrumkUi->setOffsetEnd(m_ui.Gen1OffsetEndSpinBox->value());
+		updateOffset(pDrumkUi->sample(), true);
+	}
+	--m_iUpdate;
+}
+
+
+// Offset points changed (from UI).
+void drumkv1widget::offsetRangeChanged (void)
+{
+	if (m_iUpdate > 0)
+		return;
+
+	++m_iUpdate;
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi) {
+		pDrumkUi->setOffsetStart(m_ui.Gen1Sample->offsetStart());
+		pDrumkUi->setOffsetEnd(m_ui.Gen1Sample->offsetEnd());
 		updateOffset(pDrumkUi->sample(), true);
 	}
 	--m_iUpdate;
@@ -1378,25 +1410,38 @@ void drumkv1widget::sampleChanged (void)
 void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
 {
 	if (pSample) {
-		const uint32_t iOffset = pSample->offset();
+		const uint32_t iOffsetStart = pSample->offsetStart();
+		const uint32_t iOffsetEnd = pSample->offsetEnd();
 		const uint32_t nframes = pSample->length();
 		const float srate = pSample->sampleRate();
-		m_ui.Gen1OffsetLabel->setEnabled(pSample->filename() != NULL);
-		m_ui.Gen1OffsetSpinBox->setSampleRate(srate);
-		m_ui.Gen1OffsetSpinBox->setMaximum(nframes);
-		m_ui.Gen1OffsetSpinBox->setValue(iOffset);
-		m_ui.Gen1Sample->setOffset(iOffset);
+		m_ui.Gen1OffsetRangeLabel->setEnabled(pSample->filename() != NULL);
+		m_ui.Gen1OffsetStartSpinBox->setSampleRate(srate);
+		m_ui.Gen1OffsetStartSpinBox->setMinimum(0);
+		m_ui.Gen1OffsetStartSpinBox->setMaximum(iOffsetEnd);
+		m_ui.Gen1OffsetStartSpinBox->setValue(iOffsetStart);
+		m_ui.Gen1OffsetEndSpinBox->setSampleRate(srate);
+		m_ui.Gen1OffsetEndSpinBox->setMinimum(iOffsetStart);
+		m_ui.Gen1OffsetEndSpinBox->setMaximum(nframes);
+		m_ui.Gen1OffsetEndSpinBox->setValue(iOffsetEnd);
+		m_ui.Gen1Sample->setOffsetStart(iOffsetStart);
+		m_ui.Gen1Sample->setOffsetEnd(iOffsetEnd);
 		if (bDirty) {
 			m_ui.StatusBar->showMessage(
-				tr("Offset: %1")
-					.arg(m_ui.Gen1Sample->textFromValue(iOffset)), 5000);
+				tr("Offset: %1 - %2")
+					.arg(m_ui.Gen1Sample->textFromValue(iOffsetStart))
+					.arg(m_ui.Gen1Sample->textFromValue(iOffsetEnd)), 5000);
 			updateDirtyPreset(true);
 		}
 	} else {
-		m_ui.Gen1OffsetLabel->setEnabled(false);
-		m_ui.Gen1OffsetSpinBox->setMaximum(0);
-		m_ui.Gen1OffsetSpinBox->setValue(0);
-		m_ui.Gen1Sample->setOffset(0);
+		m_ui.Gen1OffsetRangeLabel->setEnabled(false);
+		m_ui.Gen1OffsetStartSpinBox->setMinimum(0);
+		m_ui.Gen1OffsetStartSpinBox->setMaximum(0);
+		m_ui.Gen1OffsetStartSpinBox->setValue(0);
+		m_ui.Gen1OffsetEndSpinBox->setMinimum(0);
+		m_ui.Gen1OffsetEndSpinBox->setMaximum(0);
+		m_ui.Gen1OffsetEndSpinBox->setValue(0);
+		m_ui.Gen1Sample->setOffsetStart(0);
+		m_ui.Gen1Sample->setOffsetEnd(0);
 	}
 }
 
@@ -1687,7 +1732,8 @@ void drumkv1widget::spinboxContextMenu ( const QPoint& pos )
 		drumkv1_config *pConfig = drumkv1_config::getInstance();
 		if (pConfig) {
 			pConfig->iFrameTimeFormat = int(format);
-			m_ui.Gen1OffsetSpinBox->setFormat(format);
+			m_ui.Gen1OffsetStartSpinBox->setFormat(format);
+			m_ui.Gen1OffsetEndSpinBox->setFormat(format);
 		}
 	}
 }

@@ -55,8 +55,9 @@ public:
 	void setSampleName(const QString& sName);
 	const QString& sampleName() const;
 
-	// Offset getter.
-	uint32_t offset() const;
+	// Offset getters.
+	uint32_t offsetStart() const;
+	uint32_t offsetEnd() const;
 
 	// Value/text format converter utilities.
 	uint32_t valueFromText (const QString& text) const;
@@ -68,7 +69,7 @@ signals:
 	void loadSampleFile(const QString&);
 
 	// Offset changed.
-	void offsetChanged();
+	void offsetRangeChanged();
 
 public slots:
 
@@ -79,7 +80,8 @@ public slots:
 	void loadSample(drumkv1_sample *pSample);
 
 	// Offset point setters.
-	void setOffset(uint32_t iOffset);
+	void setOffsetStart(uint32_t iOffsetStart);
+	void setOffsetEnd(uint32_t iOffsetEnd);
 
 protected:
 
@@ -126,17 +128,20 @@ private:
 
 	// Drag state.
 	enum DragState {
-		DragNone = 0, DragStart, DragOffset
+		DragNone = 0, DragStart,
+		DragOffsetRange, DragOffsetStart, DragOffsetEnd
 	} m_dragState, m_dragCursor;
 
 	QPoint m_posDrag;
 
-	int m_iDragOffsetX;
+	int m_iDragOffsetStartX;
+	int m_iDragOffsetEndX;
 
 	drumkv1_sample *m_pDragSample;
 
 	// Offset state.
-	uint32_t m_iOffset;
+	uint32_t m_iOffsetStart;
+	uint32_t m_iOffsetEnd;
 };
 
 #endif	// __drumkv1widget_sample_h

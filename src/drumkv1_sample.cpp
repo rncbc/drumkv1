@@ -1,7 +1,7 @@
 // drumkv1_sample.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -60,7 +60,8 @@ private:
 drumkv1_sample::drumkv1_sample ( drumkv1 *pDrumk, float srate )
 	: m_srate(srate), m_filename(NULL), m_nchannels(0),
 		m_rate0(0.0f), m_freq0(1.0f), m_ratio(0.0f),
-		m_nframes(0), m_pframes(NULL), m_reverse(false), m_offset(0)
+		m_nframes(0), m_pframes(NULL), m_reverse(false),
+		m_offset_start(0), m_offset_end(0)
 {
 	m_reverse_sched = new drumkv1_reverse_sched(pDrumk, this);
 }
@@ -143,10 +144,16 @@ bool drumkv1_sample::open ( const char *filename, float freq0 )
 	delete [] buffer;
 	::sf_close(file);
 
+	m_offset_start = 0;
+	m_offset_end = m_nframes;
+
 	if (m_reverse)
 		reverse_sync();
 
 	reset(freq0);
+
+	setOffsetStart(m_offset_start);
+	setOffsetEnd(m_offset_end);
 
 	return true;
 }
@@ -201,14 +208,29 @@ void drumkv1_sample::reverse_sync (void)
 
 
 // sample start point (offset)
-void drumkv1_sample::setOffset ( uint32_t offset )
+void drumkv1_sample::setOffsetStart ( uint32_t start )
 {
-	if (offset > m_nframes)
-		offset = 0;
-	if (offset > 0)
-		offset = zero_crossing(offset, NULL);
+	if (start > m_nframes)
+		start = 0;
+	if (start > 0)
+		start = zero_crossing(start, NULL);
+	if (start > m_offset_end)
+		start = m_offset_end;
 
-	m_offset = offset;
+	m_offset_start = start;
+}
+
+
+void drumkv1_sample::setOffsetEnd ( uint32_t end )
+{
+	if (end > m_nframes)
+		end = m_nframes;
+	if (end > 0)
+		end = zero_crossing(end, NULL);
+	if (end < m_offset_start)
+		end = m_offset_start;
+
+	m_offset_end = end;
 }
 
 

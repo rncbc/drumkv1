@@ -698,7 +698,7 @@ void drumkv1_elem::updateEnvTimes ( float srate )
 	float envtime_msecs = 10000.0f * gen1.envtime0;
 	if (envtime_msecs < MIN_ENV_MSECS) {
 		const uint32_t envtime_frames
-			= (gen1_sample.length() - gen1_sample.offset()) >> 1;
+			= (gen1_sample.offsetEnd() - gen1_sample.offsetStart()) >> 1;
 		envtime_msecs = envtime_frames / srate_ms;
 	}
 	if (envtime_msecs < MIN_ENV_MSECS)
@@ -840,8 +840,11 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
-	void setOffset(uint32_t iOffset);
-	uint32_t offset() const;
+	void setOffsetStart(uint32_t iOffsetStart);
+	uint32_t offsetStart() const;
+
+	void setOffsetEnd(uint32_t iOffsetEnd);
+	uint32_t offsetEnd() const;
 
 	void setTempo(float bpm);
 	float tempo() const;
@@ -1321,14 +1324,25 @@ bool drumkv1_impl::isReverse (void) const
 }
 
 
-void drumkv1_impl::setOffset ( uint32_t iOffset )
+void drumkv1_impl::setOffsetStart ( uint32_t iOffsetStart )
 {
-	if (m_elem) m_elem->element.setOffset(iOffset);
+	if (m_elem) m_elem->element.setOffsetStart(iOffsetStart);
 }
 
-uint32_t drumkv1_impl::offset (void) const
+uint32_t drumkv1_impl::offsetStart (void) const
 {
-	return (m_elem ? m_elem->element.offset() : 0);
+	return (m_elem ? m_elem->element.offsetStart() : 0);
+}
+
+
+void drumkv1_impl::setOffsetEnd ( uint32_t iOffsetEnd )
+{
+	if (m_elem) m_elem->element.setOffsetEnd(iOffsetEnd);
+}
+
+uint32_t drumkv1_impl::offsetEnd (void) const
+{
+	return (m_elem ? m_elem->element.offsetEnd() : 0);
 }
 
 
@@ -2235,17 +2249,28 @@ bool drumkv1::isReverse (void) const
 }
 
 
-void drumkv1::setOffset ( uint32_t iOffset )
+void drumkv1::setOffsetStart ( uint32_t iOffsetStart )
 {
-	m_pImpl->setOffset(iOffset);
+	m_pImpl->setOffsetStart(iOffsetStart);
 }
 
 
-uint32_t drumkv1::offset (void) const
+uint32_t drumkv1::offsetStart (void) const
 {
-	return m_pImpl->offset();
+	return m_pImpl->offsetStart();
 }
 
+
+void drumkv1::setOffsetEnd ( uint32_t iOffsetEnd )
+{
+	m_pImpl->setOffsetEnd(iOffsetEnd);
+}
+
+
+uint32_t drumkv1::offsetEnd (void) const
+{
+	return m_pImpl->offsetEnd();
+}
 
 
 void drumkv1::setTempo ( float bpm )
@@ -2385,18 +2410,33 @@ bool drumkv1_element::isReverse (void) const
 }
 
 
-void drumkv1_element::setOffset ( uint32_t iOffset )
+void drumkv1_element::setOffsetStart ( uint32_t iOffsetStart )
 {
 	if (m_pElem) {
-		m_pElem->gen1_sample.setOffset(iOffset);
+		m_pElem->gen1_sample.setOffsetStart(iOffsetStart);
 		m_pElem->updateEnvTimes(
 			m_pElem->gen1_sample.sampleRate());
 	}
 }
 
-uint32_t drumkv1_element::offset (void) const
+uint32_t drumkv1_element::offsetStart (void) const
 {
-	return (m_pElem ? m_pElem->gen1_sample.offset() : 0);
+	return (m_pElem ? m_pElem->gen1_sample.offsetStart() : 0);
+}
+
+
+void drumkv1_element::setOffsetEnd ( uint32_t iOffsetEnd )
+{
+	if (m_pElem) {
+		m_pElem->gen1_sample.setOffsetEnd(iOffsetEnd);
+		m_pElem->updateEnvTimes(
+			m_pElem->gen1_sample.sampleRate());
+	}
+}
+
+uint32_t drumkv1_element::offsetEnd (void) const
+{
+	return (m_pElem ? m_pElem->gen1_sample.offsetEnd() : 0);
 }
 
 

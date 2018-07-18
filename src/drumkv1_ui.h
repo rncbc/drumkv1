@@ -58,8 +58,11 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
-	void setOffset(uint32_t iOffset);
-	uint32_t offset() const;
+	void setOffsetStart(uint32_t iOffsetStart);
+	uint32_t offsetStart() const;
+
+	void setOffsetEnd(uint32_t iOffsetEnd);
+	uint32_t offsetEnd() const;
 
 	bool loadPreset(const QString& sFilename);
 	bool savePreset(const QString& sFilename);

@@ -134,56 +134,46 @@
           <item>
            <layout class="QVBoxLayout">
             <property name="spacing">
-             <number>4</number>
+             <number>2</number>
             </property>
             <item>
-             <spacer>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint">
-               <size>
-                <width>20</width>
-                <height>4</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-            <item>
-             <widget class="QLabel" name="Gen1OffsetLabel">
+             <widget class="QLabel" name="Gen1OffsetRangeLabel">
               <property name="text">
-               <string>Offset:</string>
+               <string>Offset  Start / End:</string>
               </property>
              </widget>
             </item>
             <item>
-             <widget class="drumkv1widget_spinbox" name="Gen1OffsetSpinBox">
+             <widget class="drumkv1widget_spinbox" name="Gen1OffsetStartSpinBox">
               <property name="minimumSize">
                <size>
                 <width>100</width>
-                <height>12</height>
+                <height>10</height>
                </size>
               </property>
               <property name="alignment">
                <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
               </property>
               <property name="toolTip">
-               <string>GEN Offset</string>
+               <string>GEN Offset Start</string>
               </property>
              </widget>
             </item>
             <item>
-             <spacer>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint">
+             <widget class="drumkv1widget_spinbox" name="Gen1OffsetEndSpinBox">
+              <property name="minimumSize">
                <size>
-                <width>20</width>
-                <height>4</height>
+                <width>100</width>
+                <height>10</height>
                </size>
               </property>
-             </spacer>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+              </property>
+              <property name="toolTip">
+               <string>GEN Offset End</string>
+              </property>
+             </widget>
             </item>
             <item>
              <widget class="drumkv1widget_check" name="Gen1ReverseKnob">
@@ -194,19 +184,6 @@
                <string>Reverse</string>
               </property>
              </widget>
-            </item>
-            <item>
-             <spacer>
-              <property name="orientation">
-               <enum>Qt::Vertical</enum>
-              </property>
-              <property name="sizeHint">
-               <size>
-                <width>20</width>
-                <height>4</height>
-               </size>
-              </property>
-             </spacer>
             </item>
            </layout>
           </item>

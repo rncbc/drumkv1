@@ -1,7 +1,7 @@
 // drumkv1_sample.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -52,11 +52,14 @@ public:
 	float sampleRate() const
 		{ return m_srate; }
 
-	// sample start point (offset)
-	void setOffset(uint32_t offset);
+	// sample start/end points (offsets)
+	void setOffsetStart(uint32_t start);
+	void setOffsetEnd(uint32_t end);
 
-	uint32_t offset() const
-		{ return m_offset; }
+	uint32_t offsetStart() const
+		{ return m_offset_start; }
+	uint32_t offsetEnd() const
+		{ return m_offset_end; }
 
 	// reverse mode.
 	void setReverse (bool reverse)
@@ -112,7 +115,7 @@ public:
 
 	// predicate.
 	bool isOver(uint32_t frame) const
-		{ return !m_pframes || (frame >= m_nframes); }
+		{ return !m_pframes || (frame >= m_offset_end); }
 
 protected:
 
@@ -133,7 +136,8 @@ private:
 	float  **m_pframes;
 	bool     m_reverse;
 
-	uint32_t m_offset;
+	uint32_t m_offset_start;
+	uint32_t m_offset_end;
 
 	drumkv1_reverse_sched *m_reverse_sched;
 };
@@ -164,7 +168,7 @@ public:
 	// begin.
 	void start(void)
 	{
-		m_phase = float(m_sample ? m_sample->offset() : 0);
+		m_phase = float(m_sample ? m_sample->offsetStart() : 0);
 		m_index = 0;
 		m_alpha = 0.0f;
 		m_frame = 0;

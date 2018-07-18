@@ -135,10 +135,11 @@ protected slots:
 	void swapParams(bool bOn);
 
 	// Offset point changed.
-	void offsetChanged();
+	void offsetStartChanged();
+	void offsetEndChanged();
 
-	// Offset changed (from UI).
-	void sampleChanged();
+	// Offset points changed (from UI).
+	void offsetRangeChanged();
 
 	// Notification updater.
 	void updateSchedNotify(int stype, int sid);

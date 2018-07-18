@@ -107,14 +107,25 @@ bool drumkv1_ui::isReverse (void) const
 }
 
 
-void drumkv1_ui::setOffset ( uint32_t iOffset )
+void drumkv1_ui::setOffsetStart ( uint32_t iOffsetStart )
 {
-	m_pDrumk->setOffset(iOffset);
+	m_pDrumk->setOffsetStart(iOffsetStart);
 }
 
-uint32_t drumkv1_ui::offset (void) const
+uint32_t drumkv1_ui::offsetStart (void) const
 {
-	return m_pDrumk->offset();
+	return m_pDrumk->offsetStart();
+}
+
+
+void drumkv1_ui::setOffsetEnd ( uint32_t iOffsetEnd )
+{
+	m_pDrumk->setOffsetEnd(iOffsetEnd);
+}
+
+uint32_t drumkv1_ui::offsetEnd (void) const
+{
+	return m_pDrumk->offsetEnd();
 }
 
 

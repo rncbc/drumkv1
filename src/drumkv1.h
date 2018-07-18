@@ -77,8 +77,11 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
-	void setOffset(uint32_t iOffset);
-	uint32_t offset() const;
+	void setOffsetStart(uint32_t iOffsetStart);
+	uint32_t offsetStart() const;
+
+	void setOffsetEnd(uint32_t iOffsetEnd);
+	uint32_t offsetEnd() const;
 
 	void setTempo(float bpm);
 	float tempo() const;
@@ -218,8 +221,11 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
-	void setOffset(uint32_t iOffset);
-	uint32_t offset() const;
+	void setOffsetStart(uint32_t iOffsetStart);
+	uint32_t offsetStart() const;
+
+	void setOffsetEnd(uint32_t iOffsetEnd);
+	uint32_t offsetEnd() const;
 
 	void setParamPort(drumkv1::ParamIndex index, float *pfParam);
 	drumkv1_port *paramPort(drumkv1::ParamIndex index);
