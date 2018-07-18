@@ -233,9 +233,7 @@ void drumkv1_param::loadElements (
 						fi.setFile(fi.symLinkTarget());
 					element->setSampleFile(
 						mapPath.absolutePath(fi.filePath()).toUtf8().constData());
-					element->setOffsetStart(iOffsetStart);
-					if (iOffsetStart < iOffsetEnd)
-						element->setOffsetEnd(iOffsetEnd);
+					element->setOffsetRange(iOffsetStart, iOffsetEnd);
 				}
 				else
 				if (eChild.tagName() == "params") {

@@ -53,13 +53,15 @@ public:
 		{ return m_srate; }
 
 	// sample start/end points (offsets)
-	void setOffsetStart(uint32_t start);
-	void setOffsetEnd(uint32_t end);
+	void setOffsetRange(uint32_t start, uint32_t end);
 
 	uint32_t offsetStart() const
 		{ return m_offset_start; }
 	uint32_t offsetEnd() const
 		{ return m_offset_end; }
+
+	float offsetPhase0() const
+		{ return m_offset_phase0; }
 
 	// reverse mode.
 	void setReverse (bool reverse)
@@ -114,8 +116,8 @@ public:
 		{ return m_pframes[k]; }
 
 	// predicate.
-	bool isOver(uint32_t frame) const
-		{ return !m_pframes || (frame >= m_offset_end); }
+	bool isOver(uint32_t index) const
+		{ return !m_pframes || (index >= m_offset_end2); }
 
 protected:
 
@@ -138,6 +140,8 @@ private:
 
 	uint32_t m_offset_start;
 	uint32_t m_offset_end;
+	float    m_offset_phase0;
+	uint32_t m_offset_end2;
 
 	drumkv1_reverse_sched *m_reverse_sched;
 };
@@ -168,10 +172,9 @@ public:
 	// begin.
 	void start(void)
 	{
-		m_phase = float(m_sample ? m_sample->offsetStart() : 0);
+		m_phase = (m_sample ? m_sample->offsetPhase0() : 0.0f);
 		m_index = 0;
 		m_alpha = 0.0f;
-		m_frame = 0;
 	}
 
 	// iterate.
@@ -182,9 +185,6 @@ public:
 		m_index  = int(m_phase);
 		m_alpha  = m_phase - float(m_index);
 		m_phase += delta;
-
-		if (m_frame < m_index)
-			m_frame = m_index;
 	}
 
 	// sample.
@@ -211,7 +211,7 @@ public:
 
 	// predicate.
 	bool isOver() const
-		{ return m_sample->isOver(m_frame); }
+		{ return m_sample->isOver(m_index); }
 
 private:
 
@@ -221,7 +221,6 @@ private:
 	float    m_phase;
 	uint32_t m_index;
 	float    m_alpha;
-	uint32_t m_frame;
 };
 
 

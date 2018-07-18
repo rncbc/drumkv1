@@ -1367,7 +1367,9 @@ void drumkv1widget::offsetStartChanged (void)
 	++m_iUpdate;
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi) {
-		pDrumkUi->setOffsetStart(m_ui.Gen1OffsetStartSpinBox->value());
+		const uint32_t iOffsetStart = m_ui.Gen1OffsetStartSpinBox->value();
+		const uint32_t iOffsetEnd = pDrumkUi->offsetEnd();
+		pDrumkUi->setOffsetRange(iOffsetStart, iOffsetEnd);
 		updateOffset(pDrumkUi->sample(), true);
 	}
 	--m_iUpdate;
@@ -1382,7 +1384,9 @@ void drumkv1widget::offsetEndChanged (void)
 	++m_iUpdate;
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi) {
-		pDrumkUi->setOffsetEnd(m_ui.Gen1OffsetEndSpinBox->value());
+		const uint32_t iOffsetStart = pDrumkUi->offsetStart();
+		const uint32_t iOffsetEnd = m_ui.Gen1OffsetEndSpinBox->value();
+		pDrumkUi->setOffsetRange(iOffsetStart, iOffsetEnd);
 		updateOffset(pDrumkUi->sample(), true);
 	}
 	--m_iUpdate;
@@ -1398,8 +1402,9 @@ void drumkv1widget::offsetRangeChanged (void)
 	++m_iUpdate;
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi) {
-		pDrumkUi->setOffsetStart(m_ui.Gen1Sample->offsetStart());
-		pDrumkUi->setOffsetEnd(m_ui.Gen1Sample->offsetEnd());
+		const uint32_t iOffsetStart = m_ui.Gen1Sample->offsetStart();
+		const uint32_t iOffsetEnd   = m_ui.Gen1Sample->offsetEnd();
+		pDrumkUi->setOffsetRange(iOffsetStart, iOffsetEnd);
 		updateOffset(pDrumkUi->sample(), true);
 	}
 	--m_iUpdate;

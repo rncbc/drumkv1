@@ -840,10 +840,8 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
-	void setOffsetStart(uint32_t iOffsetStart);
+	void setOffsetRange(uint32_t iOffsetStart, uint32_t iOffsetEnd);
 	uint32_t offsetStart() const;
-
-	void setOffsetEnd(uint32_t iOffsetEnd);
 	uint32_t offsetEnd() const;
 
 	void setTempo(float bpm);
@@ -1324,20 +1322,14 @@ bool drumkv1_impl::isReverse (void) const
 }
 
 
-void drumkv1_impl::setOffsetStart ( uint32_t iOffsetStart )
+void drumkv1_impl::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
-	if (m_elem) m_elem->element.setOffsetStart(iOffsetStart);
+	if (m_elem) m_elem->element.setOffsetRange(iOffsetStart, iOffsetEnd);
 }
 
 uint32_t drumkv1_impl::offsetStart (void) const
 {
 	return (m_elem ? m_elem->element.offsetStart() : 0);
-}
-
-
-void drumkv1_impl::setOffsetEnd ( uint32_t iOffsetEnd )
-{
-	if (m_elem) m_elem->element.setOffsetEnd(iOffsetEnd);
 }
 
 uint32_t drumkv1_impl::offsetEnd (void) const
@@ -2249,21 +2241,15 @@ bool drumkv1::isReverse (void) const
 }
 
 
-void drumkv1::setOffsetStart ( uint32_t iOffsetStart )
+void drumkv1::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
-	m_pImpl->setOffsetStart(iOffsetStart);
+	m_pImpl->setOffsetRange(iOffsetStart, iOffsetEnd);
 }
 
 
 uint32_t drumkv1::offsetStart (void) const
 {
 	return m_pImpl->offsetStart();
-}
-
-
-void drumkv1::setOffsetEnd ( uint32_t iOffsetEnd )
-{
-	m_pImpl->setOffsetEnd(iOffsetEnd);
 }
 
 
@@ -2410,10 +2396,10 @@ bool drumkv1_element::isReverse (void) const
 }
 
 
-void drumkv1_element::setOffsetStart ( uint32_t iOffsetStart )
+void drumkv1_element::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
 	if (m_pElem) {
-		m_pElem->gen1_sample.setOffsetStart(iOffsetStart);
+		m_pElem->gen1_sample.setOffsetRange(iOffsetStart, iOffsetEnd);
 		m_pElem->updateEnvTimes(
 			m_pElem->gen1_sample.sampleRate());
 	}
@@ -2422,16 +2408,6 @@ void drumkv1_element::setOffsetStart ( uint32_t iOffsetStart )
 uint32_t drumkv1_element::offsetStart (void) const
 {
 	return (m_pElem ? m_pElem->gen1_sample.offsetStart() : 0);
-}
-
-
-void drumkv1_element::setOffsetEnd ( uint32_t iOffsetEnd )
-{
-	if (m_pElem) {
-		m_pElem->gen1_sample.setOffsetEnd(iOffsetEnd);
-		m_pElem->updateEnvTimes(
-			m_pElem->gen1_sample.sampleRate());
-	}
 }
 
 uint32_t drumkv1_element::offsetEnd (void) const

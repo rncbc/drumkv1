@@ -61,7 +61,8 @@ drumkv1_sample::drumkv1_sample ( drumkv1 *pDrumk, float srate )
 	: m_srate(srate), m_filename(NULL), m_nchannels(0),
 		m_rate0(0.0f), m_freq0(1.0f), m_ratio(0.0f),
 		m_nframes(0), m_pframes(NULL), m_reverse(false),
-		m_offset_start(0), m_offset_end(0)
+		m_offset_start(0), m_offset_end(0),
+		m_offset_phase0(0.0f), m_offset_end2(0)
 {
 	m_reverse_sched = new drumkv1_reverse_sched(pDrumk, this);
 }
@@ -144,16 +145,12 @@ bool drumkv1_sample::open ( const char *filename, float freq0 )
 	delete [] buffer;
 	::sf_close(file);
 
-	m_offset_start = 0;
-	m_offset_end = m_nframes;
-
 	if (m_reverse)
 		reverse_sync();
 
 	reset(freq0);
 
-	setOffsetStart(m_offset_start);
-	setOffsetEnd(m_offset_end);
+	setOffsetRange(0, m_nframes);
 
 	return true;
 }
@@ -208,29 +205,25 @@ void drumkv1_sample::reverse_sync (void)
 
 
 // sample start point (offset)
-void drumkv1_sample::setOffsetStart ( uint32_t start )
+void drumkv1_sample::setOffsetRange ( uint32_t start, uint32_t end )
 {
 	if (start > m_nframes)
-		start = 0;
-	if (start > 0)
-		start = zero_crossing(start, NULL);
-	if (start > m_offset_end)
-		start = m_offset_end;
+		start = m_nframes;
 
-	m_offset_start = start;
-}
-
-
-void drumkv1_sample::setOffsetEnd ( uint32_t end )
-{
-	if (end > m_nframes)
+	if (end > m_nframes || start >= end)
 		end = m_nframes;
-	if (end > 0)
-		end = zero_crossing(end, NULL);
-	if (end < m_offset_start)
-		end = m_offset_start;
 
-	m_offset_end = end;
+	if (start < end) {
+		m_offset_start = start;
+		m_offset_end = end;
+		m_offset_phase0 = float(zero_crossing(start, NULL));
+		m_offset_end2 = zero_crossing(end, NULL);
+	} else {
+		m_offset_start = 0;
+		m_offset_end = m_nframes;
+		m_offset_phase0 = 0.0f;
+		m_offset_end2 = m_nframes;
+	}
 }
 
 
