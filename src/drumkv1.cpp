@@ -696,8 +696,11 @@ void drumkv1_elem::updateEnvTimes ( float srate )
 	const float srate_ms = 0.001f * srate;
 
 	float envtime_msecs = 10000.0f * gen1.envtime0;
-	if (envtime_msecs < MIN_ENV_MSECS)
-		envtime_msecs = (gen1_sample.length() >> 1) / srate_ms;
+	if (envtime_msecs < MIN_ENV_MSECS) {
+		const uint32_t envtime_frames
+			= (gen1_sample.length() - gen1_sample.offset()) >> 1;
+		envtime_msecs = envtime_frames / srate_ms;
+	}
 	if (envtime_msecs < MIN_ENV_MSECS)
 		envtime_msecs = MIN_ENV_MSECS * 4.0f;
 
@@ -2384,7 +2387,11 @@ bool drumkv1_element::isReverse (void) const
 
 void drumkv1_element::setOffset ( uint32_t iOffset )
 {
-	if (m_pElem) m_pElem->gen1_sample.setOffset(iOffset);
+	if (m_pElem) {
+		m_pElem->gen1_sample.setOffset(iOffset);
+		m_pElem->updateEnvTimes(
+			m_pElem->gen1_sample.sampleRate());
+	}
 }
 
 uint32_t drumkv1_element::offset (void) const
