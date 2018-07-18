@@ -486,7 +486,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		SLOT(contextMenuRequest(const QPoint&)));
 
 	QObject::connect(m_ui.Gen1Sample,
-		SIGNAL(sampleChanged()),
+		SIGNAL(offsetChanged()),
 		SLOT(sampleChanged()));
 
 	QObject::connect(m_ui.Gen1OffsetSpinBox,
@@ -1388,7 +1388,8 @@ void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
 		m_ui.Gen1Sample->setOffset(iOffset);
 		if (bDirty) {
 			m_ui.StatusBar->showMessage(
-				tr("Offset: %1").arg(iOffset), 5000);
+				tr("Offset: %1")
+					.arg(m_ui.Gen1Sample->textFromValue(iOffset)), 5000);
 			updateDirtyPreset(true);
 		}
 	} else {

@@ -26,6 +26,8 @@
 
 #include "drumkv1_ui.h"
 
+#include "drumkv1widget_spinbox.h"
+
 #include <sndfile.h>
 
 #include <QPainter>
@@ -249,10 +251,11 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 			const int w = QFrame::width();
 			if (w > 0) {
 				const uint32_t nframes = m_pSample->length();
+				const uint32_t iOffset = (m_iDragOffsetX * nframes) / w;
 				QToolTip::showText(
 					QCursor::pos(),
 					tr("Offset: %1")
-						.arg((m_iDragOffsetX * nframes) / w), this);
+						.arg(textFromValue(iOffset)), this);
 			}
 		}
 		break;
@@ -295,7 +298,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 		if (m_pSample && w > 0) {
 			const uint32_t nframes = m_pSample->length();
 			m_iOffset = (m_iDragOffsetX * nframes) / w;
-			emit sampleChanged();
+			emit offsetChanged();
 			updateToolTip();
 			update();
 		}
@@ -529,6 +532,29 @@ void drumkv1widget_sample::loadSample ( drumkv1_sample *pSample )
 }
 
 
+// Value/text format converter utilities.
+uint32_t drumkv1widget_sample::valueFromText ( const QString& text ) const
+{
+	drumkv1widget_spinbox::Format format = drumkv1widget_spinbox::Frames;
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
+	if (pConfig)
+		format = drumkv1widget_spinbox::Format(pConfig->iFrameTimeFormat);
+	const float srate = (m_pSample ? m_pSample->sampleRate() : 44100.0f);
+	return drumkv1widget_spinbox::valueFromText(text, format, srate);
+}
+
+
+QString drumkv1widget_sample::textFromValue ( uint32_t value ) const
+{
+	drumkv1widget_spinbox::Format format = drumkv1widget_spinbox::Frames;
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
+	if (pConfig)
+		format = drumkv1widget_spinbox::Format(pConfig->iFrameTimeFormat);
+	const float srate = (m_pSample ? m_pSample->sampleRate() : 44100.0f);
+	return drumkv1widget_spinbox::textFromValue(value, format, srate);
+}
+
+
 // Update tool-tip.
 void drumkv1widget_sample::updateToolTip (void)
 {
@@ -549,7 +575,8 @@ void drumkv1widget_sample::updateToolTip (void)
 
 	if (m_iOffset > 0) {
 		if (!sToolTip.isEmpty()) sToolTip += '\n';
-		sToolTip += tr("Offset: %1").arg(m_iOffset);
+		sToolTip += tr("Offset: %1").
+			arg(textFromValue(m_iOffset));
 	}
 
 	setToolTip(sToolTip);

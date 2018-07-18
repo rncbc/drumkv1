@@ -58,13 +58,17 @@ public:
 	// Offset getter.
 	uint32_t offset() const;
 
+	// Value/text format converter utilities.
+	uint32_t valueFromText (const QString& text) const;
+	QString textFromValue (uint32_t value) const;
+
 signals:
 
 	// Load new sample file.
 	void loadSampleFile(const QString&);
 
 	// Offset changed.
-	void sampleChanged();
+	void offsetChanged();
 
 public slots:
 
