@@ -170,6 +170,8 @@ void drumkv1_sample::close (void)
 	m_rate0     = 0.0f;
 	m_nchannels = 0;
 
+	setOffsetRange(0, 0);
+
 	if (m_filename) {
 		::free(m_filename);
 		m_filename = NULL;
