@@ -224,9 +224,8 @@ void drumkv1_param::loadElements (
 					continue;
 				if (eChild.tagName() == "sample") {
 				//	const int index = eChild.attribute("index").toInt();
-					uint32_t iOffsetStart = eChild.attribute("offset").toULong();
-					if (iOffsetStart == 0)
-						iOffsetStart = eChild.attribute("offset-start").toULong();
+					const uint32_t iOffsetStart
+						= eChild.attribute("offset-start").toULong();
 					const uint32_t iOffsetEnd
 						= eChild.attribute("offset-end").toULong();
 					QFileInfo fi(eChild.text());
