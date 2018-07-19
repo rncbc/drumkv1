@@ -28,7 +28,7 @@
 	lv2:optionalFeature lv2:hardRTCapable ;
 	lv2:extensionData lv2state:interface, lv2worker:interface ;
 	lv2patch:writable drumkv1_lv2:GEN1_SAMPLE,
-		samplv1_lv2:GEN1_OFFSET_START, samplv1_lv2:GEN1_OFFSET_END ;
+		drumkv1_lv2:GEN1_OFFSET_START, drumkv1_lv2:GEN1_OFFSET_END ;
 	lv2ui:ui drumkv1_lv2:ui, drumkv1_lv2:ui_x11, drumkv1_lv2:ui_external ;
 	lv2:port [
 		a lv2:InputPort, lv2atom:AtomPort ;
@@ -96,7 +96,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group samplv1_lv2:101_GEN1 ;
+		lv2pg:group drumkv1_lv2:101_GEN1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 9 ;
