@@ -160,6 +160,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	states << tr("On");
 #if 0
 	m_ui.Gen1ReverseKnob->insertItems(0, states);
+	m_ui.Gen1OffsetKnob->insertItems(0, states);
 
 	m_ui.Lfo1SyncKnob->insertItems(0, states);
 
@@ -238,6 +239,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 
 	// GEN1
 	setParamKnob(drumkv1::GEN1_REVERSE, m_ui.Gen1ReverseKnob);
+	setParamKnob(drumkv1::GEN1_OFFSET,  m_ui.Gen1OffsetKnob);
 	setParamKnob(drumkv1::GEN1_GROUP,   m_ui.Gen1GroupKnob);
 	setParamKnob(drumkv1::GEN1_COARSE,  m_ui.Gen1CoarseKnob);
 	setParamKnob(drumkv1::GEN1_FINE,    m_ui.Gen1FineKnob);
@@ -703,20 +705,27 @@ void drumkv1widget::paramChanged ( float fValue )
 // Update local tied widgets.
 void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 {
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
+		return;
+
 	++m_iUpdate;
 
 	switch (index) {
-#if 0//--updateSchedNotify(drumkv1_sched::Sample, 0);
+#if 1//--updateSchedNotify(drumkv1_sched::Sample, 0);
 	case drumkv1::GEN1_REVERSE: {
-		drumkv1_ui *pDrumkUi = ui_instance();
-		if (pDrumkUi) {
-			const bool bReverse = bool(fValue > 0.0f);
-			pDrumkUi->setReverse(bReverse);
-			updateSample(pDrumkUi->sample());
-		}
+		const bool bReverse = bool(fValue > 0.0f);
+		pDrumkUi->setReverse(bReverse);
+		updateSample(pDrumkUi->sample());
 		break;
 	}
 #endif
+	case drumkv1::GEN1_OFFSET: {
+		const bool bOffset = bool(fValue > 0.0f);
+		pDrumkUi->setOffset(bOffset);
+		updateOffset(pDrumkUi->sample());
+		break;
+	}
 	case drumkv1::DCF1_SLOPE:
 		m_ui.Dcf1TypeKnob->setEnabled(int(fValue) != 3); // !Formant
 		// Fall thru...
@@ -1068,11 +1077,13 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 
 	++m_iUpdate;
 	if (pSample) {
+		m_ui.Gen1Sample->setOffset(pSample->isOffset());
 		m_ui.Gen1Sample->setOffsetStart(pSample->offsetStart());
 		m_ui.Gen1Sample->setOffsetEnd(pSample->offsetEnd());
 		activateParamKnobs(pSample->filename() != NULL);
 		updateOffset(pSample);
 	} else {
+		m_ui.Gen1Sample->setOffset(false);
 		m_ui.Gen1Sample->setOffsetStart(0);
 		m_ui.Gen1Sample->setOffsetEnd(0);
 		activateParamKnobs(false);
@@ -1320,6 +1331,7 @@ void drumkv1widget::updateElement (void)
 				pParam->setValue(fValue);
 			}
 			updateParam(index, fValue);
+			updateParamEx(index, fValue);
 			m_params_ab[i] = fValue;
 		}
 		updateSample(pDrumkUi->sample());
@@ -1415,38 +1427,49 @@ void drumkv1widget::offsetRangeChanged (void)
 void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
 {
 	if (pSample) {
+		const bool     bOffset    = pSample->isOffset();
 		const uint32_t iOffsetStart = pSample->offsetStart();
 		const uint32_t iOffsetEnd = pSample->offsetEnd();
-		const uint32_t nframes = pSample->length();
+		const uint32_t nframes    = pSample->length();
 		const float srate = pSample->sampleRate();
-		m_ui.Gen1OffsetRangeLabel->setEnabled(pSample->filename() != NULL);
+		m_ui.Gen1OffsetRangeLabel->setEnabled(bOffset);
 		m_ui.Gen1OffsetStartSpinBox->setSampleRate(srate);
+		m_ui.Gen1OffsetStartSpinBox->setEnabled(bOffset);
 		m_ui.Gen1OffsetStartSpinBox->setMinimum(0);
 		m_ui.Gen1OffsetStartSpinBox->setMaximum(iOffsetEnd);
 		m_ui.Gen1OffsetStartSpinBox->setValue(iOffsetStart);
 		m_ui.Gen1OffsetEndSpinBox->setSampleRate(srate);
+		m_ui.Gen1OffsetEndSpinBox->setEnabled(bOffset);
 		m_ui.Gen1OffsetEndSpinBox->setMinimum(iOffsetStart);
 		m_ui.Gen1OffsetEndSpinBox->setMaximum(nframes);
 		m_ui.Gen1OffsetEndSpinBox->setValue(iOffsetEnd);
 		m_ui.Gen1Sample->setOffsetStart(iOffsetStart);
 		m_ui.Gen1Sample->setOffsetEnd(iOffsetEnd);
+		m_ui.Gen1Sample->setOffset(bOffset);
 		if (bDirty) {
-			m_ui.StatusBar->showMessage(
-				tr("Offset: %1 - %2")
+			QString sMessage;
+			if (bOffset) {
+				sMessage.append(tr("Offset: %1 - %2")
 					.arg(m_ui.Gen1Sample->textFromValue(iOffsetStart))
-					.arg(m_ui.Gen1Sample->textFromValue(iOffsetEnd)), 5000);
+					.arg(m_ui.Gen1Sample->textFromValue(iOffsetEnd)));
+			}
+			if (!sMessage.isEmpty())
+				m_ui.StatusBar->showMessage(sMessage, 3000);
 			updateDirtyPreset(true);
 		}
 	} else {
 		m_ui.Gen1OffsetRangeLabel->setEnabled(false);
+		m_ui.Gen1OffsetStartSpinBox->setEnabled(false);
 		m_ui.Gen1OffsetStartSpinBox->setMinimum(0);
 		m_ui.Gen1OffsetStartSpinBox->setMaximum(0);
 		m_ui.Gen1OffsetStartSpinBox->setValue(0);
+		m_ui.Gen1OffsetEndSpinBox->setEnabled(false);
 		m_ui.Gen1OffsetEndSpinBox->setMinimum(0);
 		m_ui.Gen1OffsetEndSpinBox->setMaximum(0);
 		m_ui.Gen1OffsetEndSpinBox->setValue(0);
 		m_ui.Gen1Sample->setOffsetStart(0);
 		m_ui.Gen1Sample->setOffsetEnd(0);
+		m_ui.Gen1Sample->setOffset(false);
 	}
 }
 

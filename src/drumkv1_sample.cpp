@@ -61,7 +61,7 @@ drumkv1_sample::drumkv1_sample ( drumkv1 *pDrumk, float srate )
 	: m_srate(srate), m_filename(NULL), m_nchannels(0),
 		m_rate0(0.0f), m_freq0(1.0f), m_ratio(0.0f),
 		m_nframes(0), m_pframes(NULL), m_reverse(false),
-		m_offset_start(0), m_offset_end(0),
+		m_offset(false), m_offset_start(0), m_offset_end(0),
 		m_offset_phase0(0.0f), m_offset_end2(0)
 {
 	m_reverse_sched = new drumkv1_reverse_sched(pDrumk, this);
@@ -150,8 +150,7 @@ bool drumkv1_sample::open ( const char *filename, float freq0 )
 
 	reset(freq0);
 
-	setOffsetRange(0, m_nframes);
-
+	setOffset(m_offset);
 	return true;
 }
 
@@ -204,7 +203,7 @@ void drumkv1_sample::reverse_sync (void)
 }
 
 
-// sample start point (offset)
+// offset range.
 void drumkv1_sample::setOffsetRange ( uint32_t start, uint32_t end )
 {
 	if (start > m_nframes)

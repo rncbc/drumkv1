@@ -132,18 +132,31 @@
            </widget>
           </item>
           <item>
-           <layout class="QVBoxLayout">
+           <layout class="QGridLayout">
+            <property name="margin">
+             <number>4</number>
+            </property>
             <property name="spacing">
              <number>2</number>
             </property>
-            <item>
-             <widget class="QLabel" name="Gen1OffsetRangeLabel">
+            <item row="0" column="0">
+             <widget class="drumkv1widget_check" name="Gen1OffsetKnob">
+              <property name="toolTip">
+               <string>GEN Offset</string>
+              </property>
               <property name="text">
-               <string>Offset  Start / End:</string>
+               <string>Offset</string>
               </property>
              </widget>
             </item>
-            <item>
+            <item row="0" column="1">
+             <widget class="QLabel" name="Gen1OffsetRangeLabel">
+              <property name="text">
+               <string>Start / End </string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0" colspan="2">
              <widget class="drumkv1widget_spinbox" name="Gen1OffsetStartSpinBox">
               <property name="minimumSize">
                <size>
@@ -159,7 +172,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="2" column="0" colspan="2">
              <widget class="drumkv1widget_spinbox" name="Gen1OffsetEndSpinBox">
               <property name="minimumSize">
                <size>
@@ -175,7 +188,7 @@
               </property>
              </widget>
             </item>
-            <item>
+            <item row="3" column="0" colspan="2">
              <widget class="drumkv1widget_check" name="Gen1ReverseKnob">
               <property name="toolTip">
                <string>GEN Reverse</string>

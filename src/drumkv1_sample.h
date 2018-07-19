@@ -52,17 +52,6 @@ public:
 	float sampleRate() const
 		{ return m_srate; }
 
-	// sample start/end points (offsets)
-	void setOffsetRange(uint32_t start, uint32_t end);
-
-	uint32_t offsetStart() const
-		{ return m_offset_start; }
-	uint32_t offsetEnd() const
-		{ return m_offset_end; }
-
-	float offsetPhase0() const
-		{ return m_offset_phase0; }
-
 	// reverse mode.
 	void setReverse (bool reverse)
 		{ reverse_test(reverse); }
@@ -83,6 +72,45 @@ public:
 	// reverse sample buffer.
 	void reverse_sched();
 	void reverse_sync();
+
+	// offset mode.
+	void setOffset(bool offset)
+	{
+		m_offset = offset;
+
+		if (m_offset_start >= m_offset_end) {
+			m_offset_start = 0;
+			m_offset_end = m_nframes;
+			m_offset_phase0 = 0.0f;
+		}
+
+		m_offset_end2 = (m_offset ? m_offset_end : m_nframes);
+	}
+
+	bool isOffset() const
+		{ return m_offset && (m_offset_start < m_offset_end); }
+
+	// offset change.
+	bool offset_test(bool offset)
+	{
+		if ((m_offset && !offset) || (!m_offset && offset)) {
+			setOffset(offset);
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	// sample start/end points (offsets)
+	void setOffsetRange(uint32_t start, uint32_t end);
+
+	uint32_t offsetStart() const
+		{ return m_offset_start; }
+	uint32_t offsetEnd() const
+		{ return m_offset_end; }
+
+	float offsetPhase0() const
+		{ return (m_offset ? m_offset_phase0 : 0.0f); }
 
 	// init.
 	bool open(const char *filename, float freq0 = 1.0f);
@@ -138,6 +166,7 @@ private:
 	float  **m_pframes;
 	bool     m_reverse;
 
+	bool     m_offset;
 	uint32_t m_offset_start;
 	uint32_t m_offset_end;
 	float    m_offset_phase0;

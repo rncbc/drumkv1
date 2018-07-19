@@ -405,6 +405,7 @@ struct drumkv1_gen
 {
 	drumkv1_port sample;
 	drumkv1_port reverse;
+	drumkv1_port offset;
 	drumkv1_port group;
 	drumkv1_port coarse;
 	drumkv1_port fine;
@@ -840,6 +841,9 @@ public:
 	void setReverse(bool bReverse);
 	bool isReverse() const;
 
+	void setOffset(bool bOffset);
+	bool isOffset() const;
+
 	void setOffsetRange(uint32_t iOffsetStart, uint32_t iOffsetEnd);
 	uint32_t offsetStart() const;
 	uint32_t offsetEnd() const;
@@ -863,6 +867,8 @@ public:
 
 	void resetParamValues(bool bSwap);
 	void reset();
+
+	bool sampleOffsetTest();
 
 	void midiInEnabled(bool on);
 	uint32_t midiInCount();
@@ -1319,6 +1325,17 @@ void drumkv1_impl::setReverse ( bool bReverse )
 bool drumkv1_impl::isReverse (void) const
 {
 	return (m_elem ? m_elem->element.isReverse() : false);
+}
+
+
+void drumkv1_impl::setOffset ( bool bOffset )
+{
+	if (m_elem) m_elem->element.setOffset(bOffset);
+}
+
+bool drumkv1_impl::isOffset (void) const
+{
+	return (m_elem ? m_elem->element.isOffset() : false);
 }
 
 
@@ -2108,6 +2125,12 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 }
 
 
+bool drumkv1_impl::sampleOffsetTest (void)
+{
+	return (m_elem ? m_elem->element.sampleOffsetTest() : false);
+}
+
+
 //-------------------------------------------------------------------------
 // drumkv1 - decl.
 //
@@ -2241,6 +2264,17 @@ bool drumkv1::isReverse (void) const
 }
 
 
+void drumkv1::setOffset ( bool bOffset )
+{
+	m_pImpl->setOffset(bOffset);
+}
+
+bool drumkv1::isOffset (void) const
+{
+	return m_pImpl->isOffset();
+}
+
+
 void drumkv1::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
 	m_pImpl->setOffsetRange(iOffsetStart, iOffsetEnd);
@@ -2344,6 +2378,12 @@ void drumkv1::reset (void)
 }
 
 
+bool drumkv1::sampleOffsetTest (void) const
+{
+	return m_pImpl->sampleOffsetTest();
+}
+
+
 //-------------------------------------------------------------------------
 // drumkv1_element - decl.
 //
@@ -2396,12 +2436,22 @@ bool drumkv1_element::isReverse (void) const
 }
 
 
+void drumkv1_element::setOffset ( bool bOffset )
+{
+	if (m_pElem) m_pElem->gen1_sample.setOffset(bOffset);
+}
+
+bool drumkv1_element::isOffset (void) const
+{
+	return (m_pElem ? m_pElem->gen1_sample.isOffset() : false);
+}
+
+
 void drumkv1_element::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
 	if (m_pElem) {
 		m_pElem->gen1_sample.setOffsetRange(iOffsetStart, iOffsetEnd);
-		m_pElem->updateEnvTimes(
-			m_pElem->gen1_sample.sampleRate());
+		m_pElem->updateEnvTimes(m_pElem->gen1_sample.sampleRate());
 	}
 }
 
@@ -2434,6 +2484,7 @@ drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	switch (index) {
 //	case drumkv1::GEN1_SAMPLE:   pParamPort = &m_pElem->gen1.sample;     break;
 	case drumkv1::GEN1_REVERSE:  pParamPort = &m_pElem->gen1.reverse;    break;
+	case drumkv1::GEN1_OFFSET:   pParamPort = &m_pElem->gen1.offset;     break;
 	case drumkv1::GEN1_GROUP:    pParamPort = &m_pElem->gen1.group;      break;
 	case drumkv1::GEN1_COARSE:   pParamPort = &m_pElem->gen1.coarse;     break;
 	case drumkv1::GEN1_FINE:     pParamPort = &m_pElem->gen1.fine;       break;
@@ -2509,6 +2560,15 @@ void drumkv1_element::resetParamValues ( bool bSwap )
 		else
 			m_pElem->params[0][index] = fOldValue;
 	}
+}
+
+
+bool drumkv1_element::sampleOffsetTest (void)
+{
+	if (m_pElem)
+		return m_pElem->gen1_sample.offset_test(*m_pElem->gen1.offset > 0.5f);
+	else
+		return false;
 }
 
 

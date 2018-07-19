@@ -65,6 +65,7 @@ drumkv1widget_sample::drumkv1widget_sample (
 	QFrame::setFrameShape(QFrame::Panel);
 	QFrame::setFrameShadow(QFrame::Sunken);
 
+	m_bOffset = false;
 	m_iOffsetStart = m_iOffsetEnd = 0;
 
 	m_dragCursor  = DragNone;
@@ -94,7 +95,8 @@ void drumkv1widget_sample::setSample ( drumkv1_sample *pSample )
 
 	m_pSample = pSample;
 
-//	m_iOffset = 0;
+//	m_bOffset = 0;
+//	m_iOffsetStart = m_iOffsetEnd = 0;
 
 	m_pDragSample = NULL;
 
@@ -164,6 +166,21 @@ const QString& drumkv1widget_sample::sampleName (void) const
 }
 
 
+// Offset mode.
+void drumkv1widget_sample::setOffset ( bool bOffset )
+{
+	m_bOffset = bOffset;
+
+	updateToolTip();
+	update();
+}
+
+bool drumkv1widget_sample::isOffset (void) const
+{
+	return m_bOffset;
+}
+
+
 void drumkv1widget_sample::setOffsetStart ( uint32_t iOffsetStart )
 {
 	m_iOffsetStart = iOffsetStart;
@@ -221,9 +238,9 @@ void drumkv1widget_sample::mousePressEvent ( QMouseEvent *pMouseEvent )
 			m_dragState = DragStart;
 			m_posDrag = pMouseEvent->pos();
 		} else {
-			const int w = QFrame::width();
 			const uint32_t nframes = m_pSample->length();
-			if (nframes > 0) {
+			if (nframes > 0 && m_bOffset) {
+				const int w = QFrame::width();
 				m_iDragOffsetStartX = safeX((m_iOffsetStart * w) / nframes);
 				m_iDragOffsetEndX   = safeX((m_iOffsetEnd   * w) / nframes);
 				m_dragState = m_dragCursor;
@@ -242,18 +259,18 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 	switch (m_dragState) {
 	case DragNone:
 		if (m_pSample) {
-			const int w = QFrame::width();
 			const uint32_t nframes = m_pSample->length();
 			if (nframes > 0) {
+				const int w  = QFrame::width();
 				const int dx = QApplication::startDragDistance();
 				const int x0 = (m_iOffsetStart * w) / nframes;
 				const int x1 = (m_iOffsetEnd   * w) / nframes;
-				if (abs(x1 - x) < dx) {
+				if (abs(x1 - x) < dx && m_bOffset) {
 					m_dragCursor = DragOffsetEnd;
 					QFrame::setCursor(QCursor(Qt::SizeHorCursor));
 				}
 				else
-				if (abs(x0 - x) < dx) {
+				if (abs(x0 - x) < dx && m_bOffset) {
 					m_dragCursor = DragOffsetStart;
 					QFrame::setCursor(QCursor(Qt::SizeHorCursor));
 				}
@@ -329,8 +346,8 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 			if (m_dragCursor != DragNone)
 				m_dragState = m_dragCursor;
 			else
-			if (pMouseEvent->modifiers()
-				& (Qt::ShiftModifier | Qt::ControlModifier)) {
+			if (m_bOffset && (pMouseEvent->modifiers()
+				& (Qt::ShiftModifier | Qt::ControlModifier))) {
 				m_dragState = m_dragCursor = DragOffsetRange;
 				m_iDragOffsetStartX = m_iDragOffsetEndX = m_posDrag.x();
 				QFrame::setCursor(QCursor(Qt::SizeHorCursor));
@@ -497,7 +514,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		for (unsigned short k = 0; k < m_iChannels; ++k)
 			painter.drawPolygon(*m_ppPolyg[k]);
 		// Offset line...
-		if (bEnabled) {
+		if (m_bOffset && bEnabled) {
 			int x1 = 0, x2 = 0;
 			if (m_dragState == DragOffsetStart ||
 				m_dragState == DragOffsetEnd   ||
@@ -677,7 +694,7 @@ void drumkv1widget_sample::updateToolTip (void)
 			.arg(m_pSample->rate());
 	}
 
-	if (m_iOffsetStart < m_iOffsetEnd) {
+	if (m_bOffset && m_iOffsetStart < m_iOffsetEnd) {
 		if (!sToolTip.isEmpty()) sToolTip += '\n';
 		sToolTip += tr("Offset: %1 - %2")
 			.arg(textFromValue(m_iOffsetStart))
