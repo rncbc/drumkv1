@@ -453,9 +453,9 @@ struct drumkv1_lfo
 
 struct drumkv1_dca
 {
-	drumkv1_port2 volume;
+	drumkv1_port volume;
 
-	drumkv1_env   env;
+	drumkv1_env  env;
 };
 
 
@@ -477,10 +477,10 @@ struct drumkv1_def
 
 struct drumkv1_out
 {
-	drumkv1_port2 width;
-	drumkv1_port2 panning;
-	drumkv1_port2 fxsend;
-	drumkv1_port2 volume;
+	drumkv1_port width;
+	drumkv1_port panning;
+	drumkv1_port fxsend;
+	drumkv1_port volume;
 };
 
 
@@ -488,11 +488,11 @@ struct drumkv1_out
 
 struct drumkv1_cho
 {
-	drumkv1_port2 wet;
-	drumkv1_port2 delay;
-	drumkv1_port2 feedb;
-	drumkv1_port2 rate;
-	drumkv1_port2 mod;
+	drumkv1_port wet;
+	drumkv1_port delay;
+	drumkv1_port feedb;
+	drumkv1_port rate;
+	drumkv1_port mod;
 };
 
 
@@ -500,10 +500,10 @@ struct drumkv1_cho
 
 struct drumkv1_fla
 {
-	drumkv1_port2 wet;
-	drumkv1_port2 delay;
-	drumkv1_port2 feedb;
-	drumkv1_port2 daft;
+	drumkv1_port wet;
+	drumkv1_port delay;
+	drumkv1_port feedb;
+	drumkv1_port daft;
 };
 
 
@@ -511,11 +511,11 @@ struct drumkv1_fla
 
 struct drumkv1_pha
 {
-	drumkv1_port2 wet;
-	drumkv1_port2 rate;
-	drumkv1_port2 feedb;
-	drumkv1_port2 depth;
-	drumkv1_port2 daft;
+	drumkv1_port wet;
+	drumkv1_port rate;
+	drumkv1_port feedb;
+	drumkv1_port depth;
+	drumkv1_port daft;
 };
 
 
@@ -523,10 +523,10 @@ struct drumkv1_pha
 
 struct drumkv1_del
 {
-	drumkv1_port2 wet;
-	drumkv1_port2 delay;
-	drumkv1_port2 feedb;
-	drumkv1_port2 bpm;
+	drumkv1_port wet;
+	drumkv1_port delay;
+	drumkv1_port feedb;
+	drumkv1_port bpm;
 };
 
 
@@ -534,11 +534,11 @@ struct drumkv1_del
 
 struct drumkv1_rev
 {
-	drumkv1_port2 wet;
-	drumkv1_port2 room;
-	drumkv1_port2 damp;
-	drumkv1_port2 feedb;
-	drumkv1_port2 width;
+	drumkv1_port wet;
+	drumkv1_port room;
+	drumkv1_port damp;
+	drumkv1_port feedb;
+	drumkv1_port width;
 };
 
 // dynamic(compressor/limiter)
@@ -2111,10 +2111,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 	elem = m_elem_list.next();
 	while (elem) {
-		elem->dca1.volume.tick(nframes);
-		elem->out1.width.tick(nframes);
-		elem->out1.panning.tick(nframes);
-		elem->out1.volume.tick(nframes);
 		elem->wid1.process(nframes);
 		elem->pan1.process(nframes);
 		elem->vol1.process(nframes);
