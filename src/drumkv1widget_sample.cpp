@@ -263,16 +263,24 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 			if (nframes > 0) {
 				const int w  = QFrame::width();
 				const int dx = QApplication::startDragDistance();
-				const int x0 = (m_iOffsetStart * w) / nframes;
-				const int x1 = (m_iOffsetEnd   * w) / nframes;
-				if (abs(x1 - x) < dx && m_bOffset) {
+				const int x1 = (m_iOffsetStart * w) / nframes;
+				const int x2 = (m_iOffsetEnd   * w) / nframes;
+				if (abs(x2 - x) < dx && m_bOffset) {
 					m_dragCursor = DragOffsetEnd;
 					QFrame::setCursor(QCursor(Qt::SizeHorCursor));
+					QToolTip::showText(
+						QCursor::pos(),
+						tr("Offset end: %1")
+							.arg(textFromValue(m_iOffsetEnd)), this);
 				}
 				else
-				if (abs(x0 - x) < dx && m_bOffset) {
+				if (abs(x1 - x) < dx && m_bOffset) {
 					m_dragCursor = DragOffsetStart;
 					QFrame::setCursor(QCursor(Qt::SizeHorCursor));
+					QToolTip::showText(
+						QCursor::pos(),
+						tr("Offset start: %1")
+							.arg(textFromValue(m_iOffsetStart)), this);
 				}
 				else
 				if (m_dragCursor != DragNone) {
@@ -527,25 +535,23 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 				x1 = (m_iOffsetStart * w) / nframes;
 				x2 = (m_iOffsetEnd   * w) / nframes;
 			}
-			if (x1 < x2) {
-				QColor rgbOver = rgbDark.darker();
-				rgbOver.setAlpha(120);
-				painter.setPen(rgbLite);
-				painter.setBrush(rgbOver);
-				QPolygon polyg(3);
-			//	polyg.putPoints(0, 3, x1 + 8, 0, x1, 8, x1, 0);
-			//	painter.drawPolygon(polyg);
-				polyg.putPoints(0, 3, x1 + 8, h, x1, h - 8, x1, h);
-				painter.drawPolygon(polyg);
-				painter.fillRect(0, 0, x1, h, rgbOver);
-				painter.drawLine(x1, 0, x1, h);
-				polyg.putPoints(0, 3, x2 - 8, 0, x2, 8, x2, 0);
-				painter.drawPolygon(polyg);
-			//	polyg.putPoints(0, 3, x2 - 8, h, x2, h - 8, x2, h);
-			//	painter.drawPolygon(polyg);
-				painter.fillRect(x2, 0, w, h, rgbOver);
-				painter.drawLine(x2, 0, x2, h);
-			}
+			QColor rgbOver = rgbDark.darker();
+			rgbOver.setAlpha(120);
+			painter.setPen(rgbLite.darker(160));
+			painter.setBrush(rgbDark.lighter(160));
+			QPolygon polyg(3);
+		//	polyg.putPoints(0, 3, x1 + 8, 0, x1, 8, x1, 0);
+		//	painter.drawPolygon(polyg);
+			polyg.putPoints(0, 3, x1 + 8, h, x1, h - 8, x1, h);
+			painter.drawPolygon(polyg);
+			painter.fillRect(0, 0, x1, h, rgbOver);
+			painter.drawLine(x1, 0, x1, h);
+			polyg.putPoints(0, 3, x2 - 8, 0, x2, 8, x2, 0);
+			painter.drawPolygon(polyg);
+		//	polyg.putPoints(0, 3, x2 - 8, h, x2, h - 8, x2, h);
+		//	painter.drawPolygon(polyg);
+			painter.fillRect(x2, 0, w, h, rgbOver);
+			painter.drawLine(x2, 0, x2, h);
 		}
 		painter.setRenderHint(QPainter::Antialiasing, false);
 	} else {
