@@ -51,6 +51,8 @@ struct ParamInfo {
 	{ "GEN1_SAMPLE",   PARAM_INT,    36.0f,   0.0f, 127.0f }, // GEN1 Sample
 	{ "GEN1_REVERSE",  PARAM_BOOL,    0.0f,   0.0f,   1.0f }, // GEN1 Reverse
 	{ "GEN1_OFFSET",   PARAM_BOOL,    0.0f,   0.0f,   1.0f }, // GEN1 Offset
+	{ "GEN1_OFFSET_1", PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // GEN1 Offset Start
+	{ "GEN1_OFFSET_2", PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // GEN1 Offset End
 	{ "GEN1_GROUP",    PARAM_FLOAT,   0.0f,   0.0f, 128.0f }, // GEN1 Group
 	{ "GEN1_COARSE",   PARAM_FLOAT,   0.0f,  -4.0f,   4.0f }, // GEN1 Coarse
 	{ "GEN1_FINE",     PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // GEN1 Fine
