@@ -236,6 +236,29 @@ private:
 };
 
 
+// parameter port (scheduled/detached)
+
+class drumkv1_port3 : public drumkv1_port
+{
+public:
+
+	drumkv1_port3(drumkv1_sched *sched, drumkv1::ParamIndex index)
+		: m_sched(sched), m_index(index) {}
+
+	void set_value(float value)
+	{
+		drumkv1_port::set_value(value);
+
+		m_sched->schedule(m_index);
+	}
+
+private:
+
+	drumkv1_sched      *m_sched;
+	drumkv1::ParamIndex m_index;
+};
+
+
 // envelope
 
 struct drumkv1_env
@@ -401,17 +424,58 @@ struct drumkv1_aux
 
 // dco
 
-struct drumkv1_gen
+class drumkv1_gen : public drumkv1_sched
 {
-	drumkv1_port sample;
-	drumkv1_port reverse;
-	drumkv1_port offset;
-	drumkv1_port group;
-	drumkv1_port coarse;
-	drumkv1_port fine;
-	drumkv1_port envtime;
+public:
+
+	drumkv1_gen(drumkv1 *pDrumk)
+		: drumkv1_sched(pDrumk, drumkv1_sched::Controller),
+			offset_1(this, drumkv1::GEN1_OFFSET_1),
+			offset_2(this, drumkv1::GEN1_OFFSET_2) {}
+
+	drumkv1_port  sample;
+	drumkv1_port  reverse;
+	drumkv1_port  offset;
+	drumkv1_port3 offset_1;
+	drumkv1_port3 offset_2;
+	drumkv1_port  group;
+	drumkv1_port  coarse;
+	drumkv1_port  fine;
+	drumkv1_port  envtime;
 
 	float sample0, envtime0;
+
+protected:
+
+	void process(int sid)
+	{
+		drumkv1 *pDrumk = drumkv1_sched::instance();
+
+		switch (drumkv1::ParamIndex(sid)) {
+		case drumkv1::GEN1_OFFSET_1:
+			if (pDrumk->isOffset()) {
+				const uint32_t iOffsetEnd
+					= pDrumk->offsetEnd();
+				const uint32_t iOffsetStart	= uint32_t(
+					offset_1.value() * float(iOffsetEnd));
+				pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
+			}
+			break;
+		case drumkv1::GEN1_OFFSET_2:
+			if (pDrumk->isOffset()) {
+				const uint32_t iSampleLength
+					= pDrumk->sample()->length();
+				const uint32_t iOffsetStart
+					= pDrumk->offsetStart();
+				const uint32_t iOffsetEnd = iOffsetStart + uint32_t(
+					offset_2.value() * float(iSampleLength - iOffsetStart));
+				pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
+			}
+			break;
+		default:
+			break;
+		}
+	}
 };
 
 
@@ -660,7 +724,7 @@ public:
 // synth element
 
 drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, float srate, int key )
-	: element(this), gen1_sample(pDrumk)
+	: element(this), gen1_sample(pDrumk), gen1(pDrumk)
 {
 	// element parameter port/value set
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -2215,12 +2279,14 @@ int drumkv1::currentElement (void) const
 void drumkv1::currentElementTest (void)
 {
 	const int key = m_pImpl->currentElementTest();
-	if (key < 0)
+	if (key >= 0) {
+		m_pImpl->setCurrentElementTest(key);
+		selectSample(key);
 		return;
+	}
 
-	m_pImpl->setCurrentElementTest(key);
-
-	selectSample(key);
+	if (m_pImpl->sampleOffsetTest())
+		updateSample();
 }
 
 
@@ -2374,12 +2440,6 @@ void drumkv1::reset (void)
 }
 
 
-bool drumkv1::sampleOffsetTest (void) const
-{
-	return m_pImpl->sampleOffsetTest();
-}
-
-
 //-------------------------------------------------------------------------
 // drumkv1_element - decl.
 //
@@ -2481,6 +2541,8 @@ drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 //	case drumkv1::GEN1_SAMPLE:   pParamPort = &m_pElem->gen1.sample;     break;
 	case drumkv1::GEN1_REVERSE:  pParamPort = &m_pElem->gen1.reverse;    break;
 	case drumkv1::GEN1_OFFSET:   pParamPort = &m_pElem->gen1.offset;     break;
+	case drumkv1::GEN1_OFFSET_1: pParamPort = &m_pElem->gen1.offset_1;   break;
+	case drumkv1::GEN1_OFFSET_2: pParamPort = &m_pElem->gen1.offset_2;   break;
 	case drumkv1::GEN1_GROUP:    pParamPort = &m_pElem->gen1.group;      break;
 	case drumkv1::GEN1_COARSE:   pParamPort = &m_pElem->gen1.coarse;     break;
 	case drumkv1::GEN1_FINE:     pParamPort = &m_pElem->gen1.fine;       break;
@@ -2561,10 +2623,13 @@ void drumkv1_element::resetParamValues ( bool bSwap )
 
 bool drumkv1_element::sampleOffsetTest (void)
 {
-	if (m_pElem)
+	if (m_pElem) {
+		m_pElem->gen1.offset_1.tick(1);
+		m_pElem->gen1.offset_2.tick(1);
 		return m_pElem->gen1_sample.offset_test(*m_pElem->gen1.offset > 0.5f);
-	else
+	} else {
 		return false;
+	}
 }
 
 
