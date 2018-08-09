@@ -458,7 +458,8 @@ protected:
 					= pDrumk->offsetEnd();
 				const uint32_t iOffsetStart	= uint32_t(
 					offset_1.value() * float(iOffsetEnd));
-				pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
+				if (iOffsetStart < iOffsetEnd)
+					pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
 			}
 			break;
 		case drumkv1::GEN1_OFFSET_2:
@@ -469,7 +470,8 @@ protected:
 					= pDrumk->offsetStart();
 				const uint32_t iOffsetEnd = iOffsetStart + uint32_t(
 					offset_2.value() * float(iSampleLength - iOffsetStart));
-				pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
+				if (iOffsetStart < iOffsetEnd)
+					pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
 			}
 			break;
 		default:
