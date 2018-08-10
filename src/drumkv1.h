@@ -241,6 +241,7 @@ public:
 	void resetParamValues(bool bSwap);
 
 	bool sampleOffsetTest();
+	void sampleOffsetSync();
 
 private:
 

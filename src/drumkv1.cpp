@@ -243,19 +243,38 @@ class drumkv1_port3 : public drumkv1_port
 public:
 
 	drumkv1_port3(drumkv1_sched *sched, drumkv1::ParamIndex index)
-		: m_sched(sched), m_index(index) {}
+		: m_sched(sched), m_index(index), m_vsync(0.0f), m_xsync(false) {}
 
 	void set_value(float value)
 	{
+	   if (!m_xsync) {
+			const float v0 = drumkv1_port::value();
+			const float v1 = m_vsync;
+			const float d1 = (v1 - value);
+			const float d2 = (v1 - v0) * d1;
+			m_xsync = (d2 < 0.001f);
+		}
+
 		drumkv1_port::set_value(value);
 
-		m_sched->schedule(m_index);
+		if (m_xsync)
+			m_sched->schedule(m_index);
 	}
+
+	void set_value_sync(float value)
+		{ m_vsync = value; m_xsync = false; }
+	float value_sync() const
+		{ return m_vsync; }
+	bool is_sync() const
+		{ return m_xsync; }
 
 private:
 
 	drumkv1_sched      *m_sched;
 	drumkv1::ParamIndex m_index;
+
+	float m_vsync;
+	bool  m_xsync;
 };
 
 
@@ -935,6 +954,7 @@ public:
 	void reset();
 
 	bool sampleOffsetTest();
+	void sampleOffsetSync();
 
 	void midiInEnabled(bool on);
 	uint32_t midiInCount();
@@ -2193,6 +2213,12 @@ bool drumkv1_impl::sampleOffsetTest (void)
 }
 
 
+void drumkv1_impl::sampleOffsetSync (void)
+{
+	if (m_elem) m_elem->element.sampleOffsetSync();
+}
+
+
 //-------------------------------------------------------------------------
 // drumkv1 - decl.
 //
@@ -2632,6 +2658,29 @@ bool drumkv1_element::sampleOffsetTest (void)
 	} else {
 		return false;
 	}
+}
+
+
+void drumkv1_element::sampleOffsetSync (void)
+{
+	if (m_pElem == NULL)
+		return;
+
+	const uint32_t iOffsetStart
+		= m_pElem->gen1_sample.offsetStart();
+	const uint32_t iOffsetEnd
+		= m_pElem->gen1_sample.offsetEnd();
+	const uint32_t iSampleLength
+		= m_pElem->gen1_sample.length();
+
+	const float offset_1
+		= float(iOffsetStart) / float(iOffsetEnd);
+	const float offset_2
+		= float(iOffsetEnd - iOffsetStart)
+		/ float(iSampleLength - iOffsetStart);
+
+	m_pElem->gen1.offset_1.set_value_sync(offset_1);
+	m_pElem->gen1.offset_2.set_value_sync(offset_2);
 }
 
 
