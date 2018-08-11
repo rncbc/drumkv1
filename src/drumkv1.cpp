@@ -2668,6 +2668,9 @@ void drumkv1_element::sampleOffsetSync (void)
 	if (m_pElem == NULL)
 		return;
 
+	if (!m_pElem->gen1_sample.isOffset())
+		return;
+
 	const uint32_t iSampleLength
 		= m_pElem->gen1_sample.length();
 	const uint32_t iOffsetStart
