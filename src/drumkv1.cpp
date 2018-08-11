@@ -475,8 +475,8 @@ protected:
 			if (pDrumk->isOffset()) {
 				const uint32_t iSampleLength
 					= pDrumk->sample()->length();
-				const uint32_t iOffsetStart = uint32_t(
-					offset_1.value() * float(iSampleLength));
+				const uint32_t iOffsetStart
+					= uint32_t(offset_1.value() * float(iSampleLength));
 				const uint32_t iOffsetEnd
 					= pDrumk->offsetEnd();
 				if (iOffsetStart < iOffsetEnd)
@@ -489,8 +489,8 @@ protected:
 					= pDrumk->sample()->length();
 				const uint32_t iOffsetStart
 					= pDrumk->offsetStart();
-				const uint32_t iOffsetEnd = uint32_t(
-					offset_2.value() * float(iSampleLength));
+				const uint32_t iOffsetEnd
+					= uint32_t(offset_2.value() * float(iSampleLength));
 				if (iOffsetStart < iOffsetEnd)
 					pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
 			}
