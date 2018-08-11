@@ -473,10 +473,12 @@ protected:
 		switch (drumkv1::ParamIndex(sid)) {
 		case drumkv1::GEN1_OFFSET_1:
 			if (pDrumk->isOffset()) {
+				const uint32_t iSampleLength
+					= pDrumk->sample()->length();
+				const uint32_t iOffsetStart = uint32_t(
+					offset_1.value() * float(iSampleLength));
 				const uint32_t iOffsetEnd
 					= pDrumk->offsetEnd();
-				const uint32_t iOffsetStart	= uint32_t(
-					offset_1.value() * float(iOffsetEnd));
 				if (iOffsetStart < iOffsetEnd)
 					pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
 			}
@@ -487,8 +489,8 @@ protected:
 					= pDrumk->sample()->length();
 				const uint32_t iOffsetStart
 					= pDrumk->offsetStart();
-				const uint32_t iOffsetEnd = iOffsetStart + uint32_t(
-					offset_2.value() * float(iSampleLength - iOffsetStart));
+				const uint32_t iOffsetEnd = uint32_t(
+					offset_2.value() * float(iSampleLength));
 				if (iOffsetStart < iOffsetEnd)
 					pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
 			}
@@ -2666,18 +2668,19 @@ void drumkv1_element::sampleOffsetSync (void)
 	if (m_pElem == NULL)
 		return;
 
+	const uint32_t iSampleLength
+		= m_pElem->gen1_sample.length();
 	const uint32_t iOffsetStart
 		= m_pElem->gen1_sample.offsetStart();
 	const uint32_t iOffsetEnd
 		= m_pElem->gen1_sample.offsetEnd();
-	const uint32_t iSampleLength
-		= m_pElem->gen1_sample.length();
 
-	const float offset_1
-		= float(iOffsetStart) / float(iOffsetEnd);
-	const float offset_2
-		= float(iOffsetEnd - iOffsetStart)
-		/ float(iSampleLength - iOffsetStart);
+	const float offset_1 = (iSampleLength > 0
+		? float(iOffsetStart) / float(iSampleLength)
+		: 0.0f);
+	const float offset_2 = (iSampleLength > 0
+		? float(iOffsetEnd) / float(iSampleLength)
+		: 1.0f);
 
 	m_pElem->gen1.offset_1.set_value_sync(offset_1);
 	m_pElem->gen1.offset_2.set_value_sync(offset_2);
