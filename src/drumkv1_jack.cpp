@@ -631,6 +631,28 @@ void drumkv1_jack::updateSample (void)
 #endif
 
 
+#ifdef HAVE_SIGNAL_H
+
+#include <QSocketNotifier>
+
+#include <sys/types.h>
+#include <sys/socket.h>
+#include <signal.h>
+
+// File descriptor for SIGTERM notifier.
+static int g_fdSigterm[2] = { -1, -1 };
+
+// Unix SIGTERM signal handler.
+void drumkv1_sigterm_handler ( int /*signo*/ )
+{
+	char c = 1;
+
+	(::write(g_fdSigterm[0], &c, sizeof(c)) > 0);
+}
+
+#endif	// HAVE_SIGNAL_H
+
+
 // Constructor.
 drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 	: QObject(NULL), m_pApp(NULL), m_bGui(true),
@@ -655,12 +677,52 @@ drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 		m_pApp = new QApplication(argc, argv);
 	else
 		m_pApp = new QCoreApplication(argc, argv);
+
+#ifdef HAVE_SIGNAL_H
+
+	// set to ignore any fatal "Broken pipe" signals.
+	::signal(SIGPIPE, SIG_IGN);
+
+	// initialize file descriptors for SIGTERM socket notifier.
+	::socketpair(AF_UNIX, SOCK_STREAM, 0, g_fdSigterm);
+	m_pSigtermNotifier = new QSocketNotifier(
+		g_fdSigterm[1], QSocketNotifier::Read, this);
+
+	QObject::connect(m_pSigtermNotifier,
+		SIGNAL(activated(int)),
+		SLOT(sigterm_handler()));
+
+	// install SIGTERM signal handler.
+	struct sigaction term;
+	term.sa_handler = drumkv1_sigterm_handler;
+	::sigemptyset(&term.sa_mask);
+	term.sa_flags = 0;
+	term.sa_flags |= SA_RESTART;
+	::sigaction(SIGTERM, &term, NULL);
+	::sigaction(SIGINT,  &term, NULL);
+
+	// ignore SIGHUP signal.
+	struct sigaction hup;
+	hup.sa_handler = SIG_IGN;
+	::sigemptyset(&hup.sa_mask);
+	hup.sa_flags = 0;
+	hup.sa_flags |= SA_RESTART;
+	::sigaction(SIGHUP, &hup, NULL);
+
+#else
+
+	m_pSigtermNotifier = NULL;
+
+#endif	// !HAVE_SIGNAL_H
 }
 
 
 // Destructor.
 drumkv1_jack_application::~drumkv1_jack_application (void)
 {
+#ifdef HAVE_SIGNAL_H
+	if (m_pSigtermNotifier) delete m_pSigtermNotifier;
+#endif
 #ifdef CONFIG_NSM
 	if (m_pNsmClient) delete m_pNsmClient;
 #endif
@@ -759,7 +821,6 @@ bool drumkv1_jack_application::setup (void)
 #endif	// CONFIG_NSM
 	if (m_pWidget)
 		m_pWidget->show();
-
 
 	return true;
 }
@@ -887,6 +948,22 @@ void drumkv1_jack_application::hideSession (void)
 
 
 #endif	// CONFIG_NSM
+
+
+#ifdef HAVE_SIGNAL_H
+
+// SIGTERM signal handler.
+void drumkv1_jack_application::sigterm_handler (void)
+{
+	char c;
+
+	if (::read(g_fdSigterm[1], &c, sizeof(c)) > 0) {
+		if (m_pApp)
+			m_pApp->quit();
+	}
+}
+
+#endif	// HAVE_SIGNAL_H
 
 
 //-------------------------------------------------------------------------
