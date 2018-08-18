@@ -449,12 +449,13 @@ public:
 
 	drumkv1_gen(drumkv1 *pDrumk)
 		: drumkv1_sched(pDrumk, drumkv1_sched::Controller),
+			offset(this, drumkv1::GEN1_OFFSET),
 			offset_1(this, drumkv1::GEN1_OFFSET_1),
 			offset_2(this, drumkv1::GEN1_OFFSET_2) {}
 
 	drumkv1_port  sample;
 	drumkv1_port  reverse;
-	drumkv1_port  offset;
+	drumkv1_port3 offset;
 	drumkv1_port3 offset_1;
 	drumkv1_port3 offset_2;
 	drumkv1_port  group;
@@ -471,6 +472,9 @@ protected:
 		drumkv1 *pDrumk = drumkv1_sched::instance();
 
 		switch (drumkv1::ParamIndex(sid)) {
+		case drumkv1::GEN1_OFFSET:
+			pDrumk->setOffset(offset.value() > 0.5f);
+			break;
 		case drumkv1::GEN1_OFFSET_1:
 			if (pDrumk->isOffset()) {
 				const uint32_t iSampleLength
@@ -955,7 +959,7 @@ public:
 	void resetParamValues(bool bSwap);
 	void reset();
 
-	bool sampleOffsetTest();
+	void sampleOffsetTest();
 	void sampleOffsetSync();
 
 	void midiInEnabled(bool on);
@@ -2209,9 +2213,9 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 }
 
 
-bool drumkv1_impl::sampleOffsetTest (void)
+void drumkv1_impl::sampleOffsetTest (void)
 {
-	return (m_elem ? m_elem->element.sampleOffsetTest() : false);
+	if (m_elem) m_elem->element.sampleOffsetTest();
 }
 
 
@@ -2315,8 +2319,7 @@ void drumkv1::currentElementTest (void)
 		return;
 	}
 
-	if (m_pImpl->sampleOffsetTest())
-		updateSample();
+	m_pImpl->sampleOffsetTest();
 }
 
 
@@ -2370,6 +2373,8 @@ bool drumkv1::isOffset (void) const
 void drumkv1::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
 	m_pImpl->setOffsetRange(iOffsetStart, iOffsetEnd);
+
+	updateSample();
 }
 
 
@@ -2651,14 +2656,12 @@ void drumkv1_element::resetParamValues ( bool bSwap )
 }
 
 
-bool drumkv1_element::sampleOffsetTest (void)
+void drumkv1_element::sampleOffsetTest (void)
 {
 	if (m_pElem) {
+		m_pElem->gen1.offset.tick(1);
 		m_pElem->gen1.offset_1.tick(1);
 		m_pElem->gen1.offset_2.tick(1);
-		return m_pElem->gen1_sample.offset_test(*m_pElem->gen1.offset > 0.5f);
-	} else {
-		return false;
 	}
 }
 
@@ -2668,7 +2671,12 @@ void drumkv1_element::sampleOffsetSync (void)
 	if (m_pElem == NULL)
 		return;
 
-	if (!m_pElem->gen1_sample.isOffset())
+	const bool bOffset
+		= m_pElem->gen1_sample.isOffset();
+
+	m_pElem->gen1.offset.set_value_sync(bOffset ? 1.0f : 0.0f);
+
+	if (!bOffset)
 		return;
 
 	const uint32_t iSampleLength
