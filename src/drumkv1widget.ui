@@ -161,7 +161,7 @@
               <property name="minimumSize">
                <size>
                 <width>100</width>
-                <height>10</height>
+                <height>16</height>
                </size>
               </property>
               <property name="alignment">
@@ -177,7 +177,7 @@
               <property name="minimumSize">
                <size>
                 <width>100</width>
-                <height>10</height>
+                <height>16</height>
                </size>
               </property>
               <property name="alignment">
