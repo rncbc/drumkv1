@@ -1077,15 +1077,9 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 
 	++m_iUpdate;
 	if (pSample) {
-		m_ui.Gen1Sample->setOffset(pSample->isOffset());
-		m_ui.Gen1Sample->setOffsetStart(pSample->offsetStart());
-		m_ui.Gen1Sample->setOffsetEnd(pSample->offsetEnd());
 		activateParamKnobs(pSample->filename() != NULL);
 		updateOffset(pSample);
 	} else {
-		m_ui.Gen1Sample->setOffset(false);
-		m_ui.Gen1Sample->setOffsetStart(0);
-		m_ui.Gen1Sample->setOffsetEnd(0);
 		activateParamKnobs(false);
 		updateOffset(NULL);
 	}

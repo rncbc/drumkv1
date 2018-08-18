@@ -760,10 +760,12 @@ static LV2_Worker_Status drumkv1_lv2_worker_response (
 	LV2_Handle instance, uint32_t size, const void *data )
 {
 	drumkv1_lv2 *pDrumk = static_cast<drumkv1_lv2 *> (instance);
-	if (pDrumk && pDrumk->worker_response(data, size))
+	if (pDrumk) {
+		pDrumk->worker_response(data, size);
 		return LV2_WORKER_SUCCESS;
-	else
-		return LV2_WORKER_ERR_UNKNOWN;
+	}
+
+	return LV2_WORKER_ERR_UNKNOWN;
 }
 
 
