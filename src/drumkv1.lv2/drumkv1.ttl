@@ -768,12 +768,18 @@ drumkv1_lv2:GEN1_SAMPLE
 drumkv1_lv2:GEN1_OFFSET_START
 	a lv2:Parameter ;
 	rdfs:label "GEN1 Offset Start" ;
-	rdfs:range lv2atom:Int .
+	rdfs:range lv2atom:Int ;
+	lv2:default 0 ;
+	lv2:minimum 0 ;
+	lv2:maximum 16777216 .
 
 drumkv1_lv2:GEN1_OFFSET_END
 	a lv2:Parameter ;
 	rdfs:label "GEN1 Offset End" ;
-	rdfs:range lv2atom:Int .
+	rdfs:range lv2atom:Int ;
+	lv2:default 0 ;
+	lv2:minimum 0 ;
+	lv2:maximum 16777216 .
 
 
 drumkv1_lv2:101_GEN1
