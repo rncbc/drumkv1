@@ -568,8 +568,11 @@ void drumkv1_lv2::selectSample ( int key )
 }
 
 
-bool drumkv1_lv2::worker_work ( const void *data, uint32_t /*size*/ )
+bool drumkv1_lv2::worker_work ( const void *data, uint32_t size )
 {
+	if (size != sizeof(drumkv1_lv2_worker_message))
+		return false;
+
 	const drumkv1_lv2_worker_message *mesg
 		= (const drumkv1_lv2_worker_message *) data;
 
@@ -598,8 +601,11 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t /*size*/ )
 }
 
 
-bool drumkv1_lv2::worker_response ( const void *data, uint32_t /*size*/ )
+bool drumkv1_lv2::worker_response ( const void *data, uint32_t size )
 {
+	if (size != sizeof(drumkv1_lv2_worker_message))
+		return false;
+
 	const drumkv1_lv2_worker_message *mesg
 		= (const drumkv1_lv2_worker_message *) data;
 	if (mesg->atom.type == m_urids.state_StateChanged)
@@ -760,12 +766,10 @@ static LV2_Worker_Status drumkv1_lv2_worker_response (
 	LV2_Handle instance, uint32_t size, const void *data )
 {
 	drumkv1_lv2 *pDrumk = static_cast<drumkv1_lv2 *> (instance);
-	if (pDrumk) {
-		pDrumk->worker_response(data, size);
+	if (pDrumk && pDrumk->worker_response(data, size))
 		return LV2_WORKER_SUCCESS;
-	}
-
-	return LV2_WORKER_ERR_UNKNOWN;
+	else
+		return LV2_WORKER_ERR_UNKNOWN;
 }
 
 
