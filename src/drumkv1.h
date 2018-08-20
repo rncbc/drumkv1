@@ -240,8 +240,13 @@ public:
 
 	void resetParamValues(bool bSwap);
 
+	void sampleReverseTest();
+	void sampleReverseSync();
+
 	void sampleOffsetTest();
 	void sampleOffsetSync();
+
+	void updateEnvTimes();
 
 private:
 

@@ -27,44 +27,17 @@
 
 
 //-------------------------------------------------------------------------
-// drumkv1_reverse_sched - local module schedule thread stuff.
-//
-
-#include "drumkv1_sched.h"
-
-
-class drumkv1_reverse_sched : public drumkv1_sched
-{
-public:
-
-	// ctor.
-	drumkv1_reverse_sched (drumkv1 *pDrumk, drumkv1_sample *sample)
-		: drumkv1_sched(pDrumk, Sample), m_sample(sample) {}
-
-	// process reverse (virtual).
-	void process(int)
-		{ m_sample->reverse_sync(); }
-
-private:
-
-	// instance variables.
-	drumkv1_sample *m_sample;
-};
-
-
-//-------------------------------------------------------------------------
 // drumkv1_sample - sampler wave table.
 //
 
 // ctor.
-drumkv1_sample::drumkv1_sample ( drumkv1 *pDrumk, float srate )
+drumkv1_sample::drumkv1_sample ( float srate )
 	: m_srate(srate), m_filename(NULL), m_nchannels(0),
 		m_rate0(0.0f), m_freq0(1.0f), m_ratio(0.0f),
 		m_nframes(0), m_pframes(NULL), m_reverse(false),
 		m_offset(false), m_offset_start(0), m_offset_end(0),
 		m_offset_phase0(0.0f), m_offset_end2(0)
 {
-	m_reverse_sched = new drumkv1_reverse_sched(pDrumk, this);
 }
 
 
@@ -72,8 +45,6 @@ drumkv1_sample::drumkv1_sample ( drumkv1 *pDrumk, float srate )
 drumkv1_sample::~drumkv1_sample (void)
 {
 	close();
-
-	delete m_reverse_sched;
 }
 
 
@@ -176,13 +147,6 @@ void drumkv1_sample::close (void)
 		::free(m_filename);
 		m_filename = NULL;
 	}
-}
-
-
-// schedule sample reverse.
-void drumkv1_sample::reverse_sched (void)
-{
-	m_reverse_sched->schedule();
 }
 
 

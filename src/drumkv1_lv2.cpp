@@ -369,7 +369,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 	if (nframes > ndelta)
 		drumkv1::process(ins, outs, nframes - ndelta);
 
-	// test for current element-key/sample-offset changes
+	// test for current element-key/sample changes
 	drumkv1::currentElementTest();
 }
 

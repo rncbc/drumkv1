@@ -449,12 +449,13 @@ public:
 
 	drumkv1_gen(drumkv1 *pDrumk)
 		: drumkv1_sched(pDrumk, drumkv1_sched::Controller),
+			reverse(this, drumkv1::GEN1_REVERSE),
 			offset(this, drumkv1::GEN1_OFFSET),
 			offset_1(this, drumkv1::GEN1_OFFSET_1),
 			offset_2(this, drumkv1::GEN1_OFFSET_2) {}
 
 	drumkv1_port  sample;
-	drumkv1_port  reverse;
+	drumkv1_port3 reverse;
 	drumkv1_port3 offset;
 	drumkv1_port3 offset_1;
 	drumkv1_port3 offset_2;
@@ -472,6 +473,9 @@ protected:
 		drumkv1 *pDrumk = drumkv1_sched::instance();
 
 		switch (drumkv1::ParamIndex(sid)) {
+		case drumkv1::GEN1_REVERSE:
+			pDrumk->setReverse(reverse.value() > 0.5f);
+			break;
 		case drumkv1::GEN1_OFFSET:
 			pDrumk->setOffset(offset.value() > 0.5f);
 			break;
@@ -751,7 +755,7 @@ public:
 // synth element
 
 drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, float srate, int key )
-	: element(this), gen1_sample(pDrumk), gen1(pDrumk)
+	: element(this), gen1_sample(srate), gen1(pDrumk)
 {
 	// element parameter port/value set
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -959,8 +963,13 @@ public:
 	void resetParamValues(bool bSwap);
 	void reset();
 
+	void sampleReverseTest();
+	void sampleReverseSync();
+
 	void sampleOffsetTest();
 	void sampleOffsetSync();
+
+	void updateEnvTimes();
 
 	void midiInEnabled(bool on);
 	uint32_t midiInCount();
@@ -1990,7 +1999,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			elem->gen1.envtime0  = *elem->gen1.envtime;
 			elem->updateEnvTimes(m_srate);
 		}
-		elem->gen1_sample.reverse_test(*elem->gen1.reverse > 0.5f);
 		elem->lfo1_wave.reset_test(
 			drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
 		elem = elem->next();
@@ -2213,6 +2221,18 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 }
 
 
+void drumkv1_impl::sampleReverseTest (void)
+{
+	if (m_elem) m_elem->element.sampleReverseTest();
+}
+
+
+void drumkv1_impl::sampleReverseSync (void)
+{
+	if (m_elem) m_elem->element.sampleReverseSync();
+}
+
+
 void drumkv1_impl::sampleOffsetTest (void)
 {
 	if (m_elem) m_elem->element.sampleOffsetTest();
@@ -2222,6 +2242,12 @@ void drumkv1_impl::sampleOffsetTest (void)
 void drumkv1_impl::sampleOffsetSync (void)
 {
 	if (m_elem) m_elem->element.sampleOffsetSync();
+}
+
+
+void drumkv1_impl::updateEnvTimes (void)
+{
+	if (m_elem) m_elem->element.updateEnvTimes();
 }
 
 
@@ -2351,6 +2377,9 @@ drumkv1_sample *drumkv1::sample (void) const
 void drumkv1::setReverse ( bool bReverse )
 {
 	m_pImpl->setReverse(bReverse);
+	m_pImpl->sampleReverseSync();
+
+	updateSample();
 }
 
 bool drumkv1::isReverse (void) const
@@ -2373,6 +2402,8 @@ bool drumkv1::isOffset (void) const
 void drumkv1::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
 	m_pImpl->setOffsetRange(iOffsetStart, iOffsetEnd);
+	m_pImpl->sampleOffsetSync();
+	m_pImpl->updateEnvTimes();
 
 	updateSample();
 }
@@ -2440,6 +2471,8 @@ void drumkv1::process_midi ( uint8_t *data, uint32_t size )
 void drumkv1::process ( float **ins, float **outs, uint32_t nframes )
 {
 	m_pImpl->process(ins, outs, nframes);
+
+	m_pImpl->sampleReverseTest();
 }
 
 
@@ -2540,10 +2573,7 @@ bool drumkv1_element::isOffset (void) const
 
 void drumkv1_element::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
-	if (m_pElem) {
-		m_pElem->gen1_sample.setOffsetRange(iOffsetStart, iOffsetEnd);
-		m_pElem->updateEnvTimes(m_pElem->gen1_sample.sampleRate());
-	}
+	if (m_pElem) m_pElem->gen1_sample.setOffsetRange(iOffsetStart, iOffsetEnd);
 }
 
 uint32_t drumkv1_element::offsetStart (void) const
@@ -2656,6 +2686,25 @@ void drumkv1_element::resetParamValues ( bool bSwap )
 }
 
 
+void drumkv1_element::sampleReverseTest (void)
+{
+	if (m_pElem)
+		m_pElem->gen1.reverse.tick(1);
+}
+
+
+void drumkv1_element::sampleReverseSync (void)
+{
+	if (m_pElem == NULL)
+		return;
+
+	const bool bReverse
+		= m_pElem->gen1_sample.isReverse();
+
+	m_pElem->gen1.reverse.set_value_sync(bReverse ? 1.0f : 0.0f);
+}
+
+
 void drumkv1_element::sampleOffsetTest (void)
 {
 	if (m_pElem) {
@@ -2695,6 +2744,13 @@ void drumkv1_element::sampleOffsetSync (void)
 
 	m_pElem->gen1.offset_1.set_value_sync(offset_1);
 	m_pElem->gen1.offset_2.set_value_sync(offset_2);
+}
+
+
+void drumkv1_element::updateEnvTimes (void)
+{
+	if (m_pElem)
+		m_pElem->updateEnvTimes(m_pElem->gen1_sample.sampleRate());
 }
 
 

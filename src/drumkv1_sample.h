@@ -29,7 +29,6 @@
 
 // forward decls.
 class drumkv1;
-class drumkv1_reverse_sched;
 
 
 //-------------------------------------------------------------------------
@@ -41,7 +40,7 @@ class drumkv1_sample
 public:
 
 	// ctor.
-	drumkv1_sample(drumkv1 *pDrumk, float srate = 44100.0f);
+	drumkv1_sample(float srate = 44100.0f);
 
 	// dtor.
 	~drumkv1_sample();
@@ -54,24 +53,16 @@ public:
 
 	// reverse mode.
 	void setReverse (bool reverse)
-		{ reverse_test(reverse); }
-
-	bool isReverse() const
-		{ return m_reverse; }
-
-	// schedule sample reverse.
-	void reverse_test(bool reverse)
 	{
 		if (( m_reverse && !reverse) ||
 			(!m_reverse &&  reverse)) {
 			m_reverse = reverse;
-			reverse_sched();
+			reverse_sync();
 		}
 	}
 
-	// reverse sample buffer.
-	void reverse_sched();
-	void reverse_sync();
+	bool isReverse() const
+		{ return m_reverse; }
 
 	// offset mode.
 	void setOffset(bool offset)
@@ -89,17 +80,6 @@ public:
 
 	bool isOffset() const
 		{ return m_offset && (m_offset_start < m_offset_end); }
-
-	// offset change.
-	bool offset_test(bool offset)
-	{
-		if ((m_offset && !offset) || (!m_offset && offset)) {
-			setOffset(offset);
-			return true;
-		} else {
-			return false;
-		}
-	}
 
 	// sample start/end points (offsets)
 	void setOffsetRange(uint32_t start, uint32_t end);
@@ -149,6 +129,9 @@ public:
 
 protected:
 
+	// reverse sample buffer.
+	void reverse_sync();
+
 	// zero-crossing aliasing .
 	uint32_t zero_crossing_k(uint32_t i, uint16_t k, int *slope) const;
 	uint32_t zero_crossing(uint32_t i, int *slope) const;
@@ -171,8 +154,6 @@ private:
 	uint32_t m_offset_end;
 	float    m_offset_phase0;
 	uint32_t m_offset_end2;
-
-	drumkv1_reverse_sched *m_reverse_sched;
 };
 
 
