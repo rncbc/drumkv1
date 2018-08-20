@@ -773,7 +773,7 @@ drumkv1_lv2:GEN1_OFFSET_START
 	rdfs:range lv2atom:Int ;
 	lv2:default 0 ;
 	lv2:minimum 0 ;
-	lv2:maximum 16777216 .
+	lv2:maximum 2147483647 .
 
 drumkv1_lv2:GEN1_OFFSET_END
 	a lv2:Parameter ;
@@ -781,7 +781,7 @@ drumkv1_lv2:GEN1_OFFSET_END
 	rdfs:range lv2atom:Int ;
 	lv2:default 0 ;
 	lv2:minimum 0 ;
-	lv2:maximum 16777216 .
+	lv2:maximum 2147483647 .
 
 
 drumkv1_lv2:101_GEN1
