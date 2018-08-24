@@ -177,6 +177,7 @@ public:
 	float paramValue(ParamIndex index) const;
 
 	void resetParamValues(bool bSwap);
+
 	void reset();
 
 	drumkv1_controls *controls() const;

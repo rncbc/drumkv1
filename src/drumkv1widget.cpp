@@ -643,14 +643,13 @@ drumkv1widget_param *drumkv1widget::paramKnob ( drumkv1::ParamIndex index ) cons
 
 
 // Param port accessors.
-void drumkv1widget::setParamValue (
-	drumkv1::ParamIndex index, float fValue, bool bDefault )
+void drumkv1widget::setParamValue ( drumkv1::ParamIndex index, float fValue )
 {
 	++m_iUpdate;
 
 	drumkv1widget_param *pParam = paramKnob(index);
 	if (pParam)
-		pParam->setValue(fValue, bDefault);
+		pParam->setValue(fValue);
 
 	updateParamEx(index, fValue);
 
@@ -744,7 +743,7 @@ void drumkv1widget::updateSchedParam ( drumkv1::ParamIndex index, float fValue )
 
 	drumkv1widget_param *pParam = paramKnob(index);
 	if (pParam) {
-		pParam->setValue(fValue, false);
+		pParam->setValue(fValue);
 		updateParam(index, fValue);
 		updateParamEx(index, fValue);
 		m_ui.StatusBar->showMessage(QString("%1: %2")
@@ -871,7 +870,7 @@ void drumkv1widget::updateParamValues ( uint32_t nparams )
 		const float fValue = (pDrumkUi
 		    ? pDrumkUi->paramValue(index)
 		    : drumkv1_param::paramDefaultValue(index));
-		setParamValue(index, fValue, true);
+		setParamValue(index, fValue);
 		updateParam(index, fValue);
 	//	updateParamEx(index, fValue);
 		m_params_ab[i] = fValue;
@@ -889,7 +888,7 @@ void drumkv1widget::resetParamValues ( uint32_t nparams )
 		if (index == drumkv1::GEN1_SAMPLE)
 			continue;
 		const float fValue = drumkv1_param::paramDefaultValue(index);
-		setParamValue(index, fValue, true);
+		setParamValue(index, fValue);
 		updateParam(index, fValue);
 	//	updateParamEx(index, fValue);
 		m_params_ab[i] = fValue;
@@ -1539,6 +1538,7 @@ void drumkv1widget::updateLoadPreset ( const QString& sPreset )
 //	refreshElements();
 	activateElement();
 
+	resetParamKnobs(drumkv1::NUM_PARAMS);
 	updateParamValues(drumkv1::NUM_PARAMS);
 
 	m_ui.Preset->setPreset(sPreset);
@@ -1593,6 +1593,7 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 		//	refreshElements();
 			activateElement();
 			updateParamValues(drumkv1::NUM_PARAMS);
+			resetParamKnobs(drumkv1::NUM_PARAMS);
 			updateDirtyPreset(false);
 		} else {
 			updateElement();

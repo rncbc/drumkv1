@@ -45,9 +45,6 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	m_bIdleClosed = false;
 #endif
 
-	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
-		m_params_def[i] = true;
-
 	// May initialize the scheduler/work notifier.
 	openSchedNotifier();
 
@@ -125,8 +122,7 @@ void drumkv1widget_lv2::port_event ( uint32_t port_index,
 		const drumkv1::ParamIndex index
 			= drumkv1::ParamIndex(port_index - drumkv1_lv2::ParamBase);
 		const float fValue = *(float *) buffer;
-		setParamValue(index, fValue, m_params_def[index]);
-		m_params_def[index] = false;
+		setParamValue(index, fValue);
 	}
 }
 

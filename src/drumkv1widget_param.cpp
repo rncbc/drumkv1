@@ -178,11 +178,11 @@ QString drumkv1widget_param::text (void) const
 }
 
 
-void drumkv1widget_param::setValue ( float fValue, bool bDefault )
+void drumkv1widget_param::setValue ( float fValue )
 {
 	QPalette pal;
 
-	if (bDefault) {
+	if (m_iDefaultValue == 0) {
 		m_fDefaultValue = fValue;
 		m_iDefaultValue++;
 	}
@@ -343,10 +343,10 @@ QString drumkv1widget_knob::text (void) const
 }
 
 
-void drumkv1widget_knob::setValue ( float fValue, bool bDefault )
+void drumkv1widget_knob::setValue ( float fValue )
 {
 	const bool bDialBlock = m_pDial->blockSignals(true);
-	drumkv1widget_param::setValue(fValue, bDefault);
+	drumkv1widget_param::setValue(fValue);
 	m_pDial->setValue(scaleFromValue(fValue));
 	m_pDial->blockSignals(bDialBlock);
 }
@@ -473,10 +473,10 @@ drumkv1widget_spin::drumkv1widget_spin ( QWidget *pParent )
 
 
 // Virtual accessors.
-void drumkv1widget_spin::setValue ( float fValue, bool bDefault )
+void drumkv1widget_spin::setValue ( float fValue )
 {
 	const bool bSpinBlock = m_pSpinBox->blockSignals(true);
-	drumkv1widget_knob::setValue(fValue, bDefault);
+	drumkv1widget_knob::setValue(fValue);
 	m_pSpinBox->setValue(scaleFromValue(fValue));
 	m_pSpinBox->blockSignals(bSpinBlock);
 }
@@ -569,10 +569,10 @@ drumkv1widget_combo::drumkv1widget_combo ( QWidget *pParent )
 
 
 // Virtual accessors.
-void drumkv1widget_combo::setValue ( float fValue, bool bDefault )
+void drumkv1widget_combo::setValue ( float fValue )
 {
 	const bool bComboBlock = m_pComboBox->blockSignals(true);
-	drumkv1widget_knob::setValue(fValue, bDefault);
+	drumkv1widget_knob::setValue(fValue);
 	m_pComboBox->setCurrentIndex(iroundf(fValue));
 	m_pComboBox->blockSignals(bComboBlock);
 }
@@ -759,14 +759,14 @@ drumkv1widget_radio::~drumkv1widget_radio (void)
 
 
 // Virtual accessors.
-void drumkv1widget_radio::setValue ( float fValue, bool bDefault )
+void drumkv1widget_radio::setValue ( float fValue )
 {
 	const int iRadioValue = iroundf(fValue);
 	QRadioButton *pRadioButton
 		= static_cast<QRadioButton *> (m_group.button(iRadioValue));
 	if (pRadioButton) {
 		const bool bRadioBlock = pRadioButton->blockSignals(true);
-		drumkv1widget_param::setValue(float(iRadioValue), bDefault);
+		drumkv1widget_param::setValue(float(iRadioValue));
 		pRadioButton->setChecked(true);
 		pRadioButton->blockSignals(bRadioBlock);
 	}
@@ -910,11 +910,11 @@ Qt::Alignment drumkv1widget_check::alignment (void) const
 
 
 // Virtual accessors.
-void drumkv1widget_check::setValue ( float fValue, bool bDefault )
+void drumkv1widget_check::setValue ( float fValue )
 {
 	const bool bCheckValue = (fValue > 0.5f * (maximum() + minimum()));
 	const bool bCheckBlock = m_pCheckBox->blockSignals(true);
-	drumkv1widget_param::setValue(bCheckValue ? maximum() : minimum(), bDefault);
+	drumkv1widget_param::setValue(bCheckValue ? maximum() : minimum());
 	m_pCheckBox->setChecked(bCheckValue);
 	m_pCheckBox->blockSignals(bCheckBlock);
 }

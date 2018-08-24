@@ -62,8 +62,6 @@ protected:
 	// Param port method.
 	void updateParam(drumkv1::ParamIndex index, float fValue) const;
 
-	bool m_params_def[drumkv1::NUM_PARAMS];
-
 	// Close event handler.
 	void closeEvent(QCloseEvent *pCloseEvent);
 

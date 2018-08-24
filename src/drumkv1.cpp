@@ -961,6 +961,7 @@ public:
 	void process(float **ins, float **outs, uint32_t nframes);
 
 	void resetParamValues(bool bSwap);
+
 	void reset();
 
 	void sampleReverseTest();
