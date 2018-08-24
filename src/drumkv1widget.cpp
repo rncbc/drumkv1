@@ -711,14 +711,12 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 	++m_iUpdate;
 
 	switch (index) {
-#if 1//--updateSchedNotify(drumkv1_sched::Sample, 0);
 	case drumkv1::GEN1_REVERSE: {
 		const bool bReverse = bool(fValue > 0.0f);
 		pDrumkUi->setReverse(bReverse);
 		updateSample(pDrumkUi->sample());
 		break;
 	}
-#endif
 	case drumkv1::GEN1_OFFSET: {
 		const bool bOffset = bool(fValue > 0.0f);
 		pDrumkUi->setOffset(bOffset);

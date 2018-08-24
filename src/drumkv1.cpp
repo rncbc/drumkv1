@@ -474,7 +474,7 @@ protected:
 
 		switch (drumkv1::ParamIndex(sid)) {
 		case drumkv1::GEN1_REVERSE:
-			pDrumk->setReverse(reverse.value() > 0.5f);
+			pDrumk->setReverseSync(reverse.value() > 0.5f);
 			break;
 		case drumkv1::GEN1_OFFSET:
 			pDrumk->setOffset(offset.value() > 0.5f);
@@ -1956,7 +1956,7 @@ uint32_t drumkv1_impl::midiInCount (void)
 	return m_midi_in.count();
 }
 
- 
+
 // synthesize
 
 void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
@@ -2376,6 +2376,11 @@ drumkv1_sample *drumkv1::sample (void) const
 
 
 void drumkv1::setReverse ( bool bReverse )
+{
+	m_pImpl->setReverse(bReverse);
+}
+
+void drumkv1::setReverseSync ( bool bReverse )
 {
 	m_pImpl->setReverse(bReverse);
 	m_pImpl->sampleReverseSync();

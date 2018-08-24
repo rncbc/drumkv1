@@ -75,6 +75,7 @@ public:
 	drumkv1_sample *sample() const;
 
 	void setReverse(bool bReverse);
+	void setReverseSync(bool bReverse);
 	bool isReverse() const;
 
 	void setOffset(bool bOffset);
