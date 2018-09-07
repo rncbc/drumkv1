@@ -150,8 +150,20 @@ drumkv1_lv2::drumkv1_lv2 (
 		if (::strcmp(host_feature->URI, LV2_URID_MAP_URI) == 0) {
 			m_urid_map = (LV2_URID_Map *) host_feature->data;
 			if (m_urid_map) {
- 				m_urids.gen1_sample = m_urid_map->map(
- 					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SAMPLE");
+			#if 1//DRUMKV1_LV2_LEGACY
+				m_urids.gen1_sample = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SAMPLE");
+				m_urids.gen1_offset_start = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_OFFSET_START");
+				m_urids.gen1_offset_end = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_OFFSET_END");
+			#endif
+				m_urids.p101_sample_file = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "P101_SAMPLE_FILE");
+				m_urids.p102_offset_start = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "P102_OFFSET_START");
+				m_urids.p103_offset_end = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "P103_OFFSET_END");
 				m_urids.gen1_select = m_urid_map->map(
 				    m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SELECT");
 				m_urids.gen1_update = m_urid_map->map(
@@ -338,7 +350,8 @@ void drumkv1_lv2::run ( uint32_t nframes )
 					if (property && value && property->type == m_forge.URID) {
 						const uint32_t key = ((const LV2_Atom_URID *) property)->body;
 						const LV2_URID type = value->type;
-						if (key == m_urids.gen1_sample
+						if ((key == m_urids.p101_sample_file ||
+							 key == m_urids.gen1_sample)
 							&& type == m_urids.atom_Path) {
 							if (m_schedule) {
 								drumkv1_lv2_worker_message mesg;
@@ -349,6 +362,32 @@ void drumkv1_lv2::run ( uint32_t nframes )
 								// schedule loading new sample
 								m_schedule->schedule_work(
 									m_schedule->handle, sizeof(mesg), &mesg);
+							}
+						}
+						else
+						if ((key == m_urids.p102_offset_start ||
+							 key == m_urids.gen1_offset_start)
+							&& type == m_urids.atom_Int) {
+							drumkv1_sample *pSample = drumkv1::sample();
+							if (pSample) {
+								const uint32_t offset_start
+									= *(uint32_t *) LV2_ATOM_BODY_CONST(value);
+								const uint32_t offset_end
+									= pSample->offsetEnd();
+								setOffsetRange(offset_start, offset_end);
+							}
+						}
+						else
+						if ((key == m_urids.p103_offset_end ||
+							 key == m_urids.gen1_offset_end)
+							&& type == m_urids.atom_Int) {
+							drumkv1_sample *pSample = drumkv1::sample();
+							if (pSample) {
+								const uint32_t offset_start
+									= pSample->offsetStart();
+								const uint32_t offset_end
+									= *(uint32_t *) LV2_ATOM_BODY_CONST(value);
+								setOffsetRange(offset_start, offset_end);
 							}
 						}
 					}
@@ -654,8 +693,12 @@ bool drumkv1_lv2::patch_put ( uint32_t ndelta )
 
 	LV2_Atom_Forge_Frame body_frame;
 	lv2_atom_forge_object(&m_forge, &body_frame, 0, 0);
-	lv2_atom_forge_key(&m_forge, m_urids.gen1_sample);
+	lv2_atom_forge_key(&m_forge, m_urids.p101_sample_file);
 	lv2_atom_forge_path(&m_forge, pszSampleFile, ::strlen(pszSampleFile) + 1);
+	lv2_atom_forge_key(&m_forge, m_urids.p102_offset_start);
+	lv2_atom_forge_int(&m_forge, (pSample ? pSample->offsetStart() : 0));
+	lv2_atom_forge_key(&m_forge, m_urids.p103_offset_end);
+	lv2_atom_forge_int(&m_forge, (pSample ? pSample->offsetEnd() : 0));
 
 	lv2_atom_forge_pop(&m_forge, &body_frame);
 	lv2_atom_forge_pop(&m_forge, &patch_frame);

@@ -27,8 +27,8 @@
 	lv2:requiredFeature lv2urid:map, lv2worker:schedule ;
 	lv2:optionalFeature lv2:hardRTCapable ;
 	lv2:extensionData lv2state:interface, lv2worker:interface ;
-	lv2patch:writable drumkv1_lv2:GEN1_SAMPLE,
-		drumkv1_lv2:GEN1_OFFSET_START, drumkv1_lv2:GEN1_OFFSET_END ;
+	lv2patch:writable drumkv1_lv2:P101_SAMPLE_FILE,
+		drumkv1_lv2:P102_OFFSET_START, drumkv1_lv2:P103_OFFSET_END ;
 	lv2ui:ui drumkv1_lv2:ui, drumkv1_lv2:ui_x11, drumkv1_lv2:ui_external ;
 	lv2:port [
 		a lv2:InputPort, lv2atom:AtomPort ;
@@ -78,7 +78,7 @@
 		lv2:default 36.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 127.0 ;
-		lv2pg:group drumkv1_lv2:101_GEN1 ;
+		lv2pg:group drumkv1_lv2:G101_GEN1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 7 ;
@@ -88,7 +88,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:101_GEN1 ;
+		lv2pg:group drumkv1_lv2:G101_GEN1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 8 ;
@@ -98,7 +98,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:101_GEN1 ;
+		lv2pg:group drumkv1_lv2:G101_GEN1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 9 ;
@@ -107,7 +107,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:101_GEN1 ;
+		lv2pg:group drumkv1_lv2:G101_GEN1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 10 ;
@@ -116,7 +116,7 @@
 		lv2:default 1.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:101_GEN1 ;
+		lv2pg:group drumkv1_lv2:G101_GEN1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 11 ;
@@ -125,7 +125,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 128.0 ;
-		lv2pg:group drumkv1_lv2:101_GEN1 ;
+		lv2pg:group drumkv1_lv2:G101_GEN1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 12 ;
@@ -134,7 +134,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -4.0 ;
 		lv2:maximum 4.0 ;
-		lv2pg:group drumkv1_lv2:101_GEN1 ;
+		lv2pg:group drumkv1_lv2:G101_GEN1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 13 ;
@@ -143,7 +143,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:101_GEN1 ;
+		lv2pg:group drumkv1_lv2:G101_GEN1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 14 ;
@@ -152,7 +152,7 @@
 		lv2:default 0.2 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:102_DCF1 ;
+		lv2pg:group drumkv1_lv2:G102_DCF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 15 ;
@@ -161,7 +161,7 @@
 		lv2:default 1.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:102_DCF1 ;
+		lv2pg:group drumkv1_lv2:G102_DCF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 16 ;
@@ -170,7 +170,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:102_DCF1 ;
+		lv2pg:group drumkv1_lv2:G102_DCF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 17 ;
@@ -184,7 +184,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 3.0 ;
-		lv2pg:group drumkv1_lv2:102_DCF1 ;
+		lv2pg:group drumkv1_lv2:G102_DCF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 18 ;
@@ -198,7 +198,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 3.0 ;
-		lv2pg:group drumkv1_lv2:102_DCF1 ;
+		lv2pg:group drumkv1_lv2:G102_DCF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 19 ;
@@ -207,7 +207,7 @@
 		lv2:default 1.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:102_DCF1 ;
+		lv2pg:group drumkv1_lv2:G102_DCF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 20 ;
@@ -216,7 +216,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:102_DCF1 ;
+		lv2pg:group drumkv1_lv2:G102_DCF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 21 ;
@@ -225,7 +225,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:102_DCF1 ;
+		lv2pg:group drumkv1_lv2:G102_DCF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 22 ;
@@ -234,7 +234,7 @@
 		lv2:default 0.2 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:102_DCF1 ;
+		lv2pg:group drumkv1_lv2:G102_DCF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 23 ;
@@ -243,7 +243,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:102_DCF1 ;
+		lv2pg:group drumkv1_lv2:G102_DCF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 24 ;
@@ -258,7 +258,7 @@
 		lv2:default 1.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 4.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 25 ;
@@ -267,7 +267,7 @@
 		lv2:default 1.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 26 ;
@@ -276,7 +276,7 @@
 		lv2:default 180.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 360.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 27 ;
@@ -285,7 +285,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 28 ;
@@ -295,7 +295,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 29 ;
@@ -304,7 +304,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 30 ;
@@ -313,7 +313,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 31 ;
@@ -322,7 +322,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 32;
@@ -331,7 +331,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 33 ;
@@ -340,7 +340,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 34 ;
@@ -349,7 +349,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 35 ;
@@ -358,7 +358,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 36 ;
@@ -367,7 +367,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 37 ;
@@ -376,7 +376,7 @@
 		lv2:default 0.2 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 38 ;
@@ -385,7 +385,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:103_LFO1 ;
+		lv2pg:group drumkv1_lv2:G103_LFO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 39 ;
@@ -394,7 +394,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:104_DCA1 ;
+		lv2pg:group drumkv1_lv2:G104_DCA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 40 ;
@@ -403,7 +403,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:104_DCA1 ;
+		lv2pg:group drumkv1_lv2:G104_DCA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 41 ;
@@ -412,7 +412,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:104_DCA1 ;
+		lv2pg:group drumkv1_lv2:G104_DCA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 42 ;
@@ -421,7 +421,7 @@
 		lv2:default 0.2 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:104_DCA1 ;
+		lv2pg:group drumkv1_lv2:G104_DCA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 43 ;
@@ -430,7 +430,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:104_DCA1 ;
+		lv2pg:group drumkv1_lv2:G104_DCA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 44 ;
@@ -439,7 +439,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:105_OUT1 ;
+		lv2pg:group drumkv1_lv2:G105_OUT1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 45 ;
@@ -448,7 +448,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:105_OUT1 ;
+		lv2pg:group drumkv1_lv2:G105_OUT1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 46 ;
@@ -457,7 +457,7 @@
 		lv2:default 1.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:105_OUT1 ;
+		lv2pg:group drumkv1_lv2:G105_OUT1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 47 ;
@@ -466,7 +466,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:105_OUT1 ;
+		lv2pg:group drumkv1_lv2:G105_OUT1 ;
 	] ;
 	lv2:port [
 		a lv2:InputPort, lv2:ControlPort ;
@@ -476,7 +476,7 @@
 		lv2:default 0.2 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:106_DEF1 ;
+		lv2pg:group drumkv1_lv2:G106_DEF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 49 ;
@@ -485,7 +485,7 @@
 		lv2:default 0.2 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:106_DEF1 ;
+		lv2pg:group drumkv1_lv2:G106_DEF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 50 ;
@@ -494,7 +494,7 @@
 		lv2:default 0.2 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:106_DEF1 ;
+		lv2pg:group drumkv1_lv2:G106_DEF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 51 ;
@@ -503,7 +503,7 @@
 		lv2:default 0.2 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:106_DEF1 ;
+		lv2pg:group drumkv1_lv2:G106_DEF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 52 ;
@@ -513,7 +513,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 16.0 ;
-		lv2pg:group drumkv1_lv2:106_DEF1 ;
+		lv2pg:group drumkv1_lv2:G106_DEF1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 53 ;
@@ -525,7 +525,7 @@
 		lv2:default 1.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:106_DEF1 ;
+		lv2pg:group drumkv1_lv2:G106_DEF1 ;
 	] ;
 	lv2:port [
 		a lv2:InputPort, lv2:ControlPort ;
@@ -535,7 +535,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:201_CHO1 ;
+		lv2pg:group drumkv1_lv2:G201_CHO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 55 ;
@@ -544,7 +544,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:201_CHO1 ;
+		lv2pg:group drumkv1_lv2:G201_CHO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 56 ;
@@ -553,7 +553,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:201_CHO1 ;
+		lv2pg:group drumkv1_lv2:G201_CHO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 57 ;
@@ -562,7 +562,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:201_CHO1 ;
+		lv2pg:group drumkv1_lv2:G201_CHO1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 58 ;
@@ -571,7 +571,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:201_CHO1 ;
+		lv2pg:group drumkv1_lv2:G201_CHO1 ;
 	] ;
 	lv2:port [
 		a lv2:InputPort, lv2:ControlPort ;
@@ -581,7 +581,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:202_FLA1 ;
+		lv2pg:group drumkv1_lv2:G202_FLA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 60 ;
@@ -590,7 +590,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:202_FLA1 ;
+		lv2pg:group drumkv1_lv2:G202_FLA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 61 ;
@@ -599,7 +599,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:202_FLA1 ;
+		lv2pg:group drumkv1_lv2:G202_FLA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 62 ;
@@ -608,7 +608,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:202_FLA1 ;
+		lv2pg:group drumkv1_lv2:G202_FLA1 ;
 	] ;
 	lv2:port [
 		a lv2:InputPort, lv2:ControlPort ;
@@ -618,7 +618,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:203_PHA1 ;
+		lv2pg:group drumkv1_lv2:G203_PHA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 64 ;
@@ -627,7 +627,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:203_PHA1 ;
+		lv2pg:group drumkv1_lv2:G203_PHA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 65 ;
@@ -636,7 +636,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:203_PHA1 ;
+		lv2pg:group drumkv1_lv2:G203_PHA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 66 ;
@@ -645,7 +645,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:203_PHA1 ;
+		lv2pg:group drumkv1_lv2:G203_PHA1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 67 ;
@@ -654,7 +654,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:203_PHA1 ;
+		lv2pg:group drumkv1_lv2:G203_PHA1 ;
 	] ;
 	lv2:port [
 		a lv2:InputPort, lv2:ControlPort ;
@@ -664,7 +664,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:204_DEL1 ;
+		lv2pg:group drumkv1_lv2:G204_DEL1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 69 ;
@@ -673,7 +673,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:204_DEL1 ;
+		lv2pg:group drumkv1_lv2:G204_DEL1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 70 ;
@@ -682,7 +682,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:204_DEL1 ;
+		lv2pg:group drumkv1_lv2:G204_DEL1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 71 ;
@@ -691,7 +691,7 @@
 		lv2:default 180.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 360.0 ;
-		lv2pg:group drumkv1_lv2:204_DEL1 ;
+		lv2pg:group drumkv1_lv2:G204_DEL1 ;
 	] ;
 	lv2:port [
 		a lv2:InputPort, lv2:ControlPort ;
@@ -701,7 +701,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:205_REV1 ;
+		lv2pg:group drumkv1_lv2:G205_REV1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 73 ;
@@ -710,7 +710,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:205_REV1 ;
+		lv2pg:group drumkv1_lv2:G205_REV1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 74 ;
@@ -719,7 +719,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:205_REV1 ;
+		lv2pg:group drumkv1_lv2:G205_REV1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 75 ;
@@ -728,7 +728,7 @@
 		lv2:default 0.5 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:205_REV1 ;
+		lv2pg:group drumkv1_lv2:G205_REV1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 76 ;
@@ -737,7 +737,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum -1.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:205_REV1 ;
+		lv2pg:group drumkv1_lv2:G205_REV1 ;
 	] ;
 	lv2:port [
 		a lv2:InputPort, lv2:ControlPort ;
@@ -748,7 +748,7 @@
 		lv2:default 0.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:206_DYN1 ;
+		lv2pg:group drumkv1_lv2:G206_DYN1 ;
 	], [
 		a lv2:InputPort, lv2:ControlPort ;
 		lv2:index 78 ;
@@ -758,88 +758,88 @@
 		lv2:default 1.0 ;
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
-		lv2pg:group drumkv1_lv2:206_DYN1 ;
+		lv2pg:group drumkv1_lv2:G206_DYN1 ;
 	] .
 
 
-drumkv1_lv2:GEN1_SAMPLE
+drumkv1_lv2:P101_SAMPLE_FILE
 	a lv2:Parameter ;
-	rdfs:label "GEN1 Sample File" ;
+	rdfs:label "P101 Sample File" ;
 	rdfs:range lv2atom:Path .
 
-drumkv1_lv2:GEN1_OFFSET_START
+drumkv1_lv2:P102_OFFSET_START
 	a lv2:Parameter ;
-	rdfs:label "GEN1 Offset Start" ;
+	rdfs:label "P102 Offset Start" ;
 	rdfs:range lv2atom:Int ;
 	lv2:default 0 ;
 	lv2:minimum 0 ;
 	lv2:maximum 2147483647 .
 
-drumkv1_lv2:GEN1_OFFSET_END
+drumkv1_lv2:P103_OFFSET_END
 	a lv2:Parameter ;
-	rdfs:label "GEN1 Offset End" ;
+	rdfs:label "P103 Offset End" ;
 	rdfs:range lv2atom:Int ;
 	lv2:default 0 ;
 	lv2:minimum 0 ;
 	lv2:maximum 2147483647 .
 
 
-drumkv1_lv2:101_GEN1
+drumkv1_lv2:G101_GEN1
 	a lv2pg:InputGroup;
 	lv2:name "Drum Kit - GEN1" ;
 	lv2:symbol "GEN1" .
 
-drumkv1_lv2:102_DCF1
+drumkv1_lv2:G102_DCF1
 	a lv2pg:InputGroup;
 	lv2:name "Drum Kit - DCF1" ;
 	lv2:symbol "DCF1" .
 
-drumkv1_lv2:103_LFO1
+drumkv1_lv2:G103_LFO1
 	a lv2pg:InputGroup;
 	lv2:name "Drum Kit - LFO1" ;
 	lv2:symbol "LFO1" .
 
-drumkv1_lv2:104_DCA1
+drumkv1_lv2:G104_DCA1
 	a lv2pg:InputGroup;
 	lv2:name "Drum Kit - DCA1" ;
 	lv2:symbol "DCA1" .
 
-drumkv1_lv2:105_OUT1
+drumkv1_lv2:G105_OUT1
 	a lv2pg:InputGroup;
 	lv2:name "Drum Kit - OUT1" ;
 	lv2:symbol "OUT1" .
 
-drumkv1_lv2:106_DEF1
+drumkv1_lv2:G106_DEF1
 	a lv2pg:InputGroup;
 	lv2:name "Drum Kit - DEF1" ;
 	lv2:symbol "DEF1" .
 
-drumkv1_lv2:201_CHO1
+drumkv1_lv2:G201_CHO1
 	a lv2pg:InputGroup;
 	lv2:name "Effects - Chorus" ;
 	lv2:symbol "CHO1" .
 	
-drumkv1_lv2:202_FLA1
+drumkv1_lv2:G202_FLA1
 	a lv2pg:InputGroup;
 	lv2:name "Effects - Flanger" ;
 	lv2:symbol "FLA1" .
 
-drumkv1_lv2:203_PHA1
+drumkv1_lv2:G203_PHA1
 	a lv2pg:InputGroup;
 	lv2:name "Effects - Phaser" ;
 	lv2:symbol "PHA1" .
 
-drumkv1_lv2:204_DEL1
+drumkv1_lv2:G204_DEL1
 	a lv2pg:InputGroup;
 	lv2:name "Effects - Delay" ;
 	lv2:symbol "DEL1" .
 
-drumkv1_lv2:205_REV1
+drumkv1_lv2:G205_REV1
 	a lv2pg:InputGroup;
 	lv2:name "Effects - Reverb" ;
 	lv2:symbol "REV1" .
 
-drumkv1_lv2:206_DYN1
+drumkv1_lv2:G206_DYN1
 	a lv2pg:InputGroup;
 	lv2:name "Effects - Dynamic" ;
 	lv2:symbol "DYN1" .

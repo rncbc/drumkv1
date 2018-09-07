@@ -99,7 +99,14 @@ private:
 
 	struct lv2_urids
 	{
+	#if 1//DRUMKV1_LV2_LEGACY
 		LV2_URID gen1_sample;
+		LV2_URID gen1_offset_start;
+		LV2_URID gen1_offset_end;
+	#endif
+		LV2_URID p101_sample_file;
+		LV2_URID p102_offset_start;
+		LV2_URID p103_offset_end;
 		LV2_URID gen1_select;
 		LV2_URID gen1_update;
 		LV2_URID atom_Blank;
