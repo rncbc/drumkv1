@@ -45,12 +45,18 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	m_bIdleClosed = false;
 #endif
 
-	// May initialize the scheduler/work notifier.
-	openSchedNotifier();
+	// Initialise preset stuff...
+	clearPreset();
 
 	// Initial update, always...
 	refreshElements();
 	activateElement();
+
+	resetParamValues(drumkv1::NUM_PARAMS);
+	resetParamKnobs(drumkv1::NUM_PARAMS);
+
+	// May initialize the scheduler/work notifier.
+	openSchedNotifier();
 }
 
 

@@ -793,7 +793,6 @@ void drumkv1widget::swapParams ( bool bOn )
 #ifdef CONFIG_DEBUG
 	qDebug("drumkv1widget::swapParams(%d)", int(bOn));
 #endif
-//	resetParamKnobs(drumkv1::NUM_PARAMS);
 
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi) {

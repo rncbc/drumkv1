@@ -73,16 +73,18 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 	// Initialize (user) interface stuff...
 	m_pDrumkUi = new drumkv1_ui(m_pDrumk, false);
 
-	// May initialize the scheduler/work notifier.
-	openSchedNotifier();
+	// Initialise preset stuff...
+	clearPreset();
 
-	// Initialize preset stuff...
-	//initPreset();
+	// Initial update, always...
 	refreshElements();
 	activateElement();
 
-	resetParamKnobs(drumkv1::NUM_PARAMS);
 	resetParamValues(drumkv1::NUM_PARAMS);
+	resetParamKnobs(drumkv1::NUM_PARAMS);
+
+	// May initialize the scheduler/work notifier.
+	openSchedNotifier();
 }
 
 
