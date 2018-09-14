@@ -477,18 +477,19 @@ protected:
 			pDrumk->setReverseSync(reverse.value() > 0.5f);
 			break;
 		case drumkv1::GEN1_OFFSET:
-			pDrumk->setOffset(offset.value() > 0.5f);
+			pDrumk->setOffsetSync(offset.value() > 0.5f);
 			break;
 		case drumkv1::GEN1_OFFSET_1:
 			if (pDrumk->isOffset()) {
 				const uint32_t iSampleLength
 					= pDrumk->sample()->length();
-				const uint32_t iOffsetStart
-					= uint32_t(offset_1.value() * float(iSampleLength));
 				const uint32_t iOffsetEnd
 					= pDrumk->offsetEnd();
-				if (iOffsetStart < iOffsetEnd)
-					pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
+				uint32_t iOffsetStart
+					= uint32_t(offset_1.value() * float(iSampleLength));
+				if (iOffsetStart >= iOffsetEnd)
+					iOffsetStart  = iOffsetEnd - 1;
+				pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
 			}
 			break;
 		case drumkv1::GEN1_OFFSET_2:
@@ -497,10 +498,11 @@ protected:
 					= pDrumk->sample()->length();
 				const uint32_t iOffsetStart
 					= pDrumk->offsetStart();
-				const uint32_t iOffsetEnd
+				uint32_t iOffsetEnd
 					= uint32_t(offset_2.value() * float(iSampleLength));
-				if (iOffsetStart < iOffsetEnd)
-					pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
+				if (iOffsetStart >= iOffsetEnd)
+					iOffsetEnd = iOffsetStart + 1;
+				pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
 			}
 			break;
 		default:
@@ -2397,6 +2399,14 @@ bool drumkv1::isReverse (void) const
 void drumkv1::setOffset ( bool bOffset )
 {
 	m_pImpl->setOffset(bOffset);
+}
+
+void drumkv1::setOffsetSync ( bool bOffset )
+{
+	m_pImpl->setOffset(bOffset);
+	m_pImpl->sampleOffsetSync();
+
+	updateSample();
 }
 
 bool drumkv1::isOffset (void) const

@@ -79,6 +79,7 @@ public:
 	bool isReverse() const;
 
 	void setOffset(bool bOffset);
+	void setOffsetSync(bool bOffset);
 	bool isOffset() const;
 
 	void setOffsetRange(uint32_t iOffsetStart, uint32_t iOffsetEnd);
