@@ -52,7 +52,7 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	refreshElements();
 	activateElement();
 
-	resetParamValues(drumkv1::NUM_PARAMS);
+	//resetParamValues(drumkv1::NUM_PARAMS);
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 
 	// May initialize the scheduler/work notifier.
