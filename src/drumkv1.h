@@ -74,15 +74,14 @@ public:
 
 	drumkv1_sample *sample() const;
 
-	void setReverse(bool bReverse);
-	void setReverseSync(bool bReverse);
+	void setReverse(bool bReverse, bool bSync = false);
 	bool isReverse() const;
 
-	void setOffset(bool bOffset);
-	void setOffsetSync(bool bOffset);
+	void setOffset(bool bOffset, bool bSync = false);
 	bool isOffset() const;
 
-	void setOffsetRange(uint32_t iOffsetStart, uint32_t iOffsetEnd);
+	void setOffsetRange(
+		uint32_t iOffsetStart, uint32_t iOffsetEnd, bool bSync = false);
 	uint32_t offsetStart() const;
 	uint32_t offsetEnd() const;
 
@@ -244,10 +243,10 @@ public:
 	void resetParamValues(bool bSwap);
 
 	void sampleReverseTest();
-	void sampleReverseSync();
+	void sampleReverseSync(bool bSync);
 
 	void sampleOffsetTest();
-	void sampleOffsetSync();
+	void sampleOffsetSync(bool bSync);
 
 	void updateEnvTimes();
 
