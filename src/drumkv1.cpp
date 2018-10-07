@@ -1,4 +1,4 @@
-// drumkv1.cpp
+﻿// drumkv1.cpp
 //
 /****************************************************************************
    Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
@@ -2382,7 +2382,7 @@ void drumkv1::setReverse ( bool bReverse, bool bSync )
 	m_pImpl->setReverse(bReverse);
 	m_pImpl->sampleReverseSync(bSync);
 
-	updateSample();
+	if (bSync) updateSample();
 }
 
 bool drumkv1::isReverse (void) const
@@ -2396,7 +2396,7 @@ void drumkv1::setOffset ( bool bOffset, bool bSync )
 	m_pImpl->setOffset(bOffset);
 	m_pImpl->sampleOffsetSync(bSync);
 
-	updateSample();
+	if (bSync) updateSample();
 }
 
 bool drumkv1::isOffset (void) const
@@ -2412,7 +2412,7 @@ void drumkv1::setOffsetRange (
 	m_pImpl->sampleOffsetSync(bSync);
 	m_pImpl->updateEnvTimes();
 
-	updateSample();
+	if (bSync) updateSample();
 }
 
 
