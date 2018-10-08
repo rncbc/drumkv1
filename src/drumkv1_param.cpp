@@ -366,6 +366,8 @@ bool drumkv1_param::loadPreset (
 	if (!file.open(QIODevice::ReadOnly))
 		return false;
 
+	const bool running = pDrumk->running(false);
+
 	static QHash<QString, drumkv1::ParamIndex> s_hash;
 	if (s_hash.isEmpty()) {
 		for (uint32_t i = drumkv1::NUM_ELEMENT_PARAMS; i < drumkv1::NUM_PARAMS; ++i) {
@@ -420,7 +422,7 @@ bool drumkv1_param::loadPreset (
 
 	file.close();
 
-	pDrumk->reset();
+	pDrumk->running(running);
 
 	QDir::setCurrent(currentDir.absolutePath());
 

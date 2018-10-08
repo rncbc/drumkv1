@@ -179,6 +179,8 @@ public:
 
 	void resetParamValues(bool bSwap);
 
+	bool running(bool on);
+
 	void reset();
 
 	drumkv1_controls *controls() const;

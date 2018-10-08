@@ -979,6 +979,8 @@ public:
 
 	void directNoteOn(int note, int vel);
 
+	bool running(bool on);
+
 protected:
 
 	void allSoundOff();
@@ -1074,14 +1076,17 @@ private:
 	volatile int m_direct_chan;
 	volatile int m_direct_note;
 	volatile int m_direct_vel;
+
+	volatile bool m_running;
 };
 
 
 // synth engine constructor
 
 drumkv1_impl::drumkv1_impl (
-	drumkv1 *pDrumk, uint16_t nchannels, float srate ) : m_pDrumk(pDrumk),
-		m_controls(pDrumk), m_programs(pDrumk), m_midi_in(pDrumk), m_bpm(180.0f)
+	drumkv1 *pDrumk, uint16_t nchannels, float srate )
+		: m_pDrumk(pDrumk),	m_controls(pDrumk), m_programs(pDrumk),
+			m_midi_in(pDrumk), m_bpm(180.0f), m_running(false)
 {
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
@@ -1138,7 +1143,8 @@ drumkv1_impl::drumkv1_impl (
 
 	// reset all voices
 	allControllersOff();
-	allNotesOff();
+
+	running(true);
 }
 
 
@@ -1963,6 +1969,8 @@ uint32_t drumkv1_impl::midiInCount (void)
 
 void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 {
+	if (!m_running) return;
+
 	float *v_outs[m_nchannels];
 	float *v_sfxs[m_nchannels];
 
@@ -2254,6 +2262,16 @@ void drumkv1_impl::updateEnvTimes (void)
 }
 
 
+// process running state...
+bool drumkv1_impl::running ( bool on )
+{
+	const bool running = m_running;
+	m_running = on;
+	reset();
+	return running;
+}
+
+
 //-------------------------------------------------------------------------
 // drumkv1 - decl.
 //
@@ -2504,6 +2522,14 @@ drumkv1_controls *drumkv1::controls (void) const
 drumkv1_programs *drumkv1::programs (void) const
 {
 	return m_pImpl->programs();
+}
+
+
+// process state
+
+bool drumkv1::running ( bool on )
+{
+	return m_pImpl->running(on);
 }
 
 

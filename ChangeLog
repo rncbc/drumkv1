@@ -3,6 +3,8 @@ drumkv1 - an old-school drum-kit sampler
 
 ChangeLog
 
+- For safety reasons, all processing is now suspended while
+  loading presets or program changes are issued.
 - AppStream metadata updated to be the most compliant with
   latest freedesktop.org specification and recommendation.
 - SIGTERM (and SIGINT) signal handler added to close the JACK
