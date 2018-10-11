@@ -2267,7 +2267,6 @@ bool drumkv1_impl::running ( bool on )
 {
 	const bool running = m_running;
 	m_running = on;
-	reset();
 	return running;
 }
 
