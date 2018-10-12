@@ -1143,6 +1143,7 @@ drumkv1_impl::drumkv1_impl (
 
 	// reset all voices
 	allControllersOff();
+	allNotesOff();
 
 	running(true);
 }
