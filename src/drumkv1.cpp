@@ -2223,6 +2223,10 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 	elem = m_elem_list.next();
 	while (elem) {
+		elem->dca1.volume.tick(nframes);
+		elem->out1.width.tick(nframes);
+		elem->out1.panning.tick(nframes);
+		elem->out1.volume.tick(nframes);
 		elem->wid1.process(nframes);
 		elem->pan1.process(nframes);
 		elem->vol1.process(nframes);
