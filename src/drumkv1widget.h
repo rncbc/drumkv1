@@ -60,7 +60,7 @@ public:
 	void closeSchedNotifier();
 
 	// Param port accessors.
-	void setParamValue(drumkv1::ParamIndex index, float fValue);
+	void setParamValue(drumkv1::ParamIndex index, float fValue, bool bIter = false);
 	float paramValue(drumkv1::ParamIndex index) const;
 
 	// Param kbob (widget) mapper.
@@ -199,7 +199,7 @@ protected:
 	virtual void updateParam(drumkv1::ParamIndex index, float fValue) const = 0;
 
 	// Update local tied widgets.
-	void updateParamEx(drumkv1::ParamIndex index, float fValue);
+	void updateParamEx(drumkv1::ParamIndex index, float fValue, bool bIter = false);
 
 	// Update scheduled controllers param/knob widgets.
 	void updateSchedParam(drumkv1::ParamIndex index, float fValue);

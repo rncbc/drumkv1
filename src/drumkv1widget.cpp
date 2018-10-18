@@ -643,7 +643,8 @@ drumkv1widget_param *drumkv1widget::paramKnob ( drumkv1::ParamIndex index ) cons
 
 
 // Param port accessors.
-void drumkv1widget::setParamValue ( drumkv1::ParamIndex index, float fValue )
+void drumkv1widget::setParamValue (
+	drumkv1::ParamIndex index, float fValue, bool bIter )
 {
 	++m_iUpdate;
 
@@ -651,7 +652,7 @@ void drumkv1widget::setParamValue ( drumkv1::ParamIndex index, float fValue )
 	if (pParam)
 		pParam->setValue(fValue);
 
-	updateParamEx(index, fValue);
+	updateParamEx(index, fValue, bIter);
 
 	--m_iUpdate;
 }
@@ -702,7 +703,8 @@ void drumkv1widget::paramChanged ( float fValue )
 
 
 // Update local tied widgets.
-void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
+void drumkv1widget::updateParamEx (
+	drumkv1::ParamIndex index, float fValue, bool bIter )
 {
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi == NULL)
@@ -712,15 +714,13 @@ void drumkv1widget::updateParamEx ( drumkv1::ParamIndex index, float fValue )
 
 	switch (index) {
 	case drumkv1::GEN1_REVERSE: {
-		const bool bReverse = bool(fValue > 0.0f);
-		pDrumkUi->setReverse(bReverse);
-		updateSample(pDrumkUi->sample());
+		pDrumkUi->setReverse(bool(fValue > 0.0f));
+		if (!bIter) updateSample(pDrumkUi->sample());
 		break;
 	}
 	case drumkv1::GEN1_OFFSET: {
-		const bool bOffset = bool(fValue > 0.0f);
-		pDrumkUi->setOffset(bOffset);
-		updateOffset(pDrumkUi->sample());
+		pDrumkUi->setOffset(bool(fValue > 0.0f));
+		if (!bIter) updateOffset(pDrumkUi->sample());
 		break;
 	}
 	case drumkv1::DCF1_SLOPE:
@@ -773,11 +773,12 @@ void drumkv1widget::resetParams (void)
 		drumkv1widget_param *pParam = paramKnob(index);
 		if (pParam && pParam->isDefaultValue())
 			fValue = pParam->defaultValue();
-		setParamValue(index, fValue);
+		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
-	//	updateParamEx(index, fValue);
 		m_params_ab[i] = fValue;
 	}
+
+	updateSample(pDrumkUi->sample());
 
 	m_ui.StatusBar->showMessage(tr("Reset preset"), 5000);
 	updateDirtyPreset(false);
@@ -790,37 +791,38 @@ void drumkv1widget::swapParams ( bool bOn )
 	if (m_iUpdate > 0 || !bOn)
 		return;
 
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
+		return;
+
 #ifdef CONFIG_DEBUG
 	qDebug("drumkv1widget::swapParams(%d)", int(bOn));
 #endif
 
-	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi) {
-		// Save current element param values...
-		const int key = pDrumkUi->currentElement();
-		drumkv1_element *element = pDrumkUi->element(key);
-		if (element) {
-			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-				if (index == drumkv1::GEN1_SAMPLE)
-					continue;
-				drumkv1widget_param *pParam = paramKnob(index);
-				if (pParam) {
-					pParam->setDefaultValue(element->paramValue(index, 0));
-					element->setParamValue(index, pParam->value());
-				}
+	// Save current element param values...
+	const int key = pDrumkUi->currentElement();
+	drumkv1_element *element = pDrumkUi->element(key);
+	if (element) {
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			if (index == drumkv1::GEN1_SAMPLE)
+				continue;
+			drumkv1widget_param *pParam = paramKnob(index);
+			if (pParam) {
+				pParam->setDefaultValue(element->paramValue(index, 0));
+				element->setParamValue(index, pParam->value());
 			}
 		}
-		// Swap all element params A/B...
-		pDrumkUi->resetParamValues(true);
-		// Retrieve current element param values...
-		if (element) {
-			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-				if (index == drumkv1::GEN1_SAMPLE)
-					continue;
-				m_params_ab[i] = element->paramValue(index);
-			}
+	}
+	// Swap all element params A/B...
+	pDrumkUi->resetParamValues(true);
+	// Retrieve current element param values...
+	if (element) {
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			if (index == drumkv1::GEN1_SAMPLE)
+				continue;
+			m_params_ab[i] = element->paramValue(index);
 		}
 	}
 
@@ -832,11 +834,13 @@ void drumkv1widget::swapParams ( bool bOn )
 		if (pParam) {
 			const float fOldValue = pParam->value();
 			const float fNewValue = m_params_ab[i];
-			setParamValue(index, fNewValue);
+			setParamValue(index, fNewValue, true);
 			updateParam(index, fNewValue);
 			m_params_ab[i] = fOldValue;
 		}
 	}
+
+	updateSample(pDrumkUi->sample());
 
 	const bool bSwapA = m_ui.SwapParamsAButton->isChecked();
 	m_ui.StatusBar->showMessage(tr("Swap %1").arg(bSwapA ? 'A' : 'B'), 5000);
@@ -859,19 +863,20 @@ void drumkv1widget::updateParamValues ( uint32_t nparams )
 	resetSwapParams();
 
 	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
+		return;
 
 	for (uint32_t i = 0; i < nparams; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		if (index == drumkv1::GEN1_SAMPLE)
 			continue;
-		const float fValue = (pDrumkUi
-		    ? pDrumkUi->paramValue(index)
-		    : drumkv1_param::paramDefaultValue(index));
-		setParamValue(index, fValue);
+		const float fValue = pDrumkUi->paramValue(index);
+		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
-	//	updateParamEx(index, fValue);
 		m_params_ab[i] = fValue;
 	}
+
+	updateSample(pDrumkUi->sample());
 }
 
 
@@ -880,16 +885,21 @@ void drumkv1widget::resetParamValues ( uint32_t nparams )
 {
 	resetSwapParams();
 
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi == NULL)
+		return;
+
 	for (uint32_t i = 0; i < nparams; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		if (index == drumkv1::GEN1_SAMPLE)
 			continue;
 		const float fValue = drumkv1_param::paramDefaultValue(index);
-		setParamValue(index, fValue);
+		setParamValue(index, fValue, true);
 		updateParam(index, fValue);
-	//	updateParamEx(index, fValue);
 		m_params_ab[i] = fValue;
 	}
+
+	updateSample(pDrumkUi->sample());
 }
 
 
@@ -1321,7 +1331,7 @@ void drumkv1widget::updateElement (void)
 				pParam->setValue(fValue);
 			}
 			updateParam(index, fValue);
-			updateParamEx(index, fValue);
+			updateParamEx(index, fValue, true);
 			m_params_ab[i] = fValue;
 		}
 		updateSample(pDrumkUi->sample());

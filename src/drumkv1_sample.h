@@ -190,7 +190,7 @@ public:
 	// iterate.
 	void next(float freq)
 	{
-		const float delta = freq * m_sample->ratio();
+		const float delta = freq * (m_sample ? m_sample->ratio() : 1.0f);
 
 		m_index  = int(m_phase);
 		m_alpha  = m_phase - float(m_index);
@@ -221,7 +221,7 @@ public:
 
 	// predicate.
 	bool isOver() const
-		{ return m_sample->isOver(m_index); }
+		{ return (m_sample ? m_sample->isOver(m_index) : true); }
 
 private:
 
