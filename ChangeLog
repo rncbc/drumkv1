@@ -3,6 +3,7 @@ drumkv1 - an old-school drum-kit sampler
 
 GIT HEAD
 
+- Normalized wavetable oscillator phasors. (EXPERIMENTAL)
 - Added missing include <unistd.h> to shut up some stricter
   compilers from build failures.
 
