@@ -60,6 +60,7 @@
 #include <math.h>
 
 #include <QDomDocument>
+#include <QFileInfo>
 
 
 //-------------------------------------------------------------------------
@@ -89,11 +90,11 @@ public:
 				= m_map_path->absolute_path(
 					m_map_path->handle, sAbstractPath.toUtf8().constData());
 			if (pszAbsolutePath) {
-				sAbsolutePath = pszAbsolutePath;
+				sAbsolutePath = QString::fromUtf8(pszAbsolutePath);
 				::free((void *) pszAbsolutePath);
 			}
 		}
-		return sAbsolutePath;
+		return QFileInfo(sAbsolutePath).canonicalFilePath();
 	}
 	
 	QString abstractPath(const QString& sAbsolutePath) const
@@ -104,7 +105,7 @@ public:
 				= m_map_path->abstract_path(
 					m_map_path->handle, sAbsolutePath.toUtf8().constData());
 			if (pszAbstractPath) {
-				sAbstractPath = pszAbstractPath;
+				sAbstractPath = QString::fromUtf8(pszAbstractPath);
 				::free((void *) pszAbstractPath);
 			}
 		}

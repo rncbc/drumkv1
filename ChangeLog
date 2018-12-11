@@ -3,6 +3,8 @@ drumkv1 - an old-school drum-kit sampler
 
 GIT HEAD
 
+- Make sure all LV2 state sample file references are resolved
+  to their original and canonical file-paths (not symlinks).
 - Sample waveform drawing is a bit more keen to precision.
 - Old deprecated Qt4 build support is no more.
 - Normalized wavetable oscillator phasors. (EXPERIMENTAL)
