@@ -101,10 +101,12 @@ static void drumkv1_lv2ui_cleanup ( LV2UI_Handle ui )
 	drumkv1widget_lv2 *pWidget = static_cast<drumkv1widget_lv2 *> (ui);
 	if (pWidget) {
 		delete pWidget;
+	#if 0//Avoid destructing the possibly shared QApplication instance...
 		if (--drumkv1_lv2ui_qapp_refcount == 0 && drumkv1_lv2ui_qapp_instance) {
 			delete drumkv1_lv2ui_qapp_instance;
 			drumkv1_lv2ui_qapp_instance = NULL;
 		}
+	#endif
 	}
 }
 
