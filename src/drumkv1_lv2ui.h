@@ -24,7 +24,6 @@
 
 #include "drumkv1_ui.h"
 
-#include "lv2.h"
 #include "lv2/lv2plug.in/ns/extensions/ui/ui.h"
 
 
