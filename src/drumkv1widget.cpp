@@ -1,7 +1,7 @@
 // drumkv1widget.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -1567,8 +1567,12 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 
 	switch (drumkv1_sched::Type(stype)) {
 	case drumkv1_sched::MidiIn:
-		if (sid >= 0)
-			m_ui.Elements->midiInLedNote(sid & 0x7f, (sid >> 7) & 0x7f);
+		if (sid >= 0) {
+			const int key = (sid & 0x7f);
+			const int vel = (sid >> 7) & 0x7f;
+			m_ui.Elements->midiInLedNote(key, vel);
+			m_ui.StatusBar->midiInNote(key, vel);
+		}
 		else
 		if (pDrumkUi->midiInCount() > 0) {
 			m_ui.StatusBar->midiInLed(true);
