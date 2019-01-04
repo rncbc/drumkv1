@@ -1127,20 +1127,6 @@ QString drumkv1widget::noteName ( int note )
 
 	} s_notes[] = {
 
-		// Diatonic note map...
-		{  0, QT_TR_NOOP("C")     },
-		{  1, QT_TR_NOOP("C#/Db") },
-		{  2, QT_TR_NOOP("D")     },
-		{  3, QT_TR_NOOP("D#/Eb") },
-		{  4, QT_TR_NOOP("E")     },
-		{  5, QT_TR_NOOP("F")     },
-		{  6, QT_TR_NOOP("F#/Gb") },
-		{  7, QT_TR_NOOP("G")     },
-		{  8, QT_TR_NOOP("G#/Ab") },
-		{  9, QT_TR_NOOP("A")     },
-		{ 10, QT_TR_NOOP("A#/Bb") },
-		{ 11, QT_TR_NOOP("B")     },
-
 		// GM Drum note map...
 		{ 35, QT_TR_NOOP("Acoustic Bass Drum") },
 		{ 36, QT_TR_NOOP("Bass Drum 1") },
@@ -1199,7 +1185,7 @@ QString drumkv1widget::noteName ( int note )
 	if (s_names.isEmpty()) {
 		drumkv1_config *pConfig = drumkv1_config::getInstance();
 		if (pConfig && pConfig->bUseGMDrumNames) {
-			for (int i = 12; s_notes[i].name; ++i) {
+			for (int i = 0; s_notes[i].name; ++i) {
 				s_names.insert(s_notes[i].note,
 					QObject::tr(s_notes[i].name, "noteName"));
 			}
@@ -1211,7 +1197,7 @@ QString drumkv1widget::noteName ( int note )
 	if (iter != s_names.constEnd())
 		return iter.value();
 
-	return QString("%1 %2").arg(s_notes[note % 12].name).arg((note / 12) - 1);
+	return drumkv1_ui::noteName(note);
 }
 
 QString drumkv1widget::completeNoteName ( int note )
