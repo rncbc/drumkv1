@@ -1,7 +1,7 @@
 // drumkv1widget.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -27,6 +27,8 @@
 
 #include "drumkv1widget_config.h"
 #include "drumkv1widget_control.h"
+
+#include "drumkv1widget_keybd.h"
 
 #include "drumkv1_controls.h"
 #include "drumkv1_programs.h"
@@ -523,6 +525,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	// Direct stacked-page signal/slot
 	QObject::connect(m_ui.TabBar, SIGNAL(currentChanged(int)),
 		m_ui.StackedWidget, SLOT(setCurrentIndex(int)));
+
+	// Direct status-bar keyboard input
+	QObject::connect(m_ui.StatusBar->keybd(),
+		SIGNAL(noteOnClicked(int, int)),
+		SLOT(directNoteOn(int, int)));
 
 	// Menu actions
 	QObject::connect(m_ui.helpConfigureAction,
@@ -1120,20 +1127,6 @@ QString drumkv1widget::noteName ( int note )
 
 	} s_notes[] = {
 
-		// Diatonic note map...
-		{  0, QT_TR_NOOP("C")     },
-		{  1, QT_TR_NOOP("C#/Db") },
-		{  2, QT_TR_NOOP("D")     },
-		{  3, QT_TR_NOOP("D#/Eb") },
-		{  4, QT_TR_NOOP("E")     },
-		{  5, QT_TR_NOOP("F")     },
-		{  6, QT_TR_NOOP("F#/Gb") },
-		{  7, QT_TR_NOOP("G")     },
-		{  8, QT_TR_NOOP("G#/Ab") },
-		{  9, QT_TR_NOOP("A")     },
-		{ 10, QT_TR_NOOP("A#/Bb") },
-		{ 11, QT_TR_NOOP("B")     },
-
 		// GM Drum note map...
 		{ 35, QT_TR_NOOP("Acoustic Bass Drum") },
 		{ 36, QT_TR_NOOP("Bass Drum 1") },
@@ -1192,7 +1185,7 @@ QString drumkv1widget::noteName ( int note )
 	if (s_names.isEmpty()) {
 		drumkv1_config *pConfig = drumkv1_config::getInstance();
 		if (pConfig && pConfig->bUseGMDrumNames) {
-			for (int i = 12; s_notes[i].name; ++i) {
+			for (int i = 0; s_notes[i].name; ++i) {
 				s_names.insert(s_notes[i].note,
 					QObject::tr(s_notes[i].name, "noteName"));
 			}
@@ -1204,7 +1197,7 @@ QString drumkv1widget::noteName ( int note )
 	if (iter != s_names.constEnd())
 		return iter.value();
 
-	return QString("%1 %2").arg(s_notes[note % 12].name).arg((note / 12) - 1);
+	return drumkv1_ui::noteName(note);
 }
 
 QString drumkv1widget::completeNoteName ( int note )
@@ -1567,8 +1560,12 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 
 	switch (drumkv1_sched::Type(stype)) {
 	case drumkv1_sched::MidiIn:
-		if (sid >= 0)
-			m_ui.Elements->midiInLedNote(sid & 0x7f, (sid >> 7) & 0x7f);
+		if (sid >= 0) {
+			const int key = (sid & 0x7f);
+			const int vel = (sid >> 7) & 0x7f;
+			m_ui.Elements->midiInLedNote(key, vel);
+			m_ui.StatusBar->midiInNote(key, vel);
+		}
 		else
 		if (pDrumkUi->midiInCount() > 0) {
 			m_ui.StatusBar->midiInLed(true);
@@ -1609,6 +1606,19 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 	default:
 		break;
 	}
+}
+
+
+// Direct note-on/off slot.
+void drumkv1widget::directNoteOn ( int iNote, int iVelocity )
+{
+#ifdef CONFIG_DEBUG
+	qDebug("drumkv1widget::directNoteOn(%d, %d)", iNote, iVelocity);
+#endif
+
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi)
+		pDrumkUi->directNoteOn(iNote, iVelocity); // note-on!
 }
 
 
