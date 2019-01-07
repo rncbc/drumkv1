@@ -1554,7 +1554,7 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 	if (pDrumkUi == NULL)
 		return;
 
-#ifdef CONFIG_DEBUG
+#ifdef CONFIG_DEBUG_0
 	qDebug("drumkv1widget::updateSchedNotify(%d, 0x%04x)", stype, sid);
 #endif
 
