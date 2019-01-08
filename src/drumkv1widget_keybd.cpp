@@ -21,7 +21,7 @@
 
 #include "drumkv1widget_keybd.h"
 
-#include "drumkv1_ui.h"
+#include "drumkv1widget.h"
 
 #include <QPainter>
 #include <QToolTip>
@@ -653,7 +653,7 @@ void drumkv1widget_keybd::noteToolTip ( const QPoint& pos ) const
 // Default note name map accessor.
 QString drumkv1widget_keybd::noteName ( int iNote ) const
 {
-	return drumkv1_ui::noteName(iNote);
+	return drumkv1widget::noteName(iNote);
 }
 
 
