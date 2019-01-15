@@ -256,12 +256,12 @@ signals:
 protected:
 
 	// Notififier visitor.
-	class Notifier : public drumkv1_sched_notifier
+	class Notifier : public drumkv1_sched::Notifier
 	{
 	public:
 
 		Notifier(drumkv1 *pDrumk, drumkv1widget_sched *pSched)
-			: drumkv1_sched_notifier(pDrumk), m_pSched(pSched) {}
+			: drumkv1_sched::Notifier(pDrumk), m_pSched(pSched) {}
 
 		void notify(drumkv1_sched::Type stype, int sid) const
 			{ m_pSched->emit_notify(stype, sid); }

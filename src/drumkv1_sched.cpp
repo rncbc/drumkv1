@@ -1,7 +1,7 @@
 // drumkv1_sched.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -73,7 +73,7 @@ private:
 static drumkv1_sched_thread *g_sched_thread = NULL;
 static uint32_t g_sched_refcount = 0;
 
-static QHash<drumkv1 *, QList<drumkv1_sched_notifier *> > g_sched_notifiers;
+static QHash<drumkv1 *, QList<drumkv1_sched::Notifier *> > g_sched_notifiers;
 
 
 //-------------------------------------------------------------------------
@@ -254,9 +254,9 @@ void drumkv1_sched::sync_process (void)
 void drumkv1_sched::sync_notify ( drumkv1 *pDrumk, Type stype, int sid )
 {
 	if (g_sched_notifiers.contains(pDrumk)) {
-		const QList<drumkv1_sched_notifier *>& list
+		const QList<Notifier *>& list
 			= g_sched_notifiers.value(pDrumk);
-		QListIterator<drumkv1_sched_notifier *> iter(list);
+		QListIterator<Notifier *> iter(list);
 		while (iter.hasNext())
 			iter.next()->notify(stype, sid);
 	}
@@ -264,22 +264,22 @@ void drumkv1_sched::sync_notify ( drumkv1 *pDrumk, Type stype, int sid )
 
 
 //-------------------------------------------------------------------------
-// drumkv1_sched_notifier - worker/schedule proxy decl.
+// drumkv1_sched::Notifier - worker/schedule proxy decl.
 //
 
 // ctor.
-drumkv1_sched_notifier::drumkv1_sched_notifier ( drumkv1 *pDrumk )
+drumkv1_sched::Notifier::Notifier ( drumkv1 *pDrumk )
 	: m_pDrumk(pDrumk)
 {
-	g_sched_notifiers[m_pDrumk].append(this);
+	g_sched_notifiers[pDrumk].append(this);
 }
 
 
 // dtor.
-drumkv1_sched_notifier::~drumkv1_sched_notifier (void)
+drumkv1_sched::Notifier::~Notifier (void)
 {
 	if (g_sched_notifiers.contains(m_pDrumk)) {
-		QList<drumkv1_sched_notifier *>& list = g_sched_notifiers[m_pDrumk];
+		QList<Notifier *>& list = g_sched_notifiers[m_pDrumk];
 		list.removeAll(this);
 		if (list.isEmpty())
 			g_sched_notifiers.remove(m_pDrumk);
