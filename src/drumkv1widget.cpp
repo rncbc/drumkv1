@@ -720,19 +720,23 @@ void drumkv1widget::updateParamEx (
 	++m_iUpdate;
 
 	switch (index) {
-	case drumkv1::GEN1_REVERSE: {
+	case drumkv1::GEN1_REVERSE:
 		pDrumkUi->setReverse(bool(fValue > 0.0f));
 		if (!bIter) updateSample(pDrumkUi->sample());
 		break;
-	}
-	case drumkv1::GEN1_OFFSET: {
+	case drumkv1::GEN1_OFFSET:
 		pDrumkUi->setOffset(bool(fValue > 0.0f));
 		if (!bIter) updateOffset(pDrumkUi->sample());
 		break;
-	}
 	case drumkv1::DCF1_SLOPE:
 		m_ui.Dcf1TypeKnob->setEnabled(int(fValue) != 3); // !Formant
-		// Fall thru...
+		break;
+	case drumkv1::DEF1_VELOCITY: {
+		const int vel = int(79.375f * fValue + 47.625f) & 0x7f;
+		m_ui.Elements->setDirectNoteOnVelocity(vel);
+		m_ui.StatusBar->keybd()->setVelocity(vel);
+		break;
+	}
 	default:
 		break;
 	}

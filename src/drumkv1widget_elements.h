@@ -1,7 +1,7 @@
 // drumkv1widget_elements.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -99,7 +99,6 @@ private:
 
 	static const int MAX_NOTES = 128;
 	int m_notes_on[MAX_NOTES];
-	QList<int> m_notes_off;
 };
 
 
@@ -134,6 +133,10 @@ public:
 
 	// Direct note-on methods.
 	void directNoteOn(int key);
+
+	// Direct note-on velocity accessors.
+	void setDirectNoteOnVelocity(int vel);
+	int directNoteOnVelocity() const;
 
 signals:
 
@@ -184,6 +187,7 @@ private:
 	drumkv1_sample *m_pDragSample;
 
 	int m_iDirectNoteOn;
+	int m_iDirectNoteOnVelocity;
 };
 
 

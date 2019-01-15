@@ -1,7 +1,7 @@
 // drumkv1widget_elements.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2017, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -167,22 +167,19 @@ void drumkv1widget_elements_model::midiInLedNote ( int key, int vel )
 	}
 	else
 	if (m_notes_on[key] > 0) {
-		m_notes_off.append(key);
-		QTimer::singleShot(200, this, SLOT(midiInLedTimeout()));
+		QTimer::singleShot(300, this, SLOT(midiInLedTimeout()));
 	}
 }
 
 
 void drumkv1widget_elements_model::midiInLedTimeout (void)
 {
-	QListIterator<int> iter(m_notes_off);
-	while (iter.hasNext()) {
-		const int key = iter.next();
-		midiInLedUpdate(key);
-		m_notes_on[key] = 0;
+	for (int key = 0; key < MAX_NOTES; ++key) {
+		if (m_notes_on[key] > 0) {
+			m_notes_on[key] = 0;
+			midiInLedUpdate(key);
+		}
 	}
-
-	m_notes_off.clear();
 }
 
 
@@ -256,7 +253,7 @@ int drumkv1widget_elements_model::columnAlignment( int /*column*/ ) const
 // Constructor.
 drumkv1widget_elements::drumkv1widget_elements ( QWidget *pParent )
 	: QTreeView(pParent), m_pModel(NULL),
-		m_pDragSample(NULL), m_iDirectNoteOn(-1)
+		m_pDragSample(NULL), m_iDirectNoteOn(-1), m_iDirectNoteOnVelocity(64)
 {
 	resetDragState();
 }
@@ -490,18 +487,16 @@ void drumkv1widget_elements::directNoteOn ( int key )
 	if (pDrumkUi == NULL)
 		return;
 
-	drumkv1_sample *pSample = pDrumkUi->sample();
-	if (pSample == NULL)
-		return;
-
-	const float v = pDrumkUi->paramValue(drumkv1::DEF1_VELOCITY);
-	const int vel = int(79.375f * v + 47.625f) & 0x7f;
-	pDrumkUi->directNoteOn(key, vel); // note-on!
 	m_iDirectNoteOn = key;
 
-	const float srate_ms = 0.001f * pSample->sampleRate();
-	const int timeout_ms = int(float(pSample->length() >> 1) / srate_ms);
-	QTimer::singleShot(timeout_ms, this, SLOT(directNoteOff()));
+	pDrumkUi->directNoteOn(m_iDirectNoteOn, m_iDirectNoteOnVelocity);
+
+	drumkv1_sample *pSample = pDrumkUi->sample();
+	if (pSample) {
+		const float srate_ms = 0.001f * pSample->sampleRate();
+		const int timeout_ms = int(float(pSample->length() >> 1) / srate_ms);
+		QTimer::singleShot(timeout_ms, this, SLOT(directNoteOff()));
+	}
 }
 
 
@@ -517,6 +512,19 @@ void drumkv1widget_elements::directNoteOff (void)
 	pDrumkUi->directNoteOn(m_iDirectNoteOn, 0); // note-off!
 
 	m_iDirectNoteOn = -1;
+}
+
+
+// Direct note-on velocity accessors.
+void drumkv1widget_elements::setDirectNoteOnVelocity ( int vel )
+{
+	m_iDirectNoteOnVelocity = vel;
+}
+
+
+int drumkv1widget_elements::directNoteOnVelocity (void) const
+{
+	return m_iDirectNoteOnVelocity;
 }
 
 
