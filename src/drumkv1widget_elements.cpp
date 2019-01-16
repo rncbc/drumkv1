@@ -167,7 +167,7 @@ void drumkv1widget_elements_model::midiInLedNote ( int key, int vel )
 	}
 	else
 	if (m_notes_on[key] > 0) {
-		QTimer::singleShot(300, this, SLOT(midiInLedTimeout()));
+		QTimer::singleShot(200, this, SLOT(midiInLedTimeout()));
 	}
 }
 
