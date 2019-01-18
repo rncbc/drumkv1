@@ -1330,33 +1330,31 @@ void drumkv1_impl::removeElement ( int key )
 
 void drumkv1_impl::setCurrentElement ( int key )
 {
-	if (m_elem && key == m_key0)
+	if (key == m_key0)
 		return;
 
 	if (key >= 0 && key < MAX_NOTES) {
 		// swap old element parameter port values
 		drumkv1_elem *elem = m_elem;
 		if (elem) {
-			drumkv1_element *element = &(elem->element);
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				drumkv1_port *pParamPort = element->paramPort(index);
+				drumkv1_port *pParamPort = elem->element.paramPort(index);
 				if (pParamPort)
-					pParamPort->set_port(&(elem->params[1][i]));
+					pParamPort->set_port(NULL);//&(elem->params[1][i]));
 			}
 			resetElement(elem);
 		}
 		// swap new element parameter port values
 		elem = m_elems[key];
 		if (elem) {
-			drumkv1_element *element = &(elem->element);
 			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
-				drumkv1_port *pParamPort = element->paramPort(index);
+				drumkv1_port *pParamPort = elem->element.paramPort(index);
 				if (pParamPort)
 					pParamPort->set_port(m_params[i]);
 			}
@@ -1368,7 +1366,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 	} else {
 		// null default element
 		m_elem = NULL;
-		m_key0 = int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
+		m_key0 = -1; // int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
 	}
 
 	// set current element key parameter port
@@ -1404,7 +1402,7 @@ void drumkv1_impl::clearElements (void)
 
 	// reset current element
 	m_elem = NULL;
-	m_key0 = int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
+	m_key0 = -1; // int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
 	m_key1 = m_key0;
 
 	// deallocate elements
@@ -1484,33 +1482,35 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 		pfParam = &s_fDummy;
 
 	drumkv1_port *pParamPort = paramPort(index);
-	if (pParamPort) {
+	if (pParamPort)
 		pParamPort->set_port(pfParam);
-		if (m_elem) {
-			// check null connections.
-			if (pfParam != &s_fDummy)
-			switch (index) {
-			case drumkv1::DCA1_VOLUME:
-			case drumkv1::OUT1_VOLUME:
-				m_elem->vol1.reset(
-					m_elem->out1.volume.value_ptr(),
-					m_elem->dca1.volume.value_ptr(),
-					&m_ctl.volume,
-					&m_elem->aux1.volume);
-				break;
-			case drumkv1::OUT1_WIDTH:
-				m_elem->wid1.reset(
-					m_elem->out1.width.value_ptr());
-				break;
-			case drumkv1::OUT1_PANNING:
-				m_elem->pan1.reset(
-					m_elem->out1.panning.value_ptr(),
-					&m_ctl.panning,
-					&m_elem->aux1.panning);
-				break;
-			default:
-				break;
-			}
+
+	// check null connections.
+	if (pfParam == &s_fDummy)
+		return;
+
+	if (m_elem) {
+		switch (index) {
+		case drumkv1::DCA1_VOLUME:
+		case drumkv1::OUT1_VOLUME:
+			m_elem->vol1.reset(
+				m_elem->out1.volume.value_ptr(),
+				m_elem->dca1.volume.value_ptr(),
+				&m_ctl.volume,
+				&m_elem->aux1.volume);
+			break;
+		case drumkv1::OUT1_WIDTH:
+			m_elem->wid1.reset(
+				m_elem->out1.width.value_ptr());
+			break;
+		case drumkv1::OUT1_PANNING:
+			m_elem->pan1.reset(
+				m_elem->out1.panning.value_ptr(),
+				&m_ctl.panning,
+				&m_elem->aux1.panning);
+			break;
+		default:
+			break;
 		}
 	}
 
