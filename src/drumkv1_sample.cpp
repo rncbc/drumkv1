@@ -1,7 +1,7 @@
 // drumkv1_sample.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -121,7 +121,7 @@ bool drumkv1_sample::open ( const char *filename, float freq0 )
 
 	reset(freq0);
 
-	setOffset(m_offset);
+	updateOffset();
 	return true;
 }
 
@@ -181,11 +181,22 @@ void drumkv1_sample::setOffsetRange ( uint32_t start, uint32_t end )
 	if (start < end) {
 		m_offset_start = start;
 		m_offset_end = end;
-		m_offset_phase0 = float(zero_crossing(start, NULL));
-		m_offset_end2 = zero_crossing(end, NULL);
 	} else {
 		m_offset_start = 0;
 		m_offset_end = m_nframes;
+	}
+
+	updateOffset();
+}
+
+
+// offset updater.
+void drumkv1_sample::updateOffset (void)
+{
+	if (m_offset && m_offset_start < m_offset_end) {
+		m_offset_phase0 = float(zero_crossing(m_offset_start, NULL));
+		m_offset_end2 = zero_crossing(m_offset_end, NULL);
+	} else {
 		m_offset_phase0 = 0.0f;
 		m_offset_end2 = m_nframes;
 	}
