@@ -186,8 +186,6 @@ public:
 	float operator *()
 		{ return tick(1); }
 
-	static const uint32_t NSTEP = 32;
-
 private:
 
 	float *m_port;
@@ -203,6 +201,8 @@ class drumkv1_port2 : public drumkv1_port
 public:
 
 	drumkv1_port2() : m_vtick(0.0f), m_vstep(0.0f), m_nstep(0) {}
+
+	static const uint32_t NSTEP = 32;
 
 	void set_value(float value)
 	{
@@ -503,9 +503,9 @@ protected:
 		case drumkv1::GEN1_OFFSET_2:
 			if (element->isOffset()) {
 				const uint32_t iSampleLength
-					= pDrumk->sample()->length();
+					= element->sample()->length();
 				const uint32_t iOffsetStart
-					= pDrumk->offsetStart();
+					= element->offsetStart();
 				uint32_t iOffsetEnd
 					= uint32_t(offset_2.value() * float(iSampleLength));
 				if (iOffsetStart >= iOffsetEnd)
@@ -2720,7 +2720,7 @@ void drumkv1_element::setParamValue (
 		if (pset == 1) {
 			drumkv1_port *pParamPort = paramPort(index);
 			if (pParamPort)
-				pParamPort->tick(drumkv1_port::NSTEP);
+				pParamPort->tick(drumkv1_port2::NSTEP);
 		}
 	}
 }
