@@ -198,8 +198,6 @@ public:
 
 	void updateTuning();
 
-protected:
-
 	virtual void selectSample(int key) = 0;
 	virtual void updateSample() = 0;
 

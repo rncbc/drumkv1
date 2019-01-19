@@ -186,6 +186,8 @@ public:
 	float operator *()
 		{ return tick(1); }
 
+	static const uint32_t NSTEP = 32;
+
 private:
 
 	float *m_port;
@@ -230,8 +232,6 @@ public:
 
 private:
 
-	static const uint32_t NSTEP = 32;
-
 	float    m_vtick;
 	float    m_vstep;
 	uint32_t m_nstep;
@@ -249,12 +249,12 @@ public:
 
 	void set_value(float value)
 	{
-	   if (!m_xsync) {
+		if (!m_xsync) {
 			const float v0 = drumkv1_port::value();
 			const float v1 = m_vsync;
 			const float d1 = ::fabsf(v1 - value);
 			const float d2 = ::fabsf(v1 - v0) * d1;
-			m_xsync = (d2 < 0.001f);
+			m_xsync = (d2 < 0.5f);
 		}
 
 		drumkv1_port::set_value(value);
@@ -449,12 +449,13 @@ class drumkv1_gen : public drumkv1_sched
 {
 public:
 
-	drumkv1_gen(drumkv1 *pDrumk)
+	drumkv1_gen(drumkv1 *pDrumk, int key)
 		: drumkv1_sched(pDrumk, drumkv1_sched::Controller),
 			reverse(this, drumkv1::GEN1_REVERSE),
 			offset(this, drumkv1::GEN1_OFFSET),
 			offset_1(this, drumkv1::GEN1_OFFSET_1),
-			offset_2(this, drumkv1::GEN1_OFFSET_2) {}
+			offset_2(this, drumkv1::GEN1_OFFSET_2),
+			m_key(key) {}
 
 	drumkv1_port  sample;
 	drumkv1_port3 reverse;
@@ -473,29 +474,34 @@ protected:
 	void process(int sid)
 	{
 		drumkv1 *pDrumk = drumkv1_sched::instance();
-
+		drumkv1_element *element = pDrumk->element(m_key);
+		if (element)
 		switch (drumkv1::ParamIndex(sid)) {
 		case drumkv1::GEN1_REVERSE:
-			pDrumk->setReverse(reverse.value() > 0.5f, true);
+			element->setReverse(reverse.value() > 0.5f);
+			element->sampleReverseSync(true);
 			break;
 		case drumkv1::GEN1_OFFSET:
-			pDrumk->setOffset(offset.value() > 0.5f, true);
+			element->setOffset(offset.value() > 0.5f);
+			element->sampleOffsetSync(true);
 			break;
 		case drumkv1::GEN1_OFFSET_1:
-			if (pDrumk->isOffset()) {
+			if (element->isOffset()) {
 				const uint32_t iSampleLength
-					= pDrumk->sample()->length();
+					= element->sample()->length();
 				const uint32_t iOffsetEnd
-					= pDrumk->offsetEnd();
+					= element->offsetEnd();
 				uint32_t iOffsetStart
 					= uint32_t(offset_1.value() * float(iSampleLength));
 				if (iOffsetStart >= iOffsetEnd)
 					iOffsetStart  = iOffsetEnd - 1;
-				pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd, true);
+				element->setOffsetRange(iOffsetStart, iOffsetEnd);
+				element->sampleOffsetSync(true);
+				element->updateEnvTimes();
 			}
 			break;
 		case drumkv1::GEN1_OFFSET_2:
-			if (pDrumk->isOffset()) {
+			if (element->isOffset()) {
 				const uint32_t iSampleLength
 					= pDrumk->sample()->length();
 				const uint32_t iOffsetStart
@@ -504,13 +510,23 @@ protected:
 					= uint32_t(offset_2.value() * float(iSampleLength));
 				if (iOffsetStart >= iOffsetEnd)
 					iOffsetEnd = iOffsetStart + 1;
-				pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd, true);
+				element->setOffsetRange(iOffsetStart, iOffsetEnd);
+				element->sampleOffsetSync(true);
+				element->updateEnvTimes();
 			}
 			break;
 		default:
 			break;
 		}
+		// Sync current sample...
+		if (pDrumk->currentElement() == m_key)
+			pDrumk->updateSample();
 	}
+
+private:
+
+	// Current element key(note)
+	int m_key;
 };
 
 
@@ -760,7 +776,7 @@ public:
 // synth element
 
 drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, float srate, int key )
-	: element(this), gen1_sample(srate), gen1(pDrumk)
+	: element(this), gen1_sample(srate), gen1(pDrumk, key)
 {
 	// element parameter port/value set
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -2699,8 +2715,14 @@ drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 void drumkv1_element::setParamValue (
 	drumkv1::ParamIndex index, float fValue, int pset )
 {
-	if (index < drumkv1::NUM_ELEMENT_PARAMS && index != drumkv1::GEN1_SAMPLE)
+	if (index < drumkv1::NUM_ELEMENT_PARAMS && index != drumkv1::GEN1_SAMPLE) {
 		m_pElem->params[pset][index] = fValue;
+		if (pset == 1) {
+			drumkv1_port *pParamPort = paramPort(index);
+			if (pParamPort)
+				pParamPort->tick(drumkv1_port::NSTEP);
+		}
+	}
 }
 
 
