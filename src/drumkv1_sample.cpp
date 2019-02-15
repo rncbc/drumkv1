@@ -193,7 +193,7 @@ void drumkv1_sample::setOffsetRange ( uint32_t start, uint32_t end )
 // offset updater.
 void drumkv1_sample::updateOffset (void)
 {
-	if (m_offset && m_offset_start < m_offset_end) {
+	if (m_offset_start < m_offset_end) {
 		m_offset_phase0 = float(zero_crossing(m_offset_start, NULL));
 		m_offset_end2 = zero_crossing(m_offset_end, NULL);
 	} else {

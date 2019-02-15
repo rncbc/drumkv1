@@ -73,7 +73,7 @@ public:
 	}
 
 	bool isOffset() const
-		{ return m_offset && (m_offset_start < m_offset_end); }
+		{ return m_offset; }
 
 	// sample start/end points (offsets)
 	void setOffsetRange(uint32_t start, uint32_t end);
