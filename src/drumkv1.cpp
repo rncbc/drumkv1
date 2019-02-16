@@ -1393,7 +1393,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 
 	// set current element key parameter port
 	m_key->set_value(float(m_key0));
-	m_key1 = m_key->tick(1);
+//	m_key1 = m_key->tick(1);
 }
 
 
@@ -1412,7 +1412,7 @@ void drumkv1_impl::setCurrentElementTest ( int key )
 int drumkv1_impl::currentElementTest (void)
 {
 	const int key = int(m_key->tick(1));
-	return (m_key1 == key ? -1 : key);
+	return (!m_running || m_key1 == key ? -1 : key);
 }
 
 
@@ -2268,7 +2268,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 void drumkv1_impl::sampleReverseTest (void)
 {
-	if (m_elem) m_elem->element.sampleReverseTest();
+	if (m_running && m_elem) m_elem->element.sampleReverseTest();
 }
 
 
@@ -2280,7 +2280,7 @@ void drumkv1_impl::sampleReverseSync ( bool bSync )
 
 void drumkv1_impl::sampleOffsetTest (void)
 {
-	if (m_elem) m_elem->element.sampleOffsetTest();
+	if (m_running && m_elem) m_elem->element.sampleOffsetTest();
 }
 
 
