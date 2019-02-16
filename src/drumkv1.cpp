@@ -1355,20 +1355,21 @@ void drumkv1_impl::setCurrentElement ( int key )
 	if (key == m_key0)
 		return;
 
-	if (key >= 0 && key < MAX_NOTES) {
-		// swap old element parameter port values
-		drumkv1_elem *elem = m_elem;
-		if (elem) {
-			for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-				const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-				if (index == drumkv1::GEN1_SAMPLE)
-					continue;
-				drumkv1_port *pParamPort = elem->element.paramPort(index);
-				if (pParamPort)
-					pParamPort->set_port(NULL);//&(elem->params[1][i]));
-			}
-			resetElement(elem);
+	// swap old element parameter port values
+	drumkv1_elem *elem = m_elem;
+	if (elem) {
+		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			if (index == drumkv1::GEN1_SAMPLE)
+				continue;
+			drumkv1_port *pParamPort = elem->element.paramPort(index);
+			if (pParamPort)
+				pParamPort->set_port(NULL); // &(elem->params[1][i]));
 		}
+		resetElement(elem);
+	}
+
+	if (key >= 0 && key < MAX_NOTES) {
 		// swap new element parameter port values
 		elem = m_elems[key];
 		if (elem) {
