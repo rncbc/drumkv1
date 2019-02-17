@@ -1583,7 +1583,7 @@ drumkv1_port *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DYN1_COMPRESS:  pParamPort = &m_dyn.compress;  break;
 	case drumkv1::DYN1_LIMITER:   pParamPort = &m_dyn.limiter;   break;
 	default:
-		if (m_elem) pParamPort = m_elem->element.paramPort(index);
+	//	if (m_elem) pParamPort = m_elem->element.paramPort(index);
 		break;
 	}
 
