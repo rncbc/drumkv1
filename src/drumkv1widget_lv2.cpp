@@ -1,7 +1,7 @@
 // drumkv1widget_lv2.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -128,6 +128,15 @@ void drumkv1widget_lv2::port_event ( uint32_t port_index,
 		const drumkv1::ParamIndex index
 			= drumkv1::ParamIndex(port_index - drumkv1_lv2::ParamBase);
 		const float fValue = *(float *) buffer;
+		if (index < drumkv1::NUM_ELEMENT_PARAMS) {
+			drumkv1_ui *pDrumkUi = ui_instance();
+			if (pDrumkUi) {
+				const int iCurrentNote = pDrumkUi->currentElement();
+				drumkv1_element *element = pDrumkUi->element(iCurrentNote);
+				if (element)
+					element->setParamValue(index, fValue);
+			}
+		}
 		setParamValue(index, fValue);
 	}
 }

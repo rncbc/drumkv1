@@ -1363,8 +1363,10 @@ void drumkv1_impl::setCurrentElement ( int key )
 			if (index == drumkv1::GEN1_SAMPLE)
 				continue;
 			drumkv1_port *pParamPort = elem->element.paramPort(index);
-			if (pParamPort)
-				pParamPort->set_port(NULL); // &(elem->params[1][i]));
+			if (pParamPort) {
+				elem->params[1][i] = pParamPort->tick(drumkv1_port2::NSTEP);
+				pParamPort->set_port(NULL);
+			}
 		}
 		resetElement(elem);
 	}
@@ -1378,8 +1380,11 @@ void drumkv1_impl::setCurrentElement ( int key )
 				if (index == drumkv1::GEN1_SAMPLE)
 					continue;
 				drumkv1_port *pParamPort = elem->element.paramPort(index);
-				if (pParamPort)
+				if (pParamPort) {
+					pParamPort->set_value(elem->params[1][i]);
+					pParamPort->tick(drumkv1_port2::NSTEP);
 					pParamPort->set_port(m_params[i]);
+				}
 			}
 			resetElement(elem);
 		}
@@ -1583,7 +1588,7 @@ drumkv1_port *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DYN1_COMPRESS:  pParamPort = &m_dyn.compress;  break;
 	case drumkv1::DYN1_LIMITER:   pParamPort = &m_dyn.limiter;   break;
 	default:
-	//	if (m_elem) pParamPort = m_elem->element.paramPort(index);
+		if (m_elem) pParamPort = m_elem->element.paramPort(index);
 		break;
 	}
 
