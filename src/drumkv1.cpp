@@ -752,9 +752,6 @@ public:
 
 	drumkv1_element element;
 
-	void stabilize();
-	void reset();
-
 	void midiInEnabled(bool on);
 	uint32_t midiInCount();
 
@@ -990,6 +987,7 @@ public:
 
 	void resetParamValues(bool bSwap);
 
+	void stabilize();
 	void reset();
 
 	void sampleReverseTest();
