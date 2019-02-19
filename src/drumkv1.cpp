@@ -752,6 +752,7 @@ public:
 
 	drumkv1_element element;
 
+	void stabilize();
 	void reset();
 
 	void midiInEnabled(bool on);
@@ -1955,6 +1956,18 @@ void drumkv1_impl::updateTuning (void)
 }
 
 
+// all stabilize
+
+void drumkv1_impl::stabilize (void)
+{
+	for (int i = 0; i < drumkv1::NUM_PARAMS; ++i) {
+		drumkv1_port *pParamPort = paramPort(drumkv1::ParamIndex(i));
+		if (pParamPort)
+			pParamPort->tick(drumkv1_port2::NSTEP);
+	}
+}
+
+
 // all reset clear
 
 void drumkv1_impl::reset (void)
@@ -2569,6 +2582,14 @@ drumkv1_programs *drumkv1::programs (void) const
 bool drumkv1::running ( bool on )
 {
 	return m_pImpl->running(on);
+}
+
+
+// all stabilize
+
+void drumkv1::stabilize (void)
+{
+	m_pImpl->stabilize();
 }
 
 
