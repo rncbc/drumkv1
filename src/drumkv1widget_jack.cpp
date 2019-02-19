@@ -1,7 +1,7 @@
 // drumkv1widget_jack.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -160,7 +160,7 @@ void drumkv1widget_jack::closeEvent ( QCloseEvent *pCloseEvent )
 // Optional GUI handlers.
 void drumkv1widget_jack::showEvent ( QShowEvent *pShowEvent )
 {
-	QWidget::showEvent(pShowEvent);
+	drumkv1widget::showEvent(pShowEvent);
 
 	if (m_pNsmClient)
 		m_pNsmClient->visible(true);
@@ -171,7 +171,7 @@ void drumkv1widget_jack::hideEvent ( QHideEvent *pHideEvent )
 	if (m_pNsmClient)
 		m_pNsmClient->visible(false);
 
-	QWidget::hideEvent(pHideEvent);
+	drumkv1widget::hideEvent(pHideEvent);
 }
 
 #endif	// CONFIG_NSM

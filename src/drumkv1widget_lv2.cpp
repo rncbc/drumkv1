@@ -45,6 +45,8 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	m_bIdleClosed = false;
 #endif
 
+	m_iShowEvent = 0;
+
 	// Initialise preset stuff...
 	clearPreset();
 
@@ -102,6 +104,17 @@ bool drumkv1widget_lv2::isIdleClosed (void) const
 #endif	// CONFIG_LV2_UI_IDLE
 
 
+// Show event handler.
+void drumkv1widget_lv2::showEvent ( QShowEvent *pShowEvent )
+{
+	drumkv1widget::showEvent(pShowEvent);
+
+	++m_iShowEvent;
+
+	drumkv1widget::updateElement();
+}
+
+
 // Close event handler.
 void drumkv1widget_lv2::closeEvent ( QCloseEvent *pCloseEvent )
 {
@@ -128,7 +141,7 @@ void drumkv1widget_lv2::port_event ( uint32_t port_index,
 		const drumkv1::ParamIndex index
 			= drumkv1::ParamIndex(port_index - drumkv1_lv2::ParamBase);
 		const float fValue = *(float *) buffer;
-		if (index < drumkv1::NUM_ELEMENT_PARAMS) {
+		if (index < drumkv1::NUM_ELEMENT_PARAMS && m_iShowEvent > 0) {
 			drumkv1_ui *pDrumkUi = ui_instance();
 			if (pDrumkUi) {
 				const int iCurrentNote = pDrumkUi->currentElement();
@@ -137,7 +150,8 @@ void drumkv1widget_lv2::port_event ( uint32_t port_index,
 					element->setParamValue(index, fValue);
 			}
 		}
-		setParamValue(index, fValue);
+		if (index >= drumkv1::NUM_ELEMENT_PARAMS || m_iShowEvent > 0)
+			setParamValue(index, fValue);
 	}
 }
 

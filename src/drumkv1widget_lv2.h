@@ -62,6 +62,9 @@ protected:
 	// Param port method.
 	void updateParam(drumkv1::ParamIndex index, float fValue) const;
 
+	// Show event handler.
+	void showEvent(QShowEvent *pShowEvent);
+
 	// Close event handler.
 	void closeEvent(QCloseEvent *pCloseEvent);
 
@@ -76,6 +79,8 @@ private:
 #ifdef CONFIG_LV2_UI_IDLE
 	bool m_bIdleClosed;
 #endif
+
+	int m_iShowEvent;
 };
 
 
