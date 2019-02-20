@@ -248,6 +248,7 @@ public:
 
 	void sampleOffsetTest();
 	void sampleOffsetSync(bool bSync);
+	void sampleOffsetRangeSync(bool bSync);
 
 	void updateEnvTimes();
 
