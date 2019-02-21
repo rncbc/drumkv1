@@ -245,7 +245,7 @@ class drumkv1_port3 : public drumkv1_port
 public:
 
 	drumkv1_port3(drumkv1_sched *sched, drumkv1::ParamIndex index)
-		: m_sched(sched), m_index(index), m_vsync(0.5f), m_xsync(false) {}
+		: m_sched(sched), m_index(index), m_vsync(0.0f), m_xsync(false) {}
 
 	void set_value(float value)
 	{
@@ -254,7 +254,7 @@ public:
 			const float v1 = m_vsync;
 			const float d1 = ::fabsf(v1 - value);
 			const float d2 = ::fabsf(v1 - v0) * d1;
-			m_xsync = (d2 < 0.5f);
+			m_xsync = (d2 < 0.001f);
 		}
 
 		drumkv1_port::set_value(value);
@@ -264,13 +264,7 @@ public:
 	}
 
 	void set_value_sync(float vsync, bool xsync)
-	{
-		m_vsync = vsync;
-		m_xsync = xsync;
-
-		if (!xsync) drumkv1_port::set_value(vsync);
-	}
-
+		{ m_vsync = vsync; m_xsync = xsync; }
 	float value_sync() const
 		{ return m_vsync; }
 	bool is_sync() const
@@ -1381,9 +1375,9 @@ void drumkv1_impl::setCurrentElement ( int key )
 					continue;
 				drumkv1_port *pParamPort = elem->element.paramPort(index);
 				if (pParamPort) {
+					pParamPort->set_port(m_params[i]);
 					pParamPort->set_value(elem->params[1][i]);
 					pParamPort->tick(drumkv1_port2::NSTEP);
-					pParamPort->set_port(m_params[i]);
 				}
 			}
 			resetElement(elem);
