@@ -1352,7 +1352,7 @@ void drumkv1_impl::removeElement ( int key )
 
 void drumkv1_impl::setCurrentElement ( int key )
 {
-	if (key == m_key0)
+	if (m_elem && key == m_key0)
 		return;
 
 	// swap old element parameter port values
