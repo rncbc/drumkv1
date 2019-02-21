@@ -373,7 +373,7 @@ void drumkv1widget_keybd::updatePixmap (void)
 void drumkv1widget_keybd::paintEvent ( QPaintEvent *pPaintEvent )
 {
 	QPainter painter(this);
-	
+
 	// Render the pixmap region...
 	const QRect& rect = pPaintEvent->rect();
 	painter.drawPixmap(rect, m_pixmap, rect);

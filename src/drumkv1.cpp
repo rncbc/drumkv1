@@ -1867,14 +1867,14 @@ void drumkv1_impl::directNoteOn ( int note, int vel )
 
 	const uint32_t i = m_direct_note;
 	if (i < MAX_DIRECT_NOTES) {
- 		const int ch1 = int(*m_def.channel);
+		const int ch1 = int(*m_def.channel);
 		const int chan = (ch1 > 0 ? ch1 - 1 : 0) & 0x0f;
 		direct_note& data = m_direct_notes[i];
 		data.status = (vel > 0 ? 0x90 : 0x80) | chan;
 		data.note = note;
 		data.vel = vel;
 		++m_direct_note;
- 	}
+	}
 }
 
 
