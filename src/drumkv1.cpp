@@ -158,7 +158,7 @@ class drumkv1_port
 {
 public:
 
-	drumkv1_port() : m_port(NULL), m_value(0.0f), m_vport(0.0f) {}
+	drumkv1_port() : m_port(NULL), m_value(0.0f), m_vport(0.0f), m_xport(false) {}
 
 	virtual ~drumkv1_port() {}
 
@@ -168,7 +168,7 @@ public:
 		{ return m_port; }
 
 	virtual void set_value(float value)
-		{ m_value = value; if (m_port) m_vport = *m_port; }
+		{ m_value = value; }
 
 	float value() const
 		{ return m_value; }
@@ -177,8 +177,20 @@ public:
 
 	virtual float tick(uint32_t /*nstep*/)
 	{
-		if (m_port && ::fabsf(*m_port - m_vport) > 0.001f)
-			set_value(*m_port);
+		if (m_port) {
+			const float d1
+				= ::fabsf(m_vport - *m_port);
+			if (d1 > 0.001f) {
+				if (!m_xport) {
+					const float d2
+						= ::fabsf(m_vport - m_value) * d1;
+					m_xport = (d2 < 0.001f);
+				}
+				m_vport = *m_port;
+				if (m_xport)
+					set_value(m_vport);
+			}
+		}
 
 		return m_value;
 	}
@@ -186,11 +198,15 @@ public:
 	float operator *()
 		{ return tick(1); }
 
+	void reset()
+		{ m_vport = (m_port ? *m_port : 0.0f); m_xport = false; }
+
 private:
 
 	float *m_port;
 	float  m_value;
 	float  m_vport;
+	bool   m_xport;
 };
 
 
@@ -1882,6 +1898,13 @@ void drumkv1_impl::directNoteOn ( int note, int vel )
 
 void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 {
+	for (int i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		drumkv1_port *pParamPort = elem->element.paramPort(index);
+		if (pParamPort)
+			pParamPort->reset();
+	}
+
 	elem->vol1.reset(
 		elem->out1.volume.value_ptr(),
 		elem->dca1.volume.value_ptr(),
@@ -1965,6 +1988,12 @@ void drumkv1_impl::stabilize (void)
 
 void drumkv1_impl::reset (void)
 {
+	for (int i = 0; i < drumkv1::NUM_PARAMS; ++i) {
+		drumkv1_port *pParamPort = paramPort(drumkv1::ParamIndex(i));
+		if (pParamPort)
+			pParamPort->reset();
+	}
+
 	// reset all elements
 	drumkv1_elem *elem = m_elem_list.next();
 	while (elem) {
