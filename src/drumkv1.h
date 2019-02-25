@@ -244,11 +244,11 @@ public:
 	void resetParamValues(bool bSwap);
 
 	void sampleReverseTest();
-	void sampleReverseSync(bool bSync);
+	void sampleReverseSync();
 
 	void sampleOffsetTest();
-	void sampleOffsetSync(bool bSync);
-	void sampleOffsetRangeSync(bool bSync);
+	void sampleOffsetSync();
+	void sampleOffsetRangeSync();
 
 	void updateEnvTimes();
 

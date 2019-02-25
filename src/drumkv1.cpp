@@ -245,44 +245,24 @@ class drumkv1_port3 : public drumkv1_port
 public:
 
 	drumkv1_port3(drumkv1_sched *sched, drumkv1::ParamIndex index)
-		: m_sched(sched), m_index(index), m_vsync(0.0f), m_xsync(false) {}
+		: m_sched(sched), m_index(index) {}
 
 	void set_value(float value)
 	{
-		if (!m_xsync) {
-			const float v0 = drumkv1_port::value();
-			const float v1 = m_vsync;
-			const float d1 = ::fabsf(v1 - value);
-			const float d2 = ::fabsf(v1 - v0) * d1;
-			m_xsync = (d2 < 0.001f);
-		}
-
 		drumkv1_port::set_value(value);
 
-		if (m_xsync)
-			m_sched->schedule(m_index);
+		m_sched->schedule(m_index);
 	}
 
-	void set_value_sync(float vsync, bool xsync)
+	void set_value_sync(float value)
 	{
-		m_vsync = vsync;
-		m_xsync = xsync;
-
-		drumkv1_port::set_value(vsync);
+		drumkv1_port::set_value(value);
 	}
-
-	float value_sync() const
-		{ return m_vsync; }
-	bool is_sync() const
-		{ return m_xsync; }
 
 private:
 
 	drumkv1_sched      *m_sched;
 	drumkv1::ParamIndex m_index;
-
-	float m_vsync;
-	bool  m_xsync;
 };
 
 
@@ -485,11 +465,11 @@ protected:
 		switch (drumkv1::ParamIndex(sid)) {
 		case drumkv1::GEN1_REVERSE:
 			element->setReverse(reverse.value() > 0.5f);
-			element->sampleReverseSync(true);
+			element->sampleReverseSync();
 			break;
 		case drumkv1::GEN1_OFFSET:
 			element->setOffset(offset.value() > 0.5f);
-			element->sampleOffsetSync(true);
+			element->sampleOffsetSync();
 			break;
 		case drumkv1::GEN1_OFFSET_1:
 			if (element->isOffset()) {
@@ -502,7 +482,7 @@ protected:
 				if (iOffsetStart >= iOffsetEnd)
 					iOffsetStart  = iOffsetEnd - 1;
 				element->setOffsetRange(iOffsetStart, iOffsetEnd);
-				element->sampleOffsetRangeSync(true);
+				element->sampleOffsetRangeSync();
 				element->updateEnvTimes();
 			}
 			break;
@@ -517,7 +497,7 @@ protected:
 				if (iOffsetStart >= iOffsetEnd)
 					iOffsetEnd = iOffsetStart + 1;
 				element->setOffsetRange(iOffsetStart, iOffsetEnd);
-				element->sampleOffsetRangeSync(true);
+				element->sampleOffsetRangeSync();
 				element->updateEnvTimes();
 			}
 			break;
@@ -991,11 +971,11 @@ public:
 	void reset();
 
 	void sampleReverseTest();
-	void sampleReverseSync(bool bSync);
+	void sampleReverseSync();
 
 	void sampleOffsetTest();
-	void sampleOffsetSync(bool bSync);
-	void sampleOffsetRangeSync(bool bSync);
+	void sampleOffsetSync();
+	void sampleOffsetRangeSync();
 
 	void updateEnvTimes();
 
@@ -2290,9 +2270,9 @@ void drumkv1_impl::sampleReverseTest (void)
 }
 
 
-void drumkv1_impl::sampleReverseSync ( bool bSync )
+void drumkv1_impl::sampleReverseSync (void)
 {
-	if (m_elem) m_elem->element.sampleReverseSync(bSync);
+	if (m_elem) m_elem->element.sampleReverseSync();
 }
 
 
@@ -2302,15 +2282,15 @@ void drumkv1_impl::sampleOffsetTest (void)
 }
 
 
-void drumkv1_impl::sampleOffsetSync ( bool bSync )
+void drumkv1_impl::sampleOffsetSync (void)
 {
-	if (m_elem) m_elem->element.sampleOffsetSync(bSync);
+	if (m_elem) m_elem->element.sampleOffsetSync();
 }
 
 
-void drumkv1_impl::sampleOffsetRangeSync ( bool bSync )
+void drumkv1_impl::sampleOffsetRangeSync (void)
 {
-	if (m_elem) m_elem->element.sampleOffsetRangeSync(bSync);
+	if (m_elem) m_elem->element.sampleOffsetRangeSync();
 }
 
 
@@ -2455,7 +2435,7 @@ drumkv1_sample *drumkv1::sample (void) const
 void drumkv1::setReverse ( bool bReverse, bool bSync )
 {
 	m_pImpl->setReverse(bReverse);
-	m_pImpl->sampleReverseSync(bSync);
+	m_pImpl->sampleReverseSync();
 
 	if (bSync) updateSample();
 }
@@ -2469,7 +2449,7 @@ bool drumkv1::isReverse (void) const
 void drumkv1::setOffset ( bool bOffset, bool bSync )
 {
 	m_pImpl->setOffset(bOffset);
-	m_pImpl->sampleOffsetSync(bSync);
+	m_pImpl->sampleOffsetSync();
 
 	if (bSync) updateSample();
 }
@@ -2484,7 +2464,7 @@ void drumkv1::setOffsetRange (
 	uint32_t iOffsetStart, uint32_t iOffsetEnd, bool bSync  )
 {
 	m_pImpl->setOffsetRange(iOffsetStart, iOffsetEnd);
-	m_pImpl->sampleOffsetRangeSync(bSync);
+	m_pImpl->sampleOffsetRangeSync();
 	m_pImpl->updateEnvTimes();
 
 	if (bSync) updateSample();
@@ -2797,7 +2777,7 @@ void drumkv1_element::sampleReverseTest (void)
 }
 
 
-void drumkv1_element::sampleReverseSync ( bool bSync )
+void drumkv1_element::sampleReverseSync (void)
 {
 	if (m_pElem == NULL)
 		return;
@@ -2805,7 +2785,7 @@ void drumkv1_element::sampleReverseSync ( bool bSync )
 	const bool bReverse
 		= m_pElem->gen1_sample.isReverse();
 
-	m_pElem->gen1.reverse.set_value_sync(bReverse ? 1.0f : 0.0f, bSync);
+	m_pElem->gen1.reverse.set_value_sync(bReverse ? 1.0f : 0.0f);
 }
 
 
@@ -2819,7 +2799,7 @@ void drumkv1_element::sampleOffsetTest (void)
 }
 
 
-void drumkv1_element::sampleOffsetSync ( bool bSync )
+void drumkv1_element::sampleOffsetSync (void)
 {
 	if (m_pElem == NULL)
 		return;
@@ -2827,11 +2807,11 @@ void drumkv1_element::sampleOffsetSync ( bool bSync )
 	const bool bOffset
 		= m_pElem->gen1_sample.isOffset();
 
-	m_pElem->gen1.offset.set_value_sync(bOffset ? 1.0f : 0.0f, bSync);
+	m_pElem->gen1.offset.set_value_sync(bOffset ? 1.0f : 0.0f);
 }
 
 
-void drumkv1_element::sampleOffsetRangeSync ( bool bSync )
+void drumkv1_element::sampleOffsetRangeSync (void)
 {
 	if (m_pElem == NULL)
 		return;
@@ -2850,8 +2830,8 @@ void drumkv1_element::sampleOffsetRangeSync ( bool bSync )
 		? float(iOffsetEnd) / float(iSampleLength)
 		: 1.0f);
 
-	m_pElem->gen1.offset_1.set_value_sync(offset_1, bSync);
-	m_pElem->gen1.offset_2.set_value_sync(offset_2, bSync);
+	m_pElem->gen1.offset_1.set_value_sync(offset_1);
+	m_pElem->gen1.offset_2.set_value_sync(offset_2);
 }
 
 
