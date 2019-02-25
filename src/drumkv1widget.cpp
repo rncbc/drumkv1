@@ -1446,6 +1446,8 @@ void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
 		m_ui.Gen1Sample->setOffsetStart(iOffsetStart);
 		m_ui.Gen1Sample->setOffsetEnd(iOffsetEnd);
 		m_ui.Gen1Sample->setOffset(bOffset);
+		updateParam(drumkv1::GEN1_OFFSET_1, float(iOffsetStart) / float(nframes));
+		updateParam(drumkv1::GEN1_OFFSET_2, float(iOffsetEnd) / float(nframes));
 		if (bDirty) {
 			QString sMessage;
 			if (bOffset) {
