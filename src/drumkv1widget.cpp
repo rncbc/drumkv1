@@ -1426,7 +1426,7 @@ void drumkv1widget::offsetRangeChanged (void)
 // Update offset change status.
 void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
 {
-	if (pSample) {
+	if (pSample && pSample->filename()) {
 		const bool     bOffset    = pSample->isOffset();
 		const uint32_t iOffsetStart = pSample->offsetStart();
 		const uint32_t iOffsetEnd = pSample->offsetEnd();
