@@ -351,9 +351,11 @@ void drumkv1_lv2::run ( uint32_t nframes )
 					if (property && value && property->type == m_forge.URID) {
 						const uint32_t key = ((const LV2_Atom_URID *) property)->body;
 						const LV2_URID type = value->type;
-						if ((key == m_urids.p101_sample_file ||
-							 key == m_urids.gen1_sample)
-							&& type == m_urids.atom_Path) {
+						if ((key == m_urids.p101_sample_file
+						#if 1//DRUMKV1_LV2_LEGACY
+							 || key == m_urids.gen1_sample
+						#endif
+							) && type == m_urids.atom_Path) {
 							if (m_schedule) {
 								drumkv1_lv2_worker_message mesg;
 								mesg.atom.type = key;
@@ -366,29 +368,33 @@ void drumkv1_lv2::run ( uint32_t nframes )
 							}
 						}
 						else
-						if ((key == m_urids.p102_offset_start ||
-							 key == m_urids.gen1_offset_start)
-							&& type == m_urids.atom_Int) {
+						if ((key == m_urids.p102_offset_start
+						#if 1//DRUMKV1_LV2_LEGACY
+							 || key == m_urids.gen1_offset_start
+						#endif
+							) && type == m_urids.atom_Int) {
 							drumkv1_sample *pSample = drumkv1::sample();
 							if (pSample) {
 								const uint32_t offset_start
 									= *(uint32_t *) LV2_ATOM_BODY_CONST(value);
 								const uint32_t offset_end
 									= pSample->offsetEnd();
-								setOffsetRange(offset_start, offset_end);
+								setOffsetRange(offset_start, offset_end, true);
 							}
 						}
 						else
-						if ((key == m_urids.p103_offset_end ||
-							 key == m_urids.gen1_offset_end)
-							&& type == m_urids.atom_Int) {
+						if ((key == m_urids.p103_offset_end
+						#if 1//DRUMKV1_LV2_LEGACY
+							 || key == m_urids.gen1_offset_end
+						#endif
+							) && type == m_urids.atom_Int) {
 							drumkv1_sample *pSample = drumkv1::sample();
 							if (pSample) {
 								const uint32_t offset_start
 									= pSample->offsetStart();
 								const uint32_t offset_end
 									= *(uint32_t *) LV2_ATOM_BODY_CONST(value);
-								setOffsetRange(offset_start, offset_end);
+								setOffsetRange(offset_start, offset_end, true);
 							}
 						}
 					}
