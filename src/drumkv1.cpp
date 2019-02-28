@@ -240,18 +240,43 @@ private:
 
 // parameter port (scheduled/detached)
 
+class drumkv1_port3_sched : public drumkv1_sched
+{
+public:
+
+	// ctor.
+	drumkv1_port3_sched(drumkv1 *pDrumk, int key)
+		: drumkv1_sched(pDrumk, drumkv1_sched::Controller), m_key(key) {}
+
+	// (pure) virtual prober.
+	virtual float probe(int sid) const = 0;
+
+	// key element accessor.
+	int key() const { return m_key; }
+
+protected:
+
+	// instance variables.
+	int m_key;
+};
+
+
 class drumkv1_port3 : public drumkv1_port
 {
 public:
 
-	drumkv1_port3(drumkv1_sched *sched, drumkv1::ParamIndex index)
+	drumkv1_port3(drumkv1_port3_sched *sched, drumkv1::ParamIndex index)
 		: m_sched(sched), m_index(index) {}
 
 	void set_value(float value)
 	{
+		const float v0 = m_sched->probe(m_index);
+		const float d0 = ::fabsf(value - v0);
+
 		drumkv1_port::set_value(value);
 
-		m_sched->schedule(m_index);
+		if (d0 > 0.001f)
+			m_sched->schedule(m_index);
 	}
 
 	void set_value_sync(float value)
@@ -261,8 +286,8 @@ public:
 
 private:
 
-	drumkv1_sched      *m_sched;
-	drumkv1::ParamIndex m_index;
+	drumkv1_port3_sched *m_sched;
+	drumkv1::ParamIndex  m_index;
 };
 
 
@@ -431,17 +456,16 @@ struct drumkv1_aux
 
 // dco
 
-class drumkv1_gen : public drumkv1_sched
+class drumkv1_gen : public drumkv1_port3_sched
 {
 public:
 
 	drumkv1_gen(drumkv1 *pDrumk, int key)
-		: drumkv1_sched(pDrumk, drumkv1_sched::Controller),
+		: drumkv1_port3_sched(pDrumk, key),
 			reverse(this, drumkv1::GEN1_REVERSE),
 			offset(this, drumkv1::GEN1_OFFSET),
 			offset_1(this, drumkv1::GEN1_OFFSET_1),
-			offset_2(this, drumkv1::GEN1_OFFSET_2),
-			m_key(key) {}
+			offset_2(this, drumkv1::GEN1_OFFSET_2) {}
 
 	drumkv1_port  sample;
 	drumkv1_port3 reverse;
@@ -457,10 +481,52 @@ public:
 
 protected:
 
+	float probe(int sid) const
+	{
+		float ret = 0.0f;
+		const int key = drumkv1_port3_sched::key();
+		drumkv1 *pDrumk = drumkv1_port3_sched::instance();
+		drumkv1_element *element = pDrumk->element(key);
+		if (element)
+		switch (drumkv1::ParamIndex(sid)) {
+		case drumkv1::GEN1_REVERSE:
+			ret = (element->isReverse() ? 1.0f : 0.0f);
+			break;
+		case drumkv1::GEN1_OFFSET:
+			ret = (element->isOffset() ? 1.0f : 0.0f);
+			break;
+		case drumkv1::GEN1_OFFSET_1: {
+			const uint32_t iSampleLength
+				= element->sample()->length();
+			const uint32_t iOffsetStart
+				= element->offsetStart();
+			ret = (iSampleLength > 0
+				? float(iOffsetStart) / float(iSampleLength)
+				: 0.0f);
+			break;
+		}
+		case drumkv1::GEN1_OFFSET_2: {
+			const uint32_t iSampleLength
+				= element->sample()->length();
+			const uint32_t iOffsetEnd
+				= element->offsetEnd();
+			ret = (iSampleLength > 0
+				? float(iOffsetEnd) / float(iSampleLength)
+				: 1.0f);
+			break;
+		}
+		default:
+			break;
+		}
+
+		return ret;
+	}
+
 	void process(int sid)
 	{
-		drumkv1 *pDrumk = drumkv1_sched::instance();
-		drumkv1_element *element = pDrumk->element(m_key);
+		const int key = drumkv1_port3_sched::key();
+		drumkv1 *pDrumk = drumkv1_port3_sched::instance();
+		drumkv1_element *element = pDrumk->element(key);
 		if (element)
 		switch (drumkv1::ParamIndex(sid)) {
 		case drumkv1::GEN1_REVERSE:
@@ -505,14 +571,9 @@ protected:
 			break;
 		}
 		// Sync current sample...
-		if (pDrumk->currentElement() == m_key)
+		if (pDrumk->currentElement() == key)
 			pDrumk->updateSample();
 	}
-
-private:
-
-	// Current element key(note)
-	int m_key;
 };
 
 
