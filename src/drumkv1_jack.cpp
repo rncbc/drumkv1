@@ -123,6 +123,15 @@ static int drumkv1_jack_buffer_size ( jack_nframes_t nframes, void *arg )
 }
 
 
+//----------------------------------------------------------------------
+// JACK on-shutdown callback.
+
+static void drumkv1_jack_on_shutdown ( void *arg )
+{
+	static_cast<drumkv1_jack *> (arg)->shutdown();
+}
+
+
 #ifdef CONFIG_JACK_SESSION
 
 #include <jack/session.h>
@@ -350,6 +359,9 @@ void drumkv1_jack::open ( const char *client_id )
 
 	jack_set_buffer_size_callback(m_client,
 		drumkv1_jack_buffer_size, this);
+
+	jack_on_shutdown(m_client,
+		drumkv1_jack_on_shutdown, this);
 
 	// set process callbacks...
 	::jack_set_process_callback(m_client,
@@ -614,6 +626,12 @@ void drumkv1_jack::updatePreset ( bool /*bDirty*/ )
 void drumkv1_jack::updateSample (void)
 {
 	// nothing to do here...
+}
+
+
+void drumkv1_jack::shutdown (void)
+{
+	QCoreApplication::quit();
 }
 
 
