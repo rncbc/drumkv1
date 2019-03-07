@@ -631,7 +631,9 @@ void drumkv1_jack::updateSample (void)
 
 void drumkv1_jack::shutdown (void)
 {
-	QCoreApplication::quit();
+	drumkv1_jack_application *pApp = drumkv1_jack_application::getInstance();
+	if (pApp)
+		pApp->shutdown();
 }
 
 
@@ -737,12 +739,17 @@ drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 	m_pSigtermNotifier = NULL;
 
 #endif	// !HAVE_SIGNAL_H
+
+	// Pseudo-singleton instance.
+	g_pInstance = this;
 }
 
 
 // Destructor.
 drumkv1_jack_application::~drumkv1_jack_application (void)
 {
+	g_pInstance = NULL;
+
 #ifdef HAVE_SIGNAL_H
 	if (m_pSigtermNotifier) delete m_pSigtermNotifier;
 #endif
@@ -800,6 +807,10 @@ bool drumkv1_jack_application::setup (void)
 		m_pApp->quit();
 		return false;
 	}
+
+	QObject::connect(this,
+		SIGNAL(shutdown_signal()),
+		SLOT(shutdown_slot()));
 
 	m_pDrumk = new drumkv1_jack();
 
@@ -987,6 +998,30 @@ void drumkv1_jack_application::sigterm_handler (void)
 }
 
 #endif	// HAVE_SIGNAL_H
+
+
+// JACK shutdown handlers.
+void drumkv1_jack_application::shutdown (void)
+{
+	emit shutdown_signal();
+}
+
+void drumkv1_jack_application::shutdown_slot (void)
+{
+	if (m_pWidget)
+		m_pWidget->close();
+	if (m_pApp)
+		m_pApp->quit();
+}
+
+
+// Pseudo-singleton instance.
+drumkv1_jack_application *drumkv1_jack_application::g_pInstance = NULL;
+
+drumkv1_jack_application *drumkv1_jack_application::getInstance (void)
+{
+	return g_pInstance;
+}
 
 
 //-------------------------------------------------------------------------
