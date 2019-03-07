@@ -637,6 +637,19 @@ void drumkv1_jack::shutdown (void)
 }
 
 
+void drumkv1_jack::shutdown_close (void)
+{
+	m_activated = false;
+
+	if (m_client) {
+		::jack_client_close(m_client);
+		m_client = NULL;
+	}
+
+	close();
+}
+
+
 //-------------------------------------------------------------------------
 // drumkv1_jack_application -- Singleton application instance.
 //
@@ -1006,11 +1019,18 @@ void drumkv1_jack_application::shutdown (void)
 	emit shutdown_signal();
 }
 
+
 void drumkv1_jack_application::shutdown_slot (void)
 {
+	bool bQuit = true;
+
+	if (m_pDrumk)
+		m_pDrumk->shutdown_close();
+
 	if (m_pWidget)
-		m_pWidget->close();
-	if (m_pApp)
+		bQuit = m_pWidget->queryClose();
+
+	if (m_pApp && bQuit)
 		m_pApp->quit();
 }
 
