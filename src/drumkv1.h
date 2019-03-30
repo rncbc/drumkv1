@@ -80,7 +80,8 @@ public:
 	void setOffset(bool bOffset, bool bSync = false);
 	bool isOffset() const;
 
-	void setOffsetRange(uint32_t iOffsetStart, uint32_t iOffsetEnd);
+	void setOffsetRange(
+		uint32_t iOffsetStart, uint32_t iOffsetEnd, bool bSync = false);
 	uint32_t offsetStart() const;
 	uint32_t offsetEnd() const;
 
@@ -247,7 +248,7 @@ public:
 
 	void sampleOffsetTest();
 	void sampleOffsetSync();
-	void sampleOffsetRangeSync();
+	void sampleOffsetRangeSync(bool bSync);
 
 	void updateEnvTimes();
 
