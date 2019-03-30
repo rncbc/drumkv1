@@ -2530,14 +2530,13 @@ bool drumkv1::isOffset (void) const
 }
 
 
-void drumkv1::setOffsetRange (
-	uint32_t iOffsetStart, uint32_t iOffsetEnd, bool bSync  )
+void drumkv1::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
 	m_pImpl->setOffsetRange(iOffsetStart, iOffsetEnd);
 	m_pImpl->sampleOffsetRangeSync();
 	m_pImpl->updateEnvTimes();
 
-	if (bSync) updateSample();
+	updateSample();
 }
 
 

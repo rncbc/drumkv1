@@ -379,7 +379,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 									= *(uint32_t *) LV2_ATOM_BODY_CONST(value);
 								const uint32_t offset_end
 									= pSample->offsetEnd();
-								setOffsetRange(offset_start, offset_end, true);
+								setOffsetRange(offset_start, offset_end);
 							}
 						}
 						else
@@ -394,7 +394,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 									= pSample->offsetStart();
 								const uint32_t offset_end
 									= *(uint32_t *) LV2_ATOM_BODY_CONST(value);
-								setOffsetRange(offset_start, offset_end, true);
+								setOffsetRange(offset_start, offset_end);
 							}
 						}
 					}

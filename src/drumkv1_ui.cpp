@@ -120,7 +120,7 @@ bool drumkv1_ui::isOffset (void) const
 
 void drumkv1_ui::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
-	m_pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd, true);
+	m_pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
 }
 
 uint32_t drumkv1_ui::offsetStart (void) const
