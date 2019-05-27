@@ -424,6 +424,7 @@ bool drumkv1_param::loadPreset (
 
 	file.close();
 
+	pDrumk->stabilize();
 	pDrumk->reset();
 	pDrumk->running(running);
 
