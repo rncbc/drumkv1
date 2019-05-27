@@ -731,6 +731,9 @@ void drumkv1widget::updateParamEx (
 	case drumkv1::DCF1_SLOPE:
 		m_ui.Dcf1TypeKnob->setEnabled(int(fValue) != 3); // !Formant
 		break;
+	case drumkv1::LFO1_SHAPE:
+		m_ui.Lfo1Wave->setWaveShape(fValue);
+		break;
 	case drumkv1::DEF1_VELOCITY: {
 		const int vel = int(79.375f * fValue + 47.625f) & 0x7f;
 		m_ui.Elements->setDirectNoteOnVelocity(vel);
