@@ -1730,23 +1730,23 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				// generate
 				pv->gen1.start();
 				// frequencies
-				const float tuning1
+				const float gen1_tuning
 					= *elem->gen1.coarse * COARSE_SCALE
 					+ *elem->gen1.fine * FINE_SCALE;
-				pv->gen1_freq = m_freqs[key] * drumkv1_freq2(tuning1);
+				pv->gen1_freq = m_freqs[key] * drumkv1_freq2(gen1_tuning);
 				// filters
-				const int type1 = int(*elem->dcf1.type);
-				pv->dcf11.reset(drumkv1_filter1::Type(type1));
-				pv->dcf12.reset(drumkv1_filter1::Type(type1));
-				pv->dcf13.reset(drumkv1_filter2::Type(type1));
-				pv->dcf14.reset(drumkv1_filter2::Type(type1));
-				pv->dcf15.reset(drumkv1_filter3::Type(type1));
-				pv->dcf16.reset(drumkv1_filter3::Type(type1));
+				const int dcf1_type = int(*elem->dcf1.type);
+				pv->dcf11.reset(drumkv1_filter1::Type(dcf1_type));
+				pv->dcf12.reset(drumkv1_filter1::Type(dcf1_type));
+				pv->dcf13.reset(drumkv1_filter2::Type(dcf1_type));
+				pv->dcf14.reset(drumkv1_filter2::Type(dcf1_type));
+				pv->dcf15.reset(drumkv1_filter3::Type(dcf1_type));
+				pv->dcf16.reset(drumkv1_filter3::Type(dcf1_type));
 				// formant filters
-				const float cutoff1 = *elem->dcf1.cutoff;
-				const float reso1 = *elem->dcf1.reso;
-				pv->dcf17.reset_filters(cutoff1, reso1);
-				pv->dcf18.reset_filters(cutoff1, reso1);
+				const float dcf1_cutoff = *elem->dcf1.cutoff;
+				const float dcf1_reso = *elem->dcf1.reso;
+				pv->dcf17.reset_filters(dcf1_cutoff, dcf1_reso);
+				pv->dcf18.reset_filters(dcf1_cutoff, dcf1_reso);
 				// envelopes
 				elem->dcf1.env.start(&pv->dcf1_env);
 				elem->lfo1.env.start(&pv->lfo1_env);
