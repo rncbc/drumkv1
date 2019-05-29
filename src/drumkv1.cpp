@@ -435,23 +435,6 @@ struct drumkv1_ctl
 };
 
 
-// internal control
-
-struct drumkv1_aux
-{
-	drumkv1_aux() { reset(); }
-
-	void reset()
-	{
-		panning = 0.0f;
-		volume = 1.0f;
-	}
-
-	float panning;
-	float volume;
-};
-
-
 // dco
 
 class drumkv1_gen : public drumkv1_port3_sched
@@ -711,26 +694,47 @@ struct drumkv1_dyn
 };
 
 
-// panning smoother (3 parameters)
+// balance smoother (1 parameters)
 
-class drumkv1_pan : public drumkv1_ramp3
+class drumkv1_bal1 : public drumkv1_ramp1
 {
 public:
 
-	drumkv1_pan() : drumkv1_ramp3(2) {}
+	drumkv1_bal1() : drumkv1_ramp1(2) {}
 
 protected:
 
 	float evaluate(uint16_t i)
 	{
-		drumkv1_ramp3::update();
+		drumkv1_ramp1::update();
 
-		const float wpan = 0.25f * M_PI
+		const float wbal = 0.25f * M_PI
+			* (1.0f + m_param1_v);
+
+		return M_SQRT2 * (i & 1 ? ::sinf(wbal) : ::cosf(wbal));
+	}
+};
+
+
+// balance smoother (2 parameters)
+
+class drumkv1_bal2 : public drumkv1_ramp2
+{
+public:
+
+	drumkv1_bal2() : drumkv1_ramp2(2) {}
+
+protected:
+
+	float evaluate(uint16_t i)
+	{
+		drumkv1_ramp2::update();
+
+		const float wbal = 0.25f * M_PI
 			* (1.0f + m_param1_v)
-			* (1.0f + m_param2_v)
-			* (1.0f + m_param3_v);
+			* (1.0f + m_param2_v);
 
-		return M_SQRT2 * (i == 0 ? ::cosf(wpan) : ::sinf(wpan));
+		return M_SQRT2 * (i & 1 ? ::sinf(wbal) : ::cosf(wbal));
 	}
 };
 
@@ -805,10 +809,9 @@ public:
 	drumkv1_dca    dca1;
 	drumkv1_out    out1;
 
-	drumkv1_aux    aux1;
 	drumkv1_ramp1  wid1;
-	drumkv1_pan    pan1;
-	drumkv1_ramp4  vol1;
+	drumkv1_bal2   pan1;
+	drumkv1_ramp3  vol1;
 
 	float params[3][drumkv1::NUM_ELEMENT_PARAMS];
 
@@ -924,6 +927,12 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 	drumkv1_env::State lfo1_env;
 
 	drumkv1_pre dca1_pre;
+
+	float out1_panning;
+	float out1_volume;
+
+	drumkv1_bal1  out1_pan;						// output panning
+	drumkv1_ramp1 out1_vol;						// output volume
 };
 
 
@@ -1563,8 +1572,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 			m_elem->vol1.reset(
 				m_elem->out1.volume.value_ptr(),
 				m_elem->dca1.volume.value_ptr(),
-				&m_ctl.volume,
-				&m_elem->aux1.volume);
+				&m_ctl.volume);
 			break;
 		case drumkv1::OUT1_WIDTH:
 			m_elem->wid1.reset(
@@ -1573,8 +1581,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 		case drumkv1::OUT1_PANNING:
 			m_elem->pan1.reset(
 				m_elem->out1.panning.value_ptr(),
-				&m_ctl.panning,
-				&m_elem->aux1.panning);
+				&m_ctl.panning);
 			break;
 		default:
 			break;
@@ -1757,6 +1764,12 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				const float lfo1_freq
 					= get_bpm(*elem->lfo1.bpm) / (60.01f - *elem->lfo1.rate * 60.0f);
 				pv->lfo1_sample = pv->lfo1.start(lfo1_pshift, lfo1_freq);
+				// panning
+				pv->out1_panning = 0.0f;
+				pv->out1_pan.reset(&pv->out1_panning);
+				// volume
+				pv->out1_volume = 0.0f;
+				pv->out1_vol.reset(&pv->out1_volume);
 				// allocated
 				m_notes[key] = pv;
 				// group management
@@ -1896,12 +1909,6 @@ void drumkv1_impl::allNotesOff (void)
 		pv = m_play_list.next();
 	}
 
-	drumkv1_elem *elem = m_elem_list.next();
-	while (elem) {
-		elem->aux1.reset();
-		elem = elem->next();
-	}
-
 	m_direct_note = 0;
 }
 
@@ -1932,12 +1939,10 @@ void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 	elem->vol1.reset(
 		elem->out1.volume.value_ptr(),
 		elem->dca1.volume.value_ptr(),
-		&m_ctl.volume,
-		&elem->aux1.volume);
+		&m_ctl.volume);
 	elem->pan1.reset(
 		elem->out1.panning.value_ptr(),
-		&m_ctl.panning,
-		&elem->aux1.panning);
+		&m_ctl.panning);
 	elem->wid1.reset(
 		elem->out1.width.value_ptr());
 }
@@ -2206,14 +2211,17 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float mid1 = 0.5f * (gen1 + gen2);
 				const float sid1 = 0.5f * (gen1 - gen2);
 				const float vol1 = vel1 * elem->vol1.value(j)
-					* pv->dca1_env.tick();
+					* pv->dca1_env.tick()
+					* pv->out1_vol.value(j);
 
 				// outputs
 
-				const float out1
-					= vol1 * (mid1 + sid1 * wid1) * elem->pan1.value(j, 0);
-				const float out2
-					= vol1 * (mid1 - sid1 * wid1) * elem->pan1.value(j, 1);
+				const float out1 = vol1 * (mid1 + sid1 * wid1)
+					* elem->pan1.value(j, 0)
+					* pv->out1_pan.value(j, 0);
+				const float out2 = vol1 * (mid1 - sid1 * wid1)
+					* elem->pan1.value(j, 1)
+					* pv->out1_pan.value(j, 1);
 
 				for (k = 0; k < m_nchannels; ++k) {
 					const float dry = (k & 1 ? out2 : out1);
@@ -2223,8 +2231,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				}
 
 				if (j == 0) {
-					elem->aux1.panning = lfo1 * *elem->lfo1.panning;
-					elem->aux1.volume  = lfo1 * *elem->lfo1.volume + 1.0f;
+					pv->out1_panning = lfo1 * *elem->lfo1.panning;
+					pv->out1_volume  = lfo1 * *elem->lfo1.volume + 1.0f;
 				}
 			}
 
@@ -2233,6 +2241,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			// voice ramps countdown
 
 			pv->dca1_pre.process(ngen);
+			pv->out1_pan.process(ngen);
+			pv->out1_vol.process(ngen);
 
 			// envelope countdowns
 
