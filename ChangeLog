@@ -6,6 +6,8 @@ ChangeLog
 
 GIT HEAD
 
+- Dropped LFO Sync parameter as being irrelevant across
+  element voicings. (EXPERIMENTAL) 
 - Fixed all LFO Panning and Volume modulation, now being
   correctly isolated on a per voice basis. (EXPERIMENTAL)
 - Fixed initial LFO wave shapes on LV2 plug-in UI.

@@ -497,16 +497,6 @@
              </widget>
             </item>
             <item>
-             <widget class="drumkv1widget_check" name="Lfo1SyncKnob">
-              <property name="toolTip">
-               <string>LFO Sync</string>
-              </property>
-              <property name="text">
-               <string>Sync</string>
-              </property>
-             </widget>
-            </item>
-            <item>
              <spacer>
               <property name="orientation">
                <enum>Qt::Horizontal</enum>

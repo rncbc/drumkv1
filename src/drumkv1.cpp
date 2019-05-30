@@ -580,7 +580,6 @@ struct drumkv1_lfo
 	drumkv1_port  width;
 	drumkv1_port2 bpm;
 	drumkv1_port2 rate;
-	drumkv1_port  sync;
 	drumkv1_port2 sweep;
 	drumkv1_port2 pitch;
 	drumkv1_port2 cutoff;
@@ -1146,7 +1145,6 @@ private:
 	drumkv1_fx_comp    *m_comp;
 
 	drumkv1_reverb m_reverb;
-	drumkv1_phasor m_phasor;
 
 	// process direct note on/off...
 	volatile uint16_t m_direct_note;
@@ -1759,11 +1757,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				elem->lfo1.env.start(&pv->lfo1_env);
 				elem->dca1.env.start(&pv->dca1_env);
 				// lfos
-				const float lfo1_pshift
-					= (*elem->lfo1.sync > 0.0f ? m_phasor.pshift() : 0.0f);
-				const float lfo1_freq
-					= get_bpm(*elem->lfo1.bpm) / (60.01f - *elem->lfo1.rate * 60.0f);
-				pv->lfo1_sample = pv->lfo1.start(lfo1_pshift, lfo1_freq);
+				pv->lfo1_sample = pv->lfo1.start();
 				// panning
 				pv->out1_panning = 0.0f;
 				pv->out1_pan.reset(&pv->out1_panning);
@@ -2316,8 +2310,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 	}
 
 	// post-processing
-	m_phasor.process(nframes);
-
 	elem = m_elem_list.next();
 	while (elem) {
 		elem->dca1.volume.tick(nframes);
@@ -2772,7 +2764,6 @@ drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::LFO1_WIDTH:    pParamPort = &m_pElem->lfo1.width;      break;
 	case drumkv1::LFO1_BPM:      pParamPort = &m_pElem->lfo1.bpm;        break;
 	case drumkv1::LFO1_RATE:     pParamPort = &m_pElem->lfo1.rate;       break;
-	case drumkv1::LFO1_SYNC:     pParamPort = &m_pElem->lfo1.sync;       break;
 	case drumkv1::LFO1_SWEEP:    pParamPort = &m_pElem->lfo1.sweep;      break;
 	case drumkv1::LFO1_PITCH:    pParamPort = &m_pElem->lfo1.pitch;      break;
 	case drumkv1::LFO1_CUTOFF:   pParamPort = &m_pElem->lfo1.cutoff;     break;
