@@ -4,13 +4,13 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-GIT HEAD
+0.9.8  2019-06-06  A Spring'19 Release.
 
 - Improved slew-rate to DCF Formant coefficient updates.
 - Dropped LFO Sync parameter as being irrelevant across
-  element voicings. (EXPERIMENTAL) 
+  element voicings.
 - Fixed all LFO Panning and Volume modulation, now being
-  correctly isolated on a per voice basis. (EXPERIMENTAL)
+  correctly isolated on a per voice basis.
 - Fixed initial LFO wave shapes on LV2 plug-in UI.
 - Minor update to Debian packaging control file.
 
