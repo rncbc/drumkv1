@@ -4,6 +4,11 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
+GIT HEAD
+
+- New DCF and LFO Enabled parameters. (EXPERIMENTAL)
+
+
 0.9.8  2019-06-06  A Spring'19 Release.
 
 - Improved slew-rate to DCF Formant coefficient updates.

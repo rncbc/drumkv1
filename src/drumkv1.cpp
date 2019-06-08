@@ -562,6 +562,7 @@ protected:
 
 struct drumkv1_dcf
 {
+	drumkv1_port  enabled;
 	drumkv1_port2 cutoff;
 	drumkv1_port2 reso;
 	drumkv1_port  type;
@@ -576,6 +577,7 @@ struct drumkv1_dcf
 
 struct drumkv1_lfo
 {
+	drumkv1_port  enabled;
 	drumkv1_port  shape;
 	drumkv1_port  width;
 	drumkv1_port2 bpm;
@@ -2098,8 +2100,10 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			elem->gen1.envtime0  = *elem->gen1.envtime;
 			elem->updateEnvTimes(m_srate);
 		}
-		elem->lfo1_wave.reset_test(
-			drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
+		if (*elem->lfo1.enabled > 0.0f) {
+			elem->lfo1_wave.reset_test(
+				drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
+		}
 		elem = elem->next();
 	}
 
@@ -2114,11 +2118,15 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		// controls
 		drumkv1_elem *elem = pv->elem;
 
-		const float lfo1_freq
-			= get_bpm(*elem->lfo1.bpm) / (60.01f - *elem->lfo1.rate * 60.0f);
+		const bool lfo1_enabled = (*elem->lfo1.enabled > 0.0f);
 
-		const float modwheel1
-			= m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch;
+		const float lfo1_freq = (lfo1_enabled
+			? get_bpm(*elem->lfo1.bpm) / (60.01f - *elem->lfo1.rate * 60.0f) : 0.0f);
+
+		const float modwheel1 = (lfo1_enabled
+			? m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch : 0.0f);
+
+		const bool dcf1_enabled = (*elem->dcf1.enabled > 0.0f);
 
 		const float fxsend1	= *elem->out1.fxsend * *elem->out1.fxsend;
 
@@ -2158,8 +2166,10 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 				// generators
 
-				const float lfo1_env = pv->lfo1_env.tick();
-				const float lfo1 = pv->lfo1_sample * lfo1_env;
+				const float lfo1_env
+					= (lfo1_enabled ? pv->lfo1_env.tick() : 0.0f);
+				const float lfo1
+					= (lfo1_enabled ? pv->lfo1_sample * lfo1_env : 0.0f);
 
 				pv->gen1.next(pv->gen1_freq
 					* (m_ctl.pitchbend + modwheel1 * lfo1));
@@ -2167,36 +2177,39 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				float gen1 = pv->gen1.value(k1);
 				float gen2 = pv->gen1.value(k2);
 
-				pv->lfo1_sample = pv->lfo1.sample(lfo1_freq
-					* (1.0f + SWEEP_SCALE * *elem->lfo1.sweep * lfo1_env));
+				if (lfo1_enabled) {
+					pv->lfo1_sample = pv->lfo1.sample(lfo1_freq
+						* (1.0f + SWEEP_SCALE * *elem->lfo1.sweep * lfo1_env));
+				}
 
 				// filters
 
-				const float env1 = 0.5f * (1.0f + vel1
-					* *elem->dcf1.envelope * pv->dcf1_env.tick());
-				const float cutoff1 = drumkv1_sigmoid_1(*elem->dcf1.cutoff
-					* env1 * (1.0f + *elem->lfo1.cutoff * lfo1));
-				const float reso1 = drumkv1_sigmoid_1(*elem->dcf1.reso
-					* env1 * (1.0f + *elem->lfo1.reso * lfo1));
-
-				switch (int(*elem->dcf1.slope)) {
-				case 3: // Formant
-					gen1 = pv->dcf17.output(gen1, cutoff1, reso1);
-					gen2 = pv->dcf18.output(gen2, cutoff1, reso1);
-					break;
-				case 2: // Biquad
-					gen1 = pv->dcf15.output(gen1, cutoff1, reso1);
-					gen2 = pv->dcf16.output(gen2, cutoff1, reso1);
-					break;
-				case 1: // 24db/octave
-					gen1 = pv->dcf13.output(gen1, cutoff1, reso1);
-					gen2 = pv->dcf14.output(gen2, cutoff1, reso1);
-					break;
-				case 0: // 12db/octave
-				default:
-					gen1 = pv->dcf11.output(gen1, cutoff1, reso1);
-					gen2 = pv->dcf12.output(gen2, cutoff1, reso1);
-					break;
+				if (dcf1_enabled) {
+					const float env1 = 0.5f * (1.0f + vel1
+						* *elem->dcf1.envelope * pv->dcf1_env.tick());
+					const float cutoff1 = drumkv1_sigmoid_1(*elem->dcf1.cutoff
+						* env1 * (1.0f + *elem->lfo1.cutoff * lfo1));
+					const float reso1 = drumkv1_sigmoid_1(*elem->dcf1.reso
+						* env1 * (1.0f + *elem->lfo1.reso * lfo1));
+					switch (int(*elem->dcf1.slope)) {
+					case 3: // Formant
+						gen1 = pv->dcf17.output(gen1, cutoff1, reso1);
+						gen2 = pv->dcf18.output(gen2, cutoff1, reso1);
+						break;
+					case 2: // Biquad
+						gen1 = pv->dcf15.output(gen1, cutoff1, reso1);
+						gen2 = pv->dcf16.output(gen2, cutoff1, reso1);
+						break;
+					case 1: // 24db/octave
+						gen1 = pv->dcf13.output(gen1, cutoff1, reso1);
+						gen2 = pv->dcf14.output(gen2, cutoff1, reso1);
+						break;
+					case 0: // 12db/octave
+					default:
+						gen1 = pv->dcf11.output(gen1, cutoff1, reso1);
+						gen2 = pv->dcf12.output(gen2, cutoff1, reso1);
+						break;
+					}
 				}
 
 				// volumes
@@ -2751,6 +2764,7 @@ drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::GEN1_COARSE:   pParamPort = &m_pElem->gen1.coarse;     break;
 	case drumkv1::GEN1_FINE:     pParamPort = &m_pElem->gen1.fine;       break;
 	case drumkv1::GEN1_ENVTIME:  pParamPort = &m_pElem->gen1.envtime;    break;
+	case drumkv1::DCF1_ENABLED:  pParamPort = &m_pElem->dcf1.enabled;    break;
 	case drumkv1::DCF1_CUTOFF:   pParamPort = &m_pElem->dcf1.cutoff;     break;
 	case drumkv1::DCF1_RESO:     pParamPort = &m_pElem->dcf1.reso;       break;
 	case drumkv1::DCF1_TYPE:     pParamPort = &m_pElem->dcf1.type;       break;
@@ -2760,6 +2774,7 @@ drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::DCF1_DECAY1:   pParamPort = &m_pElem->dcf1.env.decay1; break;
 	case drumkv1::DCF1_LEVEL2:   pParamPort = &m_pElem->dcf1.env.level2; break;
 	case drumkv1::DCF1_DECAY2:   pParamPort = &m_pElem->dcf1.env.decay2; break;
+	case drumkv1::LFO1_ENABLED:  pParamPort = &m_pElem->lfo1.enabled;    break;
 	case drumkv1::LFO1_SHAPE:    pParamPort = &m_pElem->lfo1.shape;      break;
 	case drumkv1::LFO1_WIDTH:    pParamPort = &m_pElem->lfo1.width;      break;
 	case drumkv1::LFO1_BPM:      pParamPort = &m_pElem->lfo1.bpm;        break;

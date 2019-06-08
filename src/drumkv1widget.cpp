@@ -243,6 +243,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::GEN1_ENVTIME, m_ui.Gen1EnvTimeKnob);
 
 	// DCF1
+	setParamKnob(drumkv1::DCF1_ENABLED,	 m_ui.Dcf1GroupBox->param());
 	setParamKnob(drumkv1::DCF1_CUTOFF,   m_ui.Dcf1CutoffKnob);
 	setParamKnob(drumkv1::DCF1_RESO,     m_ui.Dcf1ResoKnob);
 	setParamKnob(drumkv1::DCF1_TYPE,     m_ui.Dcf1TypeKnob);
@@ -303,6 +304,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Dcf1Env, SLOT(setDecay2(float)));
 
 	// LFO1
+	setParamKnob(drumkv1::LFO1_ENABLED,	m_ui.Lfo1GroupBox->param());
 	setParamKnob(drumkv1::LFO1_SHAPE,   m_ui.Lfo1ShapeKnob);
 	setParamKnob(drumkv1::LFO1_WIDTH,   m_ui.Lfo1WidthKnob);
 	setParamKnob(drumkv1::LFO1_BPM,     m_ui.Lfo1BpmKnob);
@@ -1489,11 +1491,15 @@ void drumkv1widget::activateParamKnobs ( bool bEnabled )
 void drumkv1widget::activateParamKnobsGroupBox (
 	QGroupBox *pGroupBox, bool bEnabled )
 {
-	const QList<QWidget *>& children
-		= pGroupBox->findChildren<QWidget *> ();
-	QListIterator<QWidget *> iter(children);
-	while (iter.hasNext())
-		iter.next()->setEnabled(bEnabled);
+	if (pGroupBox->isCheckable()) {
+		pGroupBox->setEnabled(bEnabled);
+	} else {
+		const QList<QWidget *>& children
+			= pGroupBox->findChildren<QWidget *> ();
+		QListIterator<QWidget *> iter(children);
+		while (iter.hasNext())
+			iter.next()->setEnabled(bEnabled);
+	}
 }
 
 

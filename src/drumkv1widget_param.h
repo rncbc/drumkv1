@@ -26,6 +26,7 @@
 #include <QDial>
 #include <QDoubleSpinBox>
 #include <QButtonGroup>
+#include <QGroupBox>
 
 
 // Forward declarations.
@@ -405,6 +406,37 @@ private:
 	QCheckBox *m_pCheckBox;
 
 	Qt::Alignment m_alignment;
+};
+
+
+//-------------------------------------------------------------------------
+// drumkv1widget_group - Custom checkable group-box widget.
+
+class drumkv1widget_group : public QGroupBox
+{
+	Q_OBJECT
+
+public:
+
+	// Constructor.
+	drumkv1widget_group(QWidget *pParent = 0);
+
+	// Desstructor.
+	~drumkv1widget_group();
+
+	// Accessors.
+	drumkv1widget_param *param() const;
+
+protected slots:
+
+	// Change slot.
+	void paramValueChanged(float);
+	void groupBoxValueChanged(bool);
+
+private:
+
+	// Widget members.
+	drumkv1widget_param *m_pParam;
 };
 
 

@@ -57,6 +57,7 @@ struct ParamInfo {
 	{ "GEN1_COARSE",   PARAM_FLOAT,   0.0f,  -4.0f,   4.0f }, // GEN1 Coarse
 	{ "GEN1_FINE",     PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // GEN1 Fine
 	{ "GEN1_ENVTIME",  PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // GEN1 Env.Time
+	{ "DCF1_ENABLED",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }, // DCF1 Enabled
 	{ "DCF1_CUTOFF",   PARAM_FLOAT,   1.0f,   0.0f,   1.0f }, // DCF1 Cutoff
 	{ "DCF1_RESO",     PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // DCF1 Resonance
 	{ "DCF1_TYPE",     PARAM_INT,     0.0f,   0.0f,   3.0f }, // DCF1 Type
@@ -66,6 +67,7 @@ struct ParamInfo {
 	{ "DCF1_DECAY1",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCF1 Decay 1
 	{ "DCF1_LEVEL2",   PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // DCF1 Level 2
 	{ "DCF1_DECAY2",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCF1 Decay 2
+	{ "LFO1_ENABLED",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }, // LFO1 Enabled
 	{ "LFO1_SHAPE",    PARAM_INT,     1.0f,   0.0f,   4.0f }, // LFO1 Wave Shape
 	{ "LFO1_WIDTH",    PARAM_FLOAT,   1.0f,   0.0f,   1.0f }, // LFO1 Wave Width
 	{ "LFO1_BPM",      PARAM_FLOAT, 180.0f,   0.0f, 360.0f }, // LFO1 BPM
