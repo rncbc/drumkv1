@@ -425,6 +425,9 @@ public:
 	~drumkv1widget_group();
 
 	// Accessors.
+	void setToolTip(const QString& sToolTip);
+	QString toolTip() const;
+
 	drumkv1widget_param *param() const;
 
 protected slots:

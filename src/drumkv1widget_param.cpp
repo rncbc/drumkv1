@@ -960,6 +960,7 @@ drumkv1widget_group::drumkv1widget_group ( QWidget *pParent )
 	QGroupBox::setStyle(drumkv1widget_param_style::getRef());
 
 	m_pParam = new drumkv1widget_param(this);
+	m_pParam->setToolTip(QGroupBox::toolTip());
 
 	QObject::connect(m_pParam,
 		 SIGNAL(valueChanged(float)),
@@ -981,6 +982,18 @@ drumkv1widget_group::~drumkv1widget_group (void)
 
 
 // Accessors.
+void drumkv1widget_group::setToolTip ( const QString& sToolTip )
+{
+	m_pParam->setToolTip(sToolTip);
+}
+
+
+QString drumkv1widget_group::toolTip (void) const
+{
+	return m_pParam->toolTip();
+}
+
+
 drumkv1widget_param *drumkv1widget_group::param (void) const
 {
 	return m_pParam;
