@@ -272,7 +272,7 @@
        <item row="1" column="0" rowspan="2" colspan="5">
         <widget class="drumkv1widget_group" name="Dcf1GroupBox">
          <property name="toolTip">
-          <string>DCF1 Enabled</string>
+          <string>DCF Enabled</string>
          </property>
          <property name="title">
           <string>DCF</string>
@@ -399,7 +399,7 @@
        <item row="1" column="5" rowspan="2" colspan="8">
         <widget class="drumkv1widget_group" name="Lfo1GroupBox">
          <property name="toolTip">
-          <string>LFO1 Enabled</string>
+          <string>LFO Enabled</string>
          </property>
          <property name="title">
           <string>LFO</string>
@@ -613,9 +613,15 @@
         </widget>
        </item>
        <item row="3" column="0" colspan="5">
-        <widget class="QGroupBox" name="Dca1GroupBox">
+        <widget class="drumkv1widget_group" name="Dca1GroupBox">
+         <property name="toolTip">
+          <string>DCA Enabled</string>
+         </property>
          <property name="title">
           <string>DCA</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout">
           <item>

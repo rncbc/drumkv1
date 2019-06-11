@@ -243,7 +243,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::GEN1_ENVTIME, m_ui.Gen1EnvTimeKnob);
 
 	// DCF1
-	setParamKnob(drumkv1::DCF1_ENABLED,	 m_ui.Dcf1GroupBox->param());
+	setParamKnob(drumkv1::DCF1_ENABLED,  m_ui.Dcf1GroupBox->param());
 	setParamKnob(drumkv1::DCF1_CUTOFF,   m_ui.Dcf1CutoffKnob);
 	setParamKnob(drumkv1::DCF1_RESO,     m_ui.Dcf1ResoKnob);
 	setParamKnob(drumkv1::DCF1_TYPE,     m_ui.Dcf1TypeKnob);
@@ -304,7 +304,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Dcf1Env, SLOT(setDecay2(float)));
 
 	// LFO1
-	setParamKnob(drumkv1::LFO1_ENABLED,	m_ui.Lfo1GroupBox->param());
+	setParamKnob(drumkv1::LFO1_ENABLED, m_ui.Lfo1GroupBox->param());
 	setParamKnob(drumkv1::LFO1_SHAPE,   m_ui.Lfo1ShapeKnob);
 	setParamKnob(drumkv1::LFO1_WIDTH,   m_ui.Lfo1WidthKnob);
 	setParamKnob(drumkv1::LFO1_BPM,     m_ui.Lfo1BpmKnob);
@@ -362,11 +362,12 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Lfo1Env, SLOT(setDecay2(float)));
 
 	// DCA1
-	setParamKnob(drumkv1::DCA1_VOLUME, m_ui.Dca1VolumeKnob);
-	setParamKnob(drumkv1::DCA1_ATTACK, m_ui.Dca1AttackKnob);
-	setParamKnob(drumkv1::DCA1_DECAY1, m_ui.Dca1Decay1Knob);
-	setParamKnob(drumkv1::DCA1_LEVEL2, m_ui.Dca1Level2Knob);
-	setParamKnob(drumkv1::DCA1_DECAY2, m_ui.Dca1Decay2Knob);
+	setParamKnob(drumkv1::DCA1_ENABLED, m_ui.Dca1GroupBox->param());
+	setParamKnob(drumkv1::DCA1_VOLUME,  m_ui.Dca1VolumeKnob);
+	setParamKnob(drumkv1::DCA1_ATTACK,  m_ui.Dca1AttackKnob);
+	setParamKnob(drumkv1::DCA1_DECAY1,  m_ui.Dca1Decay1Knob);
+	setParamKnob(drumkv1::DCA1_LEVEL2,  m_ui.Dca1Level2Knob);
+	setParamKnob(drumkv1::DCA1_DECAY2,  m_ui.Dca1Decay2Knob);
 
 	QObject::connect(
 		m_ui.Dca1Env, SIGNAL(attackChanged(float)),

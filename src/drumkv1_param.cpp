@@ -82,6 +82,7 @@ struct ParamInfo {
 	{ "LFO1_DECAY1",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // LFO1 Decay 1
 	{ "LFO1_LEVEL2",   PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // LFO1 Level 2
 	{ "LFO1_DECAY2",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // LFO1 Decay 2
+	{ "DCA1_ENABLED",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }, // DCA1 Enabled
 	{ "DCA1_VOLUME",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCA1 Volume
 	{ "DCA1_ATTACK",   PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // DCA1 Attack
 	{ "DCA1_DECAY1",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCA1 Decay1

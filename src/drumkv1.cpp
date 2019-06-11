@@ -399,6 +399,18 @@ struct drumkv1_env
 		p->c0 = p->value;
 	}
 
+	void idle(State *p)
+	{
+		p->running = false;
+		p->stage = Idle;
+		p->frames = 0;
+		p->phase = 0.0f;
+		p->delta = 0.0f;
+		p->value = 0.0f;
+		p->c1 = 0.0f;
+		p->c0 = 0.0f;
+	}
+
 	// parameters
 
 	drumkv1_port attack;
@@ -597,6 +609,7 @@ struct drumkv1_lfo
 
 struct drumkv1_dca
 {
+	drumkv1_port enabled;
 	drumkv1_port volume;
 
 	drumkv1_env  env;
@@ -1755,9 +1768,18 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				pv->dcf17.reset_filters(dcf1_cutoff, dcf1_reso);
 				pv->dcf18.reset_filters(dcf1_cutoff, dcf1_reso);
 				// envelopes
-				elem->dcf1.env.start(&pv->dcf1_env);
-				elem->lfo1.env.start(&pv->lfo1_env);
-				elem->dca1.env.start(&pv->dca1_env);
+				if (*elem->dcf1.enabled > 0.0f)
+					elem->dcf1.env.start(&pv->dcf1_env);
+				else
+					elem->dcf1.env.idle(&pv->dcf1_env);
+				if (*elem->lfo1.enabled > 0.0f)
+					elem->lfo1.env.start(&pv->lfo1_env);
+				else
+					elem->lfo1.env.idle(&pv->lfo1_env);
+				if (*elem->dca1.enabled > 0.0f)
+					elem->dca1.env.start(&pv->dca1_env);
+				else
+					elem->dca1.env.idle(&pv->dca1_env);
 				// lfos
 				pv->lfo1_sample = pv->lfo1.start();
 				// panning
@@ -2127,6 +2149,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			? m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch : 0.0f);
 
 		const bool dcf1_enabled = (*elem->dcf1.enabled > 0.0f);
+		const bool dca1_enabled = (*elem->dca1.enabled > 0.0f);
 
 		const float fxsend1	= *elem->out1.fxsend * *elem->out1.fxsend;
 
@@ -2218,7 +2241,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float mid1 = 0.5f * (gen1 + gen2);
 				const float sid1 = 0.5f * (gen1 - gen2);
 				const float vol1 = vel1 * elem->vol1.value(j)
-					* pv->dca1_env.tick()
+					* (dca1_enabled ? pv->dca1_env.tick() : 1.0f)
 					* pv->out1_vol.value(j);
 
 				// outputs
@@ -2256,7 +2279,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			if (pv->dca1_env.running && pv->dca1_env.frames == 0)
 				elem->dca1.env.next(&pv->dca1_env);
 
-			if (pv->dca1_env.stage == drumkv1_env::Idle || pv->gen1.isOver()) {
+			if (pv->gen1.isOver() ||
+				(dca1_enabled && pv->dca1_env.stage == drumkv1_env::Idle)) {
 				if (pv->note >= 0)
 					m_notes[pv->note] = NULL;
 				if (pv->group >= 0 && m_group[pv->group] == pv)
@@ -2789,6 +2813,7 @@ drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::LFO1_DECAY1:   pParamPort = &m_pElem->lfo1.env.decay1; break;
 	case drumkv1::LFO1_LEVEL2:   pParamPort = &m_pElem->lfo1.env.level2; break;
 	case drumkv1::LFO1_DECAY2:   pParamPort = &m_pElem->lfo1.env.decay2; break;
+	case drumkv1::DCA1_ENABLED:  pParamPort = &m_pElem->dca1.enabled;    break;
 	case drumkv1::DCA1_VOLUME:   pParamPort = &m_pElem->dca1.volume;     break;
 	case drumkv1::DCA1_ATTACK:   pParamPort = &m_pElem->dca1.env.attack; break;
 	case drumkv1::DCA1_DECAY1:   pParamPort = &m_pElem->dca1.env.decay1; break;
