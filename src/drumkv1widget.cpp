@@ -163,13 +163,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 #if 0
 	m_ui.Gen1ReverseKnob->insertItems(0, states);
 	m_ui.Gen1OffsetKnob->insertItems(0, states);
-
-	m_ui.Lfo1SyncKnob->insertItems(0, states);
-
 	m_ui.Dyn1CompressKnob->insertItems(0, states);
 	m_ui.Dyn1LimiterKnob->insertItems(0, states);
-#else
-	m_ui.Lfo1SyncKnob->setAlignment(Qt::AlignHCenter | Qt::AlignBottom);
 #endif
 	// Special values
 	const QString& sOff = states.first();
@@ -248,6 +243,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	setParamKnob(drumkv1::GEN1_ENVTIME, m_ui.Gen1EnvTimeKnob);
 
 	// DCF1
+	setParamKnob(drumkv1::DCF1_ENABLED,  m_ui.Dcf1GroupBox->param());
 	setParamKnob(drumkv1::DCF1_CUTOFF,   m_ui.Dcf1CutoffKnob);
 	setParamKnob(drumkv1::DCF1_RESO,     m_ui.Dcf1ResoKnob);
 	setParamKnob(drumkv1::DCF1_TYPE,     m_ui.Dcf1TypeKnob);
@@ -308,11 +304,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Dcf1Env, SLOT(setDecay2(float)));
 
 	// LFO1
+	setParamKnob(drumkv1::LFO1_ENABLED, m_ui.Lfo1GroupBox->param());
 	setParamKnob(drumkv1::LFO1_SHAPE,   m_ui.Lfo1ShapeKnob);
 	setParamKnob(drumkv1::LFO1_WIDTH,   m_ui.Lfo1WidthKnob);
 	setParamKnob(drumkv1::LFO1_BPM,     m_ui.Lfo1BpmKnob);
 	setParamKnob(drumkv1::LFO1_RATE,    m_ui.Lfo1RateKnob);
-	setParamKnob(drumkv1::LFO1_SYNC,    m_ui.Lfo1SyncKnob);
 	setParamKnob(drumkv1::LFO1_PANNING, m_ui.Lfo1PanningKnob);
 	setParamKnob(drumkv1::LFO1_VOLUME,  m_ui.Lfo1VolumeKnob);
 	setParamKnob(drumkv1::LFO1_CUTOFF,  m_ui.Lfo1CutoffKnob);
@@ -366,11 +362,12 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		m_ui.Lfo1Env, SLOT(setDecay2(float)));
 
 	// DCA1
-	setParamKnob(drumkv1::DCA1_VOLUME, m_ui.Dca1VolumeKnob);
-	setParamKnob(drumkv1::DCA1_ATTACK, m_ui.Dca1AttackKnob);
-	setParamKnob(drumkv1::DCA1_DECAY1, m_ui.Dca1Decay1Knob);
-	setParamKnob(drumkv1::DCA1_LEVEL2, m_ui.Dca1Level2Knob);
-	setParamKnob(drumkv1::DCA1_DECAY2, m_ui.Dca1Decay2Knob);
+	setParamKnob(drumkv1::DCA1_ENABLED, m_ui.Dca1GroupBox->param());
+	setParamKnob(drumkv1::DCA1_VOLUME,  m_ui.Dca1VolumeKnob);
+	setParamKnob(drumkv1::DCA1_ATTACK,  m_ui.Dca1AttackKnob);
+	setParamKnob(drumkv1::DCA1_DECAY1,  m_ui.Dca1Decay1Knob);
+	setParamKnob(drumkv1::DCA1_LEVEL2,  m_ui.Dca1Level2Knob);
+	setParamKnob(drumkv1::DCA1_DECAY2,  m_ui.Dca1Decay2Knob);
 
 	QObject::connect(
 		m_ui.Dca1Env, SIGNAL(attackChanged(float)),
@@ -728,8 +725,26 @@ void drumkv1widget::updateParamEx (
 		pDrumkUi->setOffset(bool(fValue > 0.0f));
 		if (!bIter) updateOffset(pDrumkUi->sample());
 		break;
+	case drumkv1::DCF1_ENABLED:
+		if (m_ui.Lfo1GroupBox->isChecked()) {
+			const bool bDcf1Enabled = (fValue > 0.5f);
+			m_ui.Lfo1CutoffKnob->setEnabled(bDcf1Enabled);
+			m_ui.Lfo1ResoKnob->setEnabled(bDcf1Enabled);
+		}
+		break;
+	case drumkv1::LFO1_ENABLED:
+		if (fValue > 0.5f) {
+			const bool bDcf1Enabled = m_ui.Dcf1GroupBox->isChecked();
+			m_ui.Lfo1CutoffKnob->setEnabled(bDcf1Enabled);
+			m_ui.Lfo1ResoKnob->setEnabled(bDcf1Enabled);
+		}
+		break;
 	case drumkv1::DCF1_SLOPE:
-		m_ui.Dcf1TypeKnob->setEnabled(int(fValue) != 3); // !Formant
+		if (m_ui.Dcf1GroupBox->isChecked())
+			m_ui.Dcf1TypeKnob->setEnabled(int(fValue) != 3); // !Formant
+		break;
+	case drumkv1::LFO1_SHAPE:
+		m_ui.Lfo1Wave->setWaveShape(fValue);
 		break;
 	case drumkv1::DEF1_VELOCITY: {
 		const int vel = int(79.375f * fValue + 47.625f) & 0x7f;
@@ -1492,11 +1507,15 @@ void drumkv1widget::activateParamKnobs ( bool bEnabled )
 void drumkv1widget::activateParamKnobsGroupBox (
 	QGroupBox *pGroupBox, bool bEnabled )
 {
-	const QList<QWidget *>& children
-		= pGroupBox->findChildren<QWidget *> ();
-	QListIterator<QWidget *> iter(children);
-	while (iter.hasNext())
-		iter.next()->setEnabled(bEnabled);
+	if (pGroupBox->isCheckable()) {
+		pGroupBox->setEnabled(bEnabled);
+	} else {
+		const QList<QWidget *>& children
+			= pGroupBox->findChildren<QWidget *> ();
+		QListIterator<QWidget *> iter(children);
+		while (iter.hasNext())
+			iter.next()->setEnabled(bEnabled);
+	}
 }
 
 

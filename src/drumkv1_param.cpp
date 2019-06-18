@@ -1,7 +1,7 @@
 // drumkv1_param.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019f, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -57,6 +57,7 @@ struct ParamInfo {
 	{ "GEN1_COARSE",   PARAM_FLOAT,   0.0f,  -4.0f,   4.0f }, // GEN1 Coarse
 	{ "GEN1_FINE",     PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // GEN1 Fine
 	{ "GEN1_ENVTIME",  PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // GEN1 Env.Time
+	{ "DCF1_ENABLED",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }, // DCF1 Enabled
 	{ "DCF1_CUTOFF",   PARAM_FLOAT,   1.0f,   0.0f,   1.0f }, // DCF1 Cutoff
 	{ "DCF1_RESO",     PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // DCF1 Resonance
 	{ "DCF1_TYPE",     PARAM_INT,     0.0f,   0.0f,   3.0f }, // DCF1 Type
@@ -66,11 +67,11 @@ struct ParamInfo {
 	{ "DCF1_DECAY1",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCF1 Decay 1
 	{ "DCF1_LEVEL2",   PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // DCF1 Level 2
 	{ "DCF1_DECAY2",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCF1 Decay 2
+	{ "LFO1_ENABLED",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }, // LFO1 Enabled
 	{ "LFO1_SHAPE",    PARAM_INT,     1.0f,   0.0f,   4.0f }, // LFO1 Wave Shape
 	{ "LFO1_WIDTH",    PARAM_FLOAT,   1.0f,   0.0f,   1.0f }, // LFO1 Wave Width
 	{ "LFO1_BPM",      PARAM_FLOAT, 180.0f,   0.0f, 360.0f }, // LFO1 BPM
 	{ "LFO1_RATE",     PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // LFO1 Rate
-	{ "LFO1_SYNC",     PARAM_BOOL,    0.0f,   0.0f,   1.0f }, // LFO1 Sync
 	{ "LFO1_SWEEP",    PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // LFO1 Sweep
 	{ "LFO1_PITCH",    PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // LFO1 Pitch
 	{ "LFO1_CUTOFF",   PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // LFO1 Cutoff
@@ -81,6 +82,7 @@ struct ParamInfo {
 	{ "LFO1_DECAY1",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // LFO1 Decay 1
 	{ "LFO1_LEVEL2",   PARAM_FLOAT,   0.2f,   0.0f,   1.0f }, // LFO1 Level 2
 	{ "LFO1_DECAY2",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // LFO1 Decay 2
+	{ "DCA1_ENABLED",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }, // DCA1 Enabled
 	{ "DCA1_VOLUME",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCA1 Volume
 	{ "DCA1_ATTACK",   PARAM_FLOAT,   0.0f,   0.0f,   1.0f }, // DCA1 Attack
 	{ "DCA1_DECAY1",   PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // DCA1 Decay1
@@ -424,6 +426,7 @@ bool drumkv1_param::loadPreset (
 
 	file.close();
 
+	pDrumk->stabilize();
 	pDrumk->reset();
 	pDrumk->running(running);
 

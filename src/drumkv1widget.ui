@@ -270,9 +270,15 @@
         </widget>
        </item>
        <item row="1" column="0" rowspan="2" colspan="5">
-        <widget class="QGroupBox" name="Dcf1GroupBox">
+        <widget class="drumkv1widget_group" name="Dcf1GroupBox">
+         <property name="toolTip">
+          <string>DCF Enabled</string>
+         </property>
          <property name="title">
           <string>DCF</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
          <layout class="QVBoxLayout">
           <item>
@@ -391,9 +397,15 @@
         </widget>
        </item>
        <item row="1" column="5" rowspan="2" colspan="8">
-        <widget class="QGroupBox" name="Lfo1GroupBox">
+        <widget class="drumkv1widget_group" name="Lfo1GroupBox">
+         <property name="toolTip">
+          <string>LFO Enabled</string>
+         </property>
          <property name="title">
           <string>LFO</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
          <layout class="QVBoxLayout">
           <item>
@@ -493,16 +505,6 @@
               </property>
               <property name="text">
                <string>Rate</string>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="drumkv1widget_check" name="Lfo1SyncKnob">
-              <property name="toolTip">
-               <string>LFO Sync</string>
-              </property>
-              <property name="text">
-               <string>Sync</string>
               </property>
              </widget>
             </item>
@@ -611,9 +613,15 @@
         </widget>
        </item>
        <item row="3" column="0" colspan="5">
-        <widget class="QGroupBox" name="Dca1GroupBox">
+        <widget class="drumkv1widget_group" name="Dca1GroupBox">
+         <property name="toolTip">
+          <string>DCA Enabled</string>
+         </property>
          <property name="title">
           <string>DCA</string>
+         </property>
+         <property name="checkable">
+          <bool>true</bool>
          </property>
          <layout class="QHBoxLayout">
           <item>
@@ -1312,6 +1320,11 @@
   <customwidget>
    <class>drumkv1widget_check</class>
    <extends>QCheckBox</extends>
+   <header>drumkv1widget_param.h</header>
+  </customwidget>
+  <customwidget>
+   <class>drumkv1widget_group</class>
+   <extends>QGroupBox</extends>
    <header>drumkv1widget_param.h</header>
   </customwidget>
   <customwidget>

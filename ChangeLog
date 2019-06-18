@@ -6,6 +6,29 @@ ChangeLog
 
 0.9.7  2019-04-14  A Spring-Break'19 Release.
 
+- New DCF, LFO and DCA Enabled parameters. (EXPERIMENTAL)
+- Configure updated to check for qtchooser availability.
+
+
+0.9.8  2019-06-06  A Spring'19 Release.
+
+- Improved slew-rate to DCF Formant coefficient updates.
+- Dropped LFO Sync parameter as being irrelevant across
+  element voicings.
+- Fixed all LFO Panning and Volume modulation, now being
+  correctly isolated on a per voice basis.
+- Fixed initial LFO wave shapes on LV2 plug-in UI.
+- Minor update to Debian packaging control file.
+
+
+GIT HEAD
+
+- Fixed initial DCO and LFO wave shapes on LV2 plug-in UI.
+- Minor update to Debian packaging control file.
+
+
+0.9.7  2019-04-14  A Spring-Break'19 Release.
+
 - Corrected sample offset range internal reset.
 - All audio input now get through without being processed
   by any or whole effects stage anymore.
