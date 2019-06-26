@@ -46,6 +46,13 @@ namespace drumkv1_param
 		virtual QString abstractPath(const QString& sAbsolutePath) const;
 	};
 
+	// Preset serialization methods.
+	bool loadPreset(drumkv1 *pDrumk,
+		const QString& sFilename);
+	bool savePreset(drumkv1 *pDrumk,
+		const QString& sFilename,
+		bool bSymLink = false);
+
 	// Element serialization methods.
 	void loadElements(drumkv1 *pDrumk,
 		const QDomElement& eElements,
@@ -55,11 +62,11 @@ namespace drumkv1_param
 		const map_path& mapPath = map_path(),
 		bool bSymLink = false);
 
-	// Preset serialization methods.
-	bool loadPreset(drumkv1 *pDrumk,
-		const QString& sFilename);
-	bool savePreset(drumkv1 *pDrumk,
-		const QString& sFilename,
+	// Tuning serialization methods.
+	void loadTuning(drumkv1 *pDrumk,
+		const QDomElement& eTuning);
+	void saveTuning(drumkv1 *pDrumk,
+		QDomDocument& doc, QDomElement& eTuning,
 		bool bSymLink = false);
 
 	// Default parameter name/value helpers.
@@ -70,7 +77,8 @@ namespace drumkv1_param
 	float paramScale(drumkv1::ParamIndex index, float fValue);
 	bool paramFloat(drumkv1::ParamIndex index);
 
-	// Save and convert into absolute filename helper.
+	// Load/save and convert canonical/absolute filename helpers.
+	QString loadFilename(const QString& sFilename);
 	QString saveFilename(const QString& sFilename, bool bSymLink);
 };
 
