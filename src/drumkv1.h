@@ -169,6 +169,8 @@ public:
 		DYN1_COMPRESS,
 		DYN1_LIMITER,
 
+		TUN1_ENABLED,
+
 		NUM_PARAMS
 	};
 
@@ -197,6 +199,18 @@ public:
 	uint32_t midiInCount();
 
 	void directNoteOn(int note, int vel);
+
+	void setTuningRefPitch(float refPitch);
+	float tuningRefPitch() const;
+
+	void setTuningRefNote(int refNote);
+	int tuningRefNote() const;
+
+	void setTuningScaleFile(const char *pszScaleFile);
+	const char *tuningScaleFile() const;
+
+	void setTuningKeyMapFile(const char *pszKeyMapFile);
+	const char *tuningKeyMapFile() const;
 
 	void updateTuning();
 

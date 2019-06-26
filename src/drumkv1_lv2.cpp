@@ -169,6 +169,16 @@ drumkv1_lv2::drumkv1_lv2 (
 				    m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_SELECT");
 				m_urids.gen1_update = m_urid_map->map(
 					m_urid_map->handle, DRUMKV1_LV2_PREFIX "GEN1_UPDATE");
+				m_urids.t101_ref_pitch = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "T101_REF_PITCH");
+				m_urids.t102_ref_note = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "T102_REF_NOTE");
+				m_urids.t103_scale_file = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "T103_SCALE_FILE");
+				m_urids.t104_keymap_file = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "T103_KEYMAP_FILE");
+				m_urids.tun1_update = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "TUN1_UPDATE");
 				m_urids.atom_Blank = m_urid_map->map(
 					m_urid_map->handle, LV2_ATOM__Blank);
 				m_urids.atom_Object = m_urid_map->map(
@@ -177,6 +187,8 @@ drumkv1_lv2::drumkv1_lv2 (
 					m_urid_map->handle, LV2_ATOM__Float);
 				m_urids.atom_Int = m_urid_map->map(
 					m_urid_map->handle, LV2_ATOM__Int);
+				m_urids.atom_Bool = m_urid_map->map(
+					m_urid_map->handle, LV2_ATOM__Bool);
 				m_urids.atom_Path = m_urid_map->map(
 					m_urid_map->handle, LV2_ATOM__Path);
 				m_urids.time_Position = m_urid_map->map(
@@ -396,6 +408,34 @@ void drumkv1_lv2::run ( uint32_t nframes )
 									= *(uint32_t *) LV2_ATOM_BODY_CONST(value);
 								setOffsetRange(offset_start, offset_end);
 							}
+						}
+						else
+						if (key == m_urids.t101_ref_pitch
+							&& type == m_urids.atom_Float) {
+							const float ref_pitch
+								= *(float *) LV2_ATOM_BODY_CONST(value);
+							setTuningRefPitch(ref_pitch);
+						}
+						else
+						if (key == m_urids.t102_ref_note
+							&& type == m_urids.atom_Int) {
+							const float ref_note
+								= *(int *) LV2_ATOM_BODY_CONST(value);
+							setTuningRefNote(ref_note);
+						}
+						else
+						if (key == m_urids.t103_scale_file
+							&& type == m_urids.atom_Path) {
+							const char *scale_file
+								= (const char *) LV2_ATOM_BODY_CONST(value);
+							setTuningScaleFile(scale_file);
+						}
+						else
+						if (key == m_urids.t104_keymap_file
+							&& type == m_urids.atom_Path) {
+							const char *keymap_file
+								= (const char *) LV2_ATOM_BODY_CONST(value);
+							setTuningKeyMapFile(keymap_file);
 						}
 					}
 				}
@@ -685,12 +725,10 @@ bool drumkv1_lv2::state_changed (void)
 bool drumkv1_lv2::patch_put ( uint32_t ndelta )
 {
 	static char s_szNull[1] = {'\0'};
-	const char *pszSampleFile = NULL;
+
 	drumkv1_sample *pSample = drumkv1::sample();
-	if (pSample)
-		pszSampleFile = pSample->filename();
-	if (pszSampleFile == NULL)
-		pszSampleFile = s_szNull;
+	if (pSample == NULL)
+		return false;
 
 	lv2_atom_forge_frame_time(&m_forge, ndelta);
 
@@ -701,11 +739,29 @@ bool drumkv1_lv2::patch_put ( uint32_t ndelta )
 	LV2_Atom_Forge_Frame body_frame;
 	lv2_atom_forge_object(&m_forge, &body_frame, 0, 0);
 	lv2_atom_forge_key(&m_forge, m_urids.p101_sample_file);
+	const char *pszSampleFile = pSample->filename();
+	if (pszSampleFile == NULL)
+		pszSampleFile = s_szNull;
 	lv2_atom_forge_path(&m_forge, pszSampleFile, ::strlen(pszSampleFile) + 1);
 	lv2_atom_forge_key(&m_forge, m_urids.p102_offset_start);
 	lv2_atom_forge_int(&m_forge, (pSample ? pSample->offsetStart() : 0));
 	lv2_atom_forge_key(&m_forge, m_urids.p103_offset_end);
 	lv2_atom_forge_int(&m_forge, (pSample ? pSample->offsetEnd() : 0));
+
+	lv2_atom_forge_key(&m_forge, m_urids.t101_ref_pitch);
+	lv2_atom_forge_float(&m_forge, tuningRefPitch());
+	lv2_atom_forge_key(&m_forge, m_urids.t102_ref_note);
+	lv2_atom_forge_int(&m_forge, tuningRefNote());
+	const char *pszScaleFile = tuningScaleFile();
+	if (pszScaleFile == NULL)
+		pszScaleFile = s_szNull;
+	lv2_atom_forge_key(&m_forge, m_urids.t103_scale_file);
+	lv2_atom_forge_path(&m_forge, pszScaleFile, ::strlen(pszScaleFile) + 1);
+	const char *pszKeyMapFile = tuningKeyMapFile();
+	if (pszKeyMapFile == NULL)
+		pszKeyMapFile = s_szNull;
+	lv2_atom_forge_key(&m_forge, m_urids.t104_keymap_file);
+	lv2_atom_forge_path(&m_forge, pszKeyMapFile, ::strlen(pszKeyMapFile) + 1);
 
 	lv2_atom_forge_pop(&m_forge, &body_frame);
 	lv2_atom_forge_pop(&m_forge, &patch_frame);

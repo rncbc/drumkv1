@@ -124,7 +124,9 @@ struct ParamInfo {
 	{ "REV1_FEEDB",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Reverb Feedback
 	{ "REV1_WIDTH",    PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // Reverb Width
 	{ "DYN1_COMPRESS", PARAM_BOOL,    0.0f,   0.0f,   1.0f }, // Dynamic Compressor
-	{ "DYN1_LIMITER",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }  // Dynamic Limiter
+	{ "DYN1_LIMITER",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }, // Dynamic Limiter
+
+	{ "TUN1_ENABLED",  PARAM_BOOL,    0.0f,   0.0f,   1.0f }  // Tuning Enabled
 };
 
 

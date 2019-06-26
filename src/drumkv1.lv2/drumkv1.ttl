@@ -779,6 +779,17 @@
 		lv2:minimum 0.0 ;
 		lv2:maximum 1.0 ;
 		lv2pg:group drumkv1_lv2:G206_DYN1 ;
+	] ;
+	lv2:port [
+		a lv2:InputPort, lv2:ControlPort ;
+		lv2:index 81 ;
+		lv2:symbol "TUN1_TUNING" ;
+		lv2:name "Tuning Enabled" ;
+		lv2:portProperty lv2:toggled ;
+		lv2:default 0.0 ;
+		lv2:minimum 0.0 ;
+		lv2:maximum 1.0 ;
+		lv2pg:group drumkv1_lv2:G301_TUN1 ;
 	] .
 
 
@@ -802,6 +813,33 @@ drumkv1_lv2:P103_OFFSET_END
 	lv2:default 0 ;
 	lv2:minimum 0 ;
 	lv2:maximum 2147483647 .
+
+
+drumkv1_lv2:T101_REF_PITCH
+	a lv2:Parameter ;
+	rdfs:label "T101 Reference Pitch" ;
+	rdfs:range lv2atom:Float ;
+	lv2:default 440.0 ;
+	lv2:minimum 20.0 ;
+	lv2:maximum 20000.0 .
+
+drumkv1_lv2:T102_REF_NOTE
+	a lv2:Parameter ;
+	rdfs:label "T102 Reference Note" ;
+	rdfs:range lv2atom:Int ;
+	lv2:default 69 ;
+	lv2:minimum 0 ;
+	lv2:maximum 127 .
+
+drumkv1_lv2:T103_SCALE_FILE
+	a lv2:Parameter ;
+	rdfs:label "T103 Scale File" ;
+	rdfs:range lv2atom:Path .
+
+drumkv1_lv2:T104_KEYMAP_FILE
+	a lv2:Parameter ;
+	rdfs:label "T104 Key Map File" ;
+	rdfs:range lv2atom:Path .
 
 
 drumkv1_lv2:G101_GEN1
@@ -863,3 +901,8 @@ drumkv1_lv2:G206_DYN1
 	a lv2pg:InputGroup;
 	lv2:name "Effects - Dynamic" ;
 	lv2:symbol "DYN1" .
+
+drumkv1_lv2:G301_TUN1
+	a lv2pg:InputGroup;
+	lv2:name "Config - Tuning" ;
+	lv2:symbol "TUN1" .
