@@ -490,6 +490,8 @@ static LV2_State_Status drumkv1_lv2_state_save ( LV2_Handle instance,
 	if (pPlugin == NULL)
 		return LV2_STATE_ERR_UNKNOWN;
 
+	// Save all state as XML chunk...
+	//
 	const uint32_t key = pPlugin->urid_map(DRUMKV1_LV2_PREFIX "state");
 	if (key == 0)
 		return LV2_STATE_ERR_NO_PROPERTY;
@@ -506,9 +508,14 @@ static LV2_State_Status drumkv1_lv2_state_save ( LV2_Handle instance,
 	drumkv1_lv2_map_path mapPath(features);
 
 	QDomDocument doc(DRUMKV1_TITLE);
+
 	QDomElement eElements = doc.createElement("elements");
 	drumkv1_param::saveElements(pPlugin, doc, eElements, mapPath);
 	doc.appendChild(eElements);
+
+	QDomElement eTuning = doc.createElement("tuning");
+	drumkv1_param::saveTuning(pPlugin, doc, eTuning);
+	doc.appendChild(eTuning);
 
 	const QByteArray data(doc.toByteArray());
 	const char *value = data.constData();
@@ -526,6 +533,8 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 	if (pPlugin == NULL)
 		return LV2_STATE_ERR_UNKNOWN;
 
+	// Retrieve all state as XML chunk...
+	//
 	const uint32_t key = pPlugin->urid_map(DRUMKV1_LV2_PREFIX "state");
 	if (key == 0)
 		return LV2_STATE_ERR_NO_PROPERTY;
@@ -557,9 +566,18 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 
 	QDomDocument doc(DRUMKV1_TITLE);
 	if (doc.setContent(QByteArray(value, size))) {
-		QDomElement eElements = doc.documentElement();
-		if (eElements.tagName() == "elements")
-			drumkv1_param::loadElements(pPlugin, eElements, mapPath);
+		for (QDomNode nChild = doc.documentElement();
+				!nChild.isNull();
+					nChild = nChild.nextSibling()) {
+			QDomElement eChild = nChild.toElement();
+			if (eChild.isNull())
+				continue;
+			if (eChild.tagName() == "elements")
+				drumkv1_param::loadElements(pPlugin, eChild, mapPath);
+			else
+			if (eChild.tagName() == "tuning")
+				drumkv1_param::loadTuning(pPlugin, eChild);
+		}
 	}
 
 	pPlugin->reset();
