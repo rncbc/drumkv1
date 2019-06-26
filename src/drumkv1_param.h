@@ -69,6 +69,9 @@ namespace drumkv1_param
 	float paramValue(drumkv1::ParamIndex index, float fScale);
 	float paramScale(drumkv1::ParamIndex index, float fValue);
 	bool paramFloat(drumkv1::ParamIndex index);
+
+	// Save and convert into absolute filename helper.
+	QString saveFilename(const QString& sFilename, bool bSymLink);
 };
 
 

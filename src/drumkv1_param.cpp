@@ -283,18 +283,6 @@ void drumkv1_param::saveElements (
 		const char *pszSampleFile = element->sampleFile();
 		if (pszSampleFile == NULL)
 			continue;
-		QFileInfo fi(QString::fromUtf8(pszSampleFile));
-		if (bSymLink && fi.absolutePath() != QDir::current().absolutePath()) {
-			const QString& sPath = fi.absoluteFilePath();
-			const QString& sName = fi.baseName();
-			const QString& sExt  = fi.completeSuffix();
-			const QString& sLink = sName
-				+ '-' + QString::number(qHash(sPath), 16)
-				+ '.' + sExt;
-			QFile(sPath).link(sLink);
-			fi.setFile(QDir::current(), sLink);
-		}
-		else if (fi.isSymLink()) fi.setFile(fi.symLinkTarget());
 		QDomElement eElement = doc.createElement("element");
 		eElement.setAttribute("index", QString::number(note));
 	//	eElement.setAttribute("name", noteName(note));
@@ -303,8 +291,8 @@ void drumkv1_param::saveElements (
 		eSample.setAttribute("name", "GEN1_SAMPLE");
 		eSample.setAttribute("offset-start", element->offsetStart());
 		eSample.setAttribute("offset-end", element->offsetEnd());
-		eSample.appendChild(doc.createTextNode(
-			mapPath.abstractPath(fi.absoluteFilePath())));
+		eSample.appendChild(doc.createTextNode(mapPath.abstractPath(
+			saveFilename(QString::fromUtf8(pszSampleFile), bSymLink))));
 		eElement.appendChild(eSample);
 		QDomElement eParams = doc.createElement("params");
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -482,6 +470,25 @@ bool drumkv1_param::savePreset (
 	QDir::setCurrent(currentDir.absolutePath());
 
 	return true;
+}
+
+
+// Save and convert into absolute filename helper.
+QString drumkv1_param::saveFilename ( const QString& sFilename, bool bSymLink )
+{
+	QFileInfo fi(sFilename);
+	if (bSymLink && fi.absolutePath() != QDir::current().absolutePath()) {
+		const QString& sPath = fi.absoluteFilePath();
+		const QString& sName = fi.baseName();
+		const QString& sExt  = fi.completeSuffix();
+		const QString& sLink = sName
+			+ '-' + QString::number(qHash(sPath), 16)
+			+ '.' + sExt;
+		QFile(sPath).link(sLink);
+		fi.setFile(QDir::current(), sLink);
+	}
+	else if (fi.isSymLink()) fi.setFile(fi.symLinkTarget());
+	return fi.absoluteFilePath();
 }
 
 
