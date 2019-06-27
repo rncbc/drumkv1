@@ -517,14 +517,19 @@ static LV2_State_Status drumkv1_lv2_state_save ( LV2_Handle instance,
 	drumkv1_lv2_map_path mapPath(features);
 
 	QDomDocument doc(DRUMKV1_TITLE);
+	QDomElement eState = doc.createElement("state");
 
 	QDomElement eElements = doc.createElement("elements");
 	drumkv1_param::saveElements(pPlugin, doc, eElements, mapPath);
-	doc.appendChild(eElements);
+	eState.appendChild(eElements);
 
-	QDomElement eTuning = doc.createElement("tuning");
-	drumkv1_param::saveTuning(pPlugin, doc, eTuning);
-	doc.appendChild(eTuning);
+	if (pPlugin->isTuningEnabled()) {
+		QDomElement eTuning = doc.createElement("tuning");
+		drumkv1_param::saveTuning(pPlugin, doc, eTuning);
+		eState.appendChild(eTuning);
+	}
+
+	doc.appendChild(eState);
 
 	const QByteArray data(doc.toByteArray());
 	const char *value = data.constData();
@@ -575,17 +580,25 @@ static LV2_State_Status drumkv1_lv2_state_restore ( LV2_Handle instance,
 
 	QDomDocument doc(DRUMKV1_TITLE);
 	if (doc.setContent(QByteArray(value, size))) {
-		for (QDomNode nChild = doc.documentElement();
-				!nChild.isNull();
-					nChild = nChild.nextSibling()) {
-			QDomElement eChild = nChild.toElement();
-			if (eChild.isNull())
-				continue;
-			if (eChild.tagName() == "elements")
-				drumkv1_param::loadElements(pPlugin, eChild, mapPath);
-			else
-			if (eChild.tagName() == "tuning")
-				drumkv1_param::loadTuning(pPlugin, eChild);
+		QDomElement eState = doc.documentElement();
+	#if 1//DRUMKV1_LV2_LEGACY
+		if (eState.tagName() == "elements")
+			drumkv1_param::loadElements(pPlugin, eState, mapPath);
+		else
+	#endif
+		if (eState.tagName() == "state") {
+			for (QDomNode nChild = eState.firstChild();
+					!nChild.isNull();
+						nChild = nChild.nextSibling()) {
+				QDomElement eChild = nChild.toElement();
+				if (eChild.isNull())
+					continue;
+				if (eChild.tagName() == "elements")
+					drumkv1_param::loadElements(pPlugin, eChild, mapPath);
+				else
+				if (eChild.tagName() == "tuning")
+					drumkv1_param::loadTuning(pPlugin, eChild);
+			}
 		}
 	}
 
