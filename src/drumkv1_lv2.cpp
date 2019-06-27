@@ -179,6 +179,8 @@ drumkv1_lv2::drumkv1_lv2 (
 					m_urid_map->handle, DRUMKV1_LV2_PREFIX "P204_TUNING_SCALE_FILE");
 				m_urids.p205_tuning_keyMapFile = m_urid_map->map(
 					m_urid_map->handle, DRUMKV1_LV2_PREFIX "P205_TUNING_KEYMAP_FILE");
+				m_urids.tun1_update = m_urid_map->map(
+					m_urid_map->handle, DRUMKV1_LV2_PREFIX "TUN1_UPDATE");
 				m_urids.atom_Blank = m_urid_map->map(
 					m_urid_map->handle, LV2_ATOM__Blank);
 				m_urids.atom_Object = m_urid_map->map(
@@ -679,6 +681,18 @@ void drumkv1_lv2::selectSample ( int key )
 }
 
 
+void drumkv1_lv2::updateTuning (void)
+{
+	if (m_schedule) {
+		drumkv1_lv2_worker_message mesg;
+		mesg.atom.type = m_urids.tun1_update;
+		mesg.atom.size = 0; // nothing else matters.
+		m_schedule->schedule_work(
+			m_schedule->handle, sizeof(mesg), &mesg);
+	}
+}
+
+
 bool drumkv1_lv2::worker_work ( const void *data, uint32_t size )
 {
 	if (size != sizeof(drumkv1_lv2_worker_message))
@@ -705,6 +719,11 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t size )
 			drumkv1::setCurrentElementEx(key);
 		}
 		drumkv1::setSampleFile(mesg->sample.path);
+		return true;
+	}
+	else
+	if (mesg->atom.type == m_urids.tun1_update) {
+		drumkv1::resetTuning();
 		return true;
 	}
 
@@ -774,17 +793,17 @@ bool drumkv1_lv2::patch_put ( uint32_t ndelta )
 	lv2_atom_forge_int(&m_forge, (pSample ? pSample->offsetEnd() : 0));
 
 	lv2_atom_forge_key(&m_forge, m_urids.p201_tuning_enabled);
-	lv2_atom_forge_bool(&m_forge, isTuningEnabled());
+	lv2_atom_forge_bool(&m_forge, drumkv1::isTuningEnabled());
 	lv2_atom_forge_key(&m_forge, m_urids.p202_tuning_refPitch);
-	lv2_atom_forge_float(&m_forge, tuningRefPitch());
+	lv2_atom_forge_float(&m_forge, drumkv1::tuningRefPitch());
 	lv2_atom_forge_key(&m_forge, m_urids.p203_tuning_refNote);
-	lv2_atom_forge_int(&m_forge, tuningRefNote());
-	const char *pszScaleFile = tuningScaleFile();
+	lv2_atom_forge_int(&m_forge, drumkv1::tuningRefNote());
+	const char *pszScaleFile = drumkv1::tuningScaleFile();
 	if (pszScaleFile == NULL)
 		pszScaleFile = s_szNull;
 	lv2_atom_forge_key(&m_forge, m_urids.p204_tuning_scaleFile);
 	lv2_atom_forge_path(&m_forge, pszScaleFile, ::strlen(pszScaleFile) + 1);
-	const char *pszKeyMapFile = tuningKeyMapFile();
+	const char *pszKeyMapFile = drumkv1::tuningKeyMapFile();
 	if (pszKeyMapFile == NULL)
 		pszKeyMapFile = s_szNull;
 	lv2_atom_forge_key(&m_forge, m_urids.p205_tuning_keyMapFile);

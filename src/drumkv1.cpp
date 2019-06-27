@@ -986,16 +986,11 @@ private:
 
 // micro-tuning/instance implementation
 
-class drumkv1_tun : public drumkv1_sched
+class drumkv1_tun
 {
 public:
 
-	// ctor.
-	drumkv1_tun(drumkv1 *pDrumk) : drumkv1_sched(pDrumk, Tuning),
-		enabled(false), refPitch(440.0f), refNote(69) {}
-
-	// processor.
-	void process(int) { instance()->updateTuning(); }
+	drumkv1_tun() : enabled(false), refPitch(440.0f), refNote(69) {}
 
 	bool    enabled;
 	float   refPitch;
@@ -1078,7 +1073,7 @@ public:
 	void setTuningKeyMapFile(const char *pszKeyMapFile);
 	const char *tuningKeyMapFile() const;
 
-	void updateTuning();
+	void resetTuning();
 
 	void process_midi(uint8_t *data, uint32_t size);
 	void process(float **ins, float **outs, uint32_t nframes);
@@ -1215,8 +1210,8 @@ private:
 
 drumkv1_impl::drumkv1_impl (
 	drumkv1 *pDrumk, uint16_t nchannels, float srate )
-		: m_pDrumk(pDrumk),	m_controls(pDrumk), m_programs(pDrumk),
-			m_midi_in(pDrumk), m_tun(pDrumk), m_bpm(180.0f), m_running(false)
+	: m_pDrumk(pDrumk),	m_controls(pDrumk), m_programs(pDrumk),
+		m_midi_in(pDrumk), m_bpm(180.0f), m_running(false)
 {
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
@@ -1256,7 +1251,7 @@ drumkv1_impl::drumkv1_impl (
 	m_comp = NULL;
 
 	// Micro-tuning support, if any...
-	updateTuning();
+	resetTuning();
 
 	// load controllers & programs database...
 	m_config.loadControls(&m_controls);
@@ -2088,7 +2083,7 @@ const char *drumkv1_impl::tuningKeyMapFile (void) const
 }
 
 
-void drumkv1_impl::updateTuning (void)
+void drumkv1_impl::resetTuning (void)
 {
 	if (m_tun.enabled) {
 		// Instance micro-tuning, possibly from Scala keymap and scale files...
@@ -3127,9 +3122,9 @@ const char *drumkv1::tuningKeyMapFile (void) const
 }
 
 
-void drumkv1::updateTuning (void)
+void drumkv1::resetTuning (void)
 {
-	m_pImpl->updateTuning();
+	m_pImpl->resetTuning();
 }
 
 

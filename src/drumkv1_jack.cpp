@@ -629,6 +629,12 @@ void drumkv1_jack::updateSample (void)
 }
 
 
+void drumkv1_jack::updateTuning (void)
+{
+	drumkv1::resetTuning();
+}
+
+
 void drumkv1_jack::shutdown (void)
 {
 	drumkv1_jack_application *pApp = drumkv1_jack_application::getInstance();

@@ -213,7 +213,9 @@ public:
 	void setTuningKeyMapFile(const char *pszKeyMapFile);
 	const char *tuningKeyMapFile() const;
 
-	void updateTuning();
+	void resetTuning();
+
+	virtual void updateTuning() = 0;
 
 	virtual void selectSample(int key) = 0;
 	virtual void updateSample() = 0;

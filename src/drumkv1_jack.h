@@ -76,6 +76,7 @@ protected:
 
 	void selectSample(int key);
 	void updateSample();
+	void updateTuning();
 
 private:
 
