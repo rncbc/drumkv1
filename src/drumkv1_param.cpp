@@ -124,9 +124,7 @@ struct ParamInfo {
 	{ "REV1_FEEDB",    PARAM_FLOAT,   0.5f,   0.0f,   1.0f }, // Reverb Feedback
 	{ "REV1_WIDTH",    PARAM_FLOAT,   0.0f,  -1.0f,   1.0f }, // Reverb Width
 	{ "DYN1_COMPRESS", PARAM_BOOL,    0.0f,   0.0f,   1.0f }, // Dynamic Compressor
-	{ "DYN1_LIMITER",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }, // Dynamic Limiter
-
-	{ "TUN1_ENABLED",  PARAM_BOOL,    0.0f,   0.0f,   1.0f }  // Tuning Enabled
+	{ "DYN1_LIMITER",  PARAM_BOOL,    1.0f,   0.0f,   1.0f }  // Dynamic Limiter
 };
 
 
@@ -362,6 +360,7 @@ bool drumkv1_param::loadPreset (
 
 	const bool running = pDrumk->running(false);
 
+	pDrumk->setTuningEnabled(false);
 	pDrumk->reset();
 
 	static QHash<QString, drumkv1::ParamIndex> s_hash;
@@ -466,9 +465,11 @@ bool drumkv1_param::savePreset (
 	ePreset.appendChild(eParams);
 	doc.appendChild(ePreset);
 
-	QDomElement eTuning = doc.createElement("tuning");
-	drumkv1_param::saveTuning(pDrumk, doc, eTuning, bSymLink);
-	ePreset.appendChild(eTuning);
+	if (pDrumk->isTuningEnabled()) {
+		QDomElement eTuning = doc.createElement("tuning");
+		drumkv1_param::saveTuning(pDrumk, doc, eTuning, bSymLink);
+		ePreset.appendChild(eTuning);
+	}
 
 	QFile file(fi.filePath());
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
@@ -490,12 +491,17 @@ void drumkv1_param::loadTuning (
 	if (pDrumk == NULL)
 		return;
 
+	pDrumk->setTuningEnabled(eTuning.attribute("enabled").toInt() > 0);
+
 	for (QDomNode nChild = eTuning.firstChild();
 			!nChild.isNull();
 				nChild = nChild.nextSibling()) {
 		QDomElement eChild = nChild.toElement();
 		if (eChild.isNull())
 			continue;
+		if (eChild.tagName() == "enabled") {
+			pDrumk->setTuningEnabled(eChild.text().toInt() > 0);
+		}
 		if (eChild.tagName() == "ref-pitch") {
 			pDrumk->setTuningRefPitch(eChild.text().toFloat());
 		}
@@ -520,7 +526,8 @@ void drumkv1_param::loadTuning (
 			pDrumk->setTuningScaleFile(aKeyMapFile.constData());
 		}
 	}
-	// Consolidate tuning scale...
+
+	// Consolidate tuning state...
 	pDrumk->updateTuning();
 }
 
@@ -530,6 +537,8 @@ void drumkv1_param::saveTuning (
 {
 	if (pDrumk == NULL)
 		return;
+
+	eTuning.setAttribute("enabled", int(pDrumk->isTuningEnabled()));
 
 	QDomElement eRefPitch = doc.createElement("ref-pitch");
 	eRefPitch.appendChild(doc.createTextNode(

@@ -992,19 +992,16 @@ public:
 
 	// ctor.
 	drumkv1_tun(drumkv1 *pDrumk) : drumkv1_sched(pDrumk, Tuning),
-		refPitch(440.0f), refNote(69), enabled0(false) {}
+		enabled(false), refPitch(440.0f), refNote(69) {}
 
 	// processor.
 	void process(int) { instance()->updateTuning(); }
 
-	drumkv1_port enabled;
-
+	bool    enabled;
 	float   refPitch;
 	int     refNote;
 	QString scaleFile;
 	QString keyMapFile;
-
-	bool    enabled0;
 };
 
 
@@ -1065,6 +1062,9 @@ public:
 
 	drumkv1_controls *controls();
 	drumkv1_programs *programs();
+
+	void setTuningEnabled(bool enabled);
+	bool isTuningEnabled() const;
 
 	void setTuningRefPitch(float refPitch);
 	float tuningRefPitch() const;
@@ -1683,7 +1683,6 @@ drumkv1_port *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	case drumkv1::REV1_WIDTH:     pParamPort = &m_rev.width;     break;
 	case drumkv1::DYN1_COMPRESS:  pParamPort = &m_dyn.compress;  break;
 	case drumkv1::DYN1_LIMITER:   pParamPort = &m_dyn.limiter;   break;
-	case drumkv1::TUN1_ENABLED:   pParamPort = &m_tun.enabled;   break;
 	default:
 		if (m_elem) pParamPort = m_elem->element.paramPort(index);
 		break;
@@ -2034,6 +2033,17 @@ drumkv1_programs *drumkv1_impl::programs (void)
 
 // Micro-tuning support
 
+void drumkv1_impl::setTuningEnabled ( bool enabled )
+{
+	m_tun.enabled = enabled;
+}
+
+bool drumkv1_impl::isTuningEnabled (void) const
+{
+	return m_tun.enabled;
+}
+
+
 void drumkv1_impl::setTuningRefPitch ( float refPitch )
 {
 	m_tun.refPitch = refPitch;
@@ -2043,6 +2053,7 @@ float drumkv1_impl::tuningRefPitch (void) const
 {
 	return m_tun.refPitch;
 }
+
 
 void drumkv1_impl::setTuningRefNote ( int refNote )
 {
@@ -2079,7 +2090,7 @@ const char *drumkv1_impl::tuningKeyMapFile (void) const
 
 void drumkv1_impl::updateTuning (void)
 {
-	if (m_tun.enabled0) {
+	if (m_tun.enabled) {
 		// Instance micro-tuning, possibly from Scala keymap and scale files...
 		drumkv1_tuning tuning(
 			m_tun.refPitch,
@@ -2223,11 +2234,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				drumkv1_wave::Shape(*elem->lfo1.shape), *elem->lfo1.width);
 		}
 		elem = elem->next();
-	}
-
-	if (m_tun.enabled0 != *m_tun.enabled) {
-		m_tun.enabled0  = *m_tun.enabled;
-		m_tun.schedule();
 	}
 
 	// per voice
@@ -3066,6 +3072,17 @@ void drumkv1::directNoteOn ( int note, int vel )
 
 
 // Micro-tuning support
+void drumkv1::setTuningEnabled ( bool enabled )
+{
+	m_pImpl->setTuningEnabled(enabled);
+}
+
+bool drumkv1::isTuningEnabled (void) const
+{
+	return m_pImpl->isTuningEnabled();
+}
+
+
 void drumkv1::setTuningRefPitch ( float refPitch )
 {
 	m_pImpl->setTuningRefPitch(refPitch);
@@ -3075,6 +3092,7 @@ float drumkv1::tuningRefPitch (void) const
 {
 	return m_pImpl->tuningRefPitch();
 }
+
 
 void drumkv1::setTuningRefNote ( int refNote )
 {

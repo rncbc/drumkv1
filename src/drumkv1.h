@@ -169,8 +169,6 @@ public:
 		DYN1_COMPRESS,
 		DYN1_LIMITER,
 
-		TUN1_ENABLED,
-
 		NUM_PARAMS
 	};
 
@@ -199,6 +197,9 @@ public:
 	uint32_t midiInCount();
 
 	void directNoteOn(int note, int vel);
+
+	void setTuningEnabled(bool enabled);
+	bool isTuningEnabled() const;
 
 	void setTuningRefPitch(float refPitch);
 	float tuningRefPitch() const;
