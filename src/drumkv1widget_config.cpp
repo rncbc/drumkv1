@@ -65,6 +65,10 @@ drumkv1widget_config::drumkv1widget_config (
 		notes << drumkv1_ui::noteName(note);
 	m_ui.TuningRefNoteComboBox->insertItems(0, notes);
 
+	// Tuning specifics setup...
+	m_ui.TuningTabBar->addTab(tr("&Global"));
+	m_ui.TuningTabBar->addTab(tr("&Instance"));
+
 	// Setup options...
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig && m_pDrumkUi) {
@@ -101,15 +105,9 @@ drumkv1widget_config::drumkv1widget_config (
 		loadComboBoxHistory(m_ui.TuningScaleFileComboBox);
 		loadComboBoxHistory(m_ui.TuningKeyMapFileComboBox);
 		// Micro-tonal tuning settings...
-		m_ui.TuningEnabledCheckBox->setChecked(pConfig->bTuningEnabled);
-		m_ui.TuningRefNoteComboBox->setCurrentIndex(pConfig->iTuningRefNote);
-		m_ui.TuningRefPitchSpinBox->setValue(double(pConfig->fTuningRefPitch));
-		setComboBoxCurrentItem(
-			m_ui.TuningScaleFileComboBox,
-			QFileInfo(pConfig->sTuningScaleFile));
-		setComboBoxCurrentItem(
-			m_ui.TuningKeyMapFileComboBox,
-			QFileInfo(pConfig->sTuningKeyMapFile));
+		const int iTuningTab = (m_pDrumkUi->isTuningEnabled() ? 1 : 0);
+		m_ui.TuningTabBar->setCurrentIndex(iTuningTab);
+		tuningTabChanged(iTuningTab);
 	}
 
 	// Signal/slots connections...
@@ -173,6 +171,9 @@ drumkv1widget_config::drumkv1widget_config (
 		SLOT(programsContextMenuRequested(const QPoint&)));
 
 	// Tuning slots...
+	QObject::connect(m_ui.TuningTabBar,
+		SIGNAL(currentChanged(int)),
+		SLOT(tuningTabChanged(int)));
 	QObject::connect(m_ui.TuningEnabledCheckBox,
 		SIGNAL(toggled(bool)),
 		SLOT(tuningChanged()));
@@ -452,6 +453,39 @@ void drumkv1widget_config::programsActivated (void)
 
 
 // tuning command slots
+void drumkv1widget_config::tuningTabChanged ( int iTuningTab )
+{
+	if (iTuningTab == 0) {
+		// Global (default) scope...
+		drumkv1_config *pConfig = drumkv1_config::getInstance();
+		if (pConfig) {
+			m_ui.TuningEnabledCheckBox->setChecked(pConfig->bTuningEnabled);
+			m_ui.TuningRefNoteComboBox->setCurrentIndex(pConfig->iTuningRefNote);
+			m_ui.TuningRefPitchSpinBox->setValue(double(pConfig->fTuningRefPitch));
+			setComboBoxCurrentItem(
+				m_ui.TuningScaleFileComboBox,
+				QFileInfo(pConfig->sTuningScaleFile));
+			setComboBoxCurrentItem(
+				m_ui.TuningKeyMapFileComboBox,
+				QFileInfo(pConfig->sTuningKeyMapFile));
+		}
+	}
+	else
+	if (m_pDrumkUi) {
+		// Instance scope...
+		m_ui.TuningEnabledCheckBox->setChecked(m_pDrumkUi->isTuningEnabled());
+		m_ui.TuningRefNoteComboBox->setCurrentIndex(m_pDrumkUi->tuningRefNote());
+		m_ui.TuningRefPitchSpinBox->setValue(double(m_pDrumkUi->tuningRefPitch()));
+		setComboBoxCurrentItem(
+			m_ui.TuningScaleFileComboBox,
+			QFileInfo(QString::fromUtf8(m_pDrumkUi->tuningScaleFile())));
+		setComboBoxCurrentItem(
+			m_ui.TuningKeyMapFileComboBox,
+			QFileInfo(QString::fromUtf8(m_pDrumkUi->tuningKeyMapFile())));
+	}
+}
+
+
 void drumkv1widget_config::tuningRefNoteClicked (void)
 {
 	m_ui.TuningRefNoteComboBox->setCurrentIndex(69);
@@ -626,11 +660,25 @@ void drumkv1widget_config::accept (void)
 
 	if (m_iDirtyTuning > 0 && pConfig && m_pDrumkUi) {
 		// Micro-tonal tuning settings...
-		pConfig->bTuningEnabled = m_ui.TuningEnabledCheckBox->isChecked();
-		pConfig->iTuningRefNote = m_ui.TuningRefNoteComboBox->currentIndex();
-		pConfig->fTuningRefPitch = float(m_ui.TuningRefPitchSpinBox->value());
-		pConfig->sTuningScaleFile = comboBoxCurrentItem(m_ui.TuningScaleFileComboBox);
-		pConfig->sTuningKeyMapFile = comboBoxCurrentItem(m_ui.TuningKeyMapFileComboBox);
+		if (m_ui.TuningTabBar->currentIndex() == 0) {
+			// Global (default) scope...
+			pConfig->bTuningEnabled = m_ui.TuningEnabledCheckBox->isChecked();
+			pConfig->iTuningRefNote = m_ui.TuningRefNoteComboBox->currentIndex();
+			pConfig->fTuningRefPitch = float(m_ui.TuningRefPitchSpinBox->value());
+			pConfig->sTuningScaleFile = comboBoxCurrentItem(m_ui.TuningScaleFileComboBox);
+			pConfig->sTuningKeyMapFile = comboBoxCurrentItem(m_ui.TuningKeyMapFileComboBox);
+		} else {
+			m_pDrumkUi->setTuningEnabled(
+				m_ui.TuningEnabledCheckBox->isChecked());
+			m_pDrumkUi->setTuningRefNote(
+				m_ui.TuningRefNoteComboBox->currentIndex());
+			m_pDrumkUi->setTuningRefPitch(
+				float(m_ui.TuningRefPitchSpinBox->value()));
+			m_pDrumkUi->setTuningScaleFile(comboBoxCurrentItem(
+				m_ui.TuningScaleFileComboBox).toUtf8().constData());
+			m_pDrumkUi->setTuningKeyMapFile(comboBoxCurrentItem(
+				m_ui.TuningKeyMapFileComboBox).toUtf8().constData());
+		}
 		// Reset/update micro-tonal tuning...
 		m_pDrumkUi->resetTuning();
 		// Save other conveniency options...
