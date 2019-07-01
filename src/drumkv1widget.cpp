@@ -53,7 +53,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 {
 	Q_INIT_RESOURCE(drumkv1);
 
-#if QT_VERSION >= 0x050000
+#if QT_VERSION >= QT_VERSION_CHECK(5, 0, 0)
 	// HACK: Dark themes grayed/disabled color group fix...
 	QPalette pal;
 	if (pal.base().color().value() < 0x7f) {
