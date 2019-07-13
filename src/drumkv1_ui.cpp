@@ -204,9 +204,64 @@ void drumkv1_ui::directNoteOn ( int note, int vel )
 }
 
 
-void drumkv1_ui::updateTuning (void)
+void drumkv1_ui::setTuningEnabled ( bool enabled )
 {
-	m_pDrumk->updateTuning();
+	m_pDrumk->setTuningEnabled(enabled);
+}
+
+bool drumkv1_ui::isTuningEnabled (void) const
+{
+	return m_pDrumk->isTuningEnabled();
+}
+
+
+void drumkv1_ui::setTuningRefPitch ( float refPitch )
+{
+	m_pDrumk->setTuningRefPitch(refPitch);
+}
+
+float drumkv1_ui::tuningRefPitch (void) const
+{
+	return m_pDrumk->tuningRefPitch();
+}
+
+
+void drumkv1_ui::setTuningRefNote ( int refNote )
+{
+	m_pDrumk->setTuningRefNote(refNote);
+}
+
+int drumkv1_ui::tuningRefNote (void) const
+{
+	return m_pDrumk->tuningRefNote();
+}
+
+
+void drumkv1_ui::setTuningScaleFile ( const char *pszScaleFile )
+{
+	m_pDrumk->setTuningScaleFile(pszScaleFile);
+}
+
+const char *drumkv1_ui::tuningScaleFile (void) const
+{
+	return m_pDrumk->tuningScaleFile();
+}
+
+
+void drumkv1_ui::setTuningKeyMapFile ( const char *pszKeyMapFile )
+{
+	m_pDrumk->setTuningKeyMapFile(pszKeyMapFile);
+}
+
+const char *drumkv1_ui::tuningKeyMapFile (void) const
+{
+	return m_pDrumk->tuningKeyMapFile();
+}
+
+
+void drumkv1_ui::resetTuning (void)
+{
+	m_pDrumk->resetTuning();
 }
 
 

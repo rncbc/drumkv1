@@ -629,6 +629,12 @@ void drumkv1_jack::updateSample (void)
 }
 
 
+void drumkv1_jack::updateTuning (void)
+{
+	drumkv1::resetTuning();
+}
+
+
 void drumkv1_jack::shutdown (void)
 {
 	drumkv1_jack_application *pApp = drumkv1_jack_application::getInstance();
@@ -712,7 +718,7 @@ drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 	else
 		m_pApp = new QCoreApplication(argc, argv);
 
-#if QT_VERSION >= 0x050600
+#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
 	if (m_bGui) m_pApp->setAttribute(Qt::AA_EnableHighDpiScaling);
 #endif
 

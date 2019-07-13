@@ -189,6 +189,29 @@ QString drumkv1_param::map_path::abstractPath (
 }
 
 
+float drumkv1_param::paramScale ( drumkv1::ParamIndex index, float fValue )
+{
+	const ParamInfo& param = drumkv1_params[index];
+
+	if (param.type == PARAM_BOOL)
+		return (fValue > 0.5f ? 1.0f : 0.0f);
+
+	const float fScale = (fValue - param.min) / (param.max - param.min);
+
+	if (param.type == PARAM_INT)
+		return ::rintf(fScale);
+	else
+		return fScale;
+}
+
+
+bool drumkv1_param::paramFloat ( drumkv1::ParamIndex index )
+{
+	return (drumkv1_params[index].type == PARAM_FLOAT);
+}
+
+
+
 // Element serialization methods.
 void drumkv1_param::loadElements (
 	drumkv1 *pDrumk, const QDomElement& eElements,
@@ -232,11 +255,12 @@ void drumkv1_param::loadElements (
 						= eChild.attribute("offset-start").toULong();
 					const uint32_t iOffsetEnd
 						= eChild.attribute("offset-end").toULong();
-					QFileInfo fi(eChild.text());
-					if (fi.isSymLink())
-						fi.setFile(fi.symLinkTarget());
-					element->setSampleFile(
-						mapPath.absolutePath(fi.filePath()).toUtf8().constData());
+					const QString& sSampleFile
+						= eChild.text();
+					const QByteArray aSampleFile
+						= mapPath.absolutePath(
+							drumkv1_param::loadFilename(sSampleFile)).toUtf8();
+					element->setSampleFile(aSampleFile.constData());
 					element->setOffsetRange(iOffsetStart, iOffsetEnd);
 				}
 				else
@@ -281,18 +305,6 @@ void drumkv1_param::saveElements (
 		const char *pszSampleFile = element->sampleFile();
 		if (pszSampleFile == NULL)
 			continue;
-		QFileInfo fi(QString::fromUtf8(pszSampleFile));
-		if (bSymLink && fi.absolutePath() != QDir::current().absolutePath()) {
-			const QString& sPath = fi.absoluteFilePath();
-			const QString& sName = fi.baseName();
-			const QString& sExt  = fi.completeSuffix();
-			const QString& sLink = sName
-				+ '-' + QString::number(qHash(sPath), 16)
-				+ '.' + sExt;
-			QFile(sPath).link(sLink);
-			fi.setFile(QDir::current(), sLink);
-		}
-		else if (fi.isSymLink()) fi.setFile(fi.symLinkTarget());
 		QDomElement eElement = doc.createElement("element");
 		eElement.setAttribute("index", QString::number(note));
 	//	eElement.setAttribute("name", noteName(note));
@@ -301,8 +313,9 @@ void drumkv1_param::saveElements (
 		eSample.setAttribute("name", "GEN1_SAMPLE");
 		eSample.setAttribute("offset-start", element->offsetStart());
 		eSample.setAttribute("offset-end", element->offsetEnd());
-		eSample.appendChild(doc.createTextNode(
-			mapPath.abstractPath(fi.absoluteFilePath())));
+		eSample.appendChild(doc.createTextNode(mapPath.abstractPath(
+			drumkv1_param::saveFilename(
+				QString::fromUtf8(pszSampleFile), bSymLink))));
 		eElement.appendChild(eSample);
 		QDomElement eParams = doc.createElement("params");
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
@@ -318,29 +331,6 @@ void drumkv1_param::saveElements (
 		eElements.appendChild(eElement);
 	}
 }
-
-
-float drumkv1_param::paramScale ( drumkv1::ParamIndex index, float fValue )
-{
-	const ParamInfo& param = drumkv1_params[index];
-
-	if (param.type == PARAM_BOOL)
-		return (fValue > 0.5f ? 1.0f : 0.0f);
-
-	const float fScale = (fValue - param.min) / (param.max - param.min);
-
-	if (param.type == PARAM_INT)
-		return ::rintf(fScale);
-	else
-		return fScale;
-}
-
-
-bool drumkv1_param::paramFloat ( drumkv1::ParamIndex index )
-{
-	return (drumkv1_params[index].type == PARAM_FLOAT);
-}
-
 
 
 // Preset serialization methods.
@@ -370,6 +360,7 @@ bool drumkv1_param::loadPreset (
 
 	const bool running = pDrumk->running(false);
 
+	pDrumk->setTuningEnabled(false);
 	pDrumk->reset();
 
 	static QHash<QString, drumkv1::ParamIndex> s_hash;
@@ -394,10 +385,6 @@ bool drumkv1_param::loadPreset (
 				QDomElement eChild = nChild.toElement();
 				if (eChild.isNull())
 					continue;
-				if (eChild.tagName() == "elements") {
-					drumkv1_param::loadElements(pDrumk, eChild);
-				}
-				else
 				if (eChild.tagName() == "params") {
 					for (QDomNode nParam = eChild.firstChild();
 							!nParam.isNull();
@@ -419,6 +406,14 @@ bool drumkv1_param::loadPreset (
 								drumkv1_param::paramSafeValue(index, fValue));
 						}
 					}
+				}
+				else
+				if (eChild.tagName() == "elements") {
+					drumkv1_param::loadElements(pDrumk, eChild);
+				}
+				else
+				if (eChild.tagName() == "tuning") {
+					drumkv1_param::loadTuning(pDrumk, eChild);
 				}
 			}
 		}
@@ -470,6 +465,12 @@ bool drumkv1_param::savePreset (
 	ePreset.appendChild(eParams);
 	doc.appendChild(ePreset);
 
+	if (pDrumk->isTuningEnabled()) {
+		QDomElement eTuning = doc.createElement("tuning");
+		drumkv1_param::saveTuning(pDrumk, doc, eTuning, bSymLink);
+		ePreset.appendChild(eTuning);
+	}
+
 	QFile file(fi.filePath());
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))
 		return false;
@@ -480,6 +481,128 @@ bool drumkv1_param::savePreset (
 	QDir::setCurrent(currentDir.absolutePath());
 
 	return true;
+}
+
+
+// Tuning serialization methods.
+void drumkv1_param::loadTuning (
+	drumkv1 *pDrumk, const QDomElement& eTuning )
+{
+	if (pDrumk == NULL)
+		return;
+
+	pDrumk->setTuningEnabled(eTuning.attribute("enabled").toInt() > 0);
+
+	for (QDomNode nChild = eTuning.firstChild();
+			!nChild.isNull();
+				nChild = nChild.nextSibling()) {
+		QDomElement eChild = nChild.toElement();
+		if (eChild.isNull())
+			continue;
+		if (eChild.tagName() == "enabled") {
+			pDrumk->setTuningEnabled(eChild.text().toInt() > 0);
+		}
+		if (eChild.tagName() == "ref-pitch") {
+			pDrumk->setTuningRefPitch(eChild.text().toFloat());
+		}
+		else
+		if (eChild.tagName() == "ref-note") {
+			pDrumk->setTuningRefNote(eChild.text().toInt());
+		}
+		else
+		if (eChild.tagName() == "scale-file") {
+			const QString& sScaleFile
+				= eChild.text();
+			const QByteArray aScaleFile
+				= drumkv1_param::loadFilename(sScaleFile).toUtf8();
+			pDrumk->setTuningScaleFile(aScaleFile.constData());
+		}
+		else
+		if (eChild.tagName() == "keymap-file") {
+			const QString& sKeyMapFile
+				= eChild.text();
+			const QByteArray aKeyMapFile
+				= drumkv1_param::loadFilename(sKeyMapFile).toUtf8();
+			pDrumk->setTuningScaleFile(aKeyMapFile.constData());
+		}
+	}
+
+	// Consolidate tuning state...
+	pDrumk->resetTuning();
+}
+
+
+void drumkv1_param::saveTuning (
+	drumkv1 *pDrumk, QDomDocument& doc, QDomElement& eTuning, bool bSymLink )
+{
+	if (pDrumk == NULL)
+		return;
+
+	eTuning.setAttribute("enabled", int(pDrumk->isTuningEnabled()));
+
+	QDomElement eRefPitch = doc.createElement("ref-pitch");
+	eRefPitch.appendChild(doc.createTextNode(
+		QString::number(pDrumk->tuningRefPitch())));
+	eTuning.appendChild(eRefPitch);
+
+	QDomElement eRefNote = doc.createElement("ref-note");
+	eRefNote.appendChild(doc.createTextNode(
+		QString::number(pDrumk->tuningRefNote())));
+	eTuning.appendChild(eRefNote);
+
+	const char *pszScaleFile = pDrumk->tuningScaleFile();
+	if (pszScaleFile) {
+		const QString& sScaleFile
+			= QString::fromUtf8(pszScaleFile);
+		if (!sScaleFile.isEmpty()) {
+			QDomElement eScaleFile = doc.createElement("scale-file");
+			eScaleFile.appendChild(doc.createTextNode(
+				QDir::current().relativeFilePath(
+					drumkv1_param::saveFilename(sScaleFile, bSymLink))));
+			eTuning.appendChild(eScaleFile);
+		}
+	}
+
+	const char *pszKeyMapFile = pDrumk->tuningKeyMapFile();
+	if (pszKeyMapFile) {
+		const QString& sKeyMapFile
+			= QString::fromUtf8(pszKeyMapFile);
+		if (!sKeyMapFile.isEmpty()) {
+			QDomElement eKeyMapFile = doc.createElement("keymap-file");
+			eKeyMapFile.appendChild(doc.createTextNode(
+				QDir::current().relativeFilePath(
+					drumkv1_param::saveFilename(sKeyMapFile, bSymLink))));
+			eTuning.appendChild(eKeyMapFile);
+		}
+	}
+}
+
+
+// Load/save and convert canonical/absolute filename helpers.
+QString drumkv1_param::loadFilename ( const QString& sFilename )
+{
+	QFileInfo fi(sFilename);
+	if (fi.isSymLink())
+		fi.setFile(fi.symLinkTarget());
+	return fi.canonicalFilePath();
+}
+
+
+QString drumkv1_param::saveFilename ( const QString& sFilename, bool bSymLink )
+{
+	QFileInfo fi(sFilename);
+	if (bSymLink && fi.absolutePath() != QDir::current().absolutePath()) {
+		const QString& sPath = fi.absoluteFilePath();
+		const QString& sName = fi.baseName();
+		const QString& sExt  = fi.completeSuffix();
+		const QString& sLink = sName
+			+ '-' + QString::number(qHash(sPath), 16)
+			+ '.' + sExt;
+		QFile(sPath).link(sLink);
+		fi.setFile(QDir::current(), sLink);
+	}
+	else if (fi.isSymLink()) fi.setFile(fi.symLinkTarget());
+	return fi.absoluteFilePath();
 }
 
 

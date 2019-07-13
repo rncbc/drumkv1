@@ -186,7 +186,7 @@ void drumkv1widget_elements_model::midiInLedTimeout (void)
 void drumkv1widget_elements_model::midiInLedUpdate ( int key )
 {
 	const QModelIndex& index = drumkv1widget_elements_model::index(key, 0);
-#if QT_VERSION >= 0x050100
+#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
 	emit dataChanged(index, index, QVector<int>() << Qt::DecorationRole);
 #else
 	emit dataChanged(index, index);
@@ -196,7 +196,7 @@ void drumkv1widget_elements_model::midiInLedUpdate ( int key )
 
 void drumkv1widget_elements_model::reset (void)
 {
-#if QT_VERSION < 0x050000
+#if QT_VERSION < QT_VERSION_CHECK(5, 0, 0)
 	QAbstractItemModel::reset();
 #else
 	QAbstractItemModel::beginResetModel();
