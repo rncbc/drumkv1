@@ -67,6 +67,9 @@ public:
 	// Special time-formatted spinbox option.
 	int iFrameTimeFormat;
 
+	// Default randomize factor (percent).
+	float fRandomizePercent;
+
 	// Whether to display GM Standard drum-note/key names.
 	bool bUseGMDrumNames;
 
