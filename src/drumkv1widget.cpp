@@ -833,7 +833,21 @@ void drumkv1widget::randomParams (void)
 
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		// TODO: Filter non-randomizable parameters!...
+		// Filter out some non-randomizable parameters!...
+		if (index == drumkv1::GEN1_SAMPLE   ||
+		    index == drumkv1::GEN1_OFFSET   ||
+		    index == drumkv1::GEN1_OFFSET_1 ||
+		    index == drumkv1::GEN1_OFFSET_2 ||
+			index == drumkv1::GEN1_GROUP    ||
+			index == drumkv1::GEN1_COARSE   ||
+			index == drumkv1::GEN1_FINE     ||
+			index == drumkv1::GEN1_ENVTIME  ||
+			index == drumkv1::DCF1_ENABLED  ||
+			index == drumkv1::LFO1_ENABLED  ||
+			index == drumkv1::DCA1_ENABLED) 
+			continue;
+		if (index >= drumkv1::OUT1_WIDTH)
+			break;
 		drumkv1widget_param *pParam = paramKnob(index);
 		if (pParam) {
 			const float v = pParam->value();
