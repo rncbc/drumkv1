@@ -831,6 +831,14 @@ void drumkv1widget::randomParams (void)
 	if (pConfig)
 		p = 0.01f * pConfig->fRandomizePercent;
 
+	if (QMessageBox::warning(this,
+		tr("Warning") + " - " DRUMKV1_TITLE,
+		tr("About to randomize current parameter values:\n\n"
+		"-/+ %1%.\n\n"
+		"Are you sure?").arg(100.0f * p),
+		QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
+		return;
+
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		// Filter out some non-randomizable parameters!...
