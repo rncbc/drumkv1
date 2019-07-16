@@ -860,7 +860,7 @@ void drumkv1widget::randomParams (void)
 		if (pParam) {
 			const float v = pParam->value();
 			const float q = 1000.0f * ::fabsf(pParam->maximum() - pParam->minimum());
-			const float r = pParam->minimum() + 0.001f * float(::rand() % int(q));
+			const float r = pParam->minimum() + 0.001f * float(::rand() % int(q + 1));
 			float fValue = v;
 			if (drumkv1_param::paramFloat(index))
 				fValue += p * (r - v);
