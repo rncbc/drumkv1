@@ -91,6 +91,7 @@ drumkv1widget_config::drumkv1widget_config (
 		m_ui.CustomStyleThemeTextLabel->setEnabled(!bPlugin);
 		m_ui.CustomStyleThemeComboBox->setEnabled(!bPlugin);
 		m_ui.FrameTimeFormatComboBox->setCurrentIndex(pConfig->iFrameTimeFormat);
+		m_ui.RandomizePercentSpinBox->setValue(pConfig->fRandomizePercent);
 		m_ui.UseGMDrumNamesCheckBox->setChecked(pConfig->bUseGMDrumNames);
 		// Load controllers database...
 		drumkv1_controls *pControls = m_pDrumkUi->controls();
@@ -226,6 +227,9 @@ drumkv1widget_config::drumkv1widget_config (
 		SLOT(optionsChanged()));
 	QObject::connect(m_ui.UseGMDrumNamesCheckBox,
 		SIGNAL(toggled(bool)),
+		SLOT(optionsChanged()));
+	QObject::connect(m_ui.RandomizePercentSpinBox,
+		SIGNAL(valueChanged(double)),
 		SLOT(optionsChanged()));
 
 	// Dialog commands...
@@ -747,6 +751,7 @@ void drumkv1widget_config::accept (void)
 		const int iOldFrameTimeFormat = pConfig->iFrameTimeFormat;
 		const bool bOldUseGMDrumNames = pConfig->bUseGMDrumNames;
 		pConfig->iFrameTimeFormat = m_ui.FrameTimeFormatComboBox->currentIndex();
+		pConfig->fRandomizePercent = float(m_ui.RandomizePercentSpinBox->value());
 		pConfig->bUseGMDrumNames = m_ui.UseGMDrumNamesCheckBox->isChecked();
 		int iNeedRestart = 0;
 		if (pConfig->iFrameTimeFormat != iOldFrameTimeFormat)
