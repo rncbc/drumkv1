@@ -111,7 +111,7 @@ public:
 		{ if (++g_iRefCount == 1) g_pStyle = new drumkv1widget_param_style(); }
 
 	static void releaseRef ()
-		{ if (--g_iRefCount == 0) { delete g_pStyle; g_pStyle = NULL; } }
+		{ if (--g_iRefCount == 0) { delete g_pStyle; g_pStyle = nullptr; } }
 
 	static drumkv1widget_param_style *getRef ()
 		{ return g_pStyle; }
@@ -125,7 +125,7 @@ private:
 };
 
 
-drumkv1widget_param_style *drumkv1widget_param_style::g_pStyle = NULL;
+drumkv1widget_param_style *drumkv1widget_param_style::g_pStyle = nullptr;
 unsigned int drumkv1widget_param_style::g_iRefCount = 0;
 
 

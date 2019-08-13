@@ -79,7 +79,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 	m_ui.setupUi(this);
 
 	// Init sched notifier.
-	m_sched_notifier = NULL;
+	m_sched_notifier = nullptr;
 
 	// Init swapable params A/B to default.
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
@@ -587,7 +587,7 @@ void drumkv1widget::openSchedNotifier (void)
 		return;
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	m_sched_notifier = new drumkv1widget_sched(pDrumkUi->instance(), this);
@@ -604,7 +604,7 @@ void drumkv1widget::closeSchedNotifier (void)
 {
 	if (m_sched_notifier) {
 		delete m_sched_notifier;
-		m_sched_notifier = NULL;
+		m_sched_notifier = nullptr;
 	}
 
 	drumkv1_ui *pDrumkUi = ui_instance();
@@ -651,7 +651,7 @@ void drumkv1widget::setParamKnob ( drumkv1::ParamIndex index, drumkv1widget_para
 
 drumkv1widget_param *drumkv1widget::paramKnob ( drumkv1::ParamIndex index ) const
 {
-	return m_paramKnobs.value(index, NULL);
+	return m_paramKnobs.value(index, nullptr);
 }
 
 
@@ -720,7 +720,7 @@ void drumkv1widget::updateParamEx (
 	drumkv1::ParamIndex index, float fValue, bool bIter )
 {
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	++m_iUpdate;
@@ -793,7 +793,7 @@ void drumkv1widget::updateSchedParam ( drumkv1::ParamIndex index, float fValue )
 void drumkv1widget::resetParams (void)
 {
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	pDrumkUi->reset();
@@ -824,7 +824,7 @@ void drumkv1widget::resetParams (void)
 void drumkv1widget::randomParams (void)
 {
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	float p = 1.0f;
@@ -841,7 +841,7 @@ void drumkv1widget::randomParams (void)
 		QMessageBox::Ok | QMessageBox::Cancel) == QMessageBox::Cancel)
 		return;
 
-	std::default_random_engine re(::time(NULL));
+	std::default_random_engine re(::time(nullptr));
 
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
@@ -889,7 +889,7 @@ void drumkv1widget::swapParams ( bool bOn )
 		return;
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 #ifdef CONFIG_DEBUG
@@ -960,7 +960,7 @@ void drumkv1widget::updateParamValues ( uint32_t nparams )
 	resetSwapParams();
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	for (uint32_t i = 0; i < nparams; ++i) {
@@ -983,7 +983,7 @@ void drumkv1widget::resetParamValues ( uint32_t nparams )
 	resetSwapParams();
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	for (uint32_t i = 0; i < nparams; ++i) {
@@ -1142,9 +1142,9 @@ void drumkv1widget::clearSampleFile (void)
 
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
-		pDrumkUi->setSampleFile(NULL);
+		pDrumkUi->setSampleFile(nullptr);
 
-	updateSample(NULL);
+	updateSample(nullptr);
 }
 
 
@@ -1156,14 +1156,14 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 #endif
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	const int iCurrentNote = currentNote();
 	if (iCurrentNote < 0)
 		return;
 
-	if (pDrumkUi->element(iCurrentNote) == NULL) {
+	if (pDrumkUi->element(iCurrentNote) == nullptr) {
 		pDrumkUi->addElement(iCurrentNote);
 		pDrumkUi->setCurrentElement(iCurrentNote);
 	}
@@ -1183,11 +1183,11 @@ void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 
 	++m_iUpdate;
 	if (pSample) {
-		activateParamKnobs(pSample->filename() != NULL);
+		activateParamKnobs(pSample->filename() != nullptr);
 		updateOffset(pSample);
 	} else {
 		activateParamKnobs(false);
-		updateOffset(NULL);
+		updateOffset(nullptr);
 	}
 	--m_iUpdate;
 
@@ -1269,7 +1269,7 @@ QString drumkv1widget::noteName ( int note )
 		{ 80, QT_TR_NOOP("Mute Triangle") },
 		{ 81, QT_TR_NOOP("Open Triangle") },
 
-		{  0, NULL }
+		{  0, nullptr }
 	};
 
 	static QHash<int, QString> s_names;
@@ -1312,7 +1312,7 @@ void drumkv1widget::refreshElements (void)
 	const bool bBlockSignals = m_ui.Elements->blockSignals(true);
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (m_ui.Elements->instance() == NULL)
+	if (m_ui.Elements->instance() == nullptr)
 		m_ui.Elements->setInstance(pDrumkUi);
 
 	int iCurrentNote = currentNote();
@@ -1355,11 +1355,11 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 #endif
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	drumkv1_element *element = pDrumkUi->element(iCurrentNote);
-	if (element == NULL && bOpenSample) {
+	if (element == nullptr && bOpenSample) {
 		element = pDrumkUi->addElement(iCurrentNote);
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
@@ -1391,7 +1391,7 @@ void drumkv1widget::updateElement (void)
 	resetParamKnobs(drumkv1::NUM_ELEMENT_PARAMS);
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	const int iCurrentNote = pDrumkUi->currentElement();
@@ -1423,7 +1423,7 @@ void drumkv1widget::updateElement (void)
 		updateSample(pDrumkUi->sample());
 		refreshElements();
 	} else {
-		updateSample(NULL);
+		updateSample(nullptr);
 		resetParamValues(drumkv1::NUM_ELEMENT_PARAMS);
 	//	activateParamKnobs(false);
 	}
@@ -1594,14 +1594,14 @@ void drumkv1widget::activateParamKnobsGroupBox (
 void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 {
 	QWidget *pSender = static_cast<QWidget *> (sender());
-	if (pSender == NULL)
+	if (pSender == nullptr)
 		return;
 
 	QMenu menu(this);
 	QAction *pAction;
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	drumkv1_element *element = NULL;
+	drumkv1_element *element = nullptr;
 	if (pDrumkUi) {
 		const int key = pDrumkUi->currentElement();
 		element = pDrumkUi->element(key);
@@ -1610,15 +1610,15 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 	pAction = menu.addAction(
 		QIcon(":/images/fileOpen.png"),
 		tr("Open Sample..."), this, SLOT(openSample()));
-	pAction->setEnabled(pDrumkUi != NULL);
+	pAction->setEnabled(pDrumkUi != nullptr);
 	pAction = menu.addAction(
 		QIcon(":/images/playSample.png"),
 		tr("Play"), this, SLOT(playSample()));
-	pAction->setEnabled(element != NULL);
+	pAction->setEnabled(element != nullptr);
 	menu.addSeparator();
 	pAction = menu.addAction(
 		tr("Reset"), this, SLOT(resetElement()));
-	pAction->setEnabled(element != NULL);
+	pAction->setEnabled(element != nullptr);
 
 	QAbstractScrollArea *pAbstractScrollArea
 		= qobject_cast<QAbstractScrollArea *> (pSender);
@@ -1650,7 +1650,7 @@ void drumkv1widget::updateLoadPreset ( const QString& sPreset )
 void drumkv1widget::updateSchedNotify ( int stype, int sid )
 {
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 #ifdef CONFIG_DEBUG_0
@@ -1732,7 +1732,7 @@ void drumkv1widget::midiInLedTimeout (void)
 void drumkv1widget::helpConfigure (void)
 {
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	drumkv1widget_config(pDrumkUi, this).exec();
@@ -1811,15 +1811,15 @@ void drumkv1widget::paramContextMenu ( const QPoint& pos )
 {
 	drumkv1widget_param *pParam
 		= qobject_cast<drumkv1widget_param *> (sender());
-	if (pParam == NULL)
+	if (pParam == nullptr)
 		return;
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	drumkv1_controls *pControls = pDrumkUi->controls();
-	if (pControls == NULL)
+	if (pControls == nullptr)
 		return;
 
 	if (!pControls->enabled())
@@ -1844,7 +1844,7 @@ void drumkv1widget::spinboxContextMenu ( const QPoint& pos )
 {
 	drumkv1widget_spinbox *pSpinBox
 		= qobject_cast<drumkv1widget_spinbox *> (sender());
-	if (pSpinBox == NULL)
+	if (pSpinBox == nullptr)
 		return;
 
 	drumkv1widget_spinbox::Format format = pSpinBox->format();
@@ -1863,7 +1863,7 @@ void drumkv1widget::spinboxContextMenu ( const QPoint& pos )
 	pAction->setData(int(drumkv1widget_spinbox::Time));
 
 	pAction = menu.exec(pSpinBox->mapToGlobal(pos));
-	if (pAction == NULL)
+	if (pAction == nullptr)
 		return;
 
 	format = drumkv1widget_spinbox::Format(pAction->data().toInt());

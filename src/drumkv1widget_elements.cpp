@@ -136,7 +136,7 @@ QVariant drumkv1widget_elements_model::data (
 QModelIndex drumkv1widget_elements_model::index (
 	int row, int column, const QModelIndex& /*parent*/) const
 {
-	return createIndex(row, column, (m_pDrumkUi ? m_pDrumkUi->element(row) : NULL));
+	return createIndex(row, column, (m_pDrumkUi ? m_pDrumkUi->element(row) : nullptr));
 }
 
 
@@ -252,8 +252,8 @@ int drumkv1widget_elements_model::columnAlignment( int /*column*/ ) const
 
 // Constructor.
 drumkv1widget_elements::drumkv1widget_elements ( QWidget *pParent )
-	: QTreeView(pParent), m_pModel(NULL),
-		m_pDragSample(NULL), m_iDirectNoteOn(-1), m_iDirectNoteOnVelocity(64)
+	: QTreeView(pParent), m_pModel(nullptr),
+		m_pDragSample(nullptr), m_iDirectNoteOn(-1), m_iDirectNoteOnVelocity(64)
 {
 	resetDragState();
 }
@@ -306,7 +306,7 @@ void drumkv1widget_elements::setInstance ( drumkv1_ui *pDrumkUi )
 
 drumkv1_ui *drumkv1widget_elements::instance (void) const
 {
-	return (m_pModel ? m_pModel->instance() : NULL);
+	return (m_pModel ? m_pModel->instance() : nullptr);
 }
 
 
@@ -386,7 +386,7 @@ void drumkv1widget_elements::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 
 	directNoteOff();
 
-	m_pDragSample = NULL;
+	m_pDragSample = nullptr;
 	resetDragState();
 }
 
@@ -448,7 +448,7 @@ void drumkv1widget_elements::resetDragState (void)
 // Refreshner.
 void drumkv1widget_elements::refresh (void)
 {
-	if (m_pModel == NULL)
+	if (m_pModel == nullptr)
 		return;
 
 	QItemSelectionModel *pSelectionModel = QTreeView::selectionModel();
@@ -480,11 +480,11 @@ void drumkv1widget_elements::midiInLedNote ( int key, int vel )
 // Direct note-on/off methods.
 void drumkv1widget_elements::directNoteOn ( int key )
 {
-	if (m_pModel == NULL || key < 0)
+	if (m_pModel == nullptr || key < 0)
 		return;
 
 	drumkv1_ui *pDrumkUi = m_pModel->instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	m_iDirectNoteOn = key;
@@ -502,11 +502,11 @@ void drumkv1widget_elements::directNoteOn ( int key )
 
 void drumkv1widget_elements::directNoteOff (void)
 {
-	if (m_pModel == NULL || m_iDirectNoteOn < 0)
+	if (m_pModel == nullptr || m_iDirectNoteOn < 0)
 		return;
 
 	drumkv1_ui *pDrumkUi = m_pModel->instance();
-	if (pDrumkUi == NULL)
+	if (pDrumkUi == nullptr)
 		return;
 
 	pDrumkUi->directNoteOn(m_iDirectNoteOn, 0); // note-off!

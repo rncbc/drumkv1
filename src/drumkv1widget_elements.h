@@ -49,7 +49,7 @@ class drumkv1widget_elements_model : public QAbstractItemModel
 public:
 
 	// Constructor.
-	drumkv1widget_elements_model(drumkv1_ui *pDrumkUi, QObject *pParent = NULL);
+	drumkv1widget_elements_model(drumkv1_ui *pDrumkUi, QObject *pParent = nullptr);
 
 	// Destructor.
 	~drumkv1widget_elements_model();

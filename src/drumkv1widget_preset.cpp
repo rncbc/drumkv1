@@ -1,7 +1,7 @@
 // drumkv1widget_preset.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -53,7 +53,7 @@ drumkv1widget_preset::drumkv1widget_preset ( QWidget *pParent )
 	m_pComboBox->setEditable(true);
 	m_pComboBox->setMinimumWidth(240);
 #if QT_VERSION >= QT_VERSION_CHECK(4, 2, 0)
-	m_pComboBox->setCompleter(NULL);
+	m_pComboBox->setCompleter(nullptr);
 #endif
 	m_pComboBox->setInsertPolicy(QComboBox::NoInsert);
 	m_pSaveButton->setIcon(QIcon(":/images/presetSave.png"));
@@ -141,7 +141,7 @@ bool drumkv1widget_preset::queryPreset (void)
 		return true;
 
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig == NULL)
+	if (pConfig == nullptr)
 		return false;
 
 	if (m_iDirtyPreset > 0) {
@@ -225,7 +225,7 @@ void drumkv1widget_preset::newPreset (void)
 void drumkv1widget_preset::openPreset (void)
 {
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig == NULL)
+	if (pConfig == nullptr)
 		return;
 
 	QStringList files;
@@ -234,7 +234,7 @@ void drumkv1widget_preset::openPreset (void)
 	const QString& sTitle  = tr("Open Preset") + " - " DRUMKV1_TITLE;
 	const QString& sFilter = tr("Preset files (*.%1)").arg(sExt);
 
-	QWidget *pParentWidget = NULL;
+	QWidget *pParentWidget = nullptr;
 	QFileDialog::Options options = 0;
 	if (pConfig->bDontUseNativeDialogs) {
 		options |= QFileDialog::DontUseNativeDialog;
@@ -242,7 +242,7 @@ void drumkv1widget_preset::openPreset (void)
 	}
 #if 1//QT_VERSION < QT_VERSION_CHECK(4, 4, 0)
 	files = QFileDialog::getOpenFileNames(pParentWidget,
-		sTitle, pConfig->sPresetDir, sFilter, NULL, options);
+		sTitle, pConfig->sPresetDir, sFilter, nullptr, options);
 #else
 	QFileDialog fileDialog(pParentWidget,
 		sTitle, pConfig->sPresetDir, sFilter);
@@ -293,7 +293,7 @@ void drumkv1widget_preset::savePreset ( const QString& sPreset )
 		return;
 
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig == NULL)
+	if (pConfig == nullptr)
 		return;
 
 	const QString sExt(DRUMKV1_TITLE);
@@ -302,7 +302,7 @@ void drumkv1widget_preset::savePreset ( const QString& sPreset )
 	if (!fi.exists()) {
 		const QString& sTitle  = tr("Save Preset") + " - " DRUMKV1_TITLE;
 		const QString& sFilter = tr("Preset files (*.%1)").arg(sExt);
-		QWidget *pParentWidget = NULL;
+		QWidget *pParentWidget = nullptr;
 		QFileDialog::Options options = 0;
 		if (pConfig->bDontUseNativeDialogs) {
 			options |= QFileDialog::DontUseNativeDialog;
@@ -310,7 +310,7 @@ void drumkv1widget_preset::savePreset ( const QString& sPreset )
 		}
 	#if 1//QT_VERSION < QT_VERSION_CHECK(4, 4, 0)
 		sFilename = QFileDialog::getSaveFileName(pParentWidget,
-			sTitle, sFilename, sFilter, NULL, options);
+			sTitle, sFilename, sFilter, nullptr, options);
 	#else
 		QFileDialog fileDialog(pParentWidget,
 			sTitle, sFilename, sFilter);
@@ -359,7 +359,7 @@ void drumkv1widget_preset::deletePreset (void)
 		return;
 
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig == NULL)
+	if (pConfig == nullptr)
 		return;
 	if (QMessageBox::warning(QWidget::window(),
 		tr("Warning") + " - " DRUMKV1_TITLE,

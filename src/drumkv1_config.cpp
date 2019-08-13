@@ -32,7 +32,7 @@
 //
 
 // Singleton instance accessor (static).
-drumkv1_config *drumkv1_config::g_pSettings = NULL;
+drumkv1_config *drumkv1_config::g_pSettings = nullptr;
 
 drumkv1_config *drumkv1_config::getInstance (void)
 {
@@ -55,7 +55,7 @@ drumkv1_config::~drumkv1_config (void)
 {
 	save();
 
-	g_pSettings = NULL;
+	g_pSettings = nullptr;
 }
 
 
