@@ -70,7 +70,7 @@ private:
 };
 
 
-static drumkv1_sched_thread *g_sched_thread = NULL;
+static drumkv1_sched_thread *g_sched_thread = nullptr;
 static uint32_t g_sched_refcount = 0;
 
 static QHash<drumkv1 *, QList<drumkv1_sched::Notifier *> > g_sched_notifiers;
@@ -146,7 +146,7 @@ void drumkv1_sched_thread::run (void)
 			drumkv1_sched *sched = m_items[r];
 			if (sched) {
 				sched->sync_process();
-				m_items[r] = NULL;
+				m_items[r] = nullptr;
 			}
 			++r &= m_nmask;
 		}
@@ -178,7 +178,7 @@ drumkv1_sched::drumkv1_sched ( drumkv1 *pDrumk, Type stype, uint32_t nsize )
 
 	::memset(m_items, 0, m_nsize * sizeof(int));
 
-	if (++g_sched_refcount == 1 && g_sched_thread == NULL) {
+	if (++g_sched_refcount == 1 && g_sched_thread == nullptr) {
 		g_sched_thread = new drumkv1_sched_thread();
 		g_sched_thread->start();
 	}
@@ -193,7 +193,7 @@ drumkv1_sched::~drumkv1_sched (void)
 	if (--g_sched_refcount == 0) {
 		if (g_sched_thread) {
 			delete g_sched_thread;
-			g_sched_thread = NULL;
+			g_sched_thread = nullptr;
 		}
 	}
 }

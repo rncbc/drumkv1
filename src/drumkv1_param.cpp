@@ -217,7 +217,7 @@ void drumkv1_param::loadElements (
 	drumkv1 *pDrumk, const QDomElement& eElements,
 	const drumkv1_param::map_path& mapPath )
 {
-	if (pDrumk == NULL)
+	if (pDrumk == nullptr)
 		return;
 
 	pDrumk->clearElements();
@@ -295,15 +295,15 @@ void drumkv1_param::saveElements (
 	drumkv1 *pDrumk, QDomDocument& doc, QDomElement& eElements,
 	const drumkv1_param::map_path& mapPath, bool bSymLink )
 {
-	if (pDrumk == NULL)
+	if (pDrumk == nullptr)
 		return;
 
 	for (int note = 0; note < 128; ++note) {
 		drumkv1_element *element = pDrumk->element(note);
-		if (element == NULL)
+		if (element == nullptr)
 			continue;
 		const char *pszSampleFile = element->sampleFile();
-		if (pszSampleFile == NULL)
+		if (pszSampleFile == nullptr)
 			continue;
 		QDomElement eElement = doc.createElement("element");
 		eElement.setAttribute("index", QString::number(note));
@@ -337,7 +337,7 @@ void drumkv1_param::saveElements (
 bool drumkv1_param::loadPreset (
 	drumkv1 *pDrumk, const QString& sFilename )
 {
-	if (pDrumk == NULL)
+	if (pDrumk == nullptr)
 		return false;
 
 	QFileInfo fi(sFilename);
@@ -434,7 +434,7 @@ bool drumkv1_param::loadPreset (
 bool drumkv1_param::savePreset (
 	drumkv1 *pDrumk, const QString& sFilename, bool bSymLink )
 {
-	if (pDrumk == NULL)
+	if (pDrumk == nullptr)
 		return false;
 
 	pDrumk->stabilize();
@@ -488,7 +488,7 @@ bool drumkv1_param::savePreset (
 void drumkv1_param::loadTuning (
 	drumkv1 *pDrumk, const QDomElement& eTuning )
 {
-	if (pDrumk == NULL)
+	if (pDrumk == nullptr)
 		return;
 
 	pDrumk->setTuningEnabled(eTuning.attribute("enabled").toInt() > 0);
@@ -535,7 +535,7 @@ void drumkv1_param::loadTuning (
 void drumkv1_param::saveTuning (
 	drumkv1 *pDrumk, QDomDocument& doc, QDomElement& eTuning, bool bSymLink )
 {
-	if (pDrumk == NULL)
+	if (pDrumk == nullptr)
 		return;
 
 	eTuning.setAttribute("enabled", int(pDrumk->isTuningEnabled()));

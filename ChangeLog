@@ -6,6 +6,13 @@ ChangeLog
 
 0.9.7  2019-04-14  A Spring-Break'19 Release.
 
+- All randomizers now compliant to the standard normal
+  distribution. (EXPERIMENTAL)
+- Make sure compiler flags comply to c++11 as standard.
+
+
+GIT HEAD
+
 - Randomization of current parameters is now available
   through a new top-level push-button.
 - Zero-crossing detection algorithm has been improved,

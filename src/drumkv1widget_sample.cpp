@@ -1,7 +1,7 @@
 // drumkv1widget_sample.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2018, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -51,7 +51,7 @@
 // Constructor.
 drumkv1widget_sample::drumkv1widget_sample (
 	QWidget *pParent, Qt::WindowFlags wflags )
-	: QFrame(pParent, wflags), m_pSample(NULL), m_iChannels(0), m_ppPolyg(NULL)
+	: QFrame(pParent, wflags), m_pSample(nullptr), m_iChannels(0), m_ppPolyg(nullptr)
 {
 	QFrame::setMouseTracking(true);
 	QFrame::setFocusPolicy(Qt::ClickFocus);
@@ -69,7 +69,7 @@ drumkv1widget_sample::drumkv1widget_sample (
 	m_iOffsetStart = m_iOffsetEnd = 0;
 
 	m_dragCursor  = DragNone;
-	m_pDragSample = NULL;
+	m_pDragSample = nullptr;
 
 	resetDragState();
 }
@@ -78,7 +78,7 @@ drumkv1widget_sample::drumkv1widget_sample (
 // Destructor.
 drumkv1widget_sample::~drumkv1widget_sample (void)
 {
-	setSample(NULL);
+	setSample(nullptr);
 }
 
 
@@ -98,7 +98,7 @@ void drumkv1widget_sample::setSample ( drumkv1_sample *pSample )
 //	m_bOffset = 0;
 //	m_iOffsetStart = m_iOffsetEnd = 0;
 
-	m_pDragSample = NULL;
+	m_pDragSample = nullptr;
 
 	if (m_pSample)
 		m_iChannels = m_pSample->channels();
@@ -425,7 +425,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 		break;
 	}
 
-	m_pDragSample = NULL;
+	m_pDragSample = nullptr;
 	resetDragState();
 }
 
@@ -441,7 +441,7 @@ void drumkv1widget_sample::keyPressEvent ( QKeyEvent *pKeyEvent )
 {
 	switch (pKeyEvent->key()) {
 	case Qt::Key_Escape:
-		m_pDragSample = NULL;
+		m_pDragSample = nullptr;
 		resetDragState();
 		update();
 		break;
@@ -586,7 +586,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 void drumkv1widget_sample::openSample ( const QString& sName )
 {
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig == NULL)
+	if (pConfig == nullptr)
 		return;
 
 	QString sFilename = pConfig->sSampleDir;
@@ -601,10 +601,10 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 		QStringList exts;
 		SF_FORMAT_INFO sffinfo;
 		int iCount = 0;
-		::sf_command(NULL, SFC_GET_FORMAT_MAJOR_COUNT, &iCount, sizeof(int));
+		::sf_command(nullptr, SFC_GET_FORMAT_MAJOR_COUNT, &iCount, sizeof(int));
 		for (int i = 0 ; i < iCount; ++i) {
 			sffinfo.format = i;
-			::sf_command(NULL, SFC_GET_FORMAT_MAJOR, &sffinfo, sizeof(sffinfo));
+			::sf_command(nullptr, SFC_GET_FORMAT_MAJOR, &sffinfo, sizeof(sffinfo));
 			const QString sFilterName = QString(sffinfo.name)
 				.replace('/', '-') // Replace some illegal characters.
 				.remove('(').remove(')');
@@ -625,7 +625,7 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 
 	const QString& sTitle  = tr("Open Sample [%1]").arg(sName) + " - " DRUMKV1_TITLE;
 	const QString& sFilter = s_filters.join(";;");
-	QWidget *pParentWidget = NULL;
+	QWidget *pParentWidget = nullptr;
 	QFileDialog::Options options = 0;
 	if (pConfig->bDontUseNativeDialogs) {
 		options |= QFileDialog::DontUseNativeDialog;
@@ -633,7 +633,7 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 	}
 #if 1//QT_VERSION < QT_VERSION_CHECK(4, 4, 0)
 	sFilename = QFileDialog::getOpenFileName(pParentWidget,
-		sTitle, sFilename, sFilter, NULL, options);
+		sTitle, sFilename, sFilter, nullptr, options);
 #else
 	QFileDialog fileDialog(pParentWidget, sTitle, sFilename, sFilter);
 	fileDialog.setAcceptMode(QFileDialog::AcceptOpen);

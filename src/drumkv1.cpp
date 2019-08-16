@@ -156,7 +156,7 @@ class drumkv1_port
 {
 public:
 
-	drumkv1_port() : m_port(NULL), m_value(0.0f), m_vport(0.0f) {}
+	drumkv1_port() : m_port(nullptr), m_value(0.0f), m_vport(0.0f) {}
 
 	virtual ~drumkv1_port() {}
 
@@ -903,17 +903,17 @@ void drumkv1_elem::updateEnvTimes ( float srate )
 
 struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 {
-	drumkv1_voice(drumkv1_elem *pElem = NULL) { reset(pElem); }
+	drumkv1_voice(drumkv1_elem *pElem = nullptr) { reset(pElem); }
 
 	void reset(drumkv1_elem *pElem)
 	{
 		elem = pElem;
 
-		gen1.reset(pElem ? &pElem->gen1_sample : NULL);
-		lfo1.reset(pElem ? &pElem->lfo1_wave : NULL);
+		gen1.reset(pElem ? &pElem->gen1_sample : nullptr);
+		lfo1.reset(pElem ? &pElem->lfo1_wave : nullptr);
 
-		dcf17.reset(pElem ? &pElem->dcf1_formant : NULL);
-		dcf18.reset(pElem ? &pElem->dcf1_formant : NULL);
+		dcf17.reset(pElem ? &pElem->dcf1_formant : nullptr);
+		dcf18.reset(pElem ? &pElem->dcf1_formant : nullptr);
 	}
 
 	drumkv1_elem *elem;
@@ -1112,7 +1112,7 @@ protected:
 
 	drumkv1_voice *alloc_voice ( int key )
 	{
-		drumkv1_voice *pv = NULL;
+		drumkv1_voice *pv = nullptr;
 		drumkv1_elem *elem = m_elems[key];
 		if (elem) {
 			pv = m_free_list.next();
@@ -1222,33 +1222,33 @@ drumkv1_impl::drumkv1_impl (
 	}
 
 	for (int note = 0; note < MAX_NOTES; ++note)
-		m_notes[note] = NULL;
+		m_notes[note] = nullptr;
 
 	for (int group = 0; group < MAX_GROUP; ++group)
-		m_group[group] = NULL;
+		m_group[group] = nullptr;
 
 	// reset all current param ports
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i)
-		m_params[i] = NULL;
+		m_params[i] = nullptr;
 
 	// special case for sample element switching
 	m_key = new drumkv1_port();
 
 	// local buffers none yet
-	m_sfxs = NULL;
+	m_sfxs = nullptr;
 	m_nsize = 0;
 
 	// flangers none yet
-	m_flanger = NULL;
+	m_flanger = nullptr;
 
 	// phasers none yet
-	m_phaser = NULL;
+	m_phaser = nullptr;
 
 	// delays none yet
-	m_delay = NULL;
+	m_delay = nullptr;
 
 	// compressors none yet
-	m_comp = NULL;
+	m_comp = nullptr;
 
 	// Micro-tuning support, if any...
 	resetTuning();
@@ -1314,25 +1314,25 @@ void drumkv1_impl::setChannels ( uint16_t nchannels )
 	// deallocate flangers
 	if (m_flanger) {
 		delete [] m_flanger;
-		m_flanger = NULL;
+		m_flanger = nullptr;
 	}
 
 	// deallocate phasers
 	if (m_phaser) {
 		delete [] m_phaser;
-		m_phaser = NULL;
+		m_phaser = nullptr;
 	}
 
 	// deallocate delays
 	if (m_delay) {
 		delete [] m_delay;
-		m_delay = NULL;
+		m_delay = nullptr;
 	}
 
 	// deallocate compressors
 	if (m_comp) {
 		delete [] m_comp;
-		m_comp = NULL;
+		m_comp = nullptr;
 	}
 }
 
@@ -1389,7 +1389,7 @@ void drumkv1_impl::alloc_sfxs ( uint32_t nsize )
 		for (uint16_t k = 0; k < m_nchannels; ++k)
 			delete [] m_sfxs[k];
 		delete [] m_sfxs;
-		m_sfxs = NULL;
+		m_sfxs = nullptr;
 		m_nsize = 0;
 	}
 
@@ -1404,25 +1404,25 @@ void drumkv1_impl::alloc_sfxs ( uint32_t nsize )
 
 drumkv1_element *drumkv1_impl::addElement ( int key )
 {
-	drumkv1_elem *elem = NULL;
+	drumkv1_elem *elem = nullptr;
 	if (key >= 0 && key < MAX_NOTES) {
 		elem = m_elems[key];
-		if (elem == NULL) {
+		if (elem == nullptr) {
 			elem = new drumkv1_elem(m_pDrumk, m_srate, key);
 			m_elem_list.append(elem);
 			m_elems[key] = elem;
 		}
 	}
-	return (elem ? &(elem->element) : NULL);
+	return (elem ? &(elem->element) : nullptr);
 }
 
 
 drumkv1_element *drumkv1_impl::element ( int key ) const
 {
-	drumkv1_elem *elem = NULL;
+	drumkv1_elem *elem = nullptr;
 	if (key >= 0 && key < MAX_NOTES)
 		elem = m_elems[key];
-	return (elem ? &(elem->element) : NULL);
+	return (elem ? &(elem->element) : nullptr);
 }
 
 
@@ -1430,14 +1430,14 @@ void drumkv1_impl::removeElement ( int key )
 {
 	allNotesOff();
 
-	drumkv1_elem *elem = NULL;
+	drumkv1_elem *elem = nullptr;
 	if (key >= 0 && key < MAX_NOTES)
 		elem = m_elems[key];
 	if (elem) {
 		if (m_elem == elem)
-			m_elem = NULL;
+			m_elem = nullptr;
 		m_elem_list.remove(elem);
-		m_elems[key] = NULL;
+		m_elems[key] = nullptr;
 		delete elem;
 	}
 }
@@ -1458,7 +1458,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 			drumkv1_port *pParamPort = elem->element.paramPort(index);
 			if (pParamPort) {
 				elem->params[1][i] = pParamPort->tick(drumkv1_port2::NSTEP);
-				pParamPort->set_port(NULL);
+				pParamPort->set_port(nullptr);
 			}
 		}
 		resetElement(elem);
@@ -1486,7 +1486,7 @@ void drumkv1_impl::setCurrentElement ( int key )
 		m_key0 = key;
 	} else {
 		// null default element
-		m_elem = NULL;
+		m_elem = nullptr;
 		m_key0 = -1; // int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
 	}
 
@@ -1519,10 +1519,10 @@ void drumkv1_impl::clearElements (void)
 {
 	// reset element map
 	for (int note = 0; note < MAX_NOTES; ++note)
-		m_elems[note] = NULL;
+		m_elems[note] = nullptr;
 
 	// reset current element
-	m_elem = NULL;
+	m_elem = nullptr;
 	m_key0 = -1; // int(drumkv1_param::paramDefaultValue(drumkv1::GEN1_SAMPLE));
 	m_key1 = m_key0;
 
@@ -1546,13 +1546,13 @@ void drumkv1_impl::setSampleFile ( const char *pszSampleFile )
 
 const char *drumkv1_impl::sampleFile (void) const
 {
-	return (m_elem ? m_elem->element.sampleFile() : NULL);
+	return (m_elem ? m_elem->element.sampleFile() : nullptr);
 }
 
 
 drumkv1_sample *drumkv1_impl::sample (void) const
 {
-	return (m_elem ? m_elem->element.sample() : NULL);
+	return (m_elem ? m_elem->element.sample() : nullptr);
 }
 
 
@@ -1599,7 +1599,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 {
 	static float s_fDummy = 0.0f;
 
-	if (pfParam == NULL)
+	if (pfParam == nullptr)
 		pfParam = &s_fDummy;
 
 	drumkv1_port *pParamPort = paramPort(index);
@@ -1644,7 +1644,7 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 
 drumkv1_port *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 {
-	drumkv1_port *pParamPort = NULL;
+	drumkv1_port *pParamPort = nullptr;
 
 	switch (index) {
 	case drumkv1::DEF1_PITCHBEND: pParamPort = &m_def.pitchbend; break;
@@ -1761,7 +1761,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				elem->dcf1.env.note_off_fast(&pv->dcf1_env);
 				elem->lfo1.env.note_off_fast(&pv->lfo1_env);
 				elem->dca1.env.note_off_fast(&pv->dca1_env);
-				m_notes[key] = NULL;
+				m_notes[key] = nullptr;
 				pv->note = -1;
 			}
 			// find free voice
@@ -1832,7 +1832,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 						elem_group->dcf1.env.note_off_fast(&pv_group->dcf1_env);
 						elem_group->lfo1.env.note_off_fast(&pv_group->lfo1_env);
 						elem_group->dca1.env.note_off_fast(&pv_group->dca1_env);
-						m_notes[pv_group->note] = NULL;
+						m_notes[pv_group->note] = nullptr;
 						pv_group->note = -1;
 					}
 					m_group[pv->group] = pv;
@@ -1952,9 +1952,9 @@ void drumkv1_impl::allNotesOff (void)
 	drumkv1_voice *pv = m_play_list.next();
 	while (pv) {
 		if (pv->note >= 0)
-			m_notes[pv->note] = NULL;
+			m_notes[pv->note] = nullptr;
 		if (pv->group >= 0)
-			m_group[pv->group] = NULL;
+			m_group[pv->group] = nullptr;
 		free_voice(pv);
 		pv = m_play_list.next();
 	}
@@ -2146,19 +2146,19 @@ void drumkv1_impl::reset (void)
 	}
 
 	// flangers
-	if (m_flanger == NULL)
+	if (m_flanger == nullptr)
 		m_flanger = new drumkv1_fx_flanger [m_nchannels];
 
 	// phasers
-	if (m_phaser == NULL)
+	if (m_phaser == nullptr)
 		m_phaser = new drumkv1_fx_phaser [m_nchannels];
 
 	// delays
-	if (m_delay == NULL)
+	if (m_delay == nullptr)
 		m_delay = new drumkv1_fx_delay [m_nchannels];
 
 	// compressors
-	if (m_comp == NULL)
+	if (m_comp == nullptr)
 		m_comp = new drumkv1_fx_comp [m_nchannels];
 
 	// reverbs
@@ -2384,9 +2384,9 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			if (pv->gen1.isOver() ||
 				(dca1_enabled && pv->dca1_env.stage == drumkv1_env::Idle)) {
 				if (pv->note >= 0)
-					m_notes[pv->note] = NULL;
+					m_notes[pv->note] = nullptr;
 				if (pv->group >= 0 && m_group[pv->group] == pv)
-					m_group[pv->group] = NULL;
+					m_group[pv->group] = nullptr;
 				free_voice(pv);
 				nblock = 0;
 			} else {
@@ -2816,13 +2816,13 @@ void drumkv1_element::setSampleFile ( const char *pszSampleFile )
 
 const char *drumkv1_element::sampleFile (void) const
 {
-	return (m_pElem ? m_pElem->gen1_sample.filename() : NULL);
+	return (m_pElem ? m_pElem->gen1_sample.filename() : nullptr);
 }
 
 
 drumkv1_sample *drumkv1_element::sample (void) const
 {
-	return (m_pElem ? &(m_pElem->gen1_sample) : NULL);
+	return (m_pElem ? &(m_pElem->gen1_sample) : nullptr);
 }
 
 
@@ -2875,10 +2875,10 @@ void drumkv1_element::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 
 drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 {
-	if (m_pElem == NULL)
-		return NULL;
+	if (m_pElem == nullptr)
+		return nullptr;
 
-	drumkv1_port *pParamPort = NULL;
+	drumkv1_port *pParamPort = nullptr;
 
 	switch (index) {
 //	case drumkv1::GEN1_SAMPLE:   pParamPort = &m_pElem->gen1.sample;     break;
@@ -2981,7 +2981,7 @@ void drumkv1_element::sampleReverseTest (void)
 
 void drumkv1_element::sampleReverseSync (void)
 {
-	if (m_pElem == NULL)
+	if (m_pElem == nullptr)
 		return;
 
 	const bool bReverse
@@ -3003,7 +3003,7 @@ void drumkv1_element::sampleOffsetTest (void)
 
 void drumkv1_element::sampleOffsetSync (void)
 {
-	if (m_pElem == NULL)
+	if (m_pElem == nullptr)
 		return;
 
 	const bool bOffset
@@ -3015,7 +3015,7 @@ void drumkv1_element::sampleOffsetSync (void)
 
 void drumkv1_element::sampleOffsetRangeSync (void)
 {
-	if (m_pElem == NULL)
+	if (m_pElem == nullptr)
 		return;
 
 	const uint32_t iSampleLength

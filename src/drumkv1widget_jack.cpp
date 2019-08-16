@@ -58,7 +58,7 @@
 drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 	: drumkv1widget(), m_pDrumk(pDrumk)
 	#ifdef CONFIG_NSM
-		, m_pNsmClient(NULL)
+		, m_pNsmClient(nullptr)
 	#endif
 {
 	// Special style paths...

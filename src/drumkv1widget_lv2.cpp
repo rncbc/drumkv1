@@ -39,7 +39,7 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	m_pDrumkUi = new drumkv1_lv2ui(pDrumk, controller, write_function);
 
 #ifdef CONFIG_LV2_UI_EXTERNAL
-	m_external_host = NULL;
+	m_external_host = nullptr;
 #endif
 #ifdef CONFIG_LV2_UI_IDLE
 	m_bIdleClosed = false;

@@ -248,7 +248,7 @@ class drumkv1widget_sched : public QObject
 public:
 
 	// ctor.
-	drumkv1widget_sched(drumkv1 *pDrumk, QObject *pParent = NULL)
+	drumkv1widget_sched(drumkv1 *pDrumk, QObject *pParent = nullptr)
 		: QObject(pParent), m_notifier(pDrumk, this) {}
 
 signals:

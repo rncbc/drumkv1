@@ -162,7 +162,7 @@ class drumkv1_generator
 public:
 
 	// ctor.
-	drumkv1_generator(drumkv1_sample *sample = NULL) { reset(sample); }
+	drumkv1_generator(drumkv1_sample *sample = nullptr) { reset(sample); }
 
 	// sample accessor.
 	drumkv1_sample *sample() const
