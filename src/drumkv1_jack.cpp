@@ -713,15 +713,24 @@ drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 			m_bGui = false;
 	}
 
-	if (m_bGui)
-		m_pApp = new QApplication(argc, argv);
-	else
+	if (m_bGui) {
+	#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
+		QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+	#endif
+		QApplication *pApp = new QApplication(argc, argv);
+	#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
+		pApp->setApplicationDisplayName(
+			DRUMKV1_TITLE " - " + QObject::tr(DRUMKV1_SUBTITLE));
+	#endif
+		m_pApp = pApp;
+	} else {
 		m_pApp = new QCoreApplication(argc, argv);
+	}
 
-#if QT_VERSION >= QT_VERSION_CHECK(5, 6, 0)
-	if (m_bGui) m_pApp->setAttribute(Qt::AA_EnableHighDpiScaling);
+#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
+	m_pApp->setApplicationName(DRUMKV1_TITLE);
 #endif
-
+	
 #ifdef HAVE_SIGNAL_H
 
 	// Set to ignore any fatal "Broken pipe" signals.

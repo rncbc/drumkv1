@@ -862,13 +862,13 @@ void drumkv1widget::randomParams (void)
 			break;
 		drumkv1widget_param *pParam = paramKnob(index);
 		if (pParam) {
-			const float q = 0.5f * p * (pParam->maximum() - pParam->minimum());
+			std::normal_distribution<float> nd;
+			const float q = p * (pParam->maximum() - pParam->minimum());
 			float fValue = pParam->value();
-			std::normal_distribution<float> nd(fValue, q);
 			if (drumkv1_param::paramFloat(index))
-				fValue = nd(re);
+				fValue += 0.5f * q * nd(re);
 			else
-				fValue = std::round(nd(re));
+				fValue = std::round(fValue + q * nd(re));
 			if (fValue < pParam->minimum())
 				fValue = pParam->minimum();
 			else
