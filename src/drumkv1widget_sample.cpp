@@ -623,7 +623,7 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 		s_filters.append(sFilterMask.arg(tr("All files")).arg("*.*"));
 	}
 
-	const QString& sTitle  = tr("Open Sample [%1]").arg(sName) + " - " DRUMKV1_TITLE;
+	const QString& sTitle  = tr("Open Sample [%1]").arg(sName);
 	const QString& sFilter = s_filters.join(";;");
 	QWidget *pParentWidget = nullptr;
 	QFileDialog::Options options = 0;
