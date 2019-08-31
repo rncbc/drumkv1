@@ -6,6 +6,8 @@ ChangeLog
 
 0.9.7  2019-04-14  A Spring-Break'19 Release.
 
+- Added alternate yet non-official CMake build option.
+  (EXPERIMENTAL)
 - Fix HiDPI display screen effective support (Qt >= 5.6).
 - All randomizers now compliant to the standard normal
   distribution. (EXPERIMENTAL)

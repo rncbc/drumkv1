@@ -31,7 +31,7 @@
    </rect>
   </property>
   <property name="windowTitle">
-   <string>Configure - drumkv1</string>
+   <string>Configure</string>
   </property>
   <property name="windowIcon">
    <iconset resource="drumkv1.qrc">:/images/drumkv1.png</iconset>

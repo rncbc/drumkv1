@@ -22,9 +22,6 @@
  </comment>
  <class>drumkv1widget</class>
  <widget class="QWidget" name="drumkv1widget">
-  <property name="windowTitle">
-   <string>drumkv1</string>
-  </property>
   <property name="windowIcon" >
    <iconset resource="drumkv1.qrc" >:/images/drumkv1.png</iconset>
   </property>
