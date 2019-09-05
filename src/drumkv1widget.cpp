@@ -1349,6 +1349,7 @@ void drumkv1widget::clearElements (void)
 void drumkv1widget::activateElement ( bool bOpenSample )
 {
 	const int iCurrentNote = currentNote();
+	m_ui.StatusBar->keybd()->setNoteKey(iCurrentNote);
 	if (iCurrentNote < 0)
 		return;
 
