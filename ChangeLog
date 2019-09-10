@@ -6,6 +6,8 @@ ChangeLog
 
 0.9.7  2019-04-14  A Spring-Break'19 Release.
 
+- Highlight current element/sample/key on the virtual
+  piano keyboard widget. (EXPERIMENTAL)
 - Added alternate yet non-official CMake build option.
   (EXPERIMENTAL)
 - Fix HiDPI display screen effective support (Qt >= 5.6).
