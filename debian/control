@@ -22,7 +22,6 @@ Architecture: any
 Depends: drumkv1-common (= ${binary:Version}),
  ${misc:Depends},
  ${shlibs:Depends},
-Provides: drumkv1_lv2, drumkv1_lv2ui
 Description: An old-school drum-kit sampler - LV2 plugin
   An old-school all-digital drum-kit sampler synthesizer with stereo fx.
   .
@@ -33,7 +32,6 @@ Architecture: any
 Depends: drumkv1-common (= ${binary:Version}),
  ${misc:Depends},
  ${shlibs:Depends},
-Provides: drumkv1_core, drumkv1_ui
 Description: An old-school drum-kit sampler - Common files
   An old-school all-digital drum-kit sampler synthesizer with stereo fx.
   .
