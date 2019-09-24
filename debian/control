@@ -4,14 +4,15 @@ Priority: extra
 Maintainer: Rui Nuno Capela <rncbc@rncbc.org>
 Build-Depends: debhelper (>= 5), automake, pkg-config,
   qtchooser, qtbase5-dev (>= 5.1), qtbase5-dev-tools (>= 5.1),
-  qttools5-dev-tools (>= 5.1), libjack-dev, libasound2-dev,
-  lv2-dev, liblo-dev, libsndfile-dev
+  qttools5-dev-tools (>= 5.1), libjack-dev | libjack-jackd2-dev,
+  libasound2-dev, lv2-dev, liblo-dev, libsndfile-dev
 Standards-Version: 3.9.7
 
 Package: drumkv1
 Architecture: any
-Depends: padthv1-common (= ${binary:Version}),
-  libjack0, ${shlibs:Depends}, ${misc:Depends}
+Depends: drumkv1-common (= ${binary:Version}),
+  libjack0 | libjack-jackd2-0,
+  ${shlibs:Depends}, ${misc:Depends}
 Description: An old-school drum-kit sampler - JACK standlone
   An old-school all-digital drum-kit sampler synthesizer with stereo fx.
   .
@@ -20,8 +21,7 @@ Description: An old-school drum-kit sampler - JACK standlone
 Package: drumkv1-lv2
 Architecture: any
 Depends: drumkv1-common (= ${binary:Version}),
- ${misc:Depends},
- ${shlibs:Depends},
+ ${misc:Depends}, ${shlibs:Depends},
 Description: An old-school drum-kit sampler - LV2 plugin
   An old-school all-digital drum-kit sampler synthesizer with stereo fx.
   .
@@ -30,8 +30,7 @@ Description: An old-school drum-kit sampler - LV2 plugin
 Package: drumkv1-common
 Architecture: any
 Depends: drumkv1-common (= ${binary:Version}),
- ${misc:Depends},
- ${shlibs:Depends},
+ ${misc:Depends}, ${shlibs:Depends},
 Description: An old-school drum-kit sampler - Common files
   An old-school all-digital drum-kit sampler synthesizer with stereo fx.
   .
