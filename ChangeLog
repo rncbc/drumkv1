@@ -4,22 +4,21 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-0.9.7  2019-04-14  A Spring-Break'19 Release.
+0.9.10  2019-09-24  An Early-Fall'19 Release.
 
 - Upstream packaging is now split on JACK standalone,
   LV2 plugin and common core and UI packages, similar
-  to recent Debian practice. (EXPERIMENTAL)
+  to recent Debian practice.
 - Highlight current element/sample/key on the virtual
-  piano keyboard widget. (EXPERIMENTAL)
+  piano keyboard widget.
 - Added alternate yet non-official CMake build option.
-  (EXPERIMENTAL)
 - Fix HiDPI display screen effective support (Qt >= 5.6).
 - All randomizers now compliant to the standard normal
-  distribution. (EXPERIMENTAL)
+  distribution.
 - Make sure compiler flags comply to c++11 as standard.
 
 
-GIT HEAD
+0.9.9  2019-07-18  A Summer'19 Release.
 
 - Randomization of current parameters is now available
   through a new top-level push-button.
@@ -42,12 +41,6 @@ GIT HEAD
 - Fixed all LFO Panning and Volume modulation, now being
   correctly isolated on a per voice basis.
 - Fixed initial LFO wave shapes on LV2 plug-in UI.
-- Minor update to Debian packaging control file.
-
-
-GIT HEAD
-
-- Fixed initial DCO and LFO wave shapes on LV2 plug-in UI.
 - Minor update to Debian packaging control file.
 
 
