@@ -18,7 +18,7 @@ ChangeLog
 - Make sure compiler flags comply to c++11 as standard.
 
 
-GIT HEAD
+0.9.9  2019-07-18  A Summer'19 Release.
 
 - Randomization of current parameters is now available
   through a new top-level push-button.
@@ -41,12 +41,6 @@ GIT HEAD
 - Fixed all LFO Panning and Volume modulation, now being
   correctly isolated on a per voice basis.
 - Fixed initial LFO wave shapes on LV2 plug-in UI.
-- Minor update to Debian packaging control file.
-
-
-GIT HEAD
-
-- Fixed initial DCO and LFO wave shapes on LV2 plug-in UI.
 - Minor update to Debian packaging control file.
 
 
