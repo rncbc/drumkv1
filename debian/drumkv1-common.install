@@ -1,5 +1,0 @@
-debian/tmp/usr/lib*/libdrumkv1.so*
-debian/tmp/usr/lib*/libdrumkv1_ui.so*
-debian/tmp/usr/share/mime/packages/drumkv1.xml
-debian/tmp/usr/share/icons/hicolor/32x32/mimetypes/application-x-drumkv1*.png
-debian/tmp/usr/share/icons/hicolor/scalable/mimetypes/application-x-drumkv1*.svg
