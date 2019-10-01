@@ -5,7 +5,8 @@ NAME = drumkv1
 TARGET = $${NAME}_ui
 TEMPLATE = lib
 CONFIG += static
-LIBS += -L.
+
+unix { LIBS += -L. -l$${NAME} }
 
 include(src_ui.pri)
 
@@ -76,8 +77,6 @@ unix {
 	INSTALLS += target
 
 	target.path = $${LIBDIR}
-
-	LIBS += -l$${NAME}
 }
 
 QT += widgets xml
