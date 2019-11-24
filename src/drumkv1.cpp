@@ -1755,7 +1755,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 		// note on
 		if (status == 0x90 && value > 0) {
 			drumkv1_voice *pv = m_notes[key];
-			if (pv && !(int(*m_def.noteoff) > 0)) {
+			if (pv && !(*m_def.noteoff > 0.0f) && pv->note >= 0) {
 				drumkv1_elem *elem = pv->elem;
 				// retrigger fast release
 				elem->dcf1.env.note_off_fast(&pv->dcf1_env);
@@ -1842,7 +1842,7 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 		}
 		// note off
 		else if (status == 0x80 || (status == 0x90 && value == 0)) {
-			if (int(*m_def.noteoff) > 0) {
+			if (*m_def.noteoff > 0.0f) {
 				drumkv1_voice *pv = m_notes[key];
 				if (pv && pv->note >= 0) {
 					if (pv->dca1_env.stage != drumkv1_env::Decay2) {

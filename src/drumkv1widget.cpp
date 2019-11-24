@@ -1640,8 +1640,8 @@ void drumkv1widget::updateLoadPreset ( const QString& sPreset )
 //	refreshElements();
 	activateElement();
 
-//	resetParamKnobs(drumkv1::NUM_PARAMS);
-//	updateParamValues(drumkv1::NUM_PARAMS);
+	resetParamKnobs(drumkv1::NUM_PARAMS);
+	updateParamValues(drumkv1::NUM_PARAMS);
 
 	m_ui.Preset->setPreset(sPreset);
 	m_ui.StatusBar->showMessage(tr("Load preset: %1").arg(sPreset), 5000);
