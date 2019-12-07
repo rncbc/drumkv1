@@ -59,6 +59,7 @@ set (HEADERS_UI
   drumkv1widget_programs.h
   drumkv1widget_controls.h
   drumkv1widget_control.h
+  drumkv1widget_palette.h
   drumkv1widget_config.h
 )
 
@@ -78,6 +79,7 @@ set (SOURCES_UI
   drumkv1widget_programs.cpp
   drumkv1widget_controls.cpp
   drumkv1widget_control.cpp
+  drumkv1widget_palette.cpp
   drumkv1widget_config.cpp
 )
 

@@ -30,6 +30,7 @@ HEADERS = \
 	drumkv1widget_programs.h \
 	drumkv1widget_controls.h \
 	drumkv1widget_control.h \
+	drumkv1widget_palette.h \
 	drumkv1widget_config.h
 
 SOURCES = \
@@ -48,11 +49,13 @@ SOURCES = \
 	drumkv1widget_programs.cpp \
 	drumkv1widget_controls.cpp \
 	drumkv1widget_control.cpp \
+	drumkv1widget_palette.cpp \
 	drumkv1widget_config.cpp
 
 FORMS = \
 	drumkv1widget.ui \
 	drumkv1widget_control.ui \
+	drumkv1widget_palette.ui \
 	drumkv1widget_config.ui
 
 RESOURCES += drumkv1.qrc

@@ -21,6 +21,8 @@
 
 #include "drumkv1widget_jack.h"
 
+#include "drumkv1widget_palette.h"
+
 #include "drumkv1_jack.h"
 
 #ifdef CONFIG_NSM
@@ -65,10 +67,20 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 	if (QDir(CONFIG_PLUGINSDIR).exists())
 		QApplication::addLibraryPath(CONFIG_PLUGINSDIR);
 
-	// Custom style theme...
+	// Custom color/style theme...
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig && !pConfig->sCustomStyleTheme.isEmpty())
-		QApplication::setStyle(QStyleFactory::create(pConfig->sCustomStyleTheme));
+	if (pConfig) {
+		if (!pConfig->sCustomColorTheme.isEmpty()) {
+			QPalette pal;
+			if (drumkv1widget_palette::namedPalette(
+					pConfig, pConfig->sCustomColorTheme, pal))
+				QApplication::setPalette(pal);
+		}
+		if (!pConfig->sCustomStyleTheme.isEmpty()) {
+			QApplication::setStyle(
+				QStyleFactory::create(pConfig->sCustomStyleTheme));
+		}
+	}
 
 	// Initialize (user) interface stuff...
 	m_pDrumkUi = new drumkv1_ui(m_pDrumk, false);
