@@ -67,7 +67,7 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 	if (QDir(CONFIG_PLUGINSDIR).exists())
 		QApplication::addLibraryPath(CONFIG_PLUGINSDIR);
 
-	// Custom color/style theme...
+	// Custom color/style themes...
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig) {
 		if (!pConfig->sCustomColorTheme.isEmpty()) {

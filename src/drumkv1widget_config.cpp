@@ -80,20 +80,12 @@ drumkv1widget_config::drumkv1widget_config (
 		m_ui.UseNativeDialogsCheckBox->setChecked(pConfig->bUseNativeDialogs);
 		m_ui.KnobDialModeComboBox->setCurrentIndex(pConfig->iKnobDialMode);
 		m_ui.KnobEditModeComboBox->setCurrentIndex(pConfig->iKnobEditMode);
-		// Custom display options (only for no-plugin forms)...
-		if (bPlugin) {
-			m_ui.CustomColorThemeTextLabel->setEnabled(false);
-			m_ui.CustomColorThemeComboBox->setEnabled(false);
-			m_ui.CustomColorThemeToolButton->setEnabled(false);
-			m_ui.CustomStyleThemeTextLabel->setEnabled(false);
-			m_ui.CustomStyleThemeComboBox->setEnabled(false);
-		} else {
-			resetCustomColorThemes(pConfig->sCustomColorTheme);
-			resetCustomStyleThemes(pConfig->sCustomStyleTheme);
-		}
 		m_ui.FrameTimeFormatComboBox->setCurrentIndex(pConfig->iFrameTimeFormat);
 		m_ui.RandomizePercentSpinBox->setValue(pConfig->fRandomizePercent);
 		m_ui.UseGMDrumNamesCheckBox->setChecked(pConfig->bUseGMDrumNames);
+		// Custom display options (only for no-plugin forms)...
+		resetCustomColorThemes(pConfig->sCustomColorTheme);
+		resetCustomStyleThemes(pConfig->sCustomStyleTheme);
 		// Load controllers database...
 		drumkv1_controls *pControls = m_pDrumkUi->controls();
 		if (pControls) {
