@@ -44,6 +44,10 @@
 #include <QStyleFactory>
 
 
+// Default (empty/blank) name.
+static const char *g_pszDefName = QT_TR_NOOP("(default)");
+
+
 //----------------------------------------------------------------------------
 // drumkv1widget_config -- UI wrapper form.
 
@@ -867,7 +871,7 @@ void drumkv1widget_config::resetCustomColorThemes (
 {
 	m_ui.CustomColorThemeComboBox->clear();
 	m_ui.CustomColorThemeComboBox->addItem(
-		tr("(default)"));
+		tr(g_pszDefName));
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig) m_ui.CustomColorThemeComboBox->addItems(
 		drumkv1widget_palette::namedPaletteList(pConfig));
@@ -886,7 +890,7 @@ void drumkv1widget_config::resetCustomStyleThemes (
 {
 	m_ui.CustomStyleThemeComboBox->clear();
 	m_ui.CustomStyleThemeComboBox->addItem(
-		tr("(default)"));
+		tr(g_pszDefName));
 	m_ui.CustomStyleThemeComboBox->addItems(
 		QStyleFactory::keys());
 
