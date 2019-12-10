@@ -877,9 +877,12 @@ void drumkv1widget_config::resetCustomColorThemes (
 		drumkv1widget_palette::namedPaletteList(pConfig));
 
 	int iCustomColorTheme = 0;
-	if (!sCustomColorTheme.isEmpty())
+	if (!sCustomColorTheme.isEmpty()) {
 		iCustomColorTheme = m_ui.CustomColorThemeComboBox->findText(
 			sCustomColorTheme);
+		if (iCustomColorTheme < 0)
+			iCustomColorTheme = 0;
+	}
 	m_ui.CustomColorThemeComboBox->setCurrentIndex(iCustomColorTheme);
 }
 
@@ -895,9 +898,12 @@ void drumkv1widget_config::resetCustomStyleThemes (
 		QStyleFactory::keys());
 
 	int iCustomStyleTheme = 0;
-	if (!sCustomStyleTheme.isEmpty())
+	if (!sCustomStyleTheme.isEmpty()) {
 		iCustomStyleTheme = m_ui.CustomStyleThemeComboBox->findText(
 			sCustomStyleTheme);
+		if (iCustomStyleTheme < 0)
+			iCustomStyleTheme = 0;
+	}
 	m_ui.CustomStyleThemeComboBox->setCurrentIndex(iCustomStyleTheme);
 }
 
