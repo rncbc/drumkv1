@@ -27,7 +27,7 @@
 	lv2:requiredFeature lv2urid:map, lv2worker:schedule ;
 	lv2:optionalFeature lv2:hardRTCapable ;
 	lv2:extensionData lv2state:interface, lv2worker:interface ;
-	lv2ui:ui drumkv1_lv2:ui, drumkv1_lv2:ui_x11, drumkv1_lv2:ui_external ;
+	lv2ui:ui drumkv1_lv2:ui_x11, drumkv1_lv2:ui_external ;
 	lv2patch:writable drumkv1_lv2:P101_SAMPLE_FILE,
 		drumkv1_lv2:P102_OFFSET_START,
 		drumkv1_lv2:P103_OFFSET_END,
