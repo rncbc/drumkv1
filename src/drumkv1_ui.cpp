@@ -284,6 +284,9 @@ QString drumkv1_ui::noteName ( int note )
 		QT_TR_NOOP("B")
 	};
 
+   if (note < 0)
+		note = 0;
+
 	return QString("%1 %2").arg(s_notes[note % 12]).arg((note / 12) - 1);
 }
 
