@@ -244,8 +244,8 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 						outs[k] += nread;
 					}
 				}
+				ndelta = event.time;
 			}
-			ndelta = event.time;
 			drumkv1::process_midi(event.buffer, event.size);
 		}
 	}
