@@ -1,7 +1,7 @@
 // drumkv1widget.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -452,6 +452,10 @@ drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
 		// Dynamics
 	setParamKnob(drumkv1::DYN1_COMPRESS, m_ui.Dyn1CompressKnob);
 	setParamKnob(drumkv1::DYN1_LIMITER,  m_ui.Dyn1LimiterKnob);
+
+    // added by scotty to try to support linnstruments need for bigger bend range
+    m_ui.Def1PitchbendKnob->setMinimum(0.0f);
+    m_ui.Def1PitchbendKnob->setMaximum(+4.0f);
 
 
 	// Element selectors...
