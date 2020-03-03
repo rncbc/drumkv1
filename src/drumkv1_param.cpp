@@ -32,7 +32,23 @@
 
 
 //-------------------------------------------------------------------------
-// state params description.
+// Abstract/absolute path functors.
+
+QString drumkv1_param::map_path::absolutePath (
+	const QString& sAbstractPath ) const
+{
+	return QDir::current().absoluteFilePath(sAbstractPath);
+}
+
+QString drumkv1_param::map_path::abstractPath (
+	const QString& sAbsolutePath ) const
+{
+	return QDir::current().relativeFilePath(sAbsolutePath);
+}
+
+
+//-------------------------------------------------------------------------
+// State params description.
 
 enum ParamType { PARAM_FLOAT = 0, PARAM_INT, PARAM_BOOL };
 
@@ -172,20 +188,6 @@ float drumkv1_param::paramValue ( drumkv1::ParamIndex index, float fScale )
 		return ::rintf(fValue);
 	else
 		return fValue;
-}
-
-
-// Abstract/absolute path functors.
-QString drumkv1_param::map_path::absolutePath (
-	const QString& sAbstractPath ) const
-{
-	return QDir::current().absoluteFilePath(sAbstractPath);
-}
-
-QString drumkv1_param::map_path::abstractPath (
-	const QString& sAbsolutePath ) const
-{
-	return QDir::current().relativeFilePath(sAbsolutePath);
 }
 
 
@@ -584,7 +586,7 @@ QString drumkv1_param::loadFilename ( const QString& sFilename )
 	QFileInfo fi(sFilename);
 	if (fi.isSymLink())
 		fi.setFile(fi.symLinkTarget());
-	return fi.absoluteFilePath();
+	return fi.filePath();
 }
 
 
