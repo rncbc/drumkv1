@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<!-- Copyright 2012-2018 Rui Nuno Capela <rncbc@rncbc.org> -->
+<!-- Copyright 2012-2020 Rui Nuno Capela <rncbc@rncbc.org> -->
 <component type="desktop">
  <id>org.rncbc.drumkv1</id>
  <metadata_license>FSFAP</metadata_license>
@@ -22,7 +22,7 @@
 ​ </provides>
  <screenshots>
   <screenshot type="default">
-   <image>http://drumkv1.sourceforge.net/image/drumkv1-screenshot4.png</image>
+   <image>https://drumkv1.sourceforge.io/image/drumkv1-screenshot9.png</image>
    <caption>The main window showing the application in action</caption>
   </screenshot>
  </screenshots>
