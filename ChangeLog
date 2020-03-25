@@ -4,11 +4,11 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-GIT HEAD
+0.9.13  2020-03-26  A Spring'20 Release.
 
 - Maximum pitch-bend range has been expanded to 0..400%,
   allegedly to support some PME driven instruments (as
-  proposed by sacarlson, to synthv1). (EXPERIMENTAL)
+  proposed by sacarlson, to synthv1).
 - Make man page compression reproducible (after request
   by Jelle van der Waa, thanks).
 - Fixed crash when showing the tooltip of a negative note
