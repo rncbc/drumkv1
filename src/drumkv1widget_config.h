@@ -1,7 +1,7 @@
 // drumkv1widget_config.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -46,8 +46,7 @@ class drumkv1widget_config : public QDialog
 public:
 
 	// ctor.
-	drumkv1widget_config(drumkv1_ui *pDrumkUi,
-		QWidget *pParent = 0, Qt::WindowFlags wflags = 0);
+	drumkv1widget_config(drumkv1_ui *pDrumkUi, QWidget *pParent = nullptr);
 
 	// dtor.
 	~drumkv1widget_config();

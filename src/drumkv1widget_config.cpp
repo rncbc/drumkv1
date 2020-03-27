@@ -1,7 +1,7 @@
 // drumkv1widget_config.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -53,8 +53,8 @@ static const char *g_pszDefName = QT_TRANSLATE_NOOP("drumkv1widget_config", "(de
 
 // ctor.
 drumkv1widget_config::drumkv1widget_config (
-	drumkv1_ui *pDrumkUi, QWidget *pParent, Qt::WindowFlags wflags )
-	: QDialog(pParent, wflags), p_ui(new Ui::drumkv1widget_config), m_ui(*p_ui),
+	drumkv1_ui *pDrumkUi, QWidget *pParent )
+	: QDialog(pParent), p_ui(new Ui::drumkv1widget_config), m_ui(*p_ui),
 		m_pDrumkUi(pDrumkUi)
 {
 	// Setup UI struct...
@@ -537,7 +537,7 @@ void drumkv1widget_config::tuningScaleFileClicked (void)
 	const QString& sFilter = filters.join(";;");
 
 	QWidget *pParentWidget = nullptr;
-	QFileDialog::Options options = 0;
+	QFileDialog::Options options;
 	if (pConfig->bDontUseNativeDialogs) {
 		options |= QFileDialog::DontUseNativeDialog;
 		pParentWidget = QWidget::window();
@@ -586,7 +586,7 @@ void drumkv1widget_config::tuningKeyMapFileClicked (void)
 	const QString& sFilter = filters.join(";;");
 
 	QWidget *pParentWidget = nullptr;
-	QFileDialog::Options options = 0;
+	QFileDialog::Options options;
 	if (pConfig->bDontUseNativeDialogs) {
 		options |= QFileDialog::DontUseNativeDialog;
 		pParentWidget = QWidget::window();

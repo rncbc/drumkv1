@@ -1,7 +1,7 @@
 // drumkv1widget_preset.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -235,7 +235,7 @@ void drumkv1widget_preset::openPreset (void)
 	const QString& sFilter = tr("Preset files (*.%1)").arg(sExt);
 
 	QWidget *pParentWidget = nullptr;
-	QFileDialog::Options options = 0;
+	QFileDialog::Options options;
 	if (pConfig->bDontUseNativeDialogs) {
 		options |= QFileDialog::DontUseNativeDialog;
 		pParentWidget = QWidget::window();
@@ -303,7 +303,7 @@ void drumkv1widget_preset::savePreset ( const QString& sPreset )
 		const QString& sTitle  = tr("Save Preset");
 		const QString& sFilter = tr("Preset files (*.%1)").arg(sExt);
 		QWidget *pParentWidget = nullptr;
-		QFileDialog::Options options = 0;
+		QFileDialog::Options options;
 		if (pConfig->bDontUseNativeDialogs) {
 			options |= QFileDialog::DontUseNativeDialog;
 			pParentWidget = QWidget::window();

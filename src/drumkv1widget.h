@@ -50,7 +50,7 @@ class drumkv1widget : public QWidget
 public:
 
 	// Constructor
-	drumkv1widget(QWidget *pParent = 0, Qt::WindowFlags wflags = 0);
+	drumkv1widget(QWidget *pParent = nullptr);
 
 	// Destructor.
 	virtual ~drumkv1widget();

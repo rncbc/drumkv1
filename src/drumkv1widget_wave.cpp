@@ -42,9 +42,8 @@ inline float safe_value ( float x )
 // drumkv1widget_wave -- Custom widget
 
 // Constructor.
-drumkv1widget_wave::drumkv1widget_wave (
-	QWidget *pParent, Qt::WindowFlags wflags )
-	: QFrame(pParent, wflags),
+drumkv1widget_wave::drumkv1widget_wave ( QWidget *pParent )
+	: QFrame(pParent),
 		m_bDragging(false), m_iDragShape(0)
 {
 	m_pWave = new drumkv1_wave_lf(128);
@@ -221,7 +220,7 @@ void drumkv1widget_wave::mouseDoubleClickEvent ( QMouseEvent *pMouseEvent )
 
 void drumkv1widget_wave::wheelEvent ( QWheelEvent *pWheelEvent )
 {
-	const int delta = (pWheelEvent->delta() / 60);
+	const int delta = (pWheelEvent->angleDelta().y() / 60);
 
 	if (pWheelEvent->modifiers() & (Qt::ShiftModifier | Qt::ControlModifier)) {
 		setWaveShape(waveShape() + (delta < 0 ? -1 : +1));

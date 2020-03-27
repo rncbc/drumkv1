@@ -50,7 +50,7 @@ public:
 	// Pseudo-constructor.
 	static void showInstance(
 		drumkv1_controls *pControls, drumkv1::ParamIndex index,
-		const QString& sTitle, QWidget *pParent = 0, Qt::WindowFlags wflags = 0);
+		const QString& sTitle, QWidget *pParent = nullptr);
 
 	// Control accessors.
 	void setControls(drumkv1_controls *pControls, drumkv1::ParamIndex index);
@@ -79,7 +79,7 @@ protected slots:
 protected:
 
 	// Constructor.
-	drumkv1widget_control(QWidget *pParent = 0, Qt::WindowFlags wflags = 0);
+	drumkv1widget_control(QWidget *pParent = nullptr);
 
 	// Destructor.
 	~drumkv1widget_control();

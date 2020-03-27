@@ -39,9 +39,8 @@ inline float safe_value ( float x )
 // drumkv1widget_env -- Custom widget
 
 // Constructor.
-drumkv1widget_env::drumkv1widget_env (
-	QWidget *pParent, Qt::WindowFlags wflags )
-	: QFrame(pParent, wflags),
+drumkv1widget_env::drumkv1widget_env ( QWidget *pParent )
+	: QFrame(pParent),
 		m_fAttack(0.0f), m_fDecay1(0.0f), m_fLevel2(0.0f), m_fDecay2(0.0f),
 		m_poly(6), m_iDragNode(-1)
 {

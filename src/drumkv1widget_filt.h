@@ -35,7 +35,7 @@ class drumkv1widget_filt : public QFrame
 public:
 
 	// Constructor.
-	drumkv1widget_filt(QWidget *pParent = 0, Qt::WindowFlags wflags = 0);
+	drumkv1widget_filt(QWidget *pParent = nullptr);
 	// Destructor.
 	~drumkv1widget_filt();
 

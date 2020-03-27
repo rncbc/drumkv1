@@ -52,8 +52,8 @@
 //
 
 // Constructor.
-drumkv1widget::drumkv1widget ( QWidget *pParent, Qt::WindowFlags wflags )
-	: QWidget(pParent, wflags), p_ui(new Ui::drumkv1widget), m_ui(*p_ui)
+drumkv1widget::drumkv1widget ( QWidget *pParent )
+	: QWidget(pParent), p_ui(new Ui::drumkv1widget), m_ui(*p_ui)
 {
 	Q_INIT_RESOURCE(drumkv1);
 
