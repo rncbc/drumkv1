@@ -763,21 +763,14 @@ void drumkv1widget_config::accept (void)
 		pConfig->bUseGMDrumNames = m_ui.UseGMDrumNamesCheckBox->isChecked();
 		int iNeedRestart = 0;
  		if (pConfig->sCustomStyleTheme != sOldCustomStyleTheme) {
-		#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-			++iNeedRestart;
-		#else		
 			if (pConfig->sCustomStyleTheme.isEmpty()) {
 				++iNeedRestart;
 			} else {
 				QApplication::setStyle(
 					QStyleFactory::create(pConfig->sCustomStyleTheme));
 			}
-		#endif
  		}
  		if (pConfig->sCustomColorTheme != sOldCustomColorTheme) {
-		#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
-			++iNeedRestart;
-		#else		
 			if (pConfig->sCustomColorTheme.isEmpty()) {
 				++iNeedRestart;
 			} else {
@@ -786,7 +779,6 @@ void drumkv1widget_config::accept (void)
 						pConfig, pConfig->sCustomColorTheme, pal))
 					QApplication::setPalette(pal);
 			}
-		#endif
 		}
 		if (pConfig->iFrameTimeFormat != iOldFrameTimeFormat)
 			++iNeedRestart;
