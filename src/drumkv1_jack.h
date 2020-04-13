@@ -73,10 +73,12 @@ public:
 protected:
 
 	void updatePreset(bool bDirty);
-
-	void selectSample(int key);
+	void updateParam(drumkv1::ParamIndex index);
+	void updateParams();
 	void updateSample();
 	void updateTuning();
+
+	void selectSample(int key);
 
 private:
 

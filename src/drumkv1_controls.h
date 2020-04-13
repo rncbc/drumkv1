@@ -1,7 +1,7 @@
 // drumkv1_controls.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -26,6 +26,8 @@
 #include "drumkv1_sched.h"
 
 #include <QMap>
+
+#include <math.h>
 
 
 //-------------------------------------------------------------------------
@@ -179,17 +181,29 @@ protected:
 
 		// ctor.
 		SchedOut (drumkv1 *pDrumk)
-			: drumkv1_sched(pDrumk, Controls) {}
+			: drumkv1_sched(pDrumk, Controls), m_value(0.0f) {}
 
-		void schedule_event(drumkv1::ParamIndex index, float fValue)
+		void schedule_event(drumkv1::ParamIndex index, float value)
 		{
-			instance()->setParamValue(index, fValue);
-
-			schedule(int(index));
+			if (::fabsf(value - m_value) > 0.001f) {
+				m_value = value;
+				schedule(int(index));
+			}
 		}
 
 		// process (virtual stub).
-		void process(int) {}
+		void process(int sid)
+		{
+			drumkv1 *pDrumk = instance();
+			drumkv1::ParamIndex index = drumkv1::ParamIndex(sid);
+			pDrumk->setParamValue(index, m_value);
+			pDrumk->updateParam(index);
+		}
+
+	private:
+
+		// instance variables
+		float m_value;
 	};
 
 private:

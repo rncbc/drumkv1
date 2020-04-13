@@ -1,7 +1,7 @@
 // drumkv1_lv2.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -54,6 +54,10 @@
 
 #ifndef LV2_STATE__StateChanged
 #define LV2_STATE__StateChanged LV2_STATE_PREFIX "StateChanged"
+#endif
+
+#ifndef LV2_ATOM__portEvent
+#define LV2_ATOM__portEvent LV2_ATOM_PREFIX "portEvent"
 #endif
 
 #include <stdlib.h>
@@ -127,9 +131,9 @@ private:
 typedef struct {
 	LV2_Atom atom;
 	union {
-		int key;
+		uint32_t    key;
 		const char *path;
-	} sample;
+	} data;
 } drumkv1_lv2_worker_message;
 
 
@@ -194,6 +198,8 @@ drumkv1_lv2::drumkv1_lv2 (
 					m_urid_map->handle, LV2_ATOM__Bool);
 				m_urids.atom_Path = m_urid_map->map(
 					m_urid_map->handle, LV2_ATOM__Path);
+				m_urids.atom_portEvent = m_urid_map->map(
+					m_urid_map->handle, LV2_ATOM__portEvent);
 				m_urids.time_Position = m_urid_map->map(
 					m_urid_map->handle, LV2_TIME__Position);
 				m_urids.time_beatsPerMinute = m_urid_map->map(
@@ -374,8 +380,8 @@ void drumkv1_lv2::run ( uint32_t nframes )
 							if (m_schedule) {
 								drumkv1_lv2_worker_message mesg;
 								mesg.atom.type = key;
-								mesg.atom.size = sizeof(mesg.sample);
-								mesg.sample.path
+								mesg.atom.size = sizeof(mesg.data.path);
+								mesg.data.path
 									= (const char *) LV2_ATOM_BODY_CONST(value);
 								// schedule loading new sample
 								m_schedule->schedule_work(
@@ -703,9 +709,33 @@ void drumkv1_lv2::updatePreset ( bool /*bDirty*/ )
 		drumkv1_lv2_worker_message mesg;
 		mesg.atom.type = m_urids.state_StateChanged;
 		mesg.atom.size = 0; // nothing else matters.
-		mesg.sample.path = nullptr;
 		m_schedule->schedule_work(
 			m_schedule->handle, sizeof(mesg), &mesg);
+	}
+}
+
+
+void drumkv1_lv2::updateParam ( drumkv1::ParamIndex index )
+{
+	if (m_schedule) {
+		drumkv1_lv2_worker_message mesg;
+		mesg.atom.type = m_urids.atom_portEvent;
+		mesg.atom.size = sizeof(mesg.data.key);
+		mesg.data.key  = uint32_t(index);
+		m_schedule->schedule_work(
+			m_schedule->handle, sizeof(mesg), &mesg);
+	}
+}
+
+
+void drumkv1_lv2::updateParams (void)
+{
+	if (m_schedule) {
+		drumkv1_lv2_worker_message mesg;
+		mesg.atom.type = m_urids.atom_portEvent;
+		mesg.atom.size = 0; // nothing else matters.
+		m_schedule->schedule_work(
+		m_schedule->handle, sizeof(mesg), &mesg);
 	}
 }
 
@@ -715,8 +745,8 @@ void drumkv1_lv2::updateSample (void)
 	if (m_schedule) {
 		drumkv1_lv2_worker_message mesg;
 		mesg.atom.type = m_urids.gen1_update;
-		mesg.atom.size = sizeof(mesg.sample);
-		mesg.sample.path = drumkv1::sampleFile();
+		mesg.atom.size = sizeof(mesg.data.path);
+		mesg.data.path = drumkv1::sampleFile();
 		m_schedule->schedule_work(
 			m_schedule->handle, sizeof(mesg), &mesg);
 	}
@@ -728,8 +758,8 @@ void drumkv1_lv2::selectSample ( int key )
 	if (m_schedule) {
 		drumkv1_lv2_worker_message mesg;
 		mesg.atom.type = m_urids.gen1_select;
-		mesg.atom.size = sizeof(mesg.sample);
-		mesg.sample.key = key;
+		mesg.atom.size = sizeof(mesg.data.key);
+		mesg.data.key = key;
 		m_schedule->schedule_work(
 			m_schedule->handle, sizeof(mesg), &mesg);
 	}
@@ -756,6 +786,9 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t size )
 	const drumkv1_lv2_worker_message *mesg
 		= (const drumkv1_lv2_worker_message *) data;
 
+	if (mesg->atom.type == m_urids.atom_portEvent)
+		return true;
+	else
 	if (mesg->atom.type == m_urids.state_StateChanged)
 		return true;
 	else
@@ -763,7 +796,7 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t size )
 		return true;
 	else
 	if (mesg->atom.type == m_urids.gen1_select) {
-		drumkv1::setCurrentElementEx(mesg->sample.key);
+		drumkv1::setCurrentElementEx(mesg->data.key);
 		return true;
 	}
 	else
@@ -773,7 +806,7 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t size )
 			drumkv1::addElement(key);
 			drumkv1::setCurrentElementEx(key);
 		}
-		drumkv1::setSampleFile(mesg->sample.path);
+		drumkv1::setSampleFile(mesg->data.path);
 		return true;
 	}
 	else
@@ -793,6 +826,14 @@ bool drumkv1_lv2::worker_response ( const void *data, uint32_t size )
 
 	const drumkv1_lv2_worker_message *mesg
 		= (const drumkv1_lv2_worker_message *) data;
+
+	if (mesg->atom.type == m_urids.atom_portEvent) {
+		if (mesg->atom.size > 0)
+			return port_event(drumkv1::ParamIndex(mesg->data.key));
+		else
+			return port_events();
+	}
+	else
 	if (mesg->atom.type == m_urids.state_StateChanged)
 		return state_changed();
 
@@ -891,6 +932,41 @@ bool drumkv1_lv2::patch_put ( uint32_t ndelta, uint32_t type )
 }
 
 #endif	// CONFIG_LV2_PATCH
+
+
+bool drumkv1_lv2::port_event ( drumkv1::ParamIndex index )
+{
+	lv2_atom_forge_frame_time(&m_forge, m_ndelta);
+
+	LV2_Atom_Forge_Frame frame;
+	lv2_atom_forge_object(&m_forge, &frame, 0, m_urids.atom_portEvent);
+
+	lv2_atom_forge_key(&m_forge, uint32_t(ParamBase + index));
+	lv2_atom_forge_float(&m_forge, drumkv1::paramValue(index));
+
+	lv2_atom_forge_pop(&m_forge, &frame);
+
+	return true;
+}
+
+
+bool drumkv1_lv2::port_events (void)
+{
+	lv2_atom_forge_frame_time(&m_forge, m_ndelta);
+
+	LV2_Atom_Forge_Frame frame;
+	lv2_atom_forge_object(&m_forge, &frame, 0, m_urids.atom_portEvent);
+
+	for (int i = 0; i < drumkv1::NUM_PARAMS; ++i) {
+		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		lv2_atom_forge_key(&m_forge, uint32_t(ParamBase + index));
+		lv2_atom_forge_float(&m_forge, drumkv1::paramValue(index));
+	}
+
+	lv2_atom_forge_pop(&m_forge, &frame);
+
+	return true;
+}
 
 
 //-------------------------------------------------------------------------

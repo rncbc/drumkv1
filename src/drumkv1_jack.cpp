@@ -629,6 +629,18 @@ void drumkv1_jack::updateSample (void)
 }
 
 
+void drumkv1_jack::updateParam ( drumkv1::ParamIndex /*index*/ )
+{
+	// nothing to do here...
+}
+
+
+void drumkv1_jack::updateParams (void)
+{
+	// nothing to do here...
+}
+
+
 void drumkv1_jack::updateTuning (void)
 {
 	drumkv1::resetTuning();
