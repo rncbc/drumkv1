@@ -182,6 +182,7 @@ void drumkv1_programs::process_program (
 
 	if (m_prog) {
 		drumkv1_param::loadPreset(pDrumk, m_prog->name());
+		pDrumk->updateSample();
 		pDrumk->updateParams();
 	}
 }
