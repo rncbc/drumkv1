@@ -836,6 +836,9 @@ bool drumkv1_lv2::worker_response ( const void *data, uint32_t size )
 	else
 	if (mesg->atom.type == m_urids.state_StateChanged)
 		return state_changed();
+	else
+	if (mesg->atom.type == m_urids.gen1_select)
+		port_events();
 
 	// update all properties, and eventually, any observers...
 	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
@@ -938,13 +941,18 @@ bool drumkv1_lv2::port_event ( drumkv1::ParamIndex index )
 {
 	lv2_atom_forge_frame_time(&m_forge, m_ndelta);
 
-	LV2_Atom_Forge_Frame frame;
-	lv2_atom_forge_object(&m_forge, &frame, 0, m_urids.atom_portEvent);
+	LV2_Atom_Forge_Frame obj_frame;
+	lv2_atom_forge_object(&m_forge, &obj_frame, 0, m_urids.atom_portEvent);
+	lv2_atom_forge_key(&m_forge, m_forge.Tuple);
 
-	lv2_atom_forge_key(&m_forge, uint32_t(ParamBase + index));
+	LV2_Atom_Forge_Frame tup_frame;
+	lv2_atom_forge_tuple(&m_forge, &tup_frame);
+
+	lv2_atom_forge_int(&m_forge, int32_t(ParamBase + index));
 	lv2_atom_forge_float(&m_forge, drumkv1::paramValue(index));
 
-	lv2_atom_forge_pop(&m_forge, &frame);
+	lv2_atom_forge_pop(&m_forge, &tup_frame);
+	lv2_atom_forge_pop(&m_forge, &obj_frame);
 
 	return true;
 }
@@ -954,16 +962,21 @@ bool drumkv1_lv2::port_events (void)
 {
 	lv2_atom_forge_frame_time(&m_forge, m_ndelta);
 
-	LV2_Atom_Forge_Frame frame;
-	lv2_atom_forge_object(&m_forge, &frame, 0, m_urids.atom_portEvent);
+	LV2_Atom_Forge_Frame obj_frame;
+	lv2_atom_forge_object(&m_forge, &obj_frame, 0, m_urids.atom_portEvent);
+	lv2_atom_forge_key(&m_forge, m_forge.Tuple);
+
+	LV2_Atom_Forge_Frame tup_frame;
+	lv2_atom_forge_tuple(&m_forge, &tup_frame);
 
 	for (int i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-		lv2_atom_forge_key(&m_forge, uint32_t(ParamBase + index));
+		lv2_atom_forge_int(&m_forge, int32_t(ParamBase + index));
 		lv2_atom_forge_float(&m_forge, drumkv1::paramValue(index));
 	}
 
-	lv2_atom_forge_pop(&m_forge, &frame);
+	lv2_atom_forge_pop(&m_forge, &tup_frame);
+	lv2_atom_forge_pop(&m_forge, &obj_frame);
 
 	return true;
 }
