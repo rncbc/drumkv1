@@ -831,14 +831,14 @@ bool drumkv1_lv2::worker_response ( const void *data, uint32_t size )
 		if (mesg->atom.size > 0)
 			return port_event(drumkv1::ParamIndex(mesg->data.key));
 		else
-			return port_events();
+			return port_events(drumkv1::NUM_PARAMS);
 	}
 	else
 	if (mesg->atom.type == m_urids.state_StateChanged)
 		return state_changed();
 	else
 	if (mesg->atom.type == m_urids.gen1_select)
-		port_events();
+		port_events(drumkv1::NUM_ELEMENT_PARAMS);
 
 	// update all properties, and eventually, any observers...
 	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
@@ -958,7 +958,7 @@ bool drumkv1_lv2::port_event ( drumkv1::ParamIndex index )
 }
 
 
-bool drumkv1_lv2::port_events (void)
+bool drumkv1_lv2::port_events ( uint32_t nparams )
 {
 	lv2_atom_forge_frame_time(&m_forge, m_ndelta);
 
@@ -969,8 +969,10 @@ bool drumkv1_lv2::port_events (void)
 	LV2_Atom_Forge_Frame tup_frame;
 	lv2_atom_forge_tuple(&m_forge, &tup_frame);
 
-	for (int i = 0; i < drumkv1::NUM_PARAMS; ++i) {
+	for (uint32_t i = 0; i < nparams; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		if (index == drumkv1::GEN1_SAMPLE)
+			continue;
 		lv2_atom_forge_int(&m_forge, int32_t(ParamBase + index));
 		lv2_atom_forge_float(&m_forge, drumkv1::paramValue(index));
 	}

@@ -105,7 +105,7 @@ protected:
 #endif
 
 	bool port_event(drumkv1::ParamIndex index);
-	bool port_events();
+	bool port_events(uint32_t nparams);
 
 private:
 
