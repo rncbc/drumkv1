@@ -227,10 +227,6 @@ drumkv1_lv2::drumkv1_lv2 (
  					m_urid_map->handle, LV2_PATCH__Get);
 				m_urids.patch_Set = m_urid_map->map(
 					m_urid_map->handle, LV2_PATCH__Set);
-				m_urids.patch_Put = m_urid_map->map(
-					m_urid_map->handle, LV2_PATCH__Put);
-				m_urids.patch_body = m_urid_map->map(
-					m_urid_map->handle, LV2_PATCH__body);
 				m_urids.patch_property = m_urid_map->map(
  					m_urid_map->handle, LV2_PATCH__property);
 				m_urids.patch_value = m_urid_map->map(
@@ -469,7 +465,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 				else
 				if (object->body.otype == m_urids.patch_Get) {
 					// put all property values (probably to UI)
-					patch_put();
+					patch_get();
 				}
 			#endif	// CONFIG_LV2_PATCH
 			}
@@ -850,7 +846,7 @@ bool drumkv1_lv2::worker_response ( const void *data, uint32_t size )
 	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
 
 #ifdef CONFIG_LV2_PATCH
-	return patch_put();
+	return patch_get();
 #else
 	return true;
 #endif
@@ -871,12 +867,9 @@ bool drumkv1_lv2::state_changed (void)
 
 #ifdef CONFIG_LV2_PATCH
 
-bool drumkv1_lv2::patch_put ( uint32_t type )
+bool drumkv1_lv2::patch_set ( LV2_URID key )
 {
 	static char s_szNull[1] = {'\0'};
-
-	if (type == m_urids.patch_Put)
-		type = 0;
 
 	drumkv1_sample *pSample = drumkv1::sample();
 	if (pSample == nullptr)
@@ -885,57 +878,65 @@ bool drumkv1_lv2::patch_put ( uint32_t type )
 	lv2_atom_forge_frame_time(&m_forge, m_ndelta);
 
 	LV2_Atom_Forge_Frame patch_frame;
-	lv2_atom_forge_object(&m_forge, &patch_frame, 0, m_urids.patch_Put);
-	lv2_atom_forge_key(&m_forge, m_urids.patch_body);
+	lv2_atom_forge_object(&m_forge, &patch_frame, 0, m_urids.patch_Set);
 
-	LV2_Atom_Forge_Frame body_frame;
-	lv2_atom_forge_object(&m_forge, &body_frame, 0, 0);
+	lv2_atom_forge_key(&m_forge, m_urids.patch_property);
+	lv2_atom_forge_urid(&m_forge, key);
 
-	if (type == 0 || type == m_urids.p101_sample_file) {
+	lv2_atom_forge_key(&m_forge, m_urids.patch_value);
+
+	if (key == m_urids.p101_sample_file) {
 		const char *pszSampleFile = pSample->filename();
 		if (pszSampleFile == nullptr)
 			pszSampleFile = s_szNull;
-		lv2_atom_forge_key(&m_forge, m_urids.p101_sample_file);
 		lv2_atom_forge_path(&m_forge, pszSampleFile, ::strlen(pszSampleFile) + 1);
 	}
-	if (type == 0 || type == m_urids.p102_offset_start) {
-		lv2_atom_forge_key(&m_forge, m_urids.p102_offset_start);
+	else
+	if (key == m_urids.p102_offset_start)
 		lv2_atom_forge_int(&m_forge, (pSample ? pSample->offsetStart() : 0));
-	}
-	if (type == 0 || type == m_urids.p103_offset_end) {
-		lv2_atom_forge_key(&m_forge, m_urids.p103_offset_end);
+	else
+	if (key == m_urids.p103_offset_end)
 		lv2_atom_forge_int(&m_forge, (pSample ? pSample->offsetEnd() : 0));
-	}
-
-	if (type == 0 || type == m_urids.p201_tuning_enabled) {
-		lv2_atom_forge_key(&m_forge, m_urids.p201_tuning_enabled);
+	else
+	if (key == m_urids.p201_tuning_enabled)
 		lv2_atom_forge_bool(&m_forge, drumkv1::isTuningEnabled());
-	}
-	if (type == 0 || type == m_urids.p202_tuning_refPitch) {
-		lv2_atom_forge_key(&m_forge, m_urids.p202_tuning_refPitch);
+	else
+	if (key == m_urids.p202_tuning_refPitch)
 		lv2_atom_forge_float(&m_forge, drumkv1::tuningRefPitch());
-	}
-	if (type == 0 || type == m_urids.p203_tuning_refNote) {
-		lv2_atom_forge_key(&m_forge, m_urids.p203_tuning_refNote);
+	else
+	if (key == m_urids.p203_tuning_refNote)
 		lv2_atom_forge_int(&m_forge, drumkv1::tuningRefNote());
-	}
-	if (type == 0 || type == m_urids.p204_tuning_scaleFile) {
+	else
+	if (key == m_urids.p204_tuning_scaleFile) {
 		const char *pszScaleFile = drumkv1::tuningScaleFile();
 		if (pszScaleFile == nullptr)
 			pszScaleFile = s_szNull;
-		lv2_atom_forge_key(&m_forge, m_urids.p204_tuning_scaleFile);
 		lv2_atom_forge_path(&m_forge, pszScaleFile, ::strlen(pszScaleFile) + 1);
 	}
-	if (type == 0 || type == m_urids.p205_tuning_keyMapFile) {
+	else
+	if (key == m_urids.p205_tuning_keyMapFile) {
 		const char *pszKeyMapFile = drumkv1::tuningKeyMapFile();
 		if (pszKeyMapFile == nullptr)
 			pszKeyMapFile = s_szNull;
-		lv2_atom_forge_key(&m_forge, m_urids.p205_tuning_keyMapFile);
 		lv2_atom_forge_path(&m_forge, pszKeyMapFile, ::strlen(pszKeyMapFile) + 1);
 	}
 
-	lv2_atom_forge_pop(&m_forge, &body_frame);
 	lv2_atom_forge_pop(&m_forge, &patch_frame);
+
+	return true;
+}
+
+bool drumkv1_lv2::patch_get (void)
+{
+	patch_set(m_urids.p101_sample_file);
+	patch_set(m_urids.p102_offset_start);
+	patch_set(m_urids.p103_offset_end);
+
+	patch_set(m_urids.p201_tuning_enabled);
+	patch_set(m_urids.p202_tuning_refPitch);
+	patch_set(m_urids.p203_tuning_refNote);
+	patch_set(m_urids.p204_tuning_scaleFile);
+	patch_set(m_urids.p205_tuning_keyMapFile);
 
 	return true;
 }
