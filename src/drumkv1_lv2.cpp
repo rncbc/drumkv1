@@ -464,8 +464,14 @@ void drumkv1_lv2::run ( uint32_t nframes )
 				}
 				else
 				if (object->body.otype == m_urids.patch_Get) {
-					// put all property values (probably to UI)
-					patch_get();
+					// get one or all property values (probably to UI)...
+					const LV2_Atom_URID *prop = nullptr;
+					lv2_atom_object_get(object,
+						m_urids.patch_property, (const LV2_Atom *) &prop, 0);
+					if (prop && prop->atom.type == m_forge.URID)
+						patch_get(prop->body);
+					else
+						patch_get(0); // all
 				}
 			#endif	// CONFIG_LV2_PATCH
 			}
@@ -846,7 +852,7 @@ bool drumkv1_lv2::worker_response ( const void *data, uint32_t size )
 	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
 
 #ifdef CONFIG_LV2_PATCH
-	return patch_get();
+	return patch_get(0);
 #else
 	return true;
 #endif
@@ -926,8 +932,10 @@ bool drumkv1_lv2::patch_set ( LV2_URID key )
 	return true;
 }
 
-bool drumkv1_lv2::patch_get (void)
+bool drumkv1_lv2::patch_get ( LV2_URID key )
 {
+	if (key) return patch_set(key);
+
 	patch_set(m_urids.p101_sample_file);
 	patch_set(m_urids.p102_offset_start);
 	patch_set(m_urids.p103_offset_end);
