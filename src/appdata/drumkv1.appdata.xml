@@ -19,7 +19,7 @@
  <launchable type="desktop-id">drumkv1.desktop</launchable>
  <provides>
 ​  <binary>drumkv1_jack</binary>
-​ </provides>
+ </provides>
  <screenshots>
   <screenshot type="default">
    <image>https://drumkv1.sourceforge.io/image/drumkv1-screenshot9.png</image>
