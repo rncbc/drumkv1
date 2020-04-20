@@ -1,7 +1,7 @@
 // drumkv1_ui.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -81,7 +81,7 @@ bool drumkv1_ui::isPlugin (void) const
 
 void drumkv1_ui::setSampleFile ( const char *pszSampleFile )
 {
-	m_pDrumk->setSampleFile(pszSampleFile);
+	m_pDrumk->setSampleFile(pszSampleFile, true);
 }
 
 const char *drumkv1_ui::sampleFile (void) const
@@ -120,7 +120,7 @@ bool drumkv1_ui::isOffset (void) const
 
 void drumkv1_ui::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
-	m_pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd);
+	m_pDrumk->setOffsetRange(iOffsetStart, iOffsetEnd, true);
 }
 
 uint32_t drumkv1_ui::offsetStart (void) const

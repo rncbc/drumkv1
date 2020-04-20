@@ -1,7 +1,7 @@
 // drumkv1.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -69,7 +69,7 @@ public:
 
 	void clearElements();
 
-	void setSampleFile(const char *pszSampleFile);
+	void setSampleFile(const char *pszSampleFile, bool bSync = false);
 	const char *sampleFile() const;
 
 	drumkv1_sample *sample() const;
@@ -80,7 +80,7 @@ public:
 	void setOffset(bool bOffset, bool bSync = false);
 	bool isOffset() const;
 
-	void setOffsetRange(uint32_t iOffsetStart, uint32_t iOffsetEnd);
+	void setOffsetRange(uint32_t iOffsetStart, uint32_t iOffsetEnd, bool bSync = false);
 	uint32_t offsetStart() const;
 	uint32_t offsetEnd() const;
 
@@ -195,6 +195,13 @@ public:
 	virtual void updateParam(ParamIndex index) = 0;
 	virtual void updateParams() = 0;
 
+	virtual void updateSample() = 0;
+
+	virtual void updateSampleFile() = 0;
+	virtual void updateOffsetRange() = 0;
+
+	virtual void selectSample(int key) = 0;
+
 	void midiInEnabled(bool on);
 	uint32_t midiInCount();
 
@@ -218,9 +225,6 @@ public:
 	void resetTuning();
 
 	virtual void updateTuning() = 0;
-
-	virtual void selectSample(int key) = 0;
-	virtual void updateSample() = 0;
 
 private:
 

@@ -608,22 +608,7 @@ void drumkv1_jack::sessionEvent ( void *pvSessionArg )
 #endif	// CONFIG_JACK_SESSION
 
 
-void drumkv1_jack::selectSample ( int key )
-{
-	// something to do...
-	drumkv1::setCurrentElementEx(key);
-
-	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
-}
-
-
 void drumkv1_jack::updatePreset ( bool /*bDirty*/ )
-{
-	// nothing to do here...
-}
-
-
-void drumkv1_jack::updateSample (void)
 {
 	// nothing to do here...
 }
@@ -638,6 +623,33 @@ void drumkv1_jack::updateParam ( drumkv1::ParamIndex /*index*/ )
 void drumkv1_jack::updateParams (void)
 {
 	// nothing to do here...
+}
+
+
+void drumkv1_jack::updateSample (void)
+{
+	// nothing to do here...
+}
+
+
+void drumkv1_jack::updateSampleFile (void)
+{
+	// nothing to do here...
+}
+
+
+void drumkv1_jack::updateOffsetRange (void)
+{
+	// nothing to do here...
+}
+
+
+void drumkv1_jack::selectSample ( int key )
+{
+	// something to do...
+	drumkv1::setCurrentElementEx(key);
+
+	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
 }
 
 

@@ -530,7 +530,7 @@ void drumkv1_param::loadTuning (
 	}
 
 	// Consolidate tuning state...
-	pDrumk->resetTuning();
+	pDrumk->updateTuning();
 }
 
 

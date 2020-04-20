@@ -93,10 +93,14 @@ protected:
 	void updatePreset(bool bDirty);
 	void updateParam(drumkv1::ParamIndex index);
 	void updateParams();
+
 	void updateSample();
-	void updateTuning();
+	void updateSampleFile();
+	void updateOffsetRange();
 
 	void selectSample(int key);
+
+	void updateTuning();
 
 	bool state_changed();
 

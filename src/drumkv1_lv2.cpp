@@ -402,7 +402,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 									= *(uint32_t *) LV2_ATOM_BODY_CONST(value);
 								const uint32_t offset_end
 									= pSample->offsetEnd();
-								setOffsetRange(offset_start, offset_end);
+								setOffsetRange(offset_start, offset_end, true);
 							}
 						}
 						else
@@ -417,7 +417,7 @@ void drumkv1_lv2::run ( uint32_t nframes )
 									= pSample->offsetStart();
 								const uint32_t offset_end
 									= *(uint32_t *) LV2_ATOM_BODY_CONST(value);
-								setOffsetRange(offset_start, offset_end);
+								setOffsetRange(offset_start, offset_end, true);
 							}
 						}
 						else
@@ -753,8 +753,35 @@ void drumkv1_lv2::updateSample (void)
 	if (m_schedule) {
 		drumkv1_lv2_worker_message mesg;
 		mesg.atom.type = m_urids.gen1_update;
+		mesg.atom.size = 0; // nothing else matters.
+		m_schedule->schedule_work(
+			m_schedule->handle, sizeof(mesg), &mesg);
+	}
+}
+
+
+void drumkv1_lv2::updateSampleFile (void)
+{
+	if (m_schedule) {
+		drumkv1_lv2_worker_message mesg;
+		mesg.atom.type = m_urids.p101_sample_file;
 		mesg.atom.size = sizeof(mesg.data.path);
 		mesg.data.path = drumkv1::sampleFile();
+		m_schedule->schedule_work(
+			m_schedule->handle, sizeof(mesg), &mesg);
+	}
+}
+
+
+void drumkv1_lv2::updateOffsetRange (void)
+{
+	if (m_schedule) {
+		drumkv1_lv2_worker_message mesg;
+		mesg.atom.type = m_urids.p102_offset_start;
+		mesg.atom.size = 0; // nothing else matters.
+		m_schedule->schedule_work(
+			m_schedule->handle, sizeof(mesg), &mesg);
+		mesg.atom.type = m_urids.p103_offset_end;
 		m_schedule->schedule_work(
 			m_schedule->handle, sizeof(mesg), &mesg);
 	}
@@ -794,36 +821,22 @@ bool drumkv1_lv2::worker_work ( const void *data, uint32_t size )
 	const drumkv1_lv2_worker_message *mesg
 		= (const drumkv1_lv2_worker_message *) data;
 
-	if (mesg->atom.type == m_urids.atom_PortEvent)
-		return true;
-	else
-	if (mesg->atom.type == m_urids.state_StateChanged)
-		return true;
-	else
-	if (mesg->atom.type == m_urids.gen1_update)
-		return true;
-	else
-	if (mesg->atom.type == m_urids.gen1_select) {
+	if (mesg->atom.type == m_urids.gen1_select)
 		drumkv1::setCurrentElementEx(mesg->data.key);
-		return true;
-	}
 	else
-	if (mesg->atom.type == m_urids.gen1_sample) {
+	if (mesg->atom.type == m_urids.p101_sample_file) {
 		const int key = drumkv1::currentElement();
 		if (drumkv1::element(key) == nullptr) {
 			drumkv1::addElement(key);
 			drumkv1::setCurrentElementEx(key);
 		}
 		drumkv1::setSampleFile(mesg->data.path);
-		return true;
 	}
 	else
-	if (mesg->atom.type == m_urids.tun1_update) {
+	if (mesg->atom.type == m_urids.tun1_update)
 		drumkv1::resetTuning();
-		return true;
-	}
 
-	return false;
+	return true;
 }
 
 
@@ -852,7 +865,7 @@ bool drumkv1_lv2::worker_response ( const void *data, uint32_t size )
 	drumkv1_sched::sync_notify(this, drumkv1_sched::Sample, 0);
 
 #ifdef CONFIG_LV2_PATCH
-	return patch_get(0);
+	return patch_get(mesg->atom.type);
 #else
 	return true;
 #endif
@@ -934,17 +947,23 @@ bool drumkv1_lv2::patch_set ( LV2_URID key )
 
 bool drumkv1_lv2::patch_get ( LV2_URID key )
 {
-	if (key) return patch_set(key);
+	if (key == 0 || key == m_urids.gen1_update || key == m_urids.gen1_select) {
+		patch_set(m_urids.p101_sample_file);
+		patch_set(m_urids.p102_offset_start);
+		patch_set(m_urids.p103_offset_end);
+		if (key) return true;
+	}
 
-	patch_set(m_urids.p101_sample_file);
-	patch_set(m_urids.p102_offset_start);
-	patch_set(m_urids.p103_offset_end);
+	if (key == 0 || key == m_urids.tun1_update) {
+		patch_set(m_urids.p201_tuning_enabled);
+		patch_set(m_urids.p202_tuning_refPitch);
+		patch_set(m_urids.p203_tuning_refNote);
+		patch_set(m_urids.p204_tuning_scaleFile);
+		patch_set(m_urids.p205_tuning_keyMapFile);
+		if (key) return true;
+	}
 
-	patch_set(m_urids.p201_tuning_enabled);
-	patch_set(m_urids.p202_tuning_refPitch);
-	patch_set(m_urids.p203_tuning_refNote);
-	patch_set(m_urids.p204_tuning_scaleFile);
-	patch_set(m_urids.p205_tuning_keyMapFile);
+	if (key) patch_set(key);
 
 	return true;
 }

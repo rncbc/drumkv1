@@ -2614,11 +2614,11 @@ void drumkv1::clearElements (void)
 }
 
 
-void drumkv1::setSampleFile ( const char *pszSampleFile )
+void drumkv1::setSampleFile ( const char *pszSampleFile, bool bSync )
 {
 	m_pImpl->setSampleFile(pszSampleFile);
 
-	updateSample();
+	if (bSync) updateSample();
 }
 
 const char *drumkv1::sampleFile (void) const
@@ -2638,7 +2638,7 @@ void drumkv1::setReverse ( bool bReverse, bool bSync )
 	m_pImpl->setReverse(bReverse);
 	m_pImpl->sampleReverseSync();
 
-	if (bSync) updateSample();
+	if (bSync) updateSampleFile();
 }
 
 bool drumkv1::isReverse (void) const
@@ -2652,7 +2652,7 @@ void drumkv1::setOffset ( bool bOffset, bool bSync )
 	m_pImpl->setOffset(bOffset);
 	m_pImpl->sampleOffsetSync();
 
-	if (bSync) updateSample();
+	if (bSync) updateOffsetRange();
 }
 
 bool drumkv1::isOffset (void) const
@@ -2661,13 +2661,13 @@ bool drumkv1::isOffset (void) const
 }
 
 
-void drumkv1::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
+void drumkv1::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd, bool bSync )
 {
 	m_pImpl->setOffsetRange(iOffsetStart, iOffsetEnd);
 	m_pImpl->sampleOffsetRangeSync();
 	m_pImpl->updateEnvTimes();
 
-	updateSample();
+	if (bSync) updateOffsetRange();
 }
 
 
