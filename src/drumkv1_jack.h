@@ -78,7 +78,6 @@ protected:
 
 	void updateSample();
 
-	void updateSampleFile();
 	void updateOffsetRange();
 
 	void selectSample(int key);

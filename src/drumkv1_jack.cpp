@@ -632,12 +632,6 @@ void drumkv1_jack::updateSample (void)
 }
 
 
-void drumkv1_jack::updateSampleFile (void)
-{
-	// nothing to do here...
-}
-
-
 void drumkv1_jack::updateOffsetRange (void)
 {
 	// nothing to do here...

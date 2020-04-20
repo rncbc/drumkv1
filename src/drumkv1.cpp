@@ -2638,7 +2638,7 @@ void drumkv1::setReverse ( bool bReverse, bool bSync )
 	m_pImpl->setReverse(bReverse);
 	m_pImpl->sampleReverseSync();
 
-	if (bSync) updateSampleFile();
+	if (bSync) updateSample();
 }
 
 bool drumkv1::isReverse (void) const

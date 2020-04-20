@@ -95,7 +95,7 @@ protected:
 	void updateParams();
 
 	void updateSample();
-	void updateSampleFile();
+
 	void updateOffsetRange();
 
 	void selectSample(int key);

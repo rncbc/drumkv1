@@ -760,19 +760,6 @@ void drumkv1_lv2::updateSample (void)
 }
 
 
-void drumkv1_lv2::updateSampleFile (void)
-{
-	if (m_schedule) {
-		drumkv1_lv2_worker_message mesg;
-		mesg.atom.type = m_urids.p101_sample_file;
-		mesg.atom.size = sizeof(mesg.data.path);
-		mesg.data.path = drumkv1::sampleFile();
-		m_schedule->schedule_work(
-			m_schedule->handle, sizeof(mesg), &mesg);
-	}
-}
-
-
 void drumkv1_lv2::updateOffsetRange (void)
 {
 	if (m_schedule) {
