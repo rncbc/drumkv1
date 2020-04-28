@@ -1,7 +1,7 @@
 // drumkv1widget_lv2.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -125,9 +125,6 @@ drumkv1_ui *drumkv1widget_lv2::ui_instance (void) const
 void drumkv1widget_lv2::setExternalHost ( LV2_External_UI_Host *external_host )
 {
 	m_external_host = external_host;
-
-	if (m_external_host && m_external_host->plugin_human_id)
-		drumkv1widget::setWindowTitle(m_external_host->plugin_human_id);
 }
 
 const LV2_External_UI_Host *drumkv1widget_lv2::externalHost (void) const
