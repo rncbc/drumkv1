@@ -532,6 +532,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 		SIGNAL(toggled(bool)),
 		SLOT(swapParams(bool)));
 
+	// Randomize params...
+	QObject::connect(m_ui.PanicButton,
+		SIGNAL(clicked()),
+		SLOT(panic()));
+	
 	// Direct stacked-page signal/slot
 	QObject::connect(m_ui.TabBar, SIGNAL(currentChanged(int)),
 		m_ui.StackedWidget, SLOT(setCurrentIndex(int)));
@@ -951,6 +956,15 @@ void drumkv1widget::swapParams ( bool bOn )
 }
 
  
+// Panic: all-notes/sound-off (reset).
+void drumkv1widget::panic (void)
+{
+	drumkv1_ui *pDrumkUi = ui_instance();
+	if (pDrumkUi)
+		pDrumkUi->reset();
+}
+
+
 // Reset swap params A/B group.
 void drumkv1widget::resetSwapParams (void)
 {
