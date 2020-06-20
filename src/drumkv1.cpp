@@ -2310,8 +2310,8 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				// filters
 
 				if (dcf1_enabled) {
-					const float env1 = 0.5f * (1.0f + vel1
-						* *elem->dcf1.envelope * pv->dcf1_env.tick());
+					const float env1 = 0.5f
+						* (1.0f + *elem->dcf1.envelope * pv->dcf1_env.tick());
 					const float cutoff1 = drumkv1_sigmoid_1(*elem->dcf1.cutoff
 						* env1 * (1.0f + *elem->lfo1.cutoff * lfo1));
 					const float reso1 = drumkv1_sigmoid_1(*elem->dcf1.reso
