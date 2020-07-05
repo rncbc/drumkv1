@@ -1,7 +1,7 @@
 // drumkv1widget_elements.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2019, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -407,7 +407,11 @@ void drumkv1widget_elements::dragMoveEvent ( QDragMoveEvent *pDragMoveEvent )
 
 	if (pDragMoveEvent->mimeData()->hasUrls()) {
 		const QModelIndex& index
+		#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+			= QTreeView::indexAt(pDragMoveEvent->position().toPoint());
+		#else
 			= QTreeView::indexAt(pDragMoveEvent->pos());
+		#endif
 		if (index.isValid()) {
 			setCurrentIndex(index.row());
 			if (m_pDragSample) {

@@ -761,7 +761,11 @@ drumkv1widget_radio::drumkv1widget_radio ( QWidget *pParent )
 #endif
 
 	QObject::connect(&m_group,
+	#if QT_VERSION >= QT_VERSION_CHECK(5, 15, 0)
+		SIGNAL(idClicked(int)),
+	#else
 		SIGNAL(buttonClicked(int)),
+	#endif
 		SLOT(radioGroupValueChanged(int)));
 }
 
