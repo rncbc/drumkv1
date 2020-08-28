@@ -1211,7 +1211,7 @@ private:
 drumkv1_impl::drumkv1_impl (
 	drumkv1 *pDrumk, uint16_t nchannels, float srate )
 	: m_pDrumk(pDrumk),	m_controls(pDrumk), m_programs(pDrumk),
-		m_midi_in(pDrumk), m_bpm(180.0f), m_running(false)
+		m_midi_in(pDrumk), m_bpm(180.0f), m_nvoices(0), m_running(false)
 {
 	// allocate voice pool.
 	m_voices = new drumkv1_voice * [MAX_VOICES];
