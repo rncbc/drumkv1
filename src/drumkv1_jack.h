@@ -43,13 +43,13 @@ class drumkv1_jack : public drumkv1
 {
 public:
 
-	drumkv1_jack();
+	drumkv1_jack(const char *client_name);
 
 	~drumkv1_jack();
 
 	jack_client_t *client() const;
 
-	void open(const char *client_id);
+	void open(const char *client_name);
 	void close();
 
 	void activate();
@@ -188,6 +188,7 @@ private:
 	QCoreApplication *m_pApp;
 	bool m_bGui;
 
+	QString m_sClientName;
 	QStringList m_presets;
 
 	drumkv1_jack *m_pDrumk;

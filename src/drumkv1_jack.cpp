@@ -158,7 +158,7 @@ static void drumkv1_jack_session_event (
 // drumkv1_jack - impl.
 //
 
-drumkv1_jack::drumkv1_jack (void) : drumkv1(2)
+drumkv1_jack::drumkv1_jack (const char *client_name) : drumkv1(2)
 {
 	m_client = nullptr;
 
@@ -186,7 +186,7 @@ drumkv1_jack::drumkv1_jack (void) : drumkv1(2)
 	drumkv1::programs()->enabled(true);
 	drumkv1::controls()->enabled(true);
 
-	open(DRUMKV1_TITLE);
+	open(client_name);
 	activate();
 }
 
@@ -288,7 +288,7 @@ int drumkv1_jack::process ( jack_nframes_t nframes )
 }
 
 
-void drumkv1_jack::open ( const char *client_id )
+void drumkv1_jack::open ( const char *client_name )
 {
 	// init param ports
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
@@ -298,7 +298,7 @@ void drumkv1_jack::open ( const char *client_id )
 	}
 
 	// open client
-	m_client = ::jack_client_open(client_id, JackNullOption, nullptr);
+	m_client = ::jack_client_open(client_name, JackNullOption, nullptr);
 	if (m_client == nullptr)
 		return;
 
@@ -341,7 +341,7 @@ void drumkv1_jack::open ( const char *client_id )
 	m_alsa_thread  = nullptr;
 	// open alsa sequencer client...
 	if (snd_seq_open(&m_alsa_seq, "hw", SND_SEQ_OPEN_INPUT, 0) >= 0) {
-		snd_seq_set_client_name(m_alsa_seq, client_id);
+		snd_seq_set_client_name(m_alsa_seq, client_name);
 	//	m_alsa_client = snd_seq_client_id(m_alsa_seq);
 		m_alsa_port = snd_seq_create_simple_port(m_alsa_seq, "in",
 			SND_SEQ_PORT_CAP_WRITE | SND_SEQ_PORT_CAP_SUBS_WRITE,
@@ -714,7 +714,7 @@ static void drumkv1_sigterm_handler ( int /*signo*/ )
 // Constructor.
 drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 	: QObject(nullptr), m_pApp(nullptr), m_bGui(true),
-		m_pDrumk(nullptr), m_pWidget(nullptr)
+		m_sClientName(DRUMKV1_TITLE), m_pDrumk(nullptr), m_pWidget(nullptr)
 	  #ifdef CONFIG_NSM
 		, m_pNsmClient(nullptr)
 	  #endif
@@ -723,12 +723,27 @@ drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 	m_bGui = (::getenv("DISPLAY") != 0);
 #endif
 	for (int i = 1; i < argc; ++i) {
-		const QString& sArg = QString::fromLocal8Bit(argv[i]);
-		if (sArg[0] != '-')
+		QString sArg = QString::fromLocal8Bit(argv[i]);
+		QString sVal;
+		const int iEqual = sArg.indexOf('=');
+		if (iEqual >= 0) {
+			sVal = sArg.right(sArg.length() - iEqual - 1);
+			sArg = sArg.left(iEqual);
+		}
+		else if (i < argc - 1) {
+			sVal = QString::fromLocal8Bit(argv[i + 1]);;
+			if (sVal.at(0) == '-')
+				sVal.clear();
+		}
+		if (sArg.at(0) != '-')
 			m_presets.append(sArg);
 		else
 		if (sArg == "-g" || sArg == "--no-gui")
 			m_bGui = false;
+		if (sArg == "-n" || sArg == "--client-name") {
+			if (!sVal.isEmpty())
+				m_sClientName = sVal;
+		}
 	}
 
 	if (m_bGui) {
@@ -819,6 +834,7 @@ bool drumkv1_jack_application::parse_args (void)
 				DRUMKV1_TITLE " - " DRUMKV1_SUBTITLE "\n\n"
 				"Options:\n\n"
 				"  -g, --no-gui\n\tDisable the graphical user interface (GUI)\n\n"
+				"  -n, --client-name=[label]\n\tSet the JACK client name (default: drumkv1)\n\n"
 				"  -h, --help\n\tShow help about command line options\n\n"
 				"  -v, --version\n\tShow version information\n\n")
 				.arg(args.at(0));
@@ -854,7 +870,12 @@ bool drumkv1_jack_application::setup (void)
 		SIGNAL(shutdown_signal()),
 		SLOT(shutdown_slot()));
 
-	m_pDrumk = new drumkv1_jack();
+	const QByteArray aClientName
+		= m_sClientName.toLocal8Bit();
+	const char *client_name
+		= aClientName.constData();
+
+	m_pDrumk = new drumkv1_jack(client_name);
 
 	if (m_bGui) {
 		m_pWidget = new drumkv1widget_jack(m_pDrumk);
@@ -889,7 +910,7 @@ bool drumkv1_jack_application::setup (void)
 		QString caps(":switch:dirty:");
 		if (m_bGui)
 			caps += "optional-gui:";
-		m_pNsmClient->announce(DRUMKV1_TITLE, caps.toLatin1().constData());
+		m_pNsmClient->announce(DRUMKV1_TITLE, caps.toLocal8Bit().constData());
 		if (m_pWidget)
 			m_pWidget->setNsmClient(m_pNsmClient);
 	}
@@ -929,11 +950,11 @@ void drumkv1_jack_application::openSession (void)
 	m_pDrumk->deactivate();
 	m_pDrumk->close();
 
-	const QString& client_id = m_pNsmClient->client_id();
+	const QString& client_name = m_pNsmClient->client_name();
 	const QString& path_name = m_pNsmClient->path_name();
 	const QString& display_name = m_pNsmClient->display_name();
 
-	m_pDrumk->open(client_id.toUtf8().constData());
+	m_pDrumk->open(client_name.toUtf8().constData());
 	m_pDrumk->activate();
 
 	const QDir dir(path_name);
@@ -974,7 +995,7 @@ void drumkv1_jack_application::saveSession (void)
 	qDebug("drumkv1_jack::saveSession()");
 #endif
 
-//	const QString& client_id = m_pNsmClient->client_id();
+//	const QString& client_name = m_pNsmClient->client_name();
 	const QString& path_name = m_pNsmClient->path_name();
 //	const QString& display_name = m_pNsmClient->display_name();
 //	const QFileInfo fi(path_name, display_name + '.' + DRUMKV1_TITLE);
