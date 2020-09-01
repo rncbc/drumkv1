@@ -856,9 +856,9 @@ void drumkv1widget::randomParams (void)
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		// Filter out some non-randomizable parameters!...
 		if (index == drumkv1::GEN1_SAMPLE   ||
-		    index == drumkv1::GEN1_OFFSET   ||
-		    index == drumkv1::GEN1_OFFSET_1 ||
-		    index == drumkv1::GEN1_OFFSET_2 ||
+			index == drumkv1::GEN1_OFFSET   ||
+			index == drumkv1::GEN1_OFFSET_1 ||
+			index == drumkv1::GEN1_OFFSET_2 ||
 			index == drumkv1::GEN1_GROUP    ||
 			index == drumkv1::GEN1_COARSE   ||
 			index == drumkv1::GEN1_FINE     ||
@@ -1563,7 +1563,7 @@ void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
 					.arg(m_ui.Gen1Sample->textFromValue(iOffsetEnd)));
 			}
 			if (!sMessage.isEmpty())
-				m_ui.StatusBar->showMessage(sMessage, 3000);
+				m_ui.StatusBar->showMessage(sMessage, 5000);
 			updateDirtyPreset(true);
 		}
 	} else {
