@@ -2805,10 +2805,11 @@ int drumkv1_element::note (void) const
 void drumkv1_element::setSampleFile ( const char *pszSampleFile )
 {
 	if (m_pElem) {
-		m_pElem->gen1_sample.close();
 		if (pszSampleFile) {
 			m_pElem->gen1_sample.open(pszSampleFile,
 				drumkv1_freq(m_pElem->gen1.sample0));
+		} else {
+			m_pElem->gen1_sample.close();
 		}
 	}
 }
