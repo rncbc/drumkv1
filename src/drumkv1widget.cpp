@@ -94,7 +94,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 
 	// Offset/Loop range font.
 	const QFont& font = m_ui.Gen1ReverseKnob->font();
-	m_ui.Gen1OffsetRangeLabel->setFont(font);
+	const QFont font2(font.family(), font.pointSize() - 1);
+	m_ui.Gen1OffsetRangeLabel->setFont(font2);
 	m_ui.Gen1OffsetStartSpinBox->setFont(font);
 	m_ui.Gen1OffsetEndSpinBox->setFont(font);
 

@@ -167,6 +167,9 @@
               <property name="text">
                <string>Offset</string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignLeft|Qt::AlignBottom</set>
+              </property>
              </widget>
             </item>
             <item row="0" column="1">
@@ -174,18 +177,21 @@
               <property name="text">
                <string>Start / End </string>
               </property>
+              <property name="alignment">
+               <set>Qt::AlignRight|Qt::AlignBottom</set>
+              </property>
              </widget>
             </item>
             <item row="1" column="0" colspan="2">
              <widget class="drumkv1widget_spinbox" name="Gen1OffsetStartSpinBox">
               <property name="minimumSize">
                <size>
-                <width>100</width>
+                <width>110</width>
                 <height>16</height>
                </size>
               </property>
               <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <set>Qt::AlignRight|Qt::AlignVCenter</set>
               </property>
               <property name="toolTip">
                <string>GEN Offset Start</string>
@@ -196,12 +202,12 @@
              <widget class="drumkv1widget_spinbox" name="Gen1OffsetEndSpinBox">
               <property name="minimumSize">
                <size>
-                <width>100</width>
+                <width>110</width>
                 <height>16</height>
                </size>
               </property>
               <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+               <set>Qt::AlignRight|Qt::AlignVCenter</set>
               </property>
               <property name="toolTip">
                <string>GEN Offset End</string>
