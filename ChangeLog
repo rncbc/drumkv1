@@ -4,6 +4,12 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
+GIT HEAD
+
+- White keys on the virtual piano keyboard are now fully
+  highlighted. (EXPERIMENTAL)
+
+
 0.9.17  2020-09-08  Late Summer'10 Release.
 
 - Added -n, --client-name to the JACK stand-alone client
