@@ -54,9 +54,15 @@ bool drumkv1_sample::open ( const char *filename, float freq0 )
 	if (filename == nullptr)
 		return false;
 
+	const bool same_filename
+		= (m_filename && ::strcmp(m_filename, filename) == 0);
+
 	char *filename2 = ::strdup(filename);
 
 	close();
+
+	if (!same_filename)
+		setOffsetRange(0, 0);
 
 	m_filename = filename2;
 

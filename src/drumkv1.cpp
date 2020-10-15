@@ -1285,7 +1285,7 @@ drumkv1_impl::~drumkv1_impl (void)
 #endif
 
 	// deallocate sample filenames
-	setSampleFile(0);
+	setSampleFile(nullptr);
 
 	// deallocate special sample element port
 	delete m_key;
@@ -1540,7 +1540,10 @@ void drumkv1_impl::setSampleFile ( const char *pszSampleFile )
 {
 	reset();
 
-	if (m_elem) m_elem->element.setSampleFile(pszSampleFile);
+	if (m_elem) {
+		m_elem->element.setSampleFile(pszSampleFile);
+		m_elem->updateEnvTimes(m_srate);
+	}
 }
 
 
