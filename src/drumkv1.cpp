@@ -295,7 +295,7 @@ struct drumkv1_env
 {
 	// envelope stages
 
-	enum Stage { Idle = 0, Attack, Decay1, Decay2 };
+	enum Stage { Idle = 0, Attack, Decay1, Decay2, End };
 
 	// per voice
 
@@ -365,7 +365,7 @@ struct drumkv1_env
 		}
 		else if (p->stage == Decay2) {
 			p->running = false;
-			p->stage = Idle;
+			p->stage = End;
 			p->frames = 0;
 			p->phase = 0.0f;
 			p->delta = 0.0f;
@@ -406,7 +406,7 @@ struct drumkv1_env
 		p->frames = 0;
 		p->phase = 0.0f;
 		p->delta = 0.0f;
-		p->value = 0.0f;
+		p->value = 1.0f;
 		p->c1 = 0.0f;
 		p->c0 = 0.0f;
 	}
@@ -2251,7 +2251,6 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			? m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch : 0.0f);
 
 		const bool dcf1_enabled = (*elem->dcf1.enabled > 0.0f);
-		const bool dca1_enabled = (*elem->dca1.enabled > 0.0f);
 
 		const float fxsend1	= *elem->out1.fxsend * *elem->out1.fxsend;
 
@@ -2343,7 +2342,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				const float mid1 = 0.5f * (gen1 + gen2);
 				const float sid1 = 0.5f * (gen1 - gen2);
 				const float vol1 = vel1 * elem->vol1.value(j)
-					* (dca1_enabled ? pv->dca1_env.tick() : 1.0f)
+					* pv->dca1_env.tick()
 					* pv->out1_vol.value(j);
 
 				// outputs
@@ -2382,7 +2381,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 				elem->dca1.env.next(&pv->dca1_env);
 
 			if (pv->gen1.isOver() ||
-				(dca1_enabled && pv->dca1_env.stage == drumkv1_env::Idle)) {
+				pv->dca1_env.stage == drumkv1_env::End) {
 				if (pv->note >= 0)
 					m_notes[pv->note] = nullptr;
 				if (pv->group >= 0 && m_group[pv->group] == pv)
