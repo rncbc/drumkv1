@@ -18,7 +18,7 @@
  </description>
  <launchable type="desktop-id">drumkv1.desktop</launchable>
  <provides>
-​  <binary>drumkv1_jack</binary>
+  <binary>drumkv1_jack</binary>
  </provides>
  <screenshots>
   <screenshot type="default">
