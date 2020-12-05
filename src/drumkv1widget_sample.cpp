@@ -391,40 +391,34 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 	QFrame::mouseReleaseEvent(pMouseEvent);
 
 	switch (m_dragState) {
-	case DragOffsetStart: {
-		if (m_pSample) {
+	case DragOffsetStart:
+		if (m_pSample && m_iDragOffsetStartX < m_iDragOffsetEndX) {
 			m_iOffsetStart = framesFromPixel(m_iDragOffsetStartX);
 			emit offsetRangeChanged();
-			updateToolTip();
-			update();
 		}
 		break;
-	}
-	case DragOffsetEnd: {
-		if (m_pSample) {
+	case DragOffsetEnd:
+		if (m_pSample && m_iDragOffsetStartX < m_iDragOffsetEndX) {
 			m_iOffsetEnd = framesFromPixel(m_iDragOffsetEndX);
 			emit offsetRangeChanged();
-			updateToolTip();
-			update();
 		}
 		break;
-	}
-	case DragOffsetRange: {
-		if (m_pSample) {
+	case DragOffsetRange:
+		if (m_pSample && m_iDragOffsetStartX < m_iDragOffsetEndX) {
 			m_iOffsetStart = framesFromPixel(m_iDragOffsetStartX);
 			m_iOffsetEnd   = framesFromPixel(m_iDragOffsetEndX);
 			emit offsetRangeChanged();
-			updateToolTip();
-			update();
 		}
-		break;
-	}
+		// Fall thru...
 	default:
 		break;
 	}
 
 	m_pDragSample = nullptr;
 	resetDragState();
+
+	updateToolTip();
+	update();
 }
 
 
