@@ -1,4 +1,4 @@
-project(DRUMKV1)
+project(drumkv1)
 
 cmake_minimum_required(VERSION 3.1)
 
