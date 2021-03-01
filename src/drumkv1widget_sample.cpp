@@ -496,7 +496,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 	const bool bDark = (pal.window().color().value() < 0x7f);
 	const QColor& rgbLite = (isEnabled()
 		? (bDark ? Qt::darkYellow : Qt::yellow) : pal.mid().color());
-    const QColor& rgbDark = pal.window().color().darker(180);
+    const QColor& rgbDark = pal.window().color().darker(220);
 
     painter.fillRect(rect, rgbDark);
 
@@ -506,7 +506,8 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		painter.setRenderHint(QPainter::Antialiasing, true);
 		// Sample waveform...
 		QLinearGradient grad(0, 0, w2, h);
-		painter.setPen(bDark ? Qt::gray : Qt::darkGray);
+	//	painter.setPen(bDark ? Qt::gray : Qt::darkGray);
+		painter.setPen(rgbLite);
 		grad.setColorAt(0.0f, rgbLite);
 		grad.setColorAt(1.0f, Qt::black);
 		painter.setBrush(grad);
@@ -524,7 +525,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 				x1 = pixelFromFrames(m_iOffsetStart);
 				x2 = pixelFromFrames(m_iOffsetEnd);
 			}
-			QColor rgbOver = rgbDark.darker();
+			QColor rgbOver = rgbDark.darker(220);
 			rgbOver.setAlpha(120);
 			painter.setPen(rgbLite.darker(160));
 			painter.setBrush(rgbDark.lighter(160));
