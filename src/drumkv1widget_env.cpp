@@ -63,7 +63,7 @@ void drumkv1widget_env::setAttack ( float fAttack )
 {
 	if (::fabsf(m_fAttack - fAttack) > 0.001f) {
 		m_fAttack = safe_value(fAttack);
-		update();
+		updatePolygon();
 		emit attackChanged(attack());
 	}
 }
@@ -78,7 +78,7 @@ void drumkv1widget_env::setDecay1 ( float fDecay1 )
 {
 	if (::fabsf(m_fDecay1 - fDecay1) > 0.001f) {
 		m_fDecay1 = safe_value(fDecay1);
-		update();
+		updatePolygon();
 		emit decay1Changed(decay1());
 	}
 }
@@ -93,7 +93,7 @@ void drumkv1widget_env::setLevel2 ( float fLevel2 )
 {
 	if (::fabsf(m_fLevel2 - fLevel2) > 0.001f) {
 		m_fLevel2 = safe_value(fLevel2);
-		update();
+		updatePolygon();
 		emit level2Changed(level2());
 	}
 }
@@ -108,7 +108,7 @@ void drumkv1widget_env::setDecay2 ( float fDecay2 )
 {
 	if (::fabsf(m_fDecay2 - fDecay2) > 0.001f) {
 		m_fDecay2 = safe_value(fDecay2);
-		update();
+		updatePolygon();
 		emit decay2Changed(decay2());
 	}
 }
@@ -124,33 +124,16 @@ void drumkv1widget_env::paintEvent ( QPaintEvent *pPaintEvent )
 {
 	QPainter painter(this);
 
-	const QRect& rect = QWidget::rect();
+	const QRect& rect = QFrame::rect();
 	const int h  = rect.height();
 	const int w  = rect.width();
-
-	const int w3 = (w - 12) / 3;
-
-	const int x1 = int(m_fAttack * float(w3)) + 6;
-	const int x2 = int(m_fDecay1 * float(w3)) + x1;
-	const int x3 = int(m_fDecay2 * float(w3)) + x2;
-
-	const int y2 = h - int(m_fLevel2 * float(h - 12)) - 6;
-
-	m_poly.putPoints(0, 6,
-		0,  h,
-		6,  h - 6,
-		x1, 6,
-		x2, y2,
-		x3, h - 6,
-		x3, h);
 
 	QPainterPath path;
 	path.addPolygon(m_poly);
 
 	const QPalette& pal = palette();
 	const bool bDark = (pal.window().color().value() < 0x7f);
-	const QColor& rgbLite = (isEnabled()
-		? (bDark ? Qt::darkYellow : Qt::yellow) : pal.mid().color());
+	const QColor& rgbLite = (isEnabled() ? Qt::darkYellow : pal.mid().color());
 	const QColor& rgbDark = pal.window().color().darker(220);
 
 	painter.fillRect(rect, rgbDark);
@@ -165,9 +148,10 @@ void drumkv1widget_env::paintEvent ( QPaintEvent *pPaintEvent )
 	painter.setPen(rgbLite);
 	painter.drawPath(path);
 
-	painter.setBrush(pal.mid().color());
-	painter.setPen(bDark ? Qt::gray : Qt::darkGray);
+	painter.setPen(Qt::darkGray);
+	painter.setBrush(pal.midlight().color());
 	painter.drawRect(nodeRect(1));
+	painter.setPen(bDark ? Qt::gray : Qt::darkGray);
 	painter.setBrush(rgbLite);
 	painter.drawRect(nodeRect(2));
 	painter.drawRect(nodeRect(3));
@@ -296,6 +280,42 @@ void drumkv1widget_env::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 		m_iDragNode = -1;
 		unsetCursor();
 	}
+}
+
+
+// Resize canvas.
+void drumkv1widget_env::resizeEvent ( QResizeEvent *pResizeEvent )
+{
+	QFrame::resizeEvent(pResizeEvent);
+
+	updatePolygon();
+}
+
+
+// Update the drawing polygon.
+void drumkv1widget_env::updatePolygon (void)
+{
+	const QRect& rect = QFrame::rect();
+	const int h  = rect.height();
+	const int w  = rect.width();
+
+	const int w3 = (w - 12) / 3;
+
+	const int x1 = int(m_fAttack * float(w3)) + 6;
+	const int x2 = int(m_fDecay1 * float(w3)) + x1;
+	const int x3 = int(m_fDecay2 * float(w3)) + x2;
+
+	const int y2 = h - int(m_fLevel2 * float(h - 12)) - 6;
+
+	m_poly.putPoints(0, 6,
+		0,  h,
+		6,  h - 6,
+		x1, 6,
+		x2, y2,
+		x3, h - 6,
+		x3, h);
+
+	QFrame::update();
 }
 
 
