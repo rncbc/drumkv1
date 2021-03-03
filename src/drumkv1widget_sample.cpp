@@ -493,7 +493,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 	const int w = rect.width();
 
 	const QPalette& pal = palette();
-//	const bool bDark = (pal.window().color().value() < 0x7f);
+	const bool bDark = (pal.window().color().value() < 0x7f);
 	const QColor& rgbLite = (isEnabled() ? Qt::yellow : pal.mid().color());
 	const QColor& rgbDark = pal.window().color().darker();
 
@@ -503,7 +503,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		const bool bEnabled = isEnabled();
 		QColor rgbLite1(rgbLite);
 		QColor rgbDrop1(Qt::black);
-		rgbLite1.setAlpha(120);
+		rgbLite1.setAlpha(bDark ? 120 : 220);
 		rgbDrop1.setAlpha(80);
 		const int w2 = (w << 1);
 		painter.setRenderHint(QPainter::Antialiasing, true);
@@ -530,8 +530,8 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 			}
 			QColor rgbOver(rgbDark.darker(220));
 			rgbOver.setAlpha(120);
-			painter.setPen(rgbLite1.darker());
-			painter.setBrush(rgbLite1.darker(220));
+			painter.setPen(rgbLite1.darker(160));
+			painter.setBrush(rgbLite1.darker());
 			QPolygon polyg(3);
 		//	polyg.putPoints(0, 3, x1 + 8, 0, x1, 8, x1, 0);
 		//	painter.drawPolygon(polyg);
