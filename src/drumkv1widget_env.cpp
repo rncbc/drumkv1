@@ -155,7 +155,7 @@ void drumkv1widget_env::paintEvent ( QPaintEvent *pPaintEvent )
 	painter.drawPath(path);
 
 	painter.setPen(bDark ? Qt::gray : Qt::darkGray);
-	painter.setBrush(pal.mid().color());
+	painter.setBrush(rgbDrop1.lighter());
 	painter.drawRect(nodeRect(1));
 	painter.setBrush(rgbLite1);
 	painter.drawRect(nodeRect(2));
@@ -304,20 +304,20 @@ void drumkv1widget_env::updatePolygon (void)
 	const int h  = rect.height();
 	const int w  = rect.width();
 
-	const int w3 = (w - 12) / 3;
+	const int w3 = (w - 10) / 3;
 
-	const int x1 = int(m_fAttack * float(w3)) + 6;
+	const int x1 = int(m_fAttack * float(w3)) + 5;
 	const int x2 = int(m_fDecay1 * float(w3)) + x1;
 	const int x3 = int(m_fDecay2 * float(w3)) + x2;
 
-	const int y2 = h - int(m_fLevel2 * float(h - 12)) - 6;
+	const int y2 = h - int(m_fLevel2 * float(h - 10)) - 5;
 
 	m_poly.putPoints(0, 6,
-		0,  h,
-		6,  h - 6,
-		x1, 6,
+		5,  h,
+		5,  h - 5,
+		x1, 5,
 		x2, y2,
-		x3, h - 6,
+		x3, h - 5,
 		x3, h);
 
 	QFrame::update();
