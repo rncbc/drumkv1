@@ -66,6 +66,15 @@ protected:
 	// Draw canvas.
 	void paintEvent(QPaintEvent *);
 
+	// Parameter node indexes.
+	enum NodeIndex {
+		Idle   = 1,
+		Attack = 2,
+		Decay1 = 3,
+		Decay2 = 4,
+		End    = 5
+	};
+
 	// Draw rectangular point.
 	QRect nodeRect(int iNode) const;
 	int nodeIndex(const QPoint& pos) const;
