@@ -137,14 +137,14 @@ void drumkv1widget_env::paintEvent ( QPaintEvent *pPaintEvent )
 	path.moveTo(m_poly.at(0));
 	path.lineTo(m_poly.at(Idle));
 	pt = m_poly.at(Idle); pt.setY(h >> 1);
-	path.cubicTo(m_poly.at(Idle), pt, m_poly.at(Attack));
+	path.quadTo(pt, m_poly.at(Attack));
 	pt = m_poly.at(Attack);
 	pt.setY((m_poly.at(Decay1).y() >> 1) + 1);
-	path.cubicTo(m_poly.at(Attack), pt, m_poly.at(Decay1));
+	path.quadTo(pt, m_poly.at(Decay1));
 //	path.lineTo(m_poly.at(Level2));
 	pt = m_poly.at(Decay1);
 	pt.setY(pt.y() + ((h - pt.y()) >> 1) - 1);
-	path.cubicTo(m_poly.at(Decay1), pt, m_poly.at(Decay2));
+	path.quadTo(pt, m_poly.at(Decay2));
 	path.lineTo(m_poly.at(End));
 	path.lineTo(m_poly.at(0));
 
