@@ -511,8 +511,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		painter.setRenderHint(QPainter::Antialiasing, true);
 		// Sample waveform...
 		QLinearGradient grad(0, 0, w2, h);
-	//	painter.setPen(bDark ? Qt::gray : Qt::darkGray);
-		painter.setPen(rgbLite1);
+		painter.setPen(rgbLite1.darker(120));
 		grad.setColorAt(0.0f, rgbLite1);
 		grad.setColorAt(1.0f, rgbDrop1);
 		painter.setBrush(grad);
