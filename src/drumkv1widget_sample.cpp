@@ -505,7 +505,7 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		const bool bEnabled = isEnabled();
 		QColor rgbLite1(rgbLite);
 		QColor rgbDrop1(Qt::black);
-		rgbLite1.setAlpha(bDark ? 120 : 180);
+		rgbLite1.setAlpha(bDark ? 120 : 160);
 		rgbDrop1.setAlpha(80);
 		const int w2 = (w << 1);
 		painter.setRenderHint(QPainter::Antialiasing, true);
