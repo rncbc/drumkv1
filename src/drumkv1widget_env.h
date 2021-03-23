@@ -23,6 +23,7 @@
 #define __drumkv1widget_env_h
 
 #include <QFrame>
+#include <QPolygon>
 
 
 //----------------------------------------------------------------------------
