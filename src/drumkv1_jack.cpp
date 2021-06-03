@@ -361,7 +361,7 @@ void drumkv1_jack::open ( const char *client_name )
 #endif	// CONFIG_ALSA_MIDI
 
 	// setup any local, initial buffers...
-	drumkv1::setBufferSize(::jack_get_buffer_size(m_client));
+	drumkv1::setBufferSize(::jack_get_buffer_size(m_client) << 2);
 
 	::jack_set_buffer_size_callback(m_client,
 		drumkv1_jack_buffer_size, this);
