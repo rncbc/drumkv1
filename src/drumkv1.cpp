@@ -437,6 +437,7 @@ struct drumkv1_ctl
 		modwheel = 0.0f;
 		panning = 0.0f;
 		volume = 1.0f;
+		sustain = false;
 	}
 
 	float pressure;
@@ -444,6 +445,7 @@ struct drumkv1_ctl
 	float modwheel;
 	float panning;
 	float volume;
+	bool  sustain;
 };
 
 
@@ -903,7 +905,7 @@ void drumkv1_elem::updateEnvTimes ( float srate )
 
 struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 {
-	drumkv1_voice(drumkv1_elem *pElem = nullptr) { reset(pElem); }
+	drumkv1_voice(drumkv1_elem *pElem = nullptr);
 
 	void reset(drumkv1_elem *pElem)
 	{
@@ -947,6 +949,8 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 
 	drumkv1_bal1  out1_pan;						// output panning
 	drumkv1_ramp1 out1_vol;						// output volume
+
+	bool sustain;
 };
 
 
@@ -1104,6 +1108,8 @@ protected:
 	void allSoundOff();
 	void allControllersOff();
 	void allNotesOff();
+	void allSustainOff();
+	void allSustainOn();
 
 	void resetElement(drumkv1_elem *elem);
 
@@ -1204,6 +1210,23 @@ private:
 
 	volatile bool m_running;
 };
+
+
+// voice constructor
+
+drumkv1_voice::drumkv1_voice ( drumkv1_elem *pElem ) :
+	note(-1),
+	group(-1),
+	vel(0.0f),
+	pre(0.0f),
+	gen1_freq(0.0f),
+	lfo1_sample(0.0f),
+	out1_volume(1.0f),
+	out1_panning(0.0f),
+	sustain(false)
+{
+	reset(pElem);
+}
 
 
 // synth engine constructor
@@ -1823,6 +1846,8 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 				// volume
 				pv->out1_volume = 1.0f;
 				pv->out1_vol.reset(&pv->out1_volume);
+				// sustain
+				pv->sustain = false;
 				// allocated
 				m_notes[key] = pv;
 				// group management
@@ -1848,11 +1873,18 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			if (*m_def.noteoff > 0.0f) {
 				drumkv1_voice *pv = m_notes[key];
 				if (pv && pv->note >= 0) {
-					if (pv->dca1_env.stage != drumkv1_env::Decay2) {
-						drumkv1_elem *elem = pv->elem;
-						elem->dca1.env.note_off(&pv->dca1_env);
-						elem->dcf1.env.note_off(&pv->dcf1_env);
-						elem->lfo1.env.note_off(&pv->lfo1_env);
+					if (m_ctl.sustain)
+						pv->sustain = true;
+					else
+					if (!pv->sustain) {
+						if (pv->dca1_env.stage != drumkv1_env::Decay2) {
+							drumkv1_elem *elem = pv->elem;
+							elem->dca1.env.note_off(&pv->dca1_env);
+							elem->dcf1.env.note_off(&pv->dcf1_env);
+							elem->lfo1.env.note_off(&pv->lfo1_env);
+						}
+						m_notes[pv->note] = nullptr;
+						pv->note = -1;
 					}
 				}
 			}
@@ -1886,6 +1918,19 @@ void drumkv1_impl::process_midi ( uint8_t *data, uint32_t size )
 			case 0x20:
 				// bank-select LSB (cc#32)
 				m_programs.bank_select_lsb(value);
+				break;
+			case 0x40:
+				// sustain/damper pedal (cc#64)
+				if (m_ctl.sustain && value <  64)
+					allSustainOff();
+				m_ctl.sustain = bool(value >= 64);
+				break;
+			case 0x42:
+				// sustenuto pedal (cc#66)
+				if (value < 64)
+					allSustainOff();
+				else
+					allSustainOn();
 				break;
 			case 0x78:
 				// all sound off (cc#120)
@@ -1963,6 +2008,40 @@ void drumkv1_impl::allNotesOff (void)
 	}
 
 	m_direct_note = 0;
+}
+
+
+// all sustained notes off
+
+void drumkv1_impl::allSustainOff (void)
+{
+	drumkv1_voice *pv = m_play_list.next();
+	while (pv) {
+		if (pv->note >= 0 && pv->sustain) {
+			pv->sustain = false;
+			if (pv->dca1_env.stage != drumkv1_env::Decay2) {
+				pv->elem->dca1.env.note_off(&pv->dca1_env);
+				pv->elem->dcf1.env.note_off(&pv->dcf1_env);
+				pv->elem->lfo1.env.note_off(&pv->lfo1_env);
+				m_notes[pv->note] = nullptr;
+				pv->note = -1;
+			}
+		}
+		pv = pv->next();
+	}
+}
+
+
+// sustain all notes on (sustenuto)
+
+void drumkv1_impl::allSustainOn (void)
+{
+	drumkv1_voice *pv = m_play_list.next();
+	while (pv) {
+		if (pv->note >= 0 && !pv->sustain)
+			pv->sustain = true;
+		pv = pv->next();
+	}
 }
 
 
