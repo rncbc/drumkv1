@@ -6,6 +6,7 @@ ChangeLog
 
 GIT HEAD
 
+- Add support for LV2 UI Windows (by AnClark). (EXPERIMENTAL)
 - Sustain/Damper/Hold (MIDI CC#64) and Sustenuto (MIDI CC#66)
   pedal controllers are now implemented. (EXPERIMENTAL)
 - Have some tolerance for buffer-size changes. (EXPERIMENTAL)
