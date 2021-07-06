@@ -4,13 +4,13 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-GIT HEAD
+0.9.23  2021-07-07  An Early-Summer'21 Release.
 
 - Add support for LV2 UI Windows platform (by AnClark, while
-  on synthv1 GH#14). (EXPERIMENTAL)
+  on synthv1).
 - Sustain/Damper/Hold (MIDI CC#64) and Sustenuto (MIDI CC#66)
-  pedal controllers are now implemented. (EXPERIMENTAL)
-- Have some tolerance for buffer-size changes. (EXPERIMENTAL)
+  pedal controllers are now implemented.
+- Have some tolerance for buffer-size changes.
 - All builds default to Qt6 (Qt >= 6.1) where available.
 - CMake is now the official build system.
 
