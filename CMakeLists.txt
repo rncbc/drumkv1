@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.13)
 
 project (drumkv1
-  VERSION 0.9.23
+  VERSION 0.9.24
   DESCRIPTION "an old-school drum-kit sampler"
   LANGUAGES C CXX)
 
