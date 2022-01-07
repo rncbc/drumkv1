@@ -1,6 +1,6 @@
 debian/tmp/usr/bin/drumkv1_jack
-debian/tmp/usr/share/metainfo/drumkv1.appdata.xml
-debian/tmp/usr/share/applications/drumkv1.desktop
+debian/tmp/usr/share/metainfo/org.rncbc.drumkv1.xml
+debian/tmp/usr/share/applications/org.rncbc.drumkv1.desktop
 debian/tmp/usr/share/mime/packages/drumkv1.xml
 debian/tmp/usr/share/icons/hicolor/32x32/apps/drumkv1.png
 debian/tmp/usr/share/icons/hicolor/32x32/mimetypes/application-x-drumkv1*.png
