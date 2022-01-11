@@ -1,5 +1,5 @@
 debian/tmp/usr/bin/drumkv1_jack
-debian/tmp/usr/share/metainfo/org.rncbc.drumkv1.xml
+debian/tmp/usr/share/metainfo/org.rncbc.drumkv1.metainfo.xml
 debian/tmp/usr/share/applications/org.rncbc.drumkv1.desktop
 debian/tmp/usr/share/mime/packages/drumkv1.xml
 debian/tmp/usr/share/icons/hicolor/32x32/apps/drumkv1.png
