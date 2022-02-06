@@ -773,13 +773,6 @@ drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 	#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
 		pApp->setApplicationDisplayName(DRUMKV1_TITLE);
 		//	DRUMKV1_TITLE " - " + QObject::tr(DRUMKV1_SUBTITLE));
-		QString sVersion(CONFIG_BUILD_VERSION);
-		sVersion += '\n';
-		sVersion += QString("Qt: %1").arg(qVersion());
-	#if defined(QT_STATIC)
-		sVersion += "-static";
-	#endif
-		QApplication::setApplicationVersion(sVersion);
 	#endif
 		m_pApp = pApp;
 	} else {
@@ -788,6 +781,13 @@ drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 
 #if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
 	m_pApp->setApplicationName(DRUMKV1_TITLE);
+	QString sVersion(CONFIG_BUILD_VERSION);
+	sVersion += '\n';
+	sVersion += QString("Qt: %1").arg(qVersion());
+#if defined(QT_STATIC)
+	sVersion += "-static";
+#endif
+	m_pApp->setApplicationVersion(sVersion);
 #endif
 	
 #ifdef HAVE_SIGNAL_H
