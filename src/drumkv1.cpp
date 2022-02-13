@@ -1,7 +1,7 @@
 ﻿// drumkv1.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2021, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2022, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -1010,7 +1010,7 @@ class drumkv1_impl
 {
 public:
 
-	drumkv1_impl(drumkv1 *pDrumk, uint16_t nchannels, float srate);
+	drumkv1_impl(drumkv1 *pDrumk, uint16_t nchannels, float srate, uint32_t nsize);
 
 	~drumkv1_impl();
 
@@ -1232,7 +1232,7 @@ drumkv1_voice::drumkv1_voice ( drumkv1_elem *pElem ) :
 // synth engine constructor
 
 drumkv1_impl::drumkv1_impl (
-	drumkv1 *pDrumk, uint16_t nchannels, float srate )
+	drumkv1 *pDrumk, uint16_t nchannels, float srate, uint32_t nsize )
 	: m_pDrumk(pDrumk),	m_controls(pDrumk), m_programs(pDrumk),
 		m_midi_in(pDrumk), m_bpm(180.0f), m_nvoices(0), m_running(false)
 {
@@ -1285,6 +1285,9 @@ drumkv1_impl::drumkv1_impl (
 
 	// set default sample rate
 	setSampleRate(srate);
+
+	// set default buffer size
+	setBufferSize(nsize);
 
 	// start clean empty
 	clearElements();
@@ -2595,9 +2598,9 @@ bool drumkv1_impl::running ( bool on )
 // drumkv1 - decl.
 //
 
-drumkv1::drumkv1 ( uint16_t nchannels, float srate )
+drumkv1::drumkv1 ( uint16_t nchannels, float srate, uint32_t nsize )
 {
-	m_pImpl = new drumkv1_impl(this, nchannels, srate);
+	m_pImpl = new drumkv1_impl(this, nchannels, srate, nsize);
 }
 
 
