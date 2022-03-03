@@ -773,6 +773,10 @@ drumkv1_jack_application::drumkv1_jack_application ( int& argc, char **argv )
 	#if QT_VERSION >= QT_VERSION_CHECK(5, 1, 0)
 		pApp->setApplicationDisplayName(DRUMKV1_TITLE);
 		//	DRUMKV1_TITLE " - " + QObject::tr(DRUMKV1_SUBTITLE));
+	#if QT_VERSION >= QT_VERSION_CHECK(5, 7, 0)
+		pApp->setDesktopFileName(
+			QString("org.rncbc.%1").arg(PACKAGE_TARNAME));
+	#endif
 	#endif
 		m_pApp = pApp;
 	} else {
