@@ -77,6 +77,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 #endif
 
 	m_ui.setupUi(this);
+#if QT_VERSION < QT_VERSION_CHECK(6, 1, 0)
+	QWidget::setWindowIcon(QIcon(":/images/drumkv1.png"));
+#endif
 
 	// Init sched notifier.
 	m_sched_notifier = nullptr;
