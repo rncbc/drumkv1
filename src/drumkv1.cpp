@@ -1221,8 +1221,8 @@ drumkv1_voice::drumkv1_voice ( drumkv1_elem *pElem ) :
 	pre(0.0f),
 	gen1_freq(0.0f),
 	lfo1_sample(0.0f),
-	out1_volume(1.0f),
 	out1_panning(0.0f),
+	out1_volume(1.0f),
 	sustain(false)
 {
 	reset(pElem);
