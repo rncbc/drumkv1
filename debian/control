@@ -12,9 +12,7 @@ Standards-Version: 3.9.7
 
 Package: drumkv1-jack
 Architecture: any
-Depends: ${shlibs:Depends}, ${misc:Depends},
-  qt6-qpa-plugins | libqt5opengl5,
-  libjack0 | libjack-jackd2-0
+Depends: ${shlibs:Depends}, ${misc:Depends}, libjack0 | libjack-jackd2-0
 Replaces: drumkv1-common (<= ${source:Version}), drumkv1 (<= ${source:Version})
 Description: An old-school drum-kit sampler - JACK standlone
   An old-school all-digital drum-kit sampler synthesizer with stereo fx.
@@ -23,8 +21,7 @@ Description: An old-school drum-kit sampler - JACK standlone
 
 Package: drumkv1-lv2
 Architecture: any
-Depends: ${misc:Depends}, ${shlibs:Depends},
-  qt6-qpa-plugins | libqt5opengl5
+Depends: ${misc:Depends}, ${shlibs:Depends}
 Replaces: drumkv1-common (<= ${source:Version})
 Description: An old-school drum-kit sampler - LV2 plugin
   An old-school all-digital drum-kit sampler synthesizer with stereo fx.
