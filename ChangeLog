@@ -4,6 +4,11 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
+GIT HEAD
+
+- Bumping up to the next development cycle...
+
+
 0.9.26  2022-06-07  An End-of-Sping'22 Release.
 
 - Added Qt::Svg module as required at build time.
