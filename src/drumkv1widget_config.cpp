@@ -24,6 +24,8 @@
 
 #include "drumkv1widget_palette.h"
 
+#include "drumkv1widget.h"
+
 #include "drumkv1_ui.h"
 
 #include "drumkv1_controls.h"
@@ -765,22 +767,25 @@ void drumkv1widget_config::accept (void)
 		pConfig->fRandomizePercent = float(m_ui.RandomizePercentSpinBox->value());
 		pConfig->bUseGMDrumNames = m_ui.UseGMDrumNamesCheckBox->isChecked();
 		int iNeedRestart = 0;
- 		if (pConfig->sCustomStyleTheme != sOldCustomStyleTheme) {
-			if (pConfig->sCustomStyleTheme.isEmpty()) {
-				++iNeedRestart;
-			} else {
-				QApplication::setStyle(
-					QStyleFactory::create(pConfig->sCustomStyleTheme));
+		QWidget *pParentWidget = parentWidget();
+		if (pParentWidget) {
+			if (pConfig->sCustomStyleTheme != sOldCustomStyleTheme) {
+				if (pConfig->sCustomStyleTheme.isEmpty()) {
+					++iNeedRestart;
+				} else {
+					pParentWidget->setStyle(
+						QStyleFactory::create(pConfig->sCustomStyleTheme));
+				}
 			}
- 		}
- 		if (pConfig->sCustomColorTheme != sOldCustomColorTheme) {
-			if (pConfig->sCustomColorTheme.isEmpty()) {
-				++iNeedRestart;
-			} else {
-				QPalette pal;
-				if (drumkv1widget_palette::namedPalette(
-						pConfig, pConfig->sCustomColorTheme, pal))
-					QApplication::setPalette(pal);
+			if (pConfig->sCustomColorTheme != sOldCustomColorTheme) {
+				if (pConfig->sCustomColorTheme.isEmpty()) {
+					++iNeedRestart;
+				} else {
+					QPalette pal;
+					if (drumkv1widget_palette::namedPalette(
+							pConfig, pConfig->sCustomColorTheme, pal))
+						pParentWidget->setPalette(pal);
+				}
 			}
 		}
 		if (pConfig->iFrameTimeFormat != iOldFrameTimeFormat)
