@@ -1082,7 +1082,7 @@ void drumkv1widget::newPreset (void)
 
 
 // Preset file I/O slots.
-void drumkv1widget::loadPreset ( const QString& sFilename )
+bool drumkv1widget::loadPreset ( const QString& sFilename )
 {
 #ifdef CONFIG_DEBUG
 	qDebug("drumkv1widget::loadPreset(\"%s\")", sFilename.toUtf8().constData());
@@ -1094,29 +1094,41 @@ void drumkv1widget::loadPreset ( const QString& sFilename )
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 	resetParamValues(drumkv1::NUM_PARAMS);
 
+	bool bLoad = false;
+
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
-		pDrumkUi->loadPreset(sFilename);
+		bLoad = pDrumkUi->loadPreset(sFilename);
 
-	updateLoadPreset(QFileInfo(sFilename).completeBaseName());
+	if (bLoad)
+		updateLoadPreset(QFileInfo(sFilename).completeBaseName());
+	else
+		updateDirtyPreset(true);
+
+	return bLoad;
 }
 
 
-void drumkv1widget::savePreset ( const QString& sFilename )
+bool drumkv1widget::savePreset ( const QString& sFilename )
 {
 #ifdef CONFIG_DEBUG
 	qDebug("drumkv1widget::savePreset(\"%s\")", sFilename.toUtf8().constData());
 #endif
 
+	bool bSave = false;
+
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
-		pDrumkUi->savePreset(sFilename);
+		bSave = pDrumkUi->savePreset(sFilename);
 
-	const QString& sPreset
-		= QFileInfo(sFilename).completeBaseName();
+	if (bSave) {
+		const QString& sPreset
+			= QFileInfo(sFilename).completeBaseName();
+		m_ui.StatusBar->showMessage(tr("Save preset: %1").arg(sPreset), 5000);
+	}
+	updateDirtyPreset(!bSave);
 
-	m_ui.StatusBar->showMessage(tr("Save preset: %1").arg(sPreset), 5000);
-	updateDirtyPreset(false);
+	return bSave;
 }
 
 

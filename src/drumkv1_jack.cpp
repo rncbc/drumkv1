@@ -1087,19 +1087,23 @@ void drumkv1_jack_application::openSession (void)
 	if (!dir.exists())
 		dir.mkpath(path_name);
 
+	bool bOpen = false;
+
 	QFileInfo fi(path_name, "session." DRUMKV1_TITLE);
 	if (!fi.exists())
 		fi.setFile(path_name, display_name + '.' + DRUMKV1_TITLE);
 	if (fi.exists()) {
 		const QString& sFilename = fi.absoluteFilePath();
 		if (m_pWidget) {
-			m_pWidget->loadPreset(sFilename);
+			bOpen = m_pWidget->loadPreset(sFilename);
 		} else {
-			drumkv1_param::loadPreset(m_pDrumk, sFilename);
+			bOpen = drumkv1_param::loadPreset(m_pDrumk, sFilename);
 		}
 	}
 
-	m_pNsmClient->open_reply();
+	m_pNsmClient->open_reply(bOpen
+		? drumkv1_nsm::ERR_OK
+		: drumkv1_nsm::ERR_GENERAL);
 	m_pNsmClient->dirty(false);
 
 	if (m_pWidget)
@@ -1127,9 +1131,12 @@ void drumkv1_jack_application::saveSession (void)
 //	const QFileInfo fi(path_name, display_name + '.' + DRUMKV1_TITLE);
 	const QFileInfo fi(path_name, "session." DRUMKV1_TITLE);
 
-	drumkv1_param::savePreset(m_pDrumk, fi.absoluteFilePath(), true);
+	const bool bSave
+		= drumkv1_param::savePreset(m_pDrumk, fi.absoluteFilePath(), true);
 
-	m_pNsmClient->save_reply();
+	m_pNsmClient->save_reply(bSave
+		? drumkv1_nsm::ERR_OK
+		: drumkv1_nsm::ERR_GENERAL);
 	m_pNsmClient->dirty(false);
 }
 
