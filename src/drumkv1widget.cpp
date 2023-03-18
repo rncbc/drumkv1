@@ -1773,10 +1773,8 @@ void drumkv1widget::midiInLedTimeout (void)
 void drumkv1widget::helpConfigure (void)
 {
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == nullptr)
-		return;
-
-	drumkv1widget_config(pDrumkUi, this).exec();
+	if (pDrumkUi)
+		drumkv1widget_config(this, pDrumkUi).exec();
 }
 
 

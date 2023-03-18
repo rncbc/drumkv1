@@ -39,7 +39,7 @@ class drumkv1widget_programs : public QTreeWidget
 public:
 
 	// ctor.
-	drumkv1widget_programs(QWidget *pParent = 0);
+	drumkv1widget_programs(QWidget *pParent = nullptr);
 	// dtor.
 	~drumkv1widget_programs();
 
@@ -47,7 +47,7 @@ public:
 	void loadPrograms(drumkv1_programs *pPrograms);
 	void savePrograms(drumkv1_programs *pPrograms);
 
-	void selectProgram(drumkv1_programs *pPrograms);
+	QString currentProgramName() const;
 
 public slots:
 

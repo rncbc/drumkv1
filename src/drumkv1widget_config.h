@@ -30,6 +30,7 @@
 // forward decls.
 namespace Ui { class drumkv1widget_config; }
 
+class drumkv1widget;
 class drumkv1_ui;
 
 class QComboBox;
@@ -46,7 +47,7 @@ class drumkv1widget_config : public QDialog
 public:
 
 	// ctor.
-	drumkv1widget_config(drumkv1_ui *pDrumkUi, QWidget *pParent = nullptr);
+	drumkv1widget_config(drumkv1widget *pParent, drumkv1_ui *pDrumkUi);
 
 	// dtor.
 	~drumkv1widget_config();

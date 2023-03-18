@@ -55,7 +55,7 @@ static const char *g_pszDefName = QT_TRANSLATE_NOOP("drumkv1widget_config", "(de
 
 // ctor.
 drumkv1widget_config::drumkv1widget_config (
-	drumkv1_ui *pDrumkUi, QWidget *pParent )
+	drumkv1widget *pParent, drumkv1_ui *pDrumkUi )
 	: QDialog(pParent), p_ui(new Ui::drumkv1widget_config), m_ui(*p_ui),
 		m_pDrumkUi(pDrumkUi)
 {
@@ -458,10 +458,17 @@ void drumkv1widget_config::programsChanged (void)
 
 void drumkv1widget_config::programsActivated (void)
 {
-	if (m_pDrumkUi) {
-		drumkv1_programs *pPrograms = m_pDrumkUi->programs();
-		if (m_ui.ProgramsPreviewCheckBox->isChecked() && pPrograms)
-			m_ui.ProgramsTreeWidget->selectProgram(pPrograms);
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
+	if (pConfig == nullptr)
+		return;
+
+	if (m_ui.ProgramsPreviewCheckBox->isChecked()) {
+		const QString& sPresetFile
+			= pConfig->presetFile(m_ui.ProgramsTreeWidget->currentProgramName());
+		drumkv1widget *pParentWidget
+			= qobject_cast<drumkv1widget *> (parentWidget());
+		if (pParentWidget && !sPresetFile.isEmpty())
+			pParentWidget->loadPreset(sPresetFile);
 	}
 
 	stabilize();
