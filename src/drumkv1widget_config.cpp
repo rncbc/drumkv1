@@ -1,7 +1,7 @@
 // drumkv1widget_config.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2022, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2023, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -83,6 +83,8 @@ drumkv1widget_config::drumkv1widget_config (
 
 	// Whether presets exist...
 	m_bPresets = false;
+
+	m_iLoadPreset = 0;
 
 	// Setup options...
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
@@ -458,18 +460,8 @@ void drumkv1widget_config::programsChanged (void)
 
 void drumkv1widget_config::programsActivated (void)
 {
-	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig == nullptr)
-		return;
-
-	if (m_ui.ProgramsPreviewCheckBox->isChecked()) {
-		const QString& sPresetFile
-			= pConfig->presetFile(m_ui.ProgramsTreeWidget->currentProgramName());
-		drumkv1widget *pParentWidget
-			= qobject_cast<drumkv1widget *> (parentWidget());
-		if (pParentWidget && !sPresetFile.isEmpty())
-			pParentWidget->loadPreset(sPresetFile);
-	}
+	if (m_ui.ProgramsPreviewCheckBox->isChecked())
+		loadPreset(m_ui.ProgramsTreeWidget->currentProgramName());
 
 	stabilize();
 }
@@ -689,7 +681,8 @@ void drumkv1widget_config::stabilize (void)
 		= (m_iDirtyTuning   > 0
 		|| m_iDirtyControls > 0
 		|| m_iDirtyPrograms > 0
-		|| m_iDirtyOptions  > 0);
+		|| m_iDirtyOptions  > 0
+		|| m_iLoadPreset    > 0);
 	m_ui.DialogButtonBox->button(QDialogButtonBox::Ok)->setEnabled(bValid);
 }
 
@@ -827,7 +820,8 @@ void drumkv1widget_config::reject (void)
 	if (m_iDirtyTuning   > 0 ||
 		m_iDirtyControls > 0 ||
 		m_iDirtyPrograms > 0 ||
-		m_iDirtyOptions  > 0) {
+		m_iDirtyOptions  > 0 ||
+		m_iLoadPreset    > 0) {
 		QMessageBox::StandardButtons buttons
 			= QMessageBox::Discard | QMessageBox::Cancel;
 		if (m_ui.DialogButtonBox->button(QDialogButtonBox::Ok)->isEnabled())
@@ -842,10 +836,13 @@ void drumkv1widget_config::reject (void)
 			return;
 		case QMessageBox::Discard:
 			break;
-		default:    // Cancel.
+		default: // Cancel.
 			bReject = false;
 		}
 	}
+
+	if (bReject && m_iLoadPreset > 0)
+		loadPreset(m_sSavePreset);
 
 	if (bReject)
 		QDialog::reject();
@@ -1008,6 +1005,28 @@ QString drumkv1widget_config::comboBoxCurrentItem ( QComboBox *pComboBox )
 		sData = pComboBox->itemData(iIndex).toString();
 
 	return sData;
+}
+
+
+// Programs/preset preview stuff...
+void drumkv1widget_config::loadPreset ( const QString& sPreset )
+{
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
+	if (pConfig == nullptr)
+		return;
+
+	const QString& sPresetFile
+		= pConfig->presetFile(sPreset);
+	if (sPresetFile.isEmpty())
+		return;
+
+	drumkv1widget *pParentWidget
+		= qobject_cast<drumkv1widget *> (parentWidget());
+	if (pParentWidget && pParentWidget->loadPreset(sPresetFile)) {
+		if (++m_iLoadPreset == 1)
+			m_sSavePreset = pConfig->sPreset;
+		pConfig->sPreset = sPreset;
+	}
 }
 
 
