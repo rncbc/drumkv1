@@ -101,7 +101,7 @@ public:
 	QString presetFile(const QString& sPreset);
 	void setPresetFile(const QString& sPreset, const QString& sPresetFile);
 	void removePreset(const QString& sPreset);
-	QStringList presetList();
+	const QStringList& presetList();
 
 	// Programs utility methods.
 	void loadPrograms(drumkv1_programs *pPrograms);
@@ -133,6 +133,9 @@ protected:
 	void save();
 
 private:
+
+	// The presets list cache.
+	QStringList m_presetList;
 
 	// The singleton instance.
 	static drumkv1_config *g_pSettings;
