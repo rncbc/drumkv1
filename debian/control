@@ -1,13 +1,14 @@
 Source: drumkv1
-Section: contrib/sound
-Priority: extra
+Section: sound
+Priority: optional
 Maintainer: Rui Nuno Capela <rncbc@rncbc.org>
 Build-Depends: debhelper (>= 11), cmake, pkg-config,
   qtbase6.5-static (>= 6.5), qttools6.5-static (>= 6.5),
   qtsvg6.5-static (>= 6.5), qttranslations6.5-static (>= 6.5),
   libjack-dev | libjack-jackd2-dev, libasound2-dev,
   lv2-dev, liblo-dev, libsndfile-dev
-Standards-Version: 3.9.7
+Standards-Version: 4.6.2
+Rules-Requires-Root: no
 
 Package: drumkv1-jack
 Architecture: any
