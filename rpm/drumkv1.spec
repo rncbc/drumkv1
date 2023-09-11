@@ -73,14 +73,14 @@ BuildRequires:	pkgconfig(Qt5Svg)
 %endif
 %if %{defined fedora}
 BuildRequires:	jack-audio-connection-kit-devel
-BuildRequires:	alsa-lib-devel
 %else
-BuildRequires:	libjack-devel
-BuildRequires:	alsa-devel
+BuildRequires:	pkgconfig(jack)
 %endif
-BuildRequires:	libsndfile-devel
-BuildRequires:	liblo-devel
-BuildRequires:	lv2-devel
+BuildRequires:	pkgconfig(alsa)
+
+BuildRequires:	pkgconfig(sndfile)
+BuildRequires:	pkgconfig(liblo)
+BuildRequires:	pkgconfig(lv2)
 
 BuildRequires:	pkgconfig(egl)
 
