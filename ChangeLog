@@ -4,6 +4,11 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
+GIT HEAD
+
+- Bumping into next development cycle (Qt >= 6.6)
+
+
 0.9.32  2023-09-12  An End-of-Summer'23 Release.
 
 - Preppings to next development cycle (Qt >= 6.6)
