@@ -33,6 +33,10 @@
 
 #include <QStyleFactory>
 
+#ifndef CONFIG_BINDIR
+#define CONFIG_BINDIR	CONFIG_PREFIX "/bin"
+#endif
+
 #ifndef CONFIG_LIBDIR
 #if defined(__x86_64__)
 #define CONFIG_LIBDIR CONFIG_PREFIX "/lib64"
@@ -61,7 +65,10 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 	QApplication *pApp = drumkv1_lv2::qapp_instance();
 	if (pApp) {
 		// Special style paths...
-		if (QDir(CONFIG_PLUGINSDIR).exists())
+		QString sPluginsPath = pApp->applicationDirPath();
+		sPluginsPath.remove(CONFIG_BINDIR);
+		sPluginsPath.append(CONFIG_PLUGINSDIR);
+		if (QDir(sPluginsPath).exists())
 			pApp->addLibraryPath(CONFIG_PLUGINSDIR);
 	}
 
