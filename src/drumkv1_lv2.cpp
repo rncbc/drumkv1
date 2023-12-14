@@ -80,13 +80,14 @@ class drumkv1_lv2_map_path : public drumkv1_param::map_path
 public:
 
 	drumkv1_lv2_map_path(const LV2_Feature *const *features)
-		: m_map_path(nullptr)
+		: m_map_path(nullptr), m_free_path(nullptr)
 	{
 		for (int i = 0; features && features[i]; ++i) {
-			if (::strcmp(features[i]->URI, LV2_STATE__mapPath) == 0) {
+			if (::strcmp(features[i]->URI, LV2_STATE__mapPath) == 0)
 				m_map_path = (LV2_State_Map_Path *) features[i]->data;
-				break;
-			}
+			else
+			if (::strcmp(features[i]->URI, LV2_STATE__freePath) == 0)
+				m_free_path = (LV2_State_Free_Path *) features[i]->data;
 		}
 	}
 
@@ -99,7 +100,12 @@ public:
 					m_map_path->handle, sAbstractPath.toUtf8().constData());
 			if (pszAbsolutePath) {
 				sAbsolutePath = QString::fromUtf8(pszAbsolutePath);
-				::free((void *) pszAbsolutePath);
+				if (m_free_path) {
+					m_free_path->free_path(
+						m_free_path->handle, (char *) pszAbsolutePath);
+				} else {
+					::free((void *) pszAbsolutePath);
+				}
 			}
 		}
 		return QFileInfo(sAbsolutePath).canonicalFilePath();
@@ -114,7 +120,12 @@ public:
 					m_map_path->handle, sAbsolutePath.toUtf8().constData());
 			if (pszAbstractPath) {
 				sAbstractPath = QString::fromUtf8(pszAbstractPath);
-				::free((void *) pszAbstractPath);
+				if (m_free_path) {
+					m_free_path->free_path(
+						m_free_path->handle, (char *) pszAbstractPath);
+				} else {
+					::free((void *) pszAbstractPath);
+				}
 			}
 		}
 		return sAbstractPath;
@@ -122,7 +133,8 @@ public:
 
 private:
 
-	LV2_State_Map_Path *m_map_path;
+	LV2_State_Map_Path  *m_map_path;
+	LV2_State_Free_Path *m_free_path;
 };
 
 
