@@ -86,11 +86,13 @@ public:
 	#endif
 	{
 		for (int i = 0; features && features[i]; ++i) {
-			if (::strcmp(features[i]->URI, LV2_STATE__mapPath) == 0)
+			if (m_map_path == nullptr
+				&& ::strcmp(features[i]->URI, LV2_STATE__mapPath) == 0)
 				m_map_path = (LV2_State_Map_Path *) features[i]->data;
 		#ifdef CONFIG_LV2_STATE_FREE_PATH
 			else
-			if (::strcmp(features[i]->URI, LV2_STATE__freePath) == 0)
+			if (m_free_path == nullptr
+				&& ::strcmp(features[i]->URI, LV2_STATE__freePath) == 0)
 				m_free_path = (LV2_State_Free_Path *) features[i]->data;
 		#endif
 		}
