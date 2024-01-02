@@ -42,7 +42,7 @@ drumkv1_config *drumkv1_config::getInstance (void)
 
 // Constructor.
 drumkv1_config::drumkv1_config (void)
-	: QSettings(DRUMKV1_DOMAIN, DRUMKV1_TITLE)
+	: QSettings(PROJECT_DOMAIN, PROJECT_NAME)
 {
 	g_pSettings = this;
 
@@ -353,7 +353,7 @@ void drumkv1_config::load (void)
 void drumkv1_config::save (void)
 {
 	QSettings::beginGroup("/Program");
-	QSettings::setValue("/Version", CONFIG_BUILD_VERSION);
+	QSettings::setValue("/Version", PROJECT_VERSION);
 	QSettings::endGroup();
 
 	QSettings::beginGroup("/Default");

@@ -24,13 +24,13 @@
 
 #include "config.h"
 
-#define DRUMKV1_TITLE       PROJECT_NAME
+#ifndef PROJECT_COPYRIGHT
+#define PROJECT_COPYRIGHT   "Copyright (C) 2012-2024, rncbc aka Rui Nuno Capela. All rights reserved."
+#endif
 
-#define DRUMKV1_SUBTITLE    PROJECT_DESCRIPTION
-#define DRUMKV1_WEBSITE     PROJECT_HOMEPAGE_URL
-
-#define DRUMKV1_COPYRIGHT   "Copyright (C) 2012-2024, rncbc aka Rui Nuno Capela. All rights reserved."
-#define DRUMKV1_DOMAIN      "rncbc.org"
+#ifndef PROJECT_DOMAIN
+#define PROJECT_DOMAIN      "rncbc.org"
+#endif
 
 
 //-------------------------------------------------------------------------
