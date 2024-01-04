@@ -39,6 +39,10 @@
 #include <QByteArray>
 #endif
 
+#ifdef CONFIG_LV2_PORT_CHANGE_REQUEST
+#include "lv2_port_change_request.h"
+#endif
+
 // Forward decls.
 class QApplication;
 
@@ -114,6 +118,11 @@ protected:
 	bool port_events(uint32_t nparams);
 #endif
 
+#ifdef CONFIG_LV2_PORT_CHANGE_REQUEST
+	bool port_change_request(drumkv1::ParamIndex index);
+	bool port_change_requests();
+#endif
+
 private:
 
 	LV2_URID_Map *m_urid_map;
@@ -177,6 +186,10 @@ private:
 #ifdef CONFIG_LV2_PROGRAMS
 	LV2_Program_Descriptor m_program;
 	QByteArray m_aProgramName;
+#endif
+
+#ifdef CONFIG_LV2_PORT_CHANGE_REQUEST
+	LV2_ControlInputPort_Change_Request *m_port_change_request;
 #endif
 
 	static QApplication *g_qapp_instance;
