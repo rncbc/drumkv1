@@ -1082,7 +1082,7 @@ bool drumkv1_lv2::port_events ( uint32_t nparams )
 #endif	// CONFIG_LV2_PORT_EVENT
 
 
-#ifdef CONFIG_LV2_PORT_EVENT
+#ifdef CONFIG_LV2_PORT_CHANGE_REQUEST
 
 bool drumkv1_lv2::port_change_request ( drumkv1::ParamIndex index )
 {
@@ -1121,7 +1121,7 @@ bool drumkv1_lv2::port_change_requests (void)
 	return true;
 }
 
-#endif	// CONFIG_LV2_PORT_CHANGE_REQUESTS
+#endif	// CONFIG_LV2_PORT_CHANGE_REQUEST
 
 
 //-------------------------------------------------------------------------
