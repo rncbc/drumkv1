@@ -17,7 +17,7 @@
 
 Summary:	An old-school drum-kit sampler
 Name:		drumkv1
-Version:	0.9.91
+Version:	1.0.0
 Release:	1.1
 License:	GPL-2.0-or-later
 Group:		Productivity/Multimedia/Sound/Midi
@@ -155,6 +155,8 @@ cmake --install build
 
 
 %changelog
+* Thu Jun 20 2024 Rui Nuno Capela <rncbc@rncbc.org> 1.0.0
+- An Unthinkable Release.
 * Thu May  2 2024 Rui Nuno Capela <rncbc@rncbc.org> 0.9.91
 - A Spring'24 Release Candidate 2.
 * Thu Apr 11 2024 Rui Nuno Capela <rncbc@rncbc.org> 0.9.90
