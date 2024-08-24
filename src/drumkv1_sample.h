@@ -1,7 +1,7 @@
 // drumkv1_sample.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2021, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2024, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -229,6 +229,78 @@ private:
 	float    m_phase;
 	uint32_t m_index;
 	float    m_alpha;
+};
+
+
+//-------------------------------------------------------------------------
+// drumkv1_sample_ref - PADsynth wave table (sample reference lists).
+//
+#include "drumkv1_list.h"
+
+class drumkv1_sample_ref
+{
+public:
+
+	// dtor.
+	~drumkv1_sample_ref()
+		{ clear_refs(true); }
+
+	// methods.
+	void append(drumkv1_sample *sample)
+		{ m_play.append(new sample_ref(sample)); }
+
+	drumkv1_sample *next() const
+		{ return m_play.next()->refp; }
+	drumkv1_sample *prev() const
+		{ return m_play.prev()->refp; }
+
+	void acquire()
+		{ ++(m_play.next()->refc); }
+	void release()
+		{ --(m_play.next()->refc); free_refs(); }
+
+	void free_refs()
+	{
+		sample_ref *ref = m_play.next();
+		while (ref && ref->refc == 0 && ref != m_play.prev()) {
+			m_play.remove(ref);
+			m_free.append(ref);
+			ref = m_play.next();
+		}
+	}
+
+	void clear_refs(bool force = false)
+	{
+		sample_ref *ref;
+		if (force) {
+			ref = m_play.next();
+			while (ref) {
+				m_play.remove(ref);
+				m_free.append(ref);
+				ref = m_play.next();
+			}
+		}
+		ref = m_free.next();
+		while (ref) {
+			m_free.remove(ref);
+			delete ref->refp;
+			delete ref;
+			ref = m_free.next();
+		}
+	}
+
+private:
+
+	struct sample_ref : public drumkv1_list<sample_ref>
+	{
+		sample_ref(drumkv1_sample *sample) : refp(sample), refc(0) {}
+
+		drumkv1_sample *refp;
+		uint32_t        refc;
+	};
+
+	drumkv1_list<sample_ref> m_play;
+	drumkv1_list<sample_ref> m_free;
 };
 
 

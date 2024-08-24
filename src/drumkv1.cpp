@@ -809,12 +809,15 @@ public:
 
 	drumkv1_elem(drumkv1 *pDrumk, float srate, int key);
 
+	~drumkv1_elem();
+
 	drumkv1_element element;
 
 	void midiInEnabled(bool on);
 	uint32_t midiInCount();
 
-	drumkv1_sample  gen1_sample;
+	drumkv1_sample_ref gen1_sample;
+
 	drumkv1_wave_lf lfo1_wave;
 
 	drumkv1_formant::Impl dcf1_formant;
@@ -838,8 +841,11 @@ public:
 // synth element
 
 drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, float srate, int key )
-	: element(this), gen1_sample(srate), gen1(pDrumk, key)
+	: element(this), gen1(pDrumk, key)
 {
+	// inittialize elemet sample list.
+	gen1_sample.append(new drumkv1_sample(srate));
+
 	// element parameter port/value set
 	for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
@@ -860,12 +866,18 @@ drumkv1_elem::drumkv1_elem ( drumkv1 *pDrumk, float srate, int key )
 	}
 
 	// element sample rate
-	gen1_sample.setSampleRate(srate);
+	gen1_sample.next()->setSampleRate(srate);
 	lfo1_wave.setSampleRate(srate);
 
 	updateEnvTimes(srate);
 
 	dcf1_formant.setSampleRate(srate);
+}
+
+
+drumkv1_elem::~drumkv1_elem (void)
+{
+	gen1_sample.clear_refs(true);
 }
 
 
@@ -876,8 +888,9 @@ void drumkv1_elem::updateEnvTimes ( float srate )
 
 	float envtime_msecs = 10000.0f * gen1.envtime0;
 	if (envtime_msecs < MIN_ENV_MSECS) {
+		drumkv1_sample *sample = gen1_sample.next();
 		const uint32_t envtime_frames
-			= (gen1_sample.offsetEnd() - gen1_sample.offsetStart()) >> 1;
+			= (sample->offsetEnd() - sample->offsetStart()) >> 1;
 		envtime_msecs = envtime_frames / srate_ms;
 	}
 	if (envtime_msecs < MIN_ENV_MSECS)
@@ -911,7 +924,7 @@ struct drumkv1_voice : public drumkv1_list<drumkv1_voice>
 	{
 		elem = pElem;
 
-		gen1.reset(pElem ? &pElem->gen1_sample : nullptr);
+		gen1.reset(pElem ? pElem->gen1_sample.next() : nullptr);
 		lfo1.reset(pElem ? &pElem->lfo1_wave : nullptr);
 
 		dcf17.reset(pElem ? &pElem->dcf1_formant : nullptr);
@@ -1123,6 +1136,7 @@ protected:
 		if (elem) {
 			pv = m_free_list.next();
 			if (pv) {
+				elem->gen1_sample.acquire();
 				pv->reset(elem);
 				m_free_list.remove(pv);
 				m_play_list.append(pv);
@@ -1134,9 +1148,12 @@ protected:
 
 	void free_voice ( drumkv1_voice *pv )
 	{
+		drumkv1_elem *elem = pv->elem;
+		if (elem)
+			elem->gen1_sample.release();
 		m_play_list.remove(pv);
 		m_free_list.append(pv);
-		pv->reset(0);
+		pv->reset(nullptr);
 		--m_nvoices;
 	}
 
@@ -2342,7 +2359,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 		// channel indexes
 
 		const uint16_t k1 = 0;
-		const uint16_t k2 = (elem->gen1_sample.channels() > 1 ? 1 : 0);
+		const uint16_t k2 = (elem->gen1_sample.next()->channels() > 1 ? 1 : 0);
 
 		// output buffers
 
@@ -2889,64 +2906,66 @@ int drumkv1_element::note (void) const
 void drumkv1_element::setSampleFile ( const char *pszSampleFile )
 {
 	if (m_pElem) {
-		if (pszSampleFile) {
-			m_pElem->gen1_sample.open(pszSampleFile,
-				drumkv1_freq(m_pElem->gen1.sample0));
-		} else {
-			m_pElem->gen1_sample.close();
-		}
+		drumkv1_sample *prev = m_pElem->gen1_sample.prev();
+		drumkv1_sample *next = new drumkv1_sample(prev->sampleRate());
+		if (pszSampleFile)
+			next->open(pszSampleFile, drumkv1_freq(m_pElem->gen1.sample0));
+		m_pElem->gen1_sample.append(next);
+		m_pElem->gen1_sample.free_refs();
+		m_pElem->gen1_sample.clear_refs();
 	}
 }
 
 
 const char *drumkv1_element::sampleFile (void) const
 {
-	return (m_pElem ? m_pElem->gen1_sample.filename() : nullptr);
+	return (m_pElem ? m_pElem->gen1_sample.prev()->filename() : nullptr);
 }
 
 
 drumkv1_sample *drumkv1_element::sample (void) const
 {
-	return (m_pElem ? &(m_pElem->gen1_sample) : nullptr);
+	return (m_pElem ? m_pElem->gen1_sample.prev() : nullptr);
 }
 
 
 void drumkv1_element::setReverse ( bool bReverse )
 {
-	if (m_pElem) m_pElem->gen1_sample.setReverse(bReverse);
+	if (m_pElem) m_pElem->gen1_sample.prev()->setReverse(bReverse);
 }
 
 
 bool drumkv1_element::isReverse (void) const
 {
-	return (m_pElem ? m_pElem->gen1_sample.isReverse() : false);
+	return (m_pElem ? m_pElem->gen1_sample.prev()->isReverse() : false);
 }
 
 
 void drumkv1_element::setOffset ( bool bOffset )
 {
-	if (m_pElem) m_pElem->gen1_sample.setOffset(bOffset);
+	if (m_pElem) m_pElem->gen1_sample.prev()->setOffset(bOffset);
 }
 
 bool drumkv1_element::isOffset (void) const
 {
-	return (m_pElem ? m_pElem->gen1_sample.isOffset() : false);
+	return (m_pElem ? m_pElem->gen1_sample.prev()->isOffset() : false);
 }
 
 
 void drumkv1_element::setOffsetRange ( uint32_t iOffsetStart, uint32_t iOffsetEnd )
 {
-	if (m_pElem) m_pElem->gen1_sample.setOffsetRange(iOffsetStart, iOffsetEnd);
+	if (m_pElem)
+		m_pElem->gen1_sample.prev()->setOffsetRange(iOffsetStart, iOffsetEnd);
 }
 
 uint32_t drumkv1_element::offsetStart (void) const
 {
-	return (m_pElem ? m_pElem->gen1_sample.offsetStart() : 0);
+	return (m_pElem ? m_pElem->gen1_sample.prev()->offsetStart() : 0);
 }
 
 uint32_t drumkv1_element::offsetEnd (void) const
 {
-	return (m_pElem ? m_pElem->gen1_sample.offsetEnd() : 0);
+	return (m_pElem ? m_pElem->gen1_sample.prev()->offsetEnd() : 0);
 }
 
 
@@ -3070,7 +3089,7 @@ void drumkv1_element::sampleReverseSync (void)
 		return;
 
 	const bool bReverse
-		= m_pElem->gen1_sample.isReverse();
+		= m_pElem->gen1_sample.prev()->isReverse();
 
 	m_pElem->gen1.reverse.set_value_sync(bReverse ? 1.0f : 0.0f);
 }
@@ -3092,7 +3111,7 @@ void drumkv1_element::sampleOffsetSync (void)
 		return;
 
 	const bool bOffset
-		= m_pElem->gen1_sample.isOffset();
+		= m_pElem->gen1_sample.prev()->isOffset();
 
 	m_pElem->gen1.offset.set_value_sync(bOffset ? 1.0f : 0.0f);
 }
@@ -3104,11 +3123,11 @@ void drumkv1_element::sampleOffsetRangeSync (void)
 		return;
 
 	const uint32_t iSampleLength
-		= m_pElem->gen1_sample.length();
+		= m_pElem->gen1_sample.prev()->length();
 	const uint32_t iOffsetStart
-		= m_pElem->gen1_sample.offsetStart();
+		= m_pElem->gen1_sample.prev()->offsetStart();
 	const uint32_t iOffsetEnd
-		= m_pElem->gen1_sample.offsetEnd();
+		= m_pElem->gen1_sample.prev()->offsetEnd();
 
 	const float offset_1 = (iSampleLength > 0
 		? float(iOffsetStart) / float(iSampleLength)
@@ -3125,7 +3144,7 @@ void drumkv1_element::sampleOffsetRangeSync (void)
 void drumkv1_element::updateEnvTimes (void)
 {
 	if (m_pElem)
-		m_pElem->updateEnvTimes(m_pElem->gen1_sample.sampleRate());
+		m_pElem->updateEnvTimes(m_pElem->gen1_sample.next()->sampleRate());
 }
 
 
