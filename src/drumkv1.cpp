@@ -1581,7 +1581,7 @@ void drumkv1_impl::clearElements (void)
 
 void drumkv1_impl::setSampleFile ( const char *pszSampleFile )
 {
-	reset();
+//	reset();
 
 	if (m_elem) {
 		m_elem->element.setSampleFile(pszSampleFile);
@@ -2908,6 +2908,8 @@ void drumkv1_element::setSampleFile ( const char *pszSampleFile )
 	if (m_pElem) {
 		drumkv1_sample *prev = m_pElem->gen1_sample.prev();
 		drumkv1_sample *next = new drumkv1_sample(prev->sampleRate());
+		next->setOffset(prev->isOffset());
+		next->setReverse(prev->isReverse());
 		if (pszSampleFile)
 			next->open(pszSampleFile, drumkv1_freq(m_pElem->gen1.sample0));
 		m_pElem->gen1_sample.append(next);
