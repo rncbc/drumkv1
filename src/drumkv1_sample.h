@@ -43,6 +43,9 @@ public:
 	// ctor.
 	drumkv1_sample(float srate = 44100.0f);
 
+	// copy-ctor.
+	drumkv1_sample(const drumkv1_sample& sample);
+
 	// dtor.
 	~drumkv1_sample();
 

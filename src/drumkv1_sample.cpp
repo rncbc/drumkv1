@@ -41,6 +41,15 @@ drumkv1_sample::drumkv1_sample ( float srate )
 }
 
 
+// copy-ctor.
+drumkv1_sample::drumkv1_sample ( const drumkv1_sample& sample )
+	: drumkv1_sample(sample.m_srate)
+{
+	m_offset  = sample.m_offset;
+	m_reverse = sample.m_reverse;
+}
+
+
 // dtor.
 drumkv1_sample::~drumkv1_sample (void)
 {
