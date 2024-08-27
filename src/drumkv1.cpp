@@ -1328,7 +1328,7 @@ drumkv1_impl::~drumkv1_impl (void)
 #endif
 
 	// deallocate sample filenames
-	setSampleFile(nullptr);
+	//setSampleFile(nullptr);
 
 	// deallocate special sample element port
 	delete m_key;

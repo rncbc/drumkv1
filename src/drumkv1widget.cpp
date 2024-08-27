@@ -1218,8 +1218,8 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 // Sample updater (crude experimental stuff II).
 void drumkv1widget::updateSample ( drumkv1_sample *pSample, bool bDirty )
 {
-	m_ui.Gen1Sample->setSampleName(currentNoteName());
 	m_ui.Gen1Sample->setSample(pSample);
+	m_ui.Gen1Sample->setSampleName(currentNoteName());
 
 	++m_iUpdate;
 	if (pSample) {
