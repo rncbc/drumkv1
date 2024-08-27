@@ -37,9 +37,9 @@
 // drumkv1_lv2ui - impl.
 //
 
-drumkv1_lv2ui::drumkv1_lv2ui ( drumkv1_lv2 *pSampl,
+drumkv1_lv2ui::drumkv1_lv2ui ( drumkv1_lv2 *pDrumk,
 	LV2UI_Controller controller, LV2UI_Write_Function write_function )
-	: drumkv1_ui(pSampl, true)
+	: drumkv1_ui(pDrumk, true)
 {
 	m_controller = controller;
 	m_write_function = write_function;
@@ -71,20 +71,20 @@ static LV2UI_Handle drumkv1_lv2ui_instantiate (
 	LV2UI_Controller controller, LV2UI_Widget *widget,
 	const LV2_Feature *const *features )
 {
-	drumkv1_lv2 *pSynth = nullptr;
+	drumkv1_lv2 *pDrumk = nullptr;
 
 	for (int i = 0; features && features[i]; ++i) {
 		if (::strcmp(features[i]->URI, LV2_INSTANCE_ACCESS_URI) == 0) {
-			pSynth = static_cast<drumkv1_lv2 *> (features[i]->data);
+			pDrumk = static_cast<drumkv1_lv2 *> (features[i]->data);
 			break;
 		}
 	}
 
-	if (pSynth == nullptr)
+	if (pDrumk == nullptr)
 		return nullptr;
 
 	drumkv1widget_lv2 *pWidget
-		= new drumkv1widget_lv2(pSynth, controller, write_function);
+		= new drumkv1widget_lv2(pDrumk, controller, write_function);
 	*widget = pWidget;
 	return pWidget;
 }

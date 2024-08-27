@@ -69,7 +69,7 @@ class drumkv1_lv2ui : public drumkv1_ui
 public:
 
 	// Constructor.
-	drumkv1_lv2ui(drumkv1_lv2 *pSampl,
+	drumkv1_lv2ui(drumkv1_lv2 *pDrumk,
 		LV2UI_Controller controller, LV2UI_Write_Function write_function);
 
 	// Accessors.
