@@ -7,3 +7,4 @@ debian/tmp/usr/share/icons/hicolor/32x32/mimetypes/org.rncbc.drumkv1.application
 debian/tmp/usr/share/icons/hicolor/scalable/apps/org.rncbc.drumkv1.svg
 debian/tmp/usr/share/icons/hicolor/scalable/mimetypes/org.rncbc.drumkv1.application-x-drumkv1*.svg
 debian/tmp/usr/share/man/man1/drumkv1*.*
+debian/tmp/usr/share/drumkv1/palette/*.conf
