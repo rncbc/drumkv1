@@ -1000,17 +1000,8 @@ bool drumkv1_jack_application::setup (void)
 
 	m_pDrumk = new drumkv1_jack(client_name);
 
-	if (m_bGui) {
+	if (m_bGui)
 		m_pWidget = new drumkv1widget_jack(m_pDrumk);
-	//	m_pWidget->show();
-		if (m_presets.isEmpty())
-			m_pWidget->initPreset();
-		else
-			m_pWidget->loadPreset(m_presets.first());
-	}
-	else
-	if (!m_presets.isEmpty())
-		drumkv1_param::loadPreset(m_pDrumk, m_presets.first());
 
 #ifdef CONFIG_NSM
 	// Check whether to participate into a NSM session...
@@ -1039,8 +1030,16 @@ bool drumkv1_jack_application::setup (void)
 	}
 	else
 #endif	// CONFIG_NSM
-	if (m_pWidget)
+	if (m_pWidget) {
 		m_pWidget->show();
+		if (m_presets.isEmpty())
+			m_pWidget->initPreset();
+		else
+			m_pWidget->loadPreset(m_presets.first());
+	}
+	else
+	if (!m_presets.isEmpty())
+		drumkv1_param::loadPreset(m_pDrumk, m_presets.first());
 
 	// Start watchdog timer...
 	watchdog_start();
