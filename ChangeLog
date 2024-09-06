@@ -6,6 +6,7 @@ ChangeLog
 
 GIT HEAD
 
+- Fixed all elements offset-start/end state save and restore.
 - NSM: prevent loading any preset(s) given on command line.
 
 

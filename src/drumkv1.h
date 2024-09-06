@@ -248,6 +248,7 @@ public:
 	const char *sampleFile() const;
 
 	drumkv1_sample *sample() const;
+	uint32_t length() const;
 
 	void setReverse(bool bReverse);
 	bool isReverse() const;

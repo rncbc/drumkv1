@@ -492,7 +492,7 @@ protected:
 			break;
 		case drumkv1::GEN1_OFFSET_1: {
 			const uint32_t iSampleLength
-				= element->sample()->length();
+				= element->length();
 			const uint32_t iOffsetStart
 				= element->offsetStart();
 			ret = (iSampleLength > 0
@@ -502,7 +502,7 @@ protected:
 		}
 		case drumkv1::GEN1_OFFSET_2: {
 			const uint32_t iSampleLength
-				= element->sample()->length();
+				= element->length();
 			const uint32_t iOffsetEnd
 				= element->offsetEnd();
 			ret = (iSampleLength > 0
@@ -535,7 +535,7 @@ protected:
 		case drumkv1::GEN1_OFFSET_1:
 			if (element->isOffset()) {
 				const uint32_t iSampleLength
-					= element->sample()->length();
+					= element->length();
 				const uint32_t iOffsetEnd
 					= element->offsetEnd();
 				uint32_t iOffsetStart
@@ -550,7 +550,7 @@ protected:
 		case drumkv1::GEN1_OFFSET_2:
 			if (element->isOffset()) {
 				const uint32_t iSampleLength
-					= element->sample()->length();
+					= element->length();
 				const uint32_t iOffsetStart
 					= element->offsetStart();
 				uint32_t iOffsetEnd
@@ -2929,6 +2929,12 @@ drumkv1_sample *drumkv1_element::sample (void) const
 }
 
 
+uint32_t drumkv1_element::length (void) const
+{
+	return (m_pElem ? m_pElem->gen1_sample.prev()->length() : 0);
+}
+
+
 void drumkv1_element::setReverse ( bool bReverse )
 {
 	if (m_pElem) m_pElem->gen1_sample.prev()->setReverse(bReverse);
@@ -3129,15 +3135,15 @@ void drumkv1_element::sampleOffsetRangeSync (void)
 	const uint32_t iOffsetEnd
 		= m_pElem->gen1_sample.prev()->offsetEnd();
 
-	const float offset_1 = (iSampleLength > 0
+	const float fOffset_1 = (iSampleLength > 0
 		? float(iOffsetStart) / float(iSampleLength)
 		: 0.0f);
-	const float offset_2 = (iSampleLength > 0
+	const float fOffset_2 = (iSampleLength > 0
 		? float(iOffsetEnd) / float(iSampleLength)
 		: 1.0f);
 
-	m_pElem->gen1.offset_1.set_value_sync(offset_1);
-	m_pElem->gen1.offset_2.set_value_sync(offset_2);
+	m_pElem->gen1.offset_1.set_value_sync(fOffset_1);
+	m_pElem->gen1.offset_2.set_value_sync(fOffset_2);
 }
 
 

@@ -279,6 +279,9 @@ void drumkv1_param::loadElements (
 							const QString& sName = eParam.attribute("name");
 							if (!sName.isEmpty() && s_hash.contains(sName))
 								index = s_hash.value(sName);
+							if (index == drumkv1::GEN1_OFFSET_1 ||
+								index == drumkv1::GEN1_OFFSET_2)
+								continue;
 							const float fValue
 								= drumkv1_param::paramSafeValue(index,
 									eParam.text().toFloat());
@@ -288,6 +291,23 @@ void drumkv1_param::loadElements (
 					}
 				}
 			}
+			// Load/correct functional dependent parametrics...
+			const bool bOffset
+				= element->isOffset();
+			const uint32_t iSampleLength
+				= element->length();
+			const uint32_t iOffsetStart
+				= element->offsetStart();
+			const uint32_t iOffsetEnd
+				= element->offsetEnd();
+			const float fOffset_1 = (bOffset && iSampleLength > 0
+				? float(iOffsetStart) / float(iSampleLength) : 0.0f);
+			const float fOffset_2 = (bOffset && iSampleLength > 0
+				? float(iOffsetEnd) / float(iSampleLength) : 1.0f);
+			element->setParamValue(drumkv1::GEN1_OFFSET_1, fOffset_1, 0);
+			element->setParamValue(drumkv1::GEN1_OFFSET_1, fOffset_1);
+			element->setParamValue(drumkv1::GEN1_OFFSET_2, fOffset_2, 0);
+			element->setParamValue(drumkv1::GEN1_OFFSET_2, fOffset_2);
 		}
 	}
 }
@@ -313,18 +333,23 @@ void drumkv1_param::saveElements (
 		QDomElement eSample = doc.createElement("sample");
 		eSample.setAttribute("index", 0);
 		eSample.setAttribute("name", "GEN1_SAMPLE");
-		eSample.setAttribute("offset-start", element->offsetStart());
-		eSample.setAttribute("offset-end", element->offsetEnd());
+		if (element->isOffset()) {
+			eSample.setAttribute("offset-start", element->offsetStart());
+			eSample.setAttribute("offset-end", element->offsetEnd());
+		}
 		eSample.appendChild(doc.createTextNode(mapPath.abstractPath(
 			drumkv1_param::saveFilename(
 				QString::fromUtf8(pszSampleFile), bSymLink))));
 		eElement.appendChild(eSample);
 		QDomElement eParams = doc.createElement("params");
 		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
+			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			if (index == drumkv1::GEN1_OFFSET_1 ||
+				index == drumkv1::GEN1_OFFSET_2)
+				continue;
 			QDomElement eParam = doc.createElement("param");
 			eParam.setAttribute("index", QString::number(i));
 			eParam.setAttribute("name", drumkv1_params[i].name);
-			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 			eParam.appendChild(doc.createTextNode(
 				QString::number(element->paramValue(index))));
 			eParams.appendChild(eParam);
