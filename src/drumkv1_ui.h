@@ -1,7 +1,7 @@
 // drumkv1_ui.h
 //
 /****************************************************************************
-   Copyright (C) 2012-2020, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2024, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -64,6 +64,8 @@ public:
 	void setOffsetRange(uint32_t iOffsetStart, uint32_t iOffsetEnd);
 	uint32_t offsetStart() const;
 	uint32_t offsetEnd() const;
+
+	bool newPreset();
 
 	bool loadPreset(const QString& sFilename);
 	bool savePreset(const QString& sFilename);

@@ -22,6 +22,8 @@
 #include "drumkv1_param.h"
 #include "drumkv1_config.h"
 
+#include "drumkv1_sched.h"
+
 #include <QHash>
 
 #include <QDomDocument>
@@ -360,6 +362,27 @@ void drumkv1_param::saveElements (
 }
 
 
+// Preset initialization method.
+bool drumkv1_param::newPreset ( drumkv1 *pDrumk )
+{
+	if (pDrumk == nullptr)
+		return false;
+
+	const bool running = pDrumk->running(false);
+
+	drumkv1_sched::sync_reset();
+
+	pDrumk->stabilize();
+	pDrumk->reset();
+
+	drumkv1_sched::sync_pending();
+
+	pDrumk->running(running);
+
+	return true;
+}
+
+
 // Preset serialization methods.
 bool drumkv1_param::loadPreset (
 	drumkv1 *pDrumk, const QString& sFilename )
@@ -386,6 +409,8 @@ bool drumkv1_param::loadPreset (
 		return false;
 
 	const bool running = pDrumk->running(false);
+
+	drumkv1_sched::sync_reset();
 
 	pDrumk->setTuningEnabled(false);
 	pDrumk->reset();
@@ -450,6 +475,9 @@ bool drumkv1_param::loadPreset (
 
 	pDrumk->stabilize();
 	pDrumk->reset();
+
+	drumkv1_sched::sync_pending();
+
 	pDrumk->running(running);
 
 	QDir::setCurrent(currentDir.absolutePath());

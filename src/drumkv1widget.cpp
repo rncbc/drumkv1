@@ -1071,7 +1071,7 @@ void drumkv1widget::newPreset (void)
 
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
-		pDrumkUi->reset();
+		pDrumkUi->newPreset();
 
 	refreshElements();
 	activateElement();

@@ -1,7 +1,7 @@
 // drumkv1_sched.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2021, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2024, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -45,10 +45,20 @@ public:
 	// schedule processing and wake from wait condition.
 	void schedule(drumkv1_sched *sched);
 
+	// process all pending runs immediately.
+	void sync_pending();
+
+	// clear all pending runs immediately.
+	void sync_reset();
+
 protected:
 
 	// main thread executive.
 	void run();
+	void run_process();
+
+	// clear all.
+	void clear();
 
 private:
 
@@ -132,6 +142,33 @@ void drumkv1_sched_thread::schedule ( drumkv1_sched *sched )
 }
 
 
+// process all pending runs, immediately.
+void drumkv1_sched_thread::sync_pending (void)
+{
+	QMutexLocker locker(&m_mutex);
+
+	run_process();
+}
+
+
+// clear all pending runs, immediately.
+void drumkv1_sched_thread::sync_reset (void)
+{
+	QMutexLocker locker(&m_mutex);
+
+	clear();
+}
+
+
+void drumkv1_sched_thread::clear (void)
+{
+	m_iread  = 0;
+	m_iwrite = 0;
+
+	::memset(m_items, 0, m_nsize * sizeof(drumkv1_sched *));
+}
+
+
 // main thread executive.
 void drumkv1_sched_thread::run (void)
 {
@@ -141,21 +178,27 @@ void drumkv1_sched_thread::run (void)
 
 	while (m_running) {
 		// do whatever we must...
-		uint32_t r = m_iread;
-		while (r != m_iwrite) {
-			drumkv1_sched *sched = m_items[r];
-			if (sched) {
-				sched->sync_process();
-				m_items[r] = nullptr;
-			}
-			++r &= m_nmask;
-		}
-		m_iread = r;
+		run_process();
 		// wait for sync...
 		m_cond.wait(&m_mutex);
 	}
 
 	m_mutex.unlock();
+}
+
+
+void drumkv1_sched_thread::run_process (void)
+{
+	uint32_t r = m_iread;
+	while (r != m_iwrite) {
+		drumkv1_sched *sched = m_items[r];
+		if (sched) {
+			sched->sync_process();
+			m_items[r] = nullptr;
+		}
+		++r &= m_nmask;
+	}
+	m_iread = r;
 }
 
 
@@ -260,6 +303,21 @@ void drumkv1_sched::sync_notify ( drumkv1 *pDrumk, Type stype, int sid )
 		while (iter.hasNext())
 			iter.next()->notify(stype, sid);
 	}
+}
+
+
+// process/clear pending schedules, immediately. (static)
+void drumkv1_sched::sync_pending (void)
+{
+	if (g_sched_thread)
+		g_sched_thread->sync_pending();
+}
+
+
+void drumkv1_sched::sync_reset (void)
+{
+	if (g_sched_thread)
+		g_sched_thread->sync_reset();
 }
 
 

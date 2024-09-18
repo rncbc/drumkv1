@@ -46,6 +46,9 @@ namespace drumkv1_param
 		virtual QString abstractPath(const QString& sAbsolutePath) const;
 	};
 
+	// Preset initialization method.
+	bool newPreset(drumkv1 *pDrumk);
+
 	// Preset serialization methods.
 	bool loadPreset(drumkv1 *pDrumk,
 		const QString& sFilename);
