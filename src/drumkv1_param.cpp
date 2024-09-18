@@ -375,6 +375,8 @@ bool drumkv1_param::newPreset ( drumkv1 *pDrumk )
 	pDrumk->stabilize();
 	pDrumk->reset();
 
+	pDrumk->clearElements();
+
 	drumkv1_sched::sync_pending();
 
 	pDrumk->running(running);
@@ -414,6 +416,8 @@ bool drumkv1_param::loadPreset (
 
 	pDrumk->setTuningEnabled(false);
 	pDrumk->reset();
+
+	pDrumk->clearElements();
 
 	static QHash<QString, drumkv1::ParamIndex> s_hash;
 	if (s_hash.isEmpty()) {

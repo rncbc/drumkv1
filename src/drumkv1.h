@@ -68,6 +68,7 @@ public:
 
 	void currentElementTest();
 
+	void resetElements();
 	void clearElements();
 
 	void setSampleFile(const char *pszSampleFile, bool bSync = false);

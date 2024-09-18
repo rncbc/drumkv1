@@ -1063,8 +1063,8 @@ void drumkv1widget::newPreset (void)
 	qDebug("drumkv1widget::newPreset()");
 #endif
 
-	clearElements();
-	clearSampleFile();
+//	clearElements();
+//	clearSampleFile();
 
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 	resetParamValues(drumkv1::NUM_PARAMS);
@@ -1088,8 +1088,8 @@ bool drumkv1widget::loadPreset ( const QString& sFilename )
 	qDebug("drumkv1widget::loadPreset(\"%s\")", sFilename.toUtf8().constData());
 #endif
 
-	clearElements();
-	clearSampleFile();
+//	clearElements();
+//	clearSampleFile();
 
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 	resetParamValues(drumkv1::NUM_PARAMS);

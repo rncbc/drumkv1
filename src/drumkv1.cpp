@@ -1046,6 +1046,7 @@ public:
 	void setCurrentElementTest(int key);
 	int currentElementTest();
 
+	void resetElements();
 	void clearElements();
 
 	void setSampleFile(const char *pszSampleFile);
@@ -1555,6 +1556,18 @@ int drumkv1_impl::currentElementTest (void)
 {
 	const int key = int(m_key->tick(1));
 	return (!m_running || m_key1 == key ? -1 : key);
+}
+
+
+void drumkv1_impl::resetElements (void)
+{
+	// reset all elements
+	drumkv1_elem *elem = m_elem_list.next();
+	while (elem) {
+		resetElement(elem);
+		elem->element.resetParamValues(false);
+		elem = elem->next();
+	}
 }
 
 
@@ -2239,13 +2252,8 @@ void drumkv1_impl::stabilize (void)
 
 void drumkv1_impl::reset (void)
 {
-	// reset all elements
-	drumkv1_elem *elem = m_elem_list.next();
-	while (elem) {
-		resetElement(elem);
-		elem->element.resetParamValues(false);
-		elem = elem->next();
-	}
+	// elements
+	resetElements();
 
 	// flangers
 	if (m_flanger == nullptr)
@@ -2706,6 +2714,12 @@ void drumkv1::currentElementTest (void)
 	}
 
 	m_pImpl->sampleOffsetTest();
+}
+
+
+void drumkv1::resetElements (void)
+{
+	m_pImpl->resetElements();
 }
 
 
