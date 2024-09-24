@@ -103,10 +103,12 @@ drumkv1widget_lv2::drumkv1widget_lv2 ( drumkv1_lv2 *pDrumk,
 					pConfig, pConfig->sCustomColorTheme, pal))
 				drumkv1widget::setPalette(pal);
 		}
+	#if 0//--Not applicable to plugin forms...
 		if (!pConfig->sCustomStyleTheme.isEmpty()) {
-			drumkv1widget::setStyle(
+			QApplication::setStyle(
 				QStyleFactory::create(pConfig->sCustomStyleTheme));
 		}
+	#endif
 	}
 
 	// Initialize (user) interface stuff...

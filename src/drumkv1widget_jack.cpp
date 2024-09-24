@@ -108,7 +108,7 @@ drumkv1widget_jack::drumkv1widget_jack ( drumkv1_jack *pDrumk )
 				drumkv1widget::setPalette(pal);
 		}
 		if (!pConfig->sCustomStyleTheme.isEmpty()) {
-			drumkv1widget::setStyle(
+			QApplication::setStyle(
 				QStyleFactory::create(pConfig->sCustomStyleTheme));
 		}
 	}
