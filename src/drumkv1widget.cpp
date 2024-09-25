@@ -566,17 +566,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 		SLOT(helpAboutQt()));
 
 	// General knob/dial behavior init...
-	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig) {
-		drumkv1widget_dial::setDialMode(
-			drumkv1widget_dial::DialMode(pConfig->iKnobDialMode));
-		drumkv1widget_edit::setEditMode(
-			drumkv1widget_edit::EditMode(pConfig->iKnobEditMode));
-		const drumkv1widget_spinbox::Format format
-			= drumkv1widget_spinbox::Format(pConfig->iFrameTimeFormat);
-		m_ui.Gen1OffsetStartSpinBox->setFormat(format);
-		m_ui.Gen1OffsetEndSpinBox->setFormat(format);
-	}
+	updateConfig();
 
 	// Epilog.
 	// QWidget::adjustSize();
@@ -1315,7 +1305,8 @@ QString drumkv1widget::noteName ( int note )
 	static QHash<int, QString> s_names;
 
 	// Pre-load drum-names hash table...
-	if (s_names.isEmpty()) {
+	if (s_names.isEmpty() || note < 0) {
+		s_names.clear();
 		drumkv1_config *pConfig = drumkv1_config::getInstance();
 		if (pConfig && pConfig->bUseGMDrumNames) {
 			for (int i = 0; s_notes[i].name; ++i) {
@@ -1336,6 +1327,11 @@ QString drumkv1widget::noteName ( int note )
 QString drumkv1widget::completeNoteName ( int note )
 {
 	return QString("%1 - %2").arg(note).arg(noteName(note));
+}
+
+void drumkv1widget::updateNoteNames (void)
+{
+	noteName(-1); // HACK: Force note names update...
 }
 
 
@@ -1494,6 +1490,24 @@ void drumkv1widget::resetElement (void)
 
 	refreshElements();
 	activateElement();
+}
+
+
+// Update visual configuration.
+void drumkv1widget::updateConfig (void)
+{
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
+	if (pConfig) {
+		drumkv1widget_dial::setDialMode(
+			drumkv1widget_dial::DialMode(pConfig->iKnobDialMode));
+		drumkv1widget_edit::setEditMode(
+			drumkv1widget_edit::EditMode(pConfig->iKnobEditMode));
+		const drumkv1widget_spinbox::Format format
+			= drumkv1widget_spinbox::Format(pConfig->iFrameTimeFormat);
+		m_ui.Gen1OffsetStartSpinBox->setFormat(format);
+		m_ui.Gen1OffsetEndSpinBox->setFormat(format);
+		updateNoteNames();
+	}
 }
 
 

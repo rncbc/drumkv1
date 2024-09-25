@@ -751,16 +751,14 @@ void drumkv1widget_config::accept (void)
 		pConfig->bProgramsPreview = m_ui.ProgramsPreviewCheckBox->isChecked();
 		pConfig->bUseNativeDialogs = m_ui.UseNativeDialogsCheckBox->isChecked();
 		pConfig->bDontUseNativeDialogs = !pConfig->bUseNativeDialogs;
-		pConfig->iKnobDialMode = m_ui.KnobDialModeComboBox->currentIndex();
-		drumkv1widget_dial::setDialMode(
-			drumkv1widget_dial::DialMode(pConfig->iKnobDialMode));
-		pConfig->iKnobEditMode = m_ui.KnobEditModeComboBox->currentIndex();
-		drumkv1widget_edit::setEditMode(
-			drumkv1widget_edit::EditMode(pConfig->iKnobEditMode));
+		pConfig->fRandomizePercent = float(m_ui.RandomizePercentSpinBox->value());
+		const int iOldKnobDialMode = pConfig->iKnobDialMode;
+		const int iOldKnobEditMode = pConfig->iKnobEditMode;
 		const int iOldFrameTimeFormat = pConfig->iFrameTimeFormat;
 		const bool bOldUseGMDrumNames = pConfig->bUseGMDrumNames;
+		pConfig->iKnobDialMode = m_ui.KnobDialModeComboBox->currentIndex();
+		pConfig->iKnobEditMode = m_ui.KnobEditModeComboBox->currentIndex();
 		pConfig->iFrameTimeFormat = m_ui.FrameTimeFormatComboBox->currentIndex();
-		pConfig->fRandomizePercent = float(m_ui.RandomizePercentSpinBox->value());
 		pConfig->bUseGMDrumNames = m_ui.UseGMDrumNamesCheckBox->isChecked();
 		int iNeedRestart = 0;
 		if (!m_pDrumkUi->isPlugin()) {
@@ -778,7 +776,8 @@ void drumkv1widget_config::accept (void)
 				}
 			}
 		}
-		QWidget *pParentWidget = parentWidget();
+		drumkv1widget *pParentWidget
+			= qobject_cast<drumkv1widget *> (parentWidget());
 		if (pParentWidget) {
 			const QString sOldCustomColorTheme = pConfig->sCustomColorTheme;
 			if (m_ui.CustomColorThemeComboBox->currentIndex() > 0)
@@ -795,11 +794,14 @@ void drumkv1widget_config::accept (void)
 						pParentWidget->setPalette(pal);
 				}
 			}
+			if (pConfig->iKnobDialMode != iOldKnobDialMode ||
+				pConfig->iKnobEditMode != iOldKnobEditMode ||
+				pConfig->iFrameTimeFormat != iOldFrameTimeFormat ||
+				(!pConfig->bUseGMDrumNames &&  bOldUseGMDrumNames) ||
+				( pConfig->bUseGMDrumNames && !bOldUseGMDrumNames)) {
+				pParentWidget->updateConfig();
+			}
 		}
-		if (pConfig->iFrameTimeFormat != iOldFrameTimeFormat)
-			++iNeedRestart;
-		if (!pConfig->bUseGMDrumNames && bOldUseGMDrumNames)
-			++iNeedRestart;
 		// Show restart message if needed...
  		if (iNeedRestart > 0) {
 			QMessageBox::information(this,
