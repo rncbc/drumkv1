@@ -83,8 +83,6 @@ public:
 	static QString noteName(int note);
 	static QString completeNoteName(int note);
 
-	static void updateNoteNames();
-
 	// Update visual configuration.
 	void updateConfig();
 

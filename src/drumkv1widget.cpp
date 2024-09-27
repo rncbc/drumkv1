@@ -1329,11 +1329,6 @@ QString drumkv1widget::completeNoteName ( int note )
 	return QString("%1 - %2").arg(note).arg(noteName(note));
 }
 
-void drumkv1widget::updateNoteNames (void)
-{
-	noteName(-1); // HACK: Force note names update...
-}
-
 
 // Dirty close prompt,
 bool drumkv1widget::queryClose (void)
@@ -1506,8 +1501,11 @@ void drumkv1widget::updateConfig (void)
 			= drumkv1widget_spinbox::Format(pConfig->iFrameTimeFormat);
 		m_ui.Gen1OffsetStartSpinBox->setFormat(format);
 		m_ui.Gen1OffsetEndSpinBox->setFormat(format);
-		updateNoteNames();
 	}
+
+	// HACK: Force note names update...
+	drumkv1widget::noteName(-1);
+	m_ui.Elements->refresh();
 }
 
 
