@@ -4,7 +4,7 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-GIT HEAD
+1.1.2  2024-10-02  An Early-Fall'24 Release.
 
 - Configure: apply Frame/Time display format and Use GM Standard
   drum names options immediately on acceptance, no need to restart
