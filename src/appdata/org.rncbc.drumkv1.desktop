@@ -14,3 +14,5 @@ Type=Application
 StartupWMClass=drumkv1_jack
 X-Window-Icon=drumkv1
 X-SuSE-translate=true
+X-NSM-Capable=true
+X-NSM-Exec=drumkv1_jack
