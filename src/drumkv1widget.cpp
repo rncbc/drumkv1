@@ -1059,6 +1059,8 @@ void drumkv1widget::newPreset (void)
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 	resetParamValues(drumkv1::NUM_PARAMS);
 
+	m_ui.Gen1Sample->setSample(nullptr);
+
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
 		pDrumkUi->newPreset();
@@ -1080,9 +1082,12 @@ bool drumkv1widget::loadPreset ( const QString& sFilename )
 
 //	clearElements();
 //	clearSampleFile();
+	m_ui.Gen1Sample->setSample(nullptr);
 
 	resetParamKnobs(drumkv1::NUM_PARAMS);
 	resetParamValues(drumkv1::NUM_PARAMS);
+
+	m_ui.Gen1Sample->setSample(nullptr);
 
 	bool bLoad = false;
 
