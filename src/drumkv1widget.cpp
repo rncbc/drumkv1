@@ -987,7 +987,8 @@ void drumkv1widget::updateParamValues ( uint32_t nparams )
 			continue;
 		const float fValue = pDrumkUi->paramValue(index);
 		setParamValue(index, fValue, true);
-		updateParam(index, fValue);
+		if (i >= drumkv1::NUM_ELEMENT_PARAMS)
+			updateParam(index, fValue);
 		m_params_ab[i] = fValue;
 	}
 
@@ -1010,7 +1011,8 @@ void drumkv1widget::resetParamValues ( uint32_t nparams )
 			continue;
 		const float fValue = drumkv1_param::paramDefaultValue(index);
 		setParamValue(index, fValue, true);
-		updateParam(index, fValue);
+		if (i >= drumkv1::NUM_ELEMENT_PARAMS)
+			updateParam(index, fValue);
 		m_params_ab[i] = fValue;
 	}
 
@@ -1453,7 +1455,7 @@ void drumkv1widget::updateElement (void)
 				pParam->setDefaultValue(element->paramValue(index, 0));
 				pParam->setValue(fValue);
 			}
-			updateParam(index, fValue);
+		//	updateParam(index, fValue);
 			updateParamEx(index, fValue, true);
 			m_params_ab[i] = fValue;
 		}

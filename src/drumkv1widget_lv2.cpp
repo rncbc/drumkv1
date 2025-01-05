@@ -236,7 +236,8 @@ void drumkv1widget_lv2::updateParam (
 	if (index == drumkv1::GEN1_SAMPLE)
 		return;
 
-	if (index < drumkv1::NUM_ELEMENT_PARAMS) {
+	if (index == drumkv1::GEN1_OFFSET_1 ||
+		index == drumkv1::GEN1_OFFSET_2) {
 		m_pDrumkUi->setParamValue(index, fValue);
 		m_pDrumkUi->updateParam(index);
 		return;
