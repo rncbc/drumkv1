@@ -233,6 +233,15 @@ void drumkv1widget_lv2::port_event ( uint32_t port_index,
 void drumkv1widget_lv2::updateParam (
 	drumkv1::ParamIndex index, float fValue ) const
 {
+	if (index == drumkv1::GEN1_SAMPLE)
+		return;
+
+	if (index < drumkv1::NUM_ELEMENT_PARAMS) {
+		m_pDrumkUi->setParamValue(index, fValue);
+		m_pDrumkUi->updateParam(index);
+		return;
+	}
+
 	m_pDrumkUi->write_function(index, fValue);
 }
 
