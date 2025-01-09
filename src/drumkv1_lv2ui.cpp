@@ -1,7 +1,7 @@
 // drumkv1_lv2ui.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2024, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2025, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -56,8 +56,12 @@ const LV2UI_Controller& drumkv1_lv2ui::controller (void) const
 void drumkv1_lv2ui::write_function (
 	drumkv1::ParamIndex index, float fValue ) const
 {
+#if 1//DRUMKV1_LV2_LEGACY_2
+	if (index > drumkv1::GEN1_SAMPLE && index < drumkv1::NUM_ELEMENT_PARAMS)
+		return;
+#endif
 	m_write_function(m_controller,
-		drumkv1_lv2::ParamBase + index, sizeof(float), 0, &fValue);
+		uint32_t(drumkv1_lv2::ParamBase + index), sizeof(float), 0, &fValue);
 }
 
 

@@ -1,7 +1,7 @@
 ﻿// drumkv1.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2024, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2025, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -457,16 +457,20 @@ public:
 
 	drumkv1_gen(drumkv1 *pDrumk, int key)
 		: drumkv1_port3_sched(pDrumk, key),
-			reverse(this, drumkv1::GEN1_REVERSE),
-			offset(this, drumkv1::GEN1_OFFSET),
+		#if 0//DRUMKV1_LV2_LEGACY_2
 			offset_1(this, drumkv1::GEN1_OFFSET_1),
 			offset_2(this, drumkv1::GEN1_OFFSET_2) {}
+		#endif
+			offset(this, drumkv1::GEN1_OFFSET),
+			reverse(this, drumkv1::GEN1_REVERSE) {}
 
 	drumkv1_port  sample;
-	drumkv1_port3 reverse;
-	drumkv1_port3 offset;
+#if 0//DRUMKV1_LV2_LEGACY_2
 	drumkv1_port3 offset_1;
 	drumkv1_port3 offset_2;
+#endif
+	drumkv1_port3 offset;
+	drumkv1_port3 reverse;
 	drumkv1_port  group;
 	drumkv1_port  coarse;
 	drumkv1_port  fine;
@@ -484,12 +488,7 @@ protected:
 		drumkv1_element *element = pDrumk->element(key);
 		if (element)
 		switch (drumkv1::ParamIndex(sid)) {
-		case drumkv1::GEN1_REVERSE:
-			ret = (element->isReverse() ? 1.0f : 0.0f);
-			break;
-		case drumkv1::GEN1_OFFSET:
-			ret = (element->isOffset() ? 1.0f : 0.0f);
-			break;
+	#if 0//DRUMKV1_LV2_LEGACY_2
 		case drumkv1::GEN1_OFFSET_1: {
 			const uint32_t iSampleLength
 				= element->length();
@@ -510,6 +509,13 @@ protected:
 				: 1.0f);
 			break;
 		}
+	#endif
+		case drumkv1::GEN1_OFFSET:
+			ret = (element->isOffset() ? 1.0f : 0.0f);
+			break;
+		case drumkv1::GEN1_REVERSE:
+			ret = (element->isReverse() ? 1.0f : 0.0f);
+			break;
 		default:
 			break;
 		}
@@ -524,14 +530,7 @@ protected:
 		drumkv1_element *element = pDrumk->element(key);
 		if (element)
 		switch (drumkv1::ParamIndex(sid)) {
-		case drumkv1::GEN1_REVERSE:
-			element->setReverse(reverse.value() > 0.5f);
-			element->sampleReverseSync();
-			break;
-		case drumkv1::GEN1_OFFSET:
-			element->setOffset(offset.value() > 0.5f);
-			element->sampleOffsetSync();
-			break;
+	#if 0//DRUMKV1_LV2_LEGACY_2
 		case drumkv1::GEN1_OFFSET_1:
 			if (element->isOffset()) {
 				const uint32_t iSampleLength
@@ -561,6 +560,15 @@ protected:
 				element->sampleOffsetRangeSync();
 				element->updateEnvTimes();
 			}
+			break;
+		#endif
+		case drumkv1::GEN1_OFFSET:
+			element->setOffset(offset.value() > 0.5f);
+			element->sampleOffsetSync();
+			break;
+		case drumkv1::GEN1_REVERSE:
+			element->setReverse(reverse.value() > 0.5f);
+			element->sampleReverseSync();
 			break;
 		default:
 			break;
@@ -3008,8 +3016,10 @@ drumkv1_port *drumkv1_element::paramPort ( drumkv1::ParamIndex index )
 //	case drumkv1::GEN1_SAMPLE:   pParamPort = &m_pElem->gen1.sample;     break;
 	case drumkv1::GEN1_REVERSE:  pParamPort = &m_pElem->gen1.reverse;    break;
 	case drumkv1::GEN1_OFFSET:   pParamPort = &m_pElem->gen1.offset;     break;
+#if 0//DRUMKV1_LV2_LEGACY_2
 	case drumkv1::GEN1_OFFSET_1: pParamPort = &m_pElem->gen1.offset_1;   break;
 	case drumkv1::GEN1_OFFSET_2: pParamPort = &m_pElem->gen1.offset_2;   break;
+#endif
 	case drumkv1::GEN1_GROUP:    pParamPort = &m_pElem->gen1.group;      break;
 	case drumkv1::GEN1_COARSE:   pParamPort = &m_pElem->gen1.coarse;     break;
 	case drumkv1::GEN1_FINE:     pParamPort = &m_pElem->gen1.fine;       break;
@@ -3119,8 +3129,10 @@ void drumkv1_element::sampleOffsetTest (void)
 {
 	if (m_pElem) {
 		m_pElem->gen1.offset.tick(1);
+	#if 0//DRUMKV1_LV2_LEGACY_2
 		m_pElem->gen1.offset_1.tick(1);
 		m_pElem->gen1.offset_2.tick(1);
+	#endif
 	}
 }
 
@@ -3156,8 +3168,10 @@ void drumkv1_element::sampleOffsetRangeSync (void)
 		? float(iOffsetEnd) / float(iSampleLength)
 		: 1.0f);
 
+#if 0//DRUMKV1_LV2_LEGACY_2
 	m_pElem->gen1.offset_1.set_value_sync(fOffset_1);
 	m_pElem->gen1.offset_2.set_value_sync(fOffset_2);
+#endif
 }
 
 

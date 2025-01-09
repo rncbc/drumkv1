@@ -349,10 +349,16 @@ void drumkv1_lv2::connect_port ( uint32_t port, void *data )
 	case AudioOutR:
 		m_outs[1] = (float *) data;
 		break;
-	default:
-		drumkv1::setParamPort(drumkv1::ParamIndex(port - ParamBase), (float *) data);
+	default: {
+		const drumkv1::ParamIndex index
+			= drumkv1::ParamIndex(port - ParamBase);
+	#if 1//DRUMKV1_LV2_LEGACY_2
+		if (index == drumkv1::GEN1_SAMPLE ||
+			index >= drumkv1::NUM_ELEMENT_PARAMS)
+	#endif
+			drumkv1::setParamPort(index, (float *) data);
 		break;
-	}
+	}}
 }
 
 
@@ -1035,6 +1041,11 @@ bool drumkv1_lv2::patch_get ( LV2_URID key )
 
 bool drumkv1_lv2::port_event ( drumkv1::ParamIndex index )
 {
+#if 1//DRUMKV1_LV2_LEGACY_2
+	if (index > drumkv1::GEN1_SAMPLE &&
+		index < drumkv1::NUM_ELEMENT_PARAMS)
+		return false;
+#endif
 	lv2_atom_forge_frame_time(&m_forge, m_ndelta);
 
 	LV2_Atom_Forge_Frame obj_frame;
@@ -1069,6 +1080,10 @@ bool drumkv1_lv2::port_events ( uint32_t nparams )
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
 		if (index == drumkv1::GEN1_SAMPLE)
 			continue;
+	#if 1//DRUMKV1_LV2_LEGACY_2
+		if (index < drumkv1::NUM_ELEMENT_PARAMS)
+			continue;
+	#endif
 		lv2_atom_forge_int(&m_forge, int32_t(ParamBase + index));
 		lv2_atom_forge_float(&m_forge, drumkv1::paramValue(index));
 	}
@@ -1093,6 +1108,11 @@ bool drumkv1_lv2::port_change_request ( drumkv1::ParamIndex index )
 	if (m_port_change_request->request_change == nullptr)
 		return false;
 
+#if 1//DRUMKV1_LV2_LEGACY_2
+	if (index > drumkv1::GEN1_SAMPLE &&
+		index < drumkv1::NUM_ELEMENT_PARAMS)
+		return false;
+#endif
 	return m_port_change_request->request_change(
 		m_port_change_request->handle,
 		uint32_t(ParamBase + index),
@@ -1112,6 +1132,12 @@ bool drumkv1_lv2::port_change_requests (void)
 
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		if (index == drumkv1::GEN1_SAMPLE)
+			continue;
+	#if 1//DRUMKV1_LV2_LEGACY_2
+		if (index < drumkv1::NUM_ELEMENT_PARAMS)
+			continue;
+	#endif
 		m_port_change_request->request_change(
 			m_port_change_request->handle,
 			uint32_t(ParamBase + index),

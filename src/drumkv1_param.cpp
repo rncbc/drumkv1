@@ -1,7 +1,7 @@
 // drumkv1_param.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2024, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2025, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -293,6 +293,7 @@ void drumkv1_param::loadElements (
 					}
 				}
 			}
+		#if 0//DRUMKV1_LV2_LEGACY_2
 			// Load/correct functional dependent parametrics...
 			const bool bOffset
 				= element->isOffset();
@@ -310,6 +311,7 @@ void drumkv1_param::loadElements (
 			element->setParamValue(drumkv1::GEN1_OFFSET_1, fOffset_1);
 			element->setParamValue(drumkv1::GEN1_OFFSET_2, fOffset_2, 0);
 			element->setParamValue(drumkv1::GEN1_OFFSET_2, fOffset_2);
+		#endif
 		}
 	}
 }
