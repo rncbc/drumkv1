@@ -94,6 +94,9 @@ public:
 	bool worker_work(const void *data, uint32_t size);
 	bool worker_response(const void *data, uint32_t size);
 
+	static uint32_t portFromParam(drumkv1::ParamIndex index);
+	static drumkv1::ParamIndex paramFromPort(uint32_t port);
+
 	static void qapp_instantiate();
 	static void qapp_cleanup();
 

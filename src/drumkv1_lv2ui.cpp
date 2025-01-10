@@ -57,11 +57,13 @@ void drumkv1_lv2ui::write_function (
 	drumkv1::ParamIndex index, float fValue ) const
 {
 #if 1//DRUMKV1_LV2_LEGACY_2
-	if (index > drumkv1::GEN1_SAMPLE && index < drumkv1::NUM_ELEMENT_PARAMS)
+	if (index > drumkv1::GEN1_SAMPLE &&
+		index < drumkv1::NUM_ELEMENT_PARAMS)
 		return;
 #endif
 	m_write_function(m_controller,
-		uint32_t(drumkv1_lv2::ParamBase + index), sizeof(float), 0, &fValue);
+		drumkv1_lv2::portFromParam(index),
+		sizeof(float), 0, &fValue);
 }
 
 

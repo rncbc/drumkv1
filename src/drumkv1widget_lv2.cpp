@@ -212,7 +212,7 @@ void drumkv1widget_lv2::port_event ( uint32_t port_index,
 {
 	if (format == 0 && buffer_size == sizeof(float)) {
 		const drumkv1::ParamIndex index
-			= drumkv1::ParamIndex(port_index - drumkv1_lv2::ParamBase);
+			= drumkv1_lv2::paramFromPort(port_index);
 		const float fValue = *(float *) buffer;
 	#if 0//DRUMKV1_LV2_LEGACY_2
 		if (index < drumkv1::NUM_ELEMENT_PARAMS && m_iShowEvent > 0) {
@@ -224,9 +224,12 @@ void drumkv1widget_lv2::port_event ( uint32_t port_index,
 					element->setParamValue(index, fValue);
 			}
 		}
-	#endif
 		if (index >= drumkv1::NUM_ELEMENT_PARAMS || m_iShowEvent > 0)
-			setParamValue(index, fValue);
+	#else
+		if (index == drumkv1::GEN1_SAMPLE ||
+			index >= drumkv1::NUM_ELEMENT_PARAMS || m_iShowEvent > 0)
+	#endif
+		setParamValue(index, fValue);
 	}
 }
 

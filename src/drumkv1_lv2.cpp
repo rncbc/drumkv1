@@ -29,6 +29,7 @@
 #include "drumkv1_programs.h"
 #include "drumkv1_controls.h"
 
+
 #ifdef CONFIG_LV2_OLD_HEADERS
 #include "lv2/lv2plug.in/ns/ext/midi/midi.h"
 #include "lv2/lv2plug.in/ns/ext/time/time.h"
@@ -350,13 +351,7 @@ void drumkv1_lv2::connect_port ( uint32_t port, void *data )
 		m_outs[1] = (float *) data;
 		break;
 	default: {
-		const drumkv1::ParamIndex index
-			= drumkv1::ParamIndex(port - ParamBase);
-	#if 1//DRUMKV1_LV2_LEGACY_2
-		if (index == drumkv1::GEN1_SAMPLE ||
-			index >= drumkv1::NUM_ELEMENT_PARAMS)
-	#endif
-			drumkv1::setParamPort(index, (float *) data);
+		drumkv1::setParamPort(paramFromPort(port), (float *) data);
 		break;
 	}}
 }
@@ -555,6 +550,28 @@ void drumkv1_lv2::deactivate (void)
 uint32_t drumkv1_lv2::urid_map ( const char *uri ) const
 {
 	return (m_urid_map ? m_urid_map->map(m_urid_map->handle, uri) : 0);
+}
+
+
+uint32_t drumkv1_lv2::portFromParam ( drumkv1::ParamIndex index )
+{
+	uint32_t port = uint32_t(drumkv1_lv2::ParamBase + index);
+#if 1//DRUMKV1_LV2_LEGACY_2
+	if (index >= drumkv1::NUM_ELEMENT_PARAMS)
+		port -= (drumkv1::NUM_ELEMENT_PARAMS - 1);
+#endif
+	return port;
+}
+
+
+drumkv1::ParamIndex drumkv1_lv2::paramFromPort ( uint32_t port )
+{
+	int index = (port - drumkv1_lv2::ParamBase);
+#if 1//DRUMKV1_LV2_LEGACY_2
+	if (index > drumkv1::GEN1_SAMPLE)
+		index += (drumkv1::NUM_ELEMENT_PARAMS - 1);
+#endif
+	return drumkv1::ParamIndex(index);
 }
 
 
@@ -1055,7 +1072,7 @@ bool drumkv1_lv2::port_event ( drumkv1::ParamIndex index )
 	LV2_Atom_Forge_Frame tup_frame;
 	lv2_atom_forge_tuple(&m_forge, &tup_frame);
 
-	lv2_atom_forge_int(&m_forge, int32_t(ParamBase + index));
+	lv2_atom_forge_int(&m_forge, portFromParam(index));
 	lv2_atom_forge_float(&m_forge, drumkv1::paramValue(index));
 
 	lv2_atom_forge_pop(&m_forge, &tup_frame);
@@ -1084,7 +1101,7 @@ bool drumkv1_lv2::port_events ( uint32_t nparams )
 		if (index < drumkv1::NUM_ELEMENT_PARAMS)
 			continue;
 	#endif
-		lv2_atom_forge_int(&m_forge, int32_t(ParamBase + index));
+		lv2_atom_forge_int(&m_forge, portFromParam(index));
 		lv2_atom_forge_float(&m_forge, drumkv1::paramValue(index));
 	}
 
@@ -1115,7 +1132,7 @@ bool drumkv1_lv2::port_change_request ( drumkv1::ParamIndex index )
 #endif
 	return m_port_change_request->request_change(
 		m_port_change_request->handle,
-		uint32_t(ParamBase + index),
+		portFromParam(index),
 		drumkv1::paramValue(index))
 		== LV2_CONTROL_INPUT_PORT_CHANGE_SUCCESS;
 }
@@ -1140,7 +1157,7 @@ bool drumkv1_lv2::port_change_requests (void)
 	#endif
 		m_port_change_request->request_change(
 			m_port_change_request->handle,
-			uint32_t(ParamBase + index),
+			portFromParam(index),
 			drumkv1::paramValue(index));
 	}
 
