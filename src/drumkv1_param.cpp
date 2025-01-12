@@ -524,13 +524,14 @@ bool drumkv1_param::savePreset (
 		eParams.appendChild(eParam);
 	}
 	ePreset.appendChild(eParams);
-	doc.appendChild(ePreset);
 
 	if (pDrumk->isTuningEnabled()) {
 		QDomElement eTuning = doc.createElement("tuning");
 		drumkv1_param::saveTuning(pDrumk, doc, eTuning, bSymLink);
 		ePreset.appendChild(eTuning);
 	}
+
+	doc.appendChild(ePreset);
 
 	QFile file(fi.filePath());
 	if (!file.open(QIODevice::WriteOnly | QIODevice::Truncate))

@@ -6,6 +6,9 @@ ChangeLog
 
 GIT HEAD
 
+- LV2 Plug-in: element parameters as legacy input control ports
+  are not automatable nor addressable from the host anymore.
+
 - LV2 Plug-in: avoid making element changes as regular parameter
   updates, which marked the host's state dirty (modified).
 
