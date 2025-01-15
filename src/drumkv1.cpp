@@ -1700,11 +1700,9 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 		}
 	}
 
-	if (index < drumkv1::NUM_ELEMENT_PARAMS) {
-		if (index == drumkv1::GEN1_SAMPLE)
-			m_key->set_port(pfParam);
-		else
-			m_params[index] = pfParam;
+	if (index > drumkv1::GEN1_SAMPLE &&
+		index < drumkv1::NUM_ELEMENT_PARAMS) {
+		m_params[index] = pfParam;
 	}
 }
 
@@ -1714,6 +1712,7 @@ drumkv1_port *drumkv1_impl::paramPort ( drumkv1::ParamIndex index )
 	drumkv1_port *pParamPort = nullptr;
 
 	switch (index) {
+	case drumkv1::GEN1_SAMPLE:    pParamPort = m_key;            break;
 	case drumkv1::DEF1_PITCHBEND: pParamPort = &m_def.pitchbend; break;
 	case drumkv1::DEF1_MODWHEEL:  pParamPort = &m_def.modwheel;  break;
 	case drumkv1::DEF1_PRESSURE:  pParamPort = &m_def.pressure;  break;

@@ -6,6 +6,9 @@ ChangeLog
 
 GIT HEAD
 
+- Last current element is now preserved and selected on preset
+  and/or LV2 plug-in load (host permiting). (EXPERIMENTAL)
+  
 - LV2 Plug-in: element parameters as legacy input control ports
   are not automatable nor addressable from the host anymore.
 

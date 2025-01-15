@@ -1095,10 +1095,12 @@ bool drumkv1_lv2::port_events ( uint32_t nparams )
 
 	for (uint32_t i = 0; i < nparams; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+	#if 0//DRUMKV1_LV2_LEGACY_2
 		if (index == drumkv1::GEN1_SAMPLE)
 			continue;
-	#if 1//DRUMKV1_LV2_LEGACY_2
-		if (index < drumkv1::NUM_ELEMENT_PARAMS)
+	#else
+		if (index > drumkv1::GEN1_SAMPLE &&
+			index < drumkv1::NUM_ELEMENT_PARAMS)
 			continue;
 	#endif
 		lv2_atom_forge_int(&m_forge, portFromParam(index));
@@ -1149,10 +1151,12 @@ bool drumkv1_lv2::port_change_requests (void)
 
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+	#if 0//DRUMKV1_LV2_LEGACY_2
 		if (index == drumkv1::GEN1_SAMPLE)
 			continue;
-	#if 1//DRUMKV1_LV2_LEGACY_2
-		if (index < drumkv1::NUM_ELEMENT_PARAMS)
+	#else
+		if (index > drumkv1::GEN1_SAMPLE &&
+			index < drumkv1::NUM_ELEMENT_PARAMS)
 			continue;
 	#endif
 		m_port_change_request->request_change(

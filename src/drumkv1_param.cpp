@@ -423,14 +423,19 @@ bool drumkv1_param::loadPreset (
 
 	static QHash<QString, drumkv1::ParamIndex> s_hash;
 	if (s_hash.isEmpty()) {
-		for (uint32_t i = drumkv1::NUM_ELEMENT_PARAMS; i < drumkv1::NUM_PARAMS; ++i) {
+		for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+			if (index > drumkv1::GEN1_SAMPLE &&
+				index < drumkv1::NUM_ELEMENT_PARAMS)
+				continue;
 			s_hash.insert(drumkv1_param::paramName(index), index);
 		}
 	}
 
 	const QDir currentDir(QDir::current());
 	QDir::setCurrent(fi.absolutePath());
+
+	int iCurrentElement = -1;
 
 	QDomDocument doc(PROJECT_NAME);
 	if (doc.setContent(&file)) {
@@ -470,6 +475,10 @@ bool drumkv1_param::loadPreset (
 					drumkv1_param::loadElements(pDrumk, eChild);
 				}
 				else
+				if (eChild.tagName() == "current-element") {
+					iCurrentElement = eChild.text().toInt();
+				}
+				else
 				if (eChild.tagName() == "tuning") {
 					drumkv1_param::loadTuning(pDrumk, eChild);
 				}
@@ -481,6 +490,9 @@ bool drumkv1_param::loadPreset (
 
 	pDrumk->stabilize();
 	pDrumk->reset();
+
+	if (iCurrentElement >= 0)
+		pDrumk->setCurrentElement(iCurrentElement);
 
 	drumkv1_sched::sync_pending();
 
@@ -514,9 +526,12 @@ bool drumkv1_param::savePreset (
 	ePreset.appendChild(eElements);
 
 	QDomElement eParams = doc.createElement("params");
-	for (uint32_t i = drumkv1::NUM_ELEMENT_PARAMS; i < drumkv1::NUM_PARAMS; ++i) {
-		QDomElement eParam = doc.createElement("param");
+	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i) {
 		const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
+		if (index > drumkv1::GEN1_SAMPLE &&
+			index < drumkv1::NUM_ELEMENT_PARAMS)
+			continue;
+		QDomElement eParam = doc.createElement("param");
 		eParam.setAttribute("index", QString::number(i));
 		eParam.setAttribute("name", drumkv1_param::paramName(index));
 		const float fValue = pDrumk->paramValue(index);
@@ -524,6 +539,11 @@ bool drumkv1_param::savePreset (
 		eParams.appendChild(eParam);
 	}
 	ePreset.appendChild(eParams);
+
+	QDomElement eCurrentElement = doc.createElement("current-element");
+	eCurrentElement.appendChild(doc.createTextNode(
+		QString::number(pDrumk->currentElement())));
+	ePreset.appendChild(eCurrentElement);
 
 	if (pDrumk->isTuningEnabled()) {
 		QDomElement eTuning = doc.createElement("tuning");
