@@ -4,11 +4,11 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-GIT HEAD
+1.3.0  2025-01-16  A New-Year'25 Release.
 
 - Last current element is now preserved and selected on preset
-  and/or LV2 plug-in load (host permiting). (EXPERIMENTAL)
-  
+  and/or LV2 plug-in load (host permiting).
+
 - LV2 Plug-in: element parameters as legacy input control ports
   are not automatable nor addressable from the host anymore.
 
