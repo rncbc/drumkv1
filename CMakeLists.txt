@@ -1,7 +1,7 @@
 cmake_minimum_required (VERSION 3.15)
 
 project (drumkv1
-  VERSION 1.3.0
+  VERSION 1.3.1
   DESCRIPTION "an old-school drum-kit sampler"
   HOMEPAGE_URL "https://drumkv1.sourceforge.io"
   LANGUAGES C CXX)
