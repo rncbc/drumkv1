@@ -6,6 +6,8 @@ ChangeLog
 
 GIT HEAD
 
+- Unassigned element/sample keys are now shown grayed out on the
+  virtual piano keyboard. (EXPERIMENTAL)
 - Stepping up next development cycle (Qt >= 6.9)
 
 
