@@ -39,9 +39,15 @@ public:
 	// Constructor.
 	drumkv1widget_keybd(QWidget *pParent = 0);
 
-	// Note enabled predicate.
+	// Note range predicate.
+	void setNoteRange(bool bNoteRange);
+	bool isNoteRange() const;
+
+	// Note enabled predicates.
 	void setNoteEnabled(int iNote, bool bEnabled);
 	bool isNoteEnabled(int iNote) const;
+
+	void setAllNotesEnabled(bool bEnabled);
 
 	// Default note-on velocity.
 	void setVelocity(int iVelocity);
@@ -55,6 +61,10 @@ public:
 	int noteKey() const;
 
 public slots:
+
+	// Keyboard note range setters.
+	void setNoteLow(int iNoteLow);
+	void setNoteHigh(int iNoteHigh);
 
 	// Keyboard note/key actions.
 	void noteOn(int iNote);
@@ -79,6 +89,10 @@ protected slots:
 	void allNotesTimeout();
 
 protected:
+
+	// Keyboard note range sanitizers.
+	int safeNoteLow(int iNoteLow) const;
+	int safeNoteHigh(int iNoteHigh) const;
 
 	// Piano key rectangle finder.
 	QRect noteRect(int iNote, bool bOn = false) const;
@@ -145,10 +159,20 @@ protected:
 
 	// Keyboard note range state.
 	enum DragState {
-		DragNone = 0, DragStart
+		DragNone = 0, DragStart,
+		DragNoteRange, DragNoteLow, DragNoteHigh
 	} m_dragState, m_dragCursor;
 
 	QPoint m_posDrag;
+
+	// Piano keyboard note range.
+	bool m_bNoteRange;
+
+	int m_iNoteLow;
+	int m_iNoteLowX;
+
+	int m_iNoteHigh;
+	int m_iNoteHighX;
 
 	// Current note being keyed on.
 	int m_iNoteOn;

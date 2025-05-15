@@ -62,6 +62,14 @@ drumkv1widget_keybd::drumkv1widget_keybd ( QWidget *pParent )
 
 	m_dragCursor = DragNone;
 
+	m_bNoteRange = false;
+
+	m_iNoteLow   = MIN_NOTE;
+	m_iNoteLowX  = 0;
+
+	m_iNoteHigh  = MAX_NOTE;
+	m_iNoteHighX = 0;
+
 	m_iNoteOn    = -1;
 	m_iTimeout   = 0;
 	m_iVelocity  = (MIN_VELOCITY + MAX_VELOCITY) / 2;
@@ -75,6 +83,21 @@ drumkv1widget_keybd::drumkv1widget_keybd ( QWidget *pParent )
 }
 
 
+// Note range predicate.
+void drumkv1widget_keybd::setNoteRange ( bool bNoteRange )
+{
+	m_bNoteRange = bNoteRange;
+
+	QWidget::update();
+}
+ 
+ 
+bool drumkv1widget_keybd::isNoteRange (void) const
+{
+	return m_bNoteRange;
+}
+ 
+ 
 // Note enabled predicate.
 void drumkv1widget_keybd::setNoteEnabled ( int iNote, bool bEnabled )
 {
@@ -89,6 +112,13 @@ bool drumkv1widget_keybd::isNoteEnabled ( int iNote ) const
 		return m_notes[iNote].enabled;
 	else
 		return false;
+}
+
+
+void drumkv1widget_keybd::setAllNotesEnabled ( bool bEnabled )
+{
+	for (int n = 0; n < NUM_NOTES; ++n)
+		setNoteEnabled(n, bEnabled);
 }
 
 
@@ -107,6 +137,60 @@ void drumkv1widget_keybd::setVelocity ( int iVelocity )
 int drumkv1widget_keybd::velocity (void) const
 {
 	return m_iVelocity;
+}
+
+
+// Keyboard note range sanitizers.
+int drumkv1widget_keybd::safeNoteLow ( int iNoteLow ) const
+{
+	if (iNoteLow < MIN_NOTE)
+		iNoteLow = MIN_NOTE;
+	if (iNoteLow > m_iNoteHigh)
+		iNoteLow = m_iNoteHigh;
+
+	return iNoteLow;
+}
+
+
+int drumkv1widget_keybd::safeNoteHigh ( int iNoteHigh ) const
+{
+	if (iNoteHigh > MAX_NOTE)
+		iNoteHigh = MAX_NOTE;
+	if (iNoteHigh < m_iNoteLow)
+		iNoteHigh = m_iNoteLow;
+
+	return iNoteHigh;
+}
+
+
+// Keyboard note range setters/getters.
+void drumkv1widget_keybd::setNoteLow ( int iNoteLow )
+{
+	m_iNoteLow  = safeNoteLow(iNoteLow);
+	m_iNoteLowX = noteRect(m_iNoteLow).left();
+
+	QWidget::update();
+}
+
+
+int drumkv1widget_keybd::noteLow (void) const
+{
+	return m_iNoteLow;
+}
+
+
+void drumkv1widget_keybd::setNoteHigh ( int iNoteHigh )
+{
+	m_iNoteHigh  = safeNoteHigh(iNoteHigh);
+	m_iNoteHighX = noteRect(m_iNoteHigh).right();
+
+	QWidget::update();
+}
+
+
+int drumkv1widget_keybd::noteHigh (void) const
+{
+	return m_iNoteHigh;
 }
 
 
@@ -175,7 +259,7 @@ QPainterPath drumkv1widget_keybd::notePath ( int iNote, bool bOn ) const
 // Piano keyboard note/key actions.
 void drumkv1widget_keybd::noteOn ( int iNote )
 {
-	if (iNote < MIN_NOTE || iNote > MAX_NOTE)
+	if (iNote < m_iNoteLow || iNote > m_iNoteHigh)
 		return;
 
 	// If it ain't changed we won't change it ;)
@@ -193,7 +277,7 @@ void drumkv1widget_keybd::noteOn ( int iNote )
 
 void drumkv1widget_keybd::noteOff ( int iNote )
 {
-	if (iNote < MIN_NOTE || iNote > MAX_NOTE)
+	if (iNote < m_iNoteLow || iNote > m_iNoteHigh)
 		return;
 
 	// Turn off old note...
@@ -246,7 +330,7 @@ void drumkv1widget_keybd::dragNoteOn ( const QPoint& pos )
 	// Compute new key cordinates...
 	const int iNote = noteAt(pos);
 
-	if (iNote < MIN_NOTE || iNote > MAX_NOTE || iNote == m_iNoteOn)
+	if (iNote < m_iNoteLow || iNote > m_iNoteHigh || iNote == m_iNoteOn)
 		return;
 
 	// Were we pending on some sounding note?
@@ -370,6 +454,9 @@ void drumkv1widget_keybd::updatePixmap (void)
 		m_notes[n].path = notePath(n, (n == m_iNoteKey
 			&& m_iNoteKey >= MIN_NOTE && MAX_NOTE >= m_iNoteKey));
 	}
+
+	m_iNoteLowX  = noteRect(m_iNoteLow).left();
+	m_iNoteHighX = noteRect(m_iNoteHigh).right();
 }
 
 
@@ -402,6 +489,20 @@ void drumkv1widget_keybd::paintEvent ( QPaintEvent *pPaintEvent )
 		else
 		if (note.on)
 			painter.fillPath(note.path, rgbOver);
+	}
+
+	// Keyboard range lines...
+	if (m_bNoteRange) {
+		const int w  = QWidget::width();
+		const int h  = QWidget::height();
+		const int x1 = m_iNoteLowX;
+		const int x2 = m_iNoteHighX;
+		rgbOver = pal.dark().color().darker();
+		rgbOver.setAlpha(120);
+		if (x1 > 0)
+			painter.fillRect(0, 0, x1, h, rgbOver);
+		if (x2 < w)
+			painter.fillRect(x2, 0, w, h, rgbOver);
 	}
 
 	// Current highlighted note.
@@ -456,11 +557,107 @@ void drumkv1widget_keybd::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 	const QPoint& pos = pMouseEvent->pos();
 
 	switch (m_dragState) {
-	case DragStart:
-		dragNoteOn(pos);
-		noteToolTip(pos);
-		// Fall thru...
 	case DragNone:
+		if (m_bNoteRange) {
+			// Are we already moving/dragging something?
+			const int dx = 4;
+			const int x1 = m_iNoteLowX;
+			const int x2 = m_iNoteHighX;
+			if (::abs(x2 - pos.x()) < dx) {
+				m_dragCursor = DragNoteHigh;
+				QWidget::setCursor(QCursor(Qt::SizeHorCursor));
+				QToolTip::showText(
+					QWidget::mapToGlobal(pos),
+					tr("High: %1 (%2)")
+						.arg(noteName(m_iNoteHigh)).arg(m_iNoteHigh), this);
+			}
+			else
+			if (::abs(x1 - pos.x()) < dx) {
+				m_dragCursor = DragNoteLow;
+				QWidget::setCursor(QCursor(Qt::SizeHorCursor));
+				QToolTip::showText(
+					QWidget::mapToGlobal(pos),
+					tr("Low: %1 (%2)")
+						.arg(noteName(m_iNoteLow)).arg(m_iNoteLow), this);
+			}
+			else
+			if (m_dragCursor != DragNone) {
+				m_dragCursor  = DragNone;
+				QWidget::unsetCursor();
+			}
+		}
+		break;
+	case DragNoteLow:
+		if (m_bNoteRange) {
+			const int iNoteLow = safeNoteLow(noteAt(pos));
+			m_iNoteLowX = noteRect(iNoteLow).left();
+			QWidget::update();
+			QToolTip::showText(
+				QCursor::pos(),
+				tr("Low: %1 (%2)")
+					.arg(noteName(iNoteLow)).arg(iNoteLow), this);
+		}
+		break;
+	case DragNoteHigh:
+		if (m_bNoteRange) {
+			const int iNoteHigh = safeNoteHigh(noteAt(pos));
+			m_iNoteHighX = noteRect(iNoteHigh).right();
+			QWidget::update();
+			QToolTip::showText(
+				QCursor::pos(),
+				tr("High: %1 (%2)")
+					.arg(noteName(iNoteHigh)).arg(iNoteHigh), this);
+		}
+		break;
+	case DragNoteRange:
+		if (m_bNoteRange) {
+			const int w = QWidget::width();
+			if (w > 0) {
+				// Rubber-band offset selection...
+				const QRect& rect = QRect(m_posDrag, pos).normalized();
+				int iNoteLow  = (NUM_NOTES * rect.left())  / w;
+				int iNoteHigh = (NUM_NOTES * rect.right()) / w;
+				if (iNoteLow  < MIN_NOTE)
+					iNoteLow  = MIN_NOTE;
+				if (iNoteLow  > iNoteHigh)
+					iNoteLow  = iNoteHigh;
+				if (iNoteHigh > MAX_NOTE)
+					iNoteHigh = MAX_NOTE;
+				if (iNoteHigh < iNoteLow)
+					iNoteHigh = iNoteLow;
+				m_iNoteLowX   = noteRect(iNoteLow).left();
+				m_iNoteHighX  = noteRect(iNoteHigh).right();
+				QWidget::update();
+				QToolTip::showText(
+					QWidget::mapToGlobal(pos),
+					tr("Low: %1 (%2) High: %3 (%4)")
+						.arg(noteName(iNoteLow)).arg(iNoteLow)
+						.arg(noteName(iNoteHigh)).arg(iNoteHigh), this);
+			}
+		}
+		break;
+	case DragStart:
+		if (m_bNoteRange) {
+			if ((m_posDrag - pos).manhattanLength()
+				> QApplication::startDragDistance()) {
+				// Start dragging alright...
+				if (m_dragCursor != DragNone)
+					m_dragState = m_dragCursor;
+				else
+				if (pMouseEvent->modifiers()
+					& (Qt::ShiftModifier | Qt::ControlModifier)) {
+					// Rubber-band starting...
+					m_dragState = m_dragCursor = DragNoteRange;
+					QWidget::setCursor(QCursor(Qt::SizeHorCursor));
+				}
+			}
+		}
+		// Are we still hovering the keyboard?
+		if (m_dragState == DragStart) {
+			dragNoteOn(pos);
+			noteToolTip(pos);
+		}
+		// Fall thru...
 	default:
 		break;
 	}
@@ -471,6 +668,50 @@ void drumkv1widget_keybd::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 
 void drumkv1widget_keybd::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 {
+	const QPoint& pos = pMouseEvent->pos();
+
+	switch (m_dragState) {
+	case DragNoteLow:
+		if (m_bNoteRange) {
+			setNoteLow(noteAt(pos));
+			emit noteRangeChanged();
+		}
+		break;
+	case DragNoteHigh:
+		if (m_bNoteRange) {
+			setNoteHigh(noteAt(pos));
+			emit noteRangeChanged();
+		}
+		break;
+	case DragNoteRange:
+		if (m_bNoteRange) {
+			const int w = QWidget::width();
+			if (w > 0) {
+				const QRect& rect = QRect(m_posDrag, pos).normalized();
+				int iNoteLow  = (NUM_NOTES * rect.left())  / w;
+				int iNoteHigh = (NUM_NOTES * rect.right()) / w;
+				if (iNoteLow  < MIN_NOTE)
+					iNoteLow  = MIN_NOTE;
+				if (iNoteHigh > MAX_NOTE)
+					iNoteHigh = MAX_NOTE;
+				if (iNoteLow  > iNoteHigh)
+					iNoteLow  = iNoteHigh;
+				if (iNoteHigh < iNoteLow)
+					iNoteHigh = iNoteLow;
+				m_iNoteLow    = iNoteLow;
+				m_iNoteLowX   = noteRect(iNoteLow).left();
+				m_iNoteHigh   = iNoteHigh;
+				m_iNoteHighX  = noteRect(iNoteHigh).right();
+				QWidget::update();
+				emit noteRangeChanged();
+			}
+		}
+		break;
+		// Fall thru...
+	default:
+		break;
+	}
+
 	// Were we stuck on some keyboard note?
 	resetDragState();
 
