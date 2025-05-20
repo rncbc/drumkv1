@@ -4,7 +4,7 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-GIT HEAD
+1.3.2  2025-05-20  A Mid-Spring'25 Release.
 
 - Unassigned element/sample keys are now shown grayed out on the
   virtual piano keyboard.
