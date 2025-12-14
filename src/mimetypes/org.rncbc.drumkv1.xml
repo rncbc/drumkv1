@@ -4,5 +4,6 @@
     <sub-class-of type="text/xml"/>
     <comment>drumkv1 preset</comment>
     <glob pattern="*.drumkv1"/>
+    <icon name="org.rncbc.drumkv1.application-x-drumkv1-preset"/>
   </mime-type>
 </mime-info>
