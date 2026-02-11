@@ -16,5 +16,6 @@
 		<file>images/fileOpen.png</file>
 		<file>images/drumkv1_preset.png</file>
 		<file>images/drumkv1_control.png</file>
+		<file>fonts/DejaVuSans.ttf</file>
 	</qresource>
 </RCC>
