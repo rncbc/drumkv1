@@ -1,7 +1,7 @@
 // drumkv1_ui.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2025, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2026, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -58,7 +58,7 @@ void drumkv1_ui::removeElement ( int key )
 
 void drumkv1_ui::setCurrentElement ( int key )
 {
-	m_pDrumk->setCurrentElement(key);
+	m_pDrumk->setCurrentElementEx(key);
 }
 
 int drumkv1_ui::currentElement (void) const

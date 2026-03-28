@@ -486,7 +486,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 		SLOT(doubleClickElement()));
 	QObject::connect(m_ui.Elements,
 		SIGNAL(itemLoadSampleFile(const QString&, int)),
-		SLOT(loadSampleElement(const QString&)));
+		SLOT(loadSample(const QString&)));
 
 	// Sample management...
 	QObject::connect(m_ui.Gen1Sample,
@@ -1491,7 +1491,7 @@ void drumkv1widget::updateElement (void)
 // Element sample loader.
 void drumkv1widget::loadSampleElement ( const QString& sFilename )
 {
-	emit loadSampleFile(sFilename);
+	loadSample(sFilename);
 }
 
 
