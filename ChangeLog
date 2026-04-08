@@ -10,6 +10,8 @@ GIT HEAD
   requiring a second try to show up correctly on the LV2 Plug-in's
   GUI (JACK stand-alone was/is fine). (EXPERIMENTAL)
 
+- Bumping into next development cycle (Qt >= 6.11)
+
 
 1.4.1  2026-03-18  An Early-Spring'26 Release.
 
