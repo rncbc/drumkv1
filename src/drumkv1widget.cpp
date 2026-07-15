@@ -1166,7 +1166,8 @@ void drumkv1widget::loadSample ( const QString& sFilename )
 // Sample openner.
 void drumkv1widget::openSample (void)
 {
-	m_ui.Gen1Sample->openSample(currentNoteName());
+//	m_ui.Gen1Sample->openSample(currentNoteName());
+	activateElement(true);
 }
 
 

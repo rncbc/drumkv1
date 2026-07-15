@@ -58,7 +58,7 @@ void drumkv1_ui::removeElement ( int key )
 
 void drumkv1_ui::setCurrentElement ( int key )
 {
-	m_pDrumk->setCurrentElementEx(key);
+	m_pDrumk->setCurrentElement(key);
 }
 
 int drumkv1_ui::currentElement (void) const
