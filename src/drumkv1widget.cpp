@@ -1381,9 +1381,11 @@ void drumkv1widget::refreshElements (void)
 	m_ui.Gen1Sample->setSampleName(completeNoteName(iCurrentNote));
 
 	drumkv1widget_keybd *pKeybd = m_ui.StatusBar->keybd();
-	for (int iNote = 0; iNote < m_ui.Elements->model()->rowCount(); ++iNote) {
-		drumkv1_element *element = pDrumkUi->element(iNote);
-		pKeybd->setNoteEnabled(iNote, element && element->sampleFile());
+	if (pDrumkUi && pKeybd) {
+		for (int iNote = 0; iNote < m_ui.Elements->model()->rowCount(); ++iNote) {
+			drumkv1_element *element = pDrumkUi->element(iNote);
+			pKeybd->setNoteEnabled(iNote, element && element->sampleFile());
+		}
 	}
 
 	m_ui.Elements->blockSignals(bBlockSignals);

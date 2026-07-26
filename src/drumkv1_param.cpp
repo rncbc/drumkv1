@@ -605,7 +605,7 @@ void drumkv1_param::loadTuning (
 				= eChild.text();
 			const QByteArray aKeyMapFile
 				= drumkv1_param::loadFilename(sKeyMapFile).toUtf8();
-			pDrumk->setTuningScaleFile(aKeyMapFile.constData());
+			pDrumk->setTuningKeyMapFile(aKeyMapFile.constData());
 		}
 	}
 
