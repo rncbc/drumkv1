@@ -6,6 +6,7 @@ ChangeLog
 
 GIT HEAD
 
+- Fixed wrong keymap-file setter on tuning loader.
 - Added file-types property to LV2 plug-in Path parameters.
 - Opening/loading sample file of an empty element revisited (last
   fix on LV2 Plug-in GUI broke the whole JACK stand-alone element
