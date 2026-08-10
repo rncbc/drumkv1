@@ -28,6 +28,7 @@ set (HEADERS
   drumkv1_tuning.h
   drumkv1_programs.h
   drumkv1_controls.h
+  drumkv1_presets.h
 )
 
 set (SOURCES
@@ -42,6 +43,7 @@ set (SOURCES
   drumkv1_tuning.cpp
   drumkv1_programs.cpp
   drumkv1_controls.cpp
+  drumkv1_presets.cpp
 )
 
 
@@ -54,8 +56,9 @@ set (HEADERS_UI
   drumkv1widget_wave.h
   drumkv1widget_param.h
   drumkv1widget_keybd.h
-  drumkv1widget_preset.h
   drumkv1widget_status.h
+  drumkv1widget_preset.h
+  drumkv1widget_presets.h
   drumkv1widget_spinbox.h
   drumkv1widget_elements.h
   drumkv1widget_programs.h
@@ -74,8 +77,9 @@ set (SOURCES_UI
   drumkv1widget_wave.cpp
   drumkv1widget_param.cpp
   drumkv1widget_keybd.cpp
-  drumkv1widget_preset.cpp
   drumkv1widget_status.cpp
+  drumkv1widget_preset.cpp
+  drumkv1widget_presets.cpp
   drumkv1widget_spinbox.cpp
   drumkv1widget_elements.cpp
   drumkv1widget_programs.cpp

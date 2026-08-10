@@ -1,7 +1,7 @@
 // drumkv1widget_programs.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2023, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2026, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -22,13 +22,15 @@
 #include "drumkv1widget_programs.h"
 
 #include "drumkv1_programs.h"
+#include "drumkv1_presets.h"
 #include "drumkv1_config.h"
+
+#include "drumkv1widget_presets.h"
 
 #include <QItemDelegate>
 #include <QHeaderView>
 #include <QSpinBox>
 #include <QLineEdit>
-#include <QComboBox>
 
 
 //----------------------------------------------------------------------------
@@ -98,11 +100,12 @@ QWidget *drumkv1widget_programs::ItemDelegate::createEditor ( QWidget *pParent,
 	case 1: // Text.
 	{
 		if (index.parent().isValid()) {
-			QComboBox *pComboBox = new QComboBox(pParent);
+			drumkv1widget_presets::ComboBox *pComboBox
+				= new drumkv1widget_presets::ComboBox(pParent);
 			pComboBox->setEditable(false);
 			drumkv1_config *pConfig = drumkv1_config::getInstance();
 			if (pConfig)
-				pComboBox->addItems(pConfig->presetList());
+				(pComboBox->presetsView())->loadPresets(&(pConfig->presets));
 			pEditor = pComboBox;
 		} else {
 			QLineEdit *pLineEdit = new QLineEdit(pParent);
@@ -150,11 +153,10 @@ void drumkv1widget_programs::ItemDelegate::setEditorData (
 		const QString& sText = index.data().toString();
 		//	= index.model()->data(index, Qt::DisplayRole).toString();
 		if (index.parent().isValid()) {
-			QComboBox *pComboBox = qobject_cast<QComboBox *> (pEditor);
+			drumkv1widget_presets::ComboBox *pComboBox
+				= qobject_cast<drumkv1widget_presets::ComboBox *> (pEditor);
 			if (pComboBox) {
-				const int iIndex = pComboBox->findText(sText);
-				if (iIndex >= 0)
-					pComboBox->setCurrentIndex(iIndex);
+				pComboBox->setCurrentPreset(sText);
 			}
 		} else {
 			QLineEdit *pLineEdit = qobject_cast<QLineEdit *> (pEditor);
@@ -194,9 +196,10 @@ void drumkv1widget_programs::ItemDelegate::setModelData ( QWidget *pEditor,
 	case 1: // Text.
 	{
 		if (index.parent().isValid()) {
-			QComboBox *pComboBox = qobject_cast<QComboBox *> (pEditor);
+			drumkv1widget_presets::ComboBox *pComboBox
+				= qobject_cast<drumkv1widget_presets::ComboBox *> (pEditor);
 			if (pComboBox) {
-				const QString& sText = pComboBox->currentText();
+				const QString& sText = pComboBox->currentPreset();
 				pModel->setData(index, sText);
 			}
 		} else {
@@ -448,10 +451,21 @@ QTreeWidgetItem *drumkv1widget_programs::newProgramItem (void)
 	QString sProgram = tr("Program %1.%2").arg(iBankData).arg(iProgData);
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig) {
-		const QStringList& presets
-			= pConfig->presetList();
-		if (iProgData < presets.count())
-			sProgram = presets.at(iProgData);
+		QStringList preset_list;
+		const QStringList& bank_list
+			= pConfig->presets.bank_list();
+		if (iBankData < bank_list.count()) {
+			const QString& sBank
+				= bank_list.at(iBankData);
+			drumkv1_presets::Bank *pBank
+				= pConfig->presets.find_bank(sBank);
+			if (pBank)
+				preset_list = pBank->preset_list();
+		} else {
+			preset_list = pConfig->presets.preset_list();
+		}
+		if (iProgData < preset_list.count())
+			sProgram = preset_list.at(iProgData);
 	}
 
 	pProgItem = new QTreeWidgetItem(QStringList()
