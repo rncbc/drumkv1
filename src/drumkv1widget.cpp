@@ -591,6 +591,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 // Destructor.
 drumkv1widget::~drumkv1widget (void)
 {
+	savePresets();
+
 	if (m_sched_notifier)
 		delete m_sched_notifier;
 
@@ -1711,6 +1713,18 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 }
 
 
+// Update/reload presets.
+void drumkv1widget::loadPresets (void)
+{
+	m_ui.Preset->loadPresets();
+}
+
+void drumkv1widget::savePresets (void)
+{
+	m_ui.Preset->savePresets();
+}
+
+
 // Preset status updater.
 void drumkv1widget::updateLoadPreset ( const QString& sPreset )
 {
@@ -1813,6 +1827,8 @@ void drumkv1widget::midiInLedTimeout (void)
 // Menu actions.
 void drumkv1widget::helpConfigure (void)
 {
+	savePresets();
+
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
 		drumkv1widget_config(this, pDrumkUi).exec();

@@ -300,7 +300,7 @@ void drumkv1widget_presets::loadPresets ( drumkv1_presets *pPresets )
 			QTreeWidgetItem *pPresetItem = new QTreeWidgetItem(pBankItem, PresetItem);
 			pPresetItem->setFlags(
 				Qt::ItemIsEnabled | Qt::ItemIsEditable | Qt::ItemIsSelectable);
-			pPresetItem->setIcon(0, QIcon(":/images/presetItem.png"));
+			pPresetItem->setIcon(0, QIcon(":/images/drumkv1_preset.png"));
 			pPresetItem->setText(0, sPreset);
 			drumkv1_presets::Preset *pPreset = pPresets->find_preset(sPreset);
 			QString sPresetFile;
