@@ -52,9 +52,6 @@ public:
 	void loadPresets(drumkv1_presets *pPresets);
 	void savePresets(drumkv1_presets *pPresets);
 
-	void loadPresetsCurrent(drumkv1_presets *pPresets);
-	void savePresetsCurrent(drumkv1_presets *pPresets);
-
 	QString currentPreset() const;
 
 	void setPresetItem(const QString& sPreset);
