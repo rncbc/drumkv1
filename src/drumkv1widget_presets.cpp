@@ -55,11 +55,16 @@ public:
 	// ctor.
 	ItemDelegate(QObject *pParent = nullptr);
 
-	// QItemDelegate interface...
+	// painting
+	void paint(QPainter *painter,
+		const QStyleOptionViewItem &option,
+		const QModelIndex &index) const;
+
 	QSize sizeHint(
 		const QStyleOptionViewItem& option,
 		const QModelIndex& index) const;
 
+	// editing
 	QWidget *createEditor(QWidget *pParent,
 		const QStyleOptionViewItem& option,
 		const QModelIndex& index) const;
@@ -83,7 +88,28 @@ drumkv1widget_presets::ItemDelegate::ItemDelegate (
 }
 
 
-// QItemDelegate interface...
+// painting
+//
+void drumkv1widget_presets::ItemDelegate::paint ( QPainter *pPainter,
+	const QStyleOptionViewItem& option, const QModelIndex& index ) const
+{
+	QStyleOptionViewItem opt = option;
+
+	drumkv1widget_presets *pWidget
+		= qobject_cast<drumkv1widget_presets *>(parent());
+	if (pWidget && !pWidget->rootIsDecorated()) {
+		QTreeWidgetItem *pItem = pWidget->itemFromIndex(index);
+		if (pItem && pWidget->isBankItem(pItem)) {
+			opt.font.setWeight(QFont::Bold);
+		} else {
+			opt.decorationAlignment = Qt::AlignRight|Qt::AlignVCenter;
+		}
+	}
+
+	QItemDelegate::paint(pPainter, opt, index);
+}
+
+
 QSize drumkv1widget_presets::ItemDelegate::sizeHint (
 	const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
@@ -91,6 +117,8 @@ QSize drumkv1widget_presets::ItemDelegate::sizeHint (
 }
 
 
+// editing
+//
 QWidget *drumkv1widget_presets::ItemDelegate::createEditor ( QWidget *pParent,
 	const QStyleOptionViewItem& /*option*/, const QModelIndex& index ) const
 {
@@ -121,6 +149,8 @@ QWidget *drumkv1widget_presets::ItemDelegate::createEditor ( QWidget *pParent,
 }
 
 
+// editing
+//
 void drumkv1widget_presets::ItemDelegate::setEditorData (
 	QWidget *pEditor, const QModelIndex& index ) const
 {
@@ -290,10 +320,10 @@ void drumkv1widget_presets::loadPresets ( drumkv1_presets *pPresets )
 		QTreeWidgetItem *pBankItem = new QTreeWidgetItem(this, BankItem);
 		if (bRootIsDecorated) {
 			pBankItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsEditable);
-			pBankItem->setIcon(0, QIcon(":/images/presetBankOpen.png"));
 		} else {
 			pBankItem->setFlags(Qt::NoItemFlags);
 		}
+		pBankItem->setIcon(0, QIcon(":/images/presetBankOpen.png"));
 		pBankItem->setText(0, pBank->name());
 		pBankItem->setData(0, Qt::UserRole, iBankData++);
 		QStringListIterator bank_preset_iter(pBank->preset_list());

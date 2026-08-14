@@ -805,8 +805,6 @@ void drumkv1widget_config::stabilize (void)
 	pItem = m_ui.PresetsTreeWidget->currentItem();
 	bEnabled = m_bPresets;
 	m_ui.PresetsPreviewCheckBox->setEnabled(bEnabled);
-	m_ui.PresetsAddBankToolButton->setEnabled(bEnabled);
-	m_ui.PresetsAddItemToolButton->setEnabled(bEnabled);
 	bEnabled = bEnabled && (pItem != nullptr);
 	m_ui.PresetsRenameToolButton->setEnabled(bEnabled);
 	m_ui.PresetsRemoveToolButton->setEnabled(bEnabled);
@@ -1188,6 +1186,9 @@ QString drumkv1widget_config::comboBoxCurrentItem ( QComboBox *pComboBox )
 // Programs/preset preview stuff...
 void drumkv1widget_config::loadPreset ( const QString& sPreset )
 {
+	if (sPreset.isEmpty())
+		return;
+
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
 	if (pConfig == nullptr)
 		return;
