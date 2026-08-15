@@ -110,8 +110,6 @@ drumkv1widget_preset::drumkv1widget_preset ( QWidget *pParent )
 		SLOT(resetPreset()));
 
 	loadPresets();
-
-	stabilizePreset();
 }
 
 
@@ -131,7 +129,7 @@ void drumkv1widget_preset::setPreset ( const QString& sPreset )
 {
 	const bool bBlockSignals
 		= m_pComboBox->blockSignals(true);
-	m_pComboBox->setEditText(sPreset);
+	m_pComboBox->setCurrentPreset(sPreset);
 	m_pComboBox->blockSignals(bBlockSignals);
 
 }
@@ -190,14 +188,14 @@ bool drumkv1widget_preset::queryPreset (void)
 // Preset management slots...
 void drumkv1widget_preset::activatePreset ( const QString& sPreset )
 {
-	QTreeWidgetItem *pPresetItem = presetItem(sPreset);
+	QTreeWidgetItem *pPresetItem = m_pPresetsView->presetItem(sPreset);
 	if (pPresetItem && queryPreset()) {
 		loadPreset(sPreset);
 		emit presetActivated(sPreset);
 		return;
 	}
 
-	if (pPresetItem == nullptr && bankItem(sPreset))
+	if (pPresetItem == nullptr && m_pPresetsView->bankItem(sPreset))
 		m_pComboBox->resetCurrentPreset();
 
 	stabilizePreset();
@@ -275,10 +273,14 @@ void drumkv1widget_preset::openPreset (void)
 				emit loadPresetFile(sPresetFile);
 				pConfig->sPreset = sPreset;
 				pConfig->sPresetDir = fi.absolutePath();
-				setPreset(sPreset);
 			}
 		}
-		loadPresets();
+	}
+
+	if (iPreset > 0) {
+		m_pPresetsView->loadPresets(&(pConfig->presets));
+		setPreset(pConfig->sPreset);
+		m_iDirtyPreset = 0;
 	}
 
 	stabilizePreset();
@@ -306,7 +308,7 @@ void drumkv1widget_preset::savePreset ( const QString& sPreset )
 	const QString& sPresetFile
 		= m_pPresetsView->savePresetFile(sPreset);
 
-	if (!sPresetFile.isEmpty()) {
+	if (sPresetFile.isEmpty()) {
 		emit savePresetFile(sPresetFile);
 		pConfig->setPresetFile(sPreset, sPresetFile);
 		drumkv1_presets::Preset *pPreset
@@ -316,8 +318,10 @@ void drumkv1widget_preset::savePreset ( const QString& sPreset )
 			++m_iInitPreset;
 			pConfig->sPreset = sPreset;
 			pConfig->sPresetDir = QFileInfo(sPresetFile).absolutePath();
+			m_pPresetsView->loadPresets(&(pConfig->presets));
+			setPreset(pConfig->sPreset);
+			m_iDirtyPreset = 0;
 		}
-		loadPresets();
 	}
 
 	stabilizePreset();
@@ -349,8 +353,9 @@ void drumkv1widget_preset::deletePreset (void)
 	pConfig->removePreset(sPreset);
 	pConfig->sPreset.clear();
 
+	m_pPresetsView->loadPresets(&(pConfig->presets));
 	clearPreset();
-	loadPresets();
+//	m_iDirtyPreet = 0;
 
 	stabilizePreset();
 }
@@ -361,7 +366,7 @@ void drumkv1widget_preset::resetPreset (void)
 	const QString& sPreset
 		= m_pComboBox->currentPreset();
 	const bool bLoadPreset
-		= (!sPreset.isEmpty() && presetItem(sPreset) != nullptr);
+		= (!sPreset.isEmpty() && m_pPresetsView->presetItem(sPreset) != nullptr);
 
 	if (bLoadPreset && !queryPreset())
 		return;
@@ -379,21 +384,24 @@ void drumkv1widget_preset::resetPreset (void)
 // Widget refreshner-loader.
 void drumkv1widget_preset::loadPresets (void)
 {
-	const bool bBlockSignals
-		= m_pComboBox->blockSignals(true);
-
-	const QString sOldPreset
-		= m_pComboBox->currentPreset();
-
 	drumkv1_config *pConfig = drumkv1_config::getInstance();
-	if (pConfig)
-		m_pPresetsView->loadPresets(&(pConfig->presets));
+	if (pConfig == nullptr)
+		return;
 
-	setPresetItem(sOldPreset);
+	m_pPresetsView->loadPresets(&(pConfig->presets));
 
-	m_iDirtyPreset = 0;
+	if (!pConfig->sPreset.isEmpty()) {
+		if (m_pPresetsView->presetItem(pConfig->sPreset) != nullptr) {
+			setPreset(pConfig->sPreset);
+			m_iDirtyPreset = 0;
+		} else {
+			pConfig->sPreset.clear();
+			clearPreset();
+			++m_iDirtyPreset;
+		}
+	}
 
-	m_pComboBox->blockSignals(bBlockSignals);
+	stabilizePreset();
 }
 
 
@@ -444,38 +452,12 @@ void drumkv1widget_preset::stabilizePreset (void)
 	const QString& sPreset = m_pComboBox->currentPreset();
 
 	const bool bEnabled = (!sPreset.isEmpty());
-	const bool bExists  = (presetItem(sPreset) != nullptr);
+	const bool bExists  = (m_pPresetsView->presetItem(sPreset) != nullptr);
 	const bool bDirty   = (m_iDirtyPreset > 0);
 
 	m_pSaveButton->setEnabled(bEnabled && (!bExists || bDirty));
 	m_pDeleteButton->setEnabled(bEnabled && bExists);
 	m_pResetButton->setEnabled(bDirty);
-}
-
-
-void drumkv1widget_preset::setPresetItem ( const QString& sPreset )
-{
-	m_pComboBox->setEditText(sPreset);
-
-	m_pPresetsView->setPresetItem(sPreset);
-}
-
-
-QTreeWidgetItem *drumkv1widget_preset::presetItem ( const QString& sPreset ) const
-{
-	return m_pPresetsView->presetItem(sPreset);
-}
-
-
-void drumkv1widget_preset::setBankItem ( const QString& sBank, int iPreset )
-{
-	m_pPresetsView->setBankItem(sBank, iPreset);
-}
-
-
-QTreeWidgetItem *drumkv1widget_preset::bankItem ( const QString& sBank ) const
-{
-	return m_pPresetsView->bankItem(sBank);
 }
 
 
