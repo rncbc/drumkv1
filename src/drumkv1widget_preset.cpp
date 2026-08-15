@@ -264,8 +264,10 @@ void drumkv1widget_preset::openPreset (void)
 		const QString& sPreset
 			= m_pPresetsView->presetRenum(fi.completeBaseName());
 		pConfig->setPresetFile(sPreset, sPresetFile);
+		const QString& sAfterPreset
+			= m_pComboBox->currentPreset();
 		drumkv1_presets::Preset *pPreset
-			= pConfig->presets.add_preset(sPreset);
+			= pConfig->presets.add_preset(sPreset, sAfterPreset);
 		if (pPreset) {
 			pPreset->set_file(sPresetFile);
 			if (++iPreset == 1) {
@@ -454,7 +456,8 @@ void drumkv1widget_preset::stabilizePreset (void)
 void drumkv1widget_preset::setPresetItem ( const QString& sPreset )
 {
 	m_pComboBox->setEditText(sPreset);
-	m_pComboBox->setCurrentPreset(sPreset);
+
+	m_pPresetsView->setPresetItem(sPreset);
 }
 
 
