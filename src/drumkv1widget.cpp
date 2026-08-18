@@ -498,11 +498,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 		SIGNAL(newPresetFile()),
 		SLOT(newPreset()));
 	QObject::connect(m_ui.Preset,
-		SIGNAL(loadPresetFile(const QString&)),
-		SLOT(loadPreset(const QString&)));
+		SIGNAL(loadPresetFile(const QString&, const QString&)),
+		SLOT(loadPreset(const QString&, const QString&)));
 	QObject::connect(m_ui.Preset,
-		SIGNAL(savePresetFile(const QString&)),
-		SLOT(savePreset(const QString&)));
+		SIGNAL(savePresetFile(const QString&, const QString&)),
+		SLOT(savePreset(const QString&, const QString&)));
 	QObject::connect(m_ui.Preset,
 		SIGNAL(resetPresetFile()),
 		SLOT(resetParams()));
@@ -1089,10 +1089,13 @@ void drumkv1widget::newPreset (void)
 
 
 // Preset file I/O slots.
-bool drumkv1widget::loadPreset ( const QString& sFilename )
+bool drumkv1widget::loadPreset (
+	const QString& sPreset, const QString& sPresetFile )
 {
 #ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget::loadPreset(\"%s\")", sFilename.toUtf8().constData());
+	qDebug("drumkv1widget::loadPreset(\"%s\", \"%s\")",
+		sPreset.toUtf8().constData(),
+		sPresetFile.toUtf8().constData());
 #endif
 
 //	clearElements();
@@ -1108,35 +1111,47 @@ bool drumkv1widget::loadPreset ( const QString& sFilename )
 
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
-		bLoad = pDrumkUi->loadPreset(sFilename);
+		bLoad = pDrumkUi->loadPreset(sPresetFile);
 
-	if (bLoad)
-		updateLoadPreset(QFileInfo(sFilename).completeBaseName());
-	else
+	if (bLoad) {
+		updateLoadPreset(sPreset);
+	} else {
 		updateDirtyPreset(true);
+		QMessageBox::warning(this, tr("Warning"),
+			tr("Could not load preset from file:\n\n"
+			"\"%1\"\n\nSorry.").arg(sPresetFile),
+			QMessageBox::Ok);
+	}
 
 	return bLoad;
 }
 
 
-bool drumkv1widget::savePreset ( const QString& sFilename )
+bool drumkv1widget::savePreset (
+	const QString& sPreset, const QString& sPresetFile )
 {
 #ifdef CONFIG_DEBUG
-	qDebug("drumkv1widget::savePreset(\"%s\")", sFilename.toUtf8().constData());
+	qDebug("drumkv1widget::savePreset(\"%s\", \"%s\")",
+		sPreset.toUtf8().constData(),
+		sPresetFile.toUtf8().constData());
 #endif
 
 	bool bSave = false;
 
 	drumkv1_ui *pDrumkUi = ui_instance();
 	if (pDrumkUi)
-		bSave = pDrumkUi->savePreset(sFilename);
+		bSave = pDrumkUi->savePreset(sPresetFile);
 
 	if (bSave) {
-		const QString& sPreset
-			= QFileInfo(sFilename).completeBaseName();
 		m_ui.StatusBar->showMessage(tr("Save preset: %1").arg(sPreset), 5000);
+		updateDirtyPreset(false);
+	} else {
+		updateDirtyPreset(true);
+		QMessageBox::warning(this, tr("Warning"),
+			tr("Could not save preset to file:\n\n"
+			"\"%1\"\n\nSorry.").arg(sPresetFile),
+			QMessageBox::Ok);
 	}
-	updateDirtyPreset(!bSave);
 
 	return bSave;
 }

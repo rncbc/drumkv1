@@ -1202,7 +1202,7 @@ void drumkv1widget_config::loadPreset ( const QString& sPreset )
 
 	drumkv1widget *pParentWidget
 		= qobject_cast<drumkv1widget *> (parentWidget());
-	if (pParentWidget && pParentWidget->loadPreset(sPresetFile)) {
+	if (pParentWidget && pParentWidget->loadPreset(sPreset, sPresetFile)) {
 		if (++m_iLoadPreset == 1)
 			m_sSavePreset = pConfig->sPreset;
 		pConfig->sPreset = sPreset;
