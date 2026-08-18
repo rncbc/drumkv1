@@ -23,7 +23,7 @@
 
 #include "drumkv1_presets.h"
 
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QLineEdit>
 
@@ -49,7 +49,7 @@
 //----------------------------------------------------------------------------
 // drumkv1widget_presets::ItemDelegate -- Custom (tree) list item delegate.
 
-class drumkv1widget_presets::ItemDelegate : public QItemDelegate
+class drumkv1widget_presets::ItemDelegate : public QStyledItemDelegate
 {
 public:
 	// ctor.
@@ -83,7 +83,7 @@ public:
 
 // ctor.
 drumkv1widget_presets::ItemDelegate::ItemDelegate (
-	QObject *pParent ) : QItemDelegate(pParent)
+	QObject *pParent ) : QStyledItemDelegate(pParent)
 {
 }
 
@@ -100,20 +100,21 @@ void drumkv1widget_presets::ItemDelegate::paint ( QPainter *pPainter,
 	if (pWidget && !pWidget->rootIsDecorated()) {
 		QTreeWidgetItem *pItem = pWidget->itemFromIndex(index);
 		if (pItem && pWidget->isBankItem(pItem)) {
+			opt.state |= QStyle::State_Enabled;
 			opt.font.setWeight(QFont::Bold);
 		} else {
 			opt.decorationAlignment = Qt::AlignRight|Qt::AlignVCenter;
 		}
 	}
 
-	QItemDelegate::paint(pPainter, opt, index);
+	QStyledItemDelegate::paint(pPainter, opt, index);
 }
 
 
 QSize drumkv1widget_presets::ItemDelegate::sizeHint (
 	const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
-	return QItemDelegate::sizeHint(option, index) + QSize(4, 4);
+	return QStyledItemDelegate::sizeHint(option, index) + QSize(4, 4);
 }
 
 
