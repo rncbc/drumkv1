@@ -129,12 +129,21 @@ protected:
 	static QString presetsBanksGroup();
 	static QString presetsBankListKey();
 
+	// Absolute/relative path functors.
+	struct MapPath
+	{
+		virtual QString operator()(const QString& sPath) const
+			{ return sPath; }
+	};
+
 	static void loadPresets(
 		QSettings *pSettings,
-		drumkv1_presets *pPresets);
+		drumkv1_presets *pPresets,
+		const MapPath& mapPath = MapPath());
 	static void savePresets(
 		QSettings *pSettings,
-		drumkv1_presets *pPresets);
+		drumkv1_presets *pPresets,
+		const MapPath& mapPath = MapPath());
 
 	// Banks programs group path.
 	static QString programsGroup();

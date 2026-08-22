@@ -25,6 +25,7 @@
 #include "drumkv1_controls.h"
 
 #include <QFileInfo>
+#include <QDir>
 
 
 //-------------------------------------------------------------------------
@@ -106,12 +107,23 @@ void drumkv1_config::importPresets (
 {
 	QSettings settings(sFilename, QSettings::IniFormat);
 
-	loadPresets(&settings, pPresets);
+	struct AbsPath : MapPath
+	{
+		AbsPath(const QString& sFilename)
+			: dir(QFileInfo(sFilename).absolutePath()) {}
+
+		QString operator()(const QString& sPath) const override
+			{ return dir.absoluteFilePath(sPath); }
+
+		QDir dir;
+	};
+
+	loadPresets(&settings, pPresets, AbsPath(sFilename));
 }
 
 
-void drumkv1_config::loadPresets (
-	QSettings *pSettings, drumkv1_presets *pPresets )
+void drumkv1_config::loadPresets ( QSettings *pSettings,
+	drumkv1_presets *pPresets,	const MapPath& mapPath )
 {
 	QStringList bank_list;
 	pSettings->beginGroup(presetsBankListKey());
@@ -154,7 +166,7 @@ void drumkv1_config::loadPresets (
 		if (pPreset == nullptr)
 			pPreset = pPresets->add_preset(sPreset);
 		const QString& sPresetFile
-			= pSettings->value(sPreset).toString();
+			= mapPath(pSettings->value(sPreset).toString());
 		if (!sPresetFile.isEmpty()
 			&& QFileInfo::exists(sPresetFile)) {
 			pPreset->set_file(sPresetFile);
@@ -199,12 +211,23 @@ void drumkv1_config::exportPresets (
 {
 	QSettings settings(sFilename, QSettings::IniFormat);
 
-	savePresets(&settings, pPresets);
+	struct RelPath : MapPath
+	{
+		RelPath(const QString& sFilename)
+			: dir(QFileInfo(sFilename).absolutePath()) {}
+
+		QString operator()(const QString& sPath) const override
+			{ return dir.relativeFilePath(sPath); }
+
+		QDir dir;
+	};
+
+	savePresets(&settings, pPresets, RelPath(sFilename));
 }
 
 
 void drumkv1_config::savePresets (
-	QSettings *pSettings, drumkv1_presets *pPresets )
+	QSettings *pSettings, drumkv1_presets *pPresets, const MapPath& mapPath )
 {
 	const QStringList& bank_list = pPresets->bank_list();
 	pSettings->beginGroup(presetsBankListKey());
@@ -254,7 +277,7 @@ void drumkv1_config::savePresets (
 	for ( ; presets_iter != presets_end; ++presets_iter) {
 		const QString& sPreset = presets_iter.key();
 		drumkv1_presets::Preset *pPreset = presets_iter.value();
-		const QString& sPresetFile = pPreset->file();
+		const QString& sPresetFile = mapPath(pPreset->file());
 		if (!sPresetFile.isEmpty()
 			&& QFileInfo::exists(sPresetFile)) {
 			pSettings->setValue(sPreset, sPresetFile);
