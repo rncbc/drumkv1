@@ -278,8 +278,7 @@ void drumkv1_config::savePresets (
 		const QString& sPreset = presets_iter.key();
 		drumkv1_presets::Preset *pPreset = presets_iter.value();
 		const QString& sPresetFile = mapPath(pPreset->file());
-		if (!sPresetFile.isEmpty()
-			&& QFileInfo::exists(sPresetFile)) {
+		if (!sPresetFile.isEmpty()) {
 			pSettings->setValue(sPreset, sPresetFile);
 		} else {
 			pPresets->remove_preset(sPreset);
