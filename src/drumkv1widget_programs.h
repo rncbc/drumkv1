@@ -27,6 +27,7 @@
 
 // forward decls.
 class drumkv1_programs;
+class drumkv1_presets;
 
 
 //----------------------------------------------------------------------------
@@ -54,6 +55,8 @@ public slots:
 	// slots.
 	void addBankItem();
 	void addProgramItem();
+
+	void addPresetItems(drumkv1_presets *pPresets);
 
 protected slots:
 
