@@ -1,7 +1,7 @@
 // drumkv1_lv2.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2025, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2026, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -23,12 +23,8 @@
 #include "drumkv1_config.h"
 
 #include "drumkv1_sched.h"
-#include "drumkv1_sample.h"
 #include "drumkv1_param.h"
-
-#include "drumkv1_programs.h"
-#include "drumkv1_controls.h"
-
+#include "drumkv1_sample.h"
 
 #ifdef CONFIG_LV2_OLD_HEADERS
 #include "lv2/lv2plug.in/ns/ext/midi/midi.h"
@@ -757,6 +753,9 @@ static const LV2_State_Interface drumkv1_lv2_state_interface =
 const LV2_Program_Descriptor *drumkv1_lv2::get_program ( uint32_t index )
 {
 	drumkv1_programs *pPrograms = drumkv1::programs();
+	if (!pPrograms->enabled())
+		return nullptr;
+
 	const drumkv1_programs::Banks& banks = pPrograms->banks();
 	drumkv1_programs::Banks::ConstIterator bank_iter = banks.constBegin();
 	const drumkv1_programs::Banks::ConstIterator& bank_end = banks.constEnd();
