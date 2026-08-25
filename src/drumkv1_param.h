@@ -51,9 +51,13 @@ namespace drumkv1_param
 
 	// Preset serialization methods.
 	bool loadPreset(drumkv1 *pDrumk,
-		const QString& sFilename);
-	bool savePreset(drumkv1 *pDrumk,
-		const QString& sFilename,
+		const QString& sPresetFile);
+	bool loadPresetEx(drumkv1 *pDrumk,
+		const QString& sPresetFile);
+	bool loadPresetName(drumkv1 *pDrumk,
+		const QString& sPreset);
+ 	bool savePreset(drumkv1 *pDrumk,
+		const QString& sPresetFile,
 		bool bSymLink = false);
 
 	// Element serialization methods.

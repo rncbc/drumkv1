@@ -181,7 +181,7 @@ void drumkv1_programs::process_program (
 	m_prog = (m_bank ? m_bank->find_prog(prog_id) : nullptr);
 
 	if (m_prog) {
-		drumkv1_param::loadPreset(pDrumk, m_prog->name());
+		drumkv1_param::loadPresetName(pDrumk, m_prog->name());
 		pDrumk->updateSample();
 		pDrumk->updateParams();
 	}

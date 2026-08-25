@@ -67,8 +67,8 @@ public:
 
 	bool newPreset();
 
-	bool loadPreset(const QString& sFilename);
-	bool savePreset(const QString& sFilename);
+	bool loadPreset(const QString& sPresetFile);
+	bool savePreset(const QString& sPresetFile);
 
 	void setParamValue(drumkv1::ParamIndex index, float fValue);
 	float paramValue(drumkv1::ParamIndex index) const;

@@ -370,8 +370,8 @@ bool drumkv1_param::newPreset ( drumkv1 *pDrumk )
 	if (pDrumk == nullptr)
 		return false;
 
-	const bool running = pDrumk->running(false);
-
+	const bool bRunning
+		= pDrumk->running(false);
 	drumkv1_sched::sync_reset();
 
 	pDrumk->stabilize();
@@ -380,8 +380,7 @@ bool drumkv1_param::newPreset ( drumkv1 *pDrumk )
 	pDrumk->clearElements();
 
 	drumkv1_sched::sync_pending();
-
-	pDrumk->running(running);
+	pDrumk->running(bRunning);
 
 	return true;
 }
@@ -389,32 +388,31 @@ bool drumkv1_param::newPreset ( drumkv1 *pDrumk )
 
 // Preset serialization methods.
 bool drumkv1_param::loadPreset (
-	drumkv1 *pDrumk, const QString& sFilename )
+	drumkv1 *pDrumk, const QString& sPresetFile )
+{
+	const bool bRunning
+		= pDrumk->running(false);
+	drumkv1_sched::sync_reset();
+
+	const bool bLoaded
+		= loadPresetEx(pDrumk, sPresetFile);
+
+	drumkv1_sched::sync_pending();
+	pDrumk->running(bRunning);
+
+	return bLoaded;
+}
+
+
+bool drumkv1_param::loadPresetEx (
+	drumkv1 *pDrumk, const QString& sPresetFile )
 {
 	if (pDrumk == nullptr)
 		return false;
 
-	QFileInfo fi(sFilename);
-	if (!fi.exists()) {
-		drumkv1_config *pConfig = drumkv1_config::getInstance();
-		if (pConfig) {
-			const QString& sPresetFile
-				= pConfig->presetFile(sFilename);
-			if (sPresetFile.isEmpty())
-				return false;
-			fi.setFile(sPresetFile);
-			if (!fi.exists())
-				return false;
-		}
-	}
-
-	QFile file(fi.filePath());
+	QFile file(sPresetFile);
 	if (!file.open(QIODevice::ReadOnly))
 		return false;
-
-	const bool running = pDrumk->running(false);
-
-	drumkv1_sched::sync_reset();
 
 	pDrumk->setTuningEnabled(false);
 	pDrumk->reset();
@@ -432,6 +430,7 @@ bool drumkv1_param::loadPreset (
 		}
 	}
 
+	const QFileInfo fi(sPresetFile);
 	const QDir currentDir(QDir::current());
 	QDir::setCurrent(fi.absolutePath());
 
@@ -494,25 +493,51 @@ bool drumkv1_param::loadPreset (
 	if (iCurrentElement >= 0)
 		pDrumk->setCurrentElement(iCurrentElement);
 
-	drumkv1_sched::sync_pending();
-
-	pDrumk->running(running);
-
 	QDir::setCurrent(currentDir.absolutePath());
 
 	return true;
 }
 
 
+bool drumkv1_param::loadPresetName (
+	drumkv1 *pDrumk, const QString& sPreset )
+{
+	if (pDrumk == nullptr)
+		return false;
+
+	if (sPreset.isEmpty())
+		return false;
+
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
+	if (pConfig == nullptr)
+		return false;
+
+	const QString& sPresetFile
+		= pConfig->presetFile(sPreset);
+	if (sPresetFile.isEmpty())
+		return false;
+	if (!QFileInfo::exists(sPresetFile))
+		return false;
+
+	const bool bRunning
+		= pDrumk->running(false);
+	const bool bLoaded
+		= loadPresetEx(pDrumk, sPresetFile);
+	pDrumk->running(bRunning);
+
+	return bLoaded;
+}
+
+
 bool drumkv1_param::savePreset (
-	drumkv1 *pDrumk, const QString& sFilename, bool bSymLink )
+	drumkv1 *pDrumk, const QString& sPresetFile, bool bSymLink )
 {
 	if (pDrumk == nullptr)
 		return false;
 
 	pDrumk->stabilize();
 
-	const QFileInfo fi(sFilename);
+	const QFileInfo fi(sPresetFile);
 	const QDir currentDir(QDir::current());
 	QDir::setCurrent(fi.absolutePath());
 

@@ -140,14 +140,14 @@ bool drumkv1_ui::newPreset (void)
 }
 
 
-bool drumkv1_ui::loadPreset ( const QString& sFilename )
+bool drumkv1_ui::loadPreset ( const QString& sPresetFile )
 {
-	return drumkv1_param::loadPreset(m_pDrumk, sFilename);
+	return drumkv1_param::loadPreset(m_pDrumk, sPresetFile);
 }
 
-bool drumkv1_ui::savePreset ( const QString& sFilename )
+bool drumkv1_ui::savePreset ( const QString& sPresetFile )
 {
-	return drumkv1_param::savePreset(m_pDrumk, sFilename);
+	return drumkv1_param::savePreset(m_pDrumk, sPresetFile);
 }
 
 
