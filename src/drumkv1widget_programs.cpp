@@ -27,7 +27,7 @@
 
 #include "drumkv1widget_presets.h"
 
-#include <QItemDelegate>
+#include <QStyledItemDelegate>
 #include <QHeaderView>
 #include <QSpinBox>
 #include <QLineEdit>
@@ -36,18 +36,23 @@
 //----------------------------------------------------------------------------
 // drumkv1widget_programs::ItemDelegate -- Custom (tree) list item delegate.
 
-class drumkv1widget_programs::ItemDelegate : public QItemDelegate
+class drumkv1widget_programs::ItemDelegate : public QStyledItemDelegate
 {
 public:
 
 	// ctor.
 	ItemDelegate(QObject *pParent = nullptr);
 
-	// QItemDelegate interface...
+	// painting
+	void paint(QPainter *painter,
+		const QStyleOptionViewItem &option,
+		const QModelIndex &index) const;
+
 	QSize sizeHint(
 		const QStyleOptionViewItem& option,
 		const QModelIndex& index) const;
 
+	// editing
 	QWidget *createEditor(QWidget *pParent,
 		const QStyleOptionViewItem& option,
 		const QModelIndex& index) const;
@@ -66,19 +71,44 @@ public:
 
 // ctor.
 drumkv1widget_programs::ItemDelegate::ItemDelegate ( QObject *pParent )
-	: QItemDelegate(pParent)
+	: QStyledItemDelegate(pParent)
 {
 }
 
+// painting
+//
+void drumkv1widget_programs::ItemDelegate::paint ( QPainter *pPainter,
+	const QStyleOptionViewItem& option, const QModelIndex& index ) const
+{
+	QStyleOptionViewItem opt = option;
 
-// QItemDelegate interface...
+	drumkv1widget_programs *pWidget
+		= qobject_cast<drumkv1widget_programs *>(parent());
+	if (pWidget) {
+		QTreeWidgetItem *pItem = pWidget->itemFromIndex(index);
+		if (pItem && pItem->parent() == nullptr) {
+			if (index.column() == 1)
+				opt.font.setWeight(QFont::Bold);
+			if (pWidget->currentItem() == pItem) {
+				opt.palette.setColor(QPalette::Text,
+					opt.palette.color(QPalette::HighlightedText));
+			}
+		}
+	}
+
+	QStyledItemDelegate::paint(pPainter, opt, index);
+}
+
+
 QSize drumkv1widget_programs::ItemDelegate::sizeHint (
 	const QStyleOptionViewItem& option, const QModelIndex& index ) const
 {
-	return QItemDelegate::sizeHint(option, index) + QSize(4, 4);
+	return QStyledItemDelegate::sizeHint(option, index) + QSize(4, 4);
 }
 
 
+// editing
+//
 QWidget *drumkv1widget_programs::ItemDelegate::createEditor ( QWidget *pParent,
 	const QStyleOptionViewItem& /*option*/, const QModelIndex& index ) const
 {

@@ -544,9 +544,15 @@ void drumkv1widget_config::presetsImportItems (void)
 	if (sFilename.isEmpty())
 		return;
 
+	const QString& sPreset
+		= m_ui.PresetsTreeWidget->currentPreset();
+
 	drumkv1_presets presets;
+	m_ui.PresetsTreeWidget->savePresets(&presets);
 	drumkv1_config::importPresets(sFilename, &presets);
 	m_ui.PresetsTreeWidget->loadPresets(&presets);
+
+	m_ui.PresetsTreeWidget->setPresetItem(sPreset);
 
 	stabilize();
 }
