@@ -26,11 +26,6 @@
 
 #include "drumkv1_presets.h"
 
-
-//-------------------------------------------------------------------------
-// drumkv1_config - Prototype settings class (singleton).
-//
-
 #include <QSettings>
 #include <QStringList>
 
@@ -38,6 +33,12 @@
 class drumkv1_programs;
 class drumkv1_controls;
 
+class QDir;
+
+
+//-------------------------------------------------------------------------
+// drumkv1_config - Prototype settings class (singleton).
+//
 
 class drumkv1_config : public QSettings
 {
@@ -136,6 +137,13 @@ protected:
 		QSettings *pSettings,
 		drumkv1_presets *pPresets,
 		const MapPath& mapPath = MapPath());
+
+	static int loadPresetsConf(
+		QSettings *pSettings,
+		drumkv1_presets *pPresets);
+	static int loadPresetsConfDir(
+		drumkv1_presets *pPresets,
+		const QDir& dir, QStringList& confs);
 
 	void clearPrograms();
 	void clearControls();
