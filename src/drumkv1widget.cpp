@@ -490,6 +490,9 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 
 	// Sample management...
 	QObject::connect(m_ui.Gen1Sample,
+		SIGNAL(openSampleFile()),
+		SLOT(openSample()));
+	QObject::connect(m_ui.Gen1Sample,
 		SIGNAL(loadSampleFile(const QString&)),
 		SLOT(loadSample(const QString&)));
 
@@ -1229,10 +1232,8 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 	if (iCurrentNote < 0)
 		return;
 
-	if (pDrumkUi->element(iCurrentNote) == nullptr) {
-		pDrumkUi->addElement(iCurrentNote);
-		pDrumkUi->setCurrentElement(iCurrentNote);
-	}
+	if (pDrumkUi->element(iCurrentNote) == nullptr)
+		return;
 
 	pDrumkUi->setSampleFile(sFilename.toUtf8().constData());
 	updateSample(pDrumkUi->sample(), true);
@@ -1457,7 +1458,7 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 // Element sample requester.
 void drumkv1widget::doubleClickElement (void)
 {
-	activateElement(true);
+	openSample();
 }
 
 
