@@ -46,6 +46,7 @@ public:
 	void removeElement(int key);
 
 	void setCurrentElement(int key);
+	void setCurrentElementEx(int key);
 	int currentElement() const;
 
 	void clearElements();

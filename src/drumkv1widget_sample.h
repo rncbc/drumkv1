@@ -69,9 +69,6 @@ public:
 
 signals:
 
-	// Open new sample file.
-	void openSampleFile();
-
 	// Load new sample file.
 	void loadSampleFile(const QString&);
 

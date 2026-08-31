@@ -236,7 +236,7 @@ private:
 
 
 //-------------------------------------------------------------------------
-// drumkv1_sample_ref - PADsynth wave table (sample reference lists).
+// drumkv1_sample_ref - wave table sample reference lists.
 //
 #include "drumkv1_list.h"
 

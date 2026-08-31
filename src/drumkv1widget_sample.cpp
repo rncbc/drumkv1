@@ -426,7 +426,7 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 
 void drumkv1widget_sample::mouseDoubleClickEvent ( QMouseEvent */*pMouseEvent*/ )
 {
-	emit openSampleFile();
+	openSample(m_sName);
 }
 
 

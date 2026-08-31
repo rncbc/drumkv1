@@ -123,7 +123,7 @@ protected slots:
 	void clearElements();
 
 	// Element activation.
-	void activateElement(bool bOpenSample = false);
+	void activateElement();
 
 	// Element sample requester.
 	void doubleClickElement();

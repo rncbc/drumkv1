@@ -490,9 +490,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 
 	// Sample management...
 	QObject::connect(m_ui.Gen1Sample,
-		SIGNAL(openSampleFile()),
-		SLOT(openSample()));
-	QObject::connect(m_ui.Gen1Sample,
 		SIGNAL(loadSampleFile(const QString&)),
 		SLOT(loadSample(const QString&)));
 
@@ -1186,8 +1183,7 @@ void drumkv1widget::loadSample ( const QString& sFilename )
 // Sample openner.
 void drumkv1widget::openSample (void)
 {
-//	m_ui.Gen1Sample->openSample(currentNoteName());
-	activateElement(true);
+	m_ui.Gen1Sample->openSample(currentNoteName());
 }
 
 
@@ -1232,8 +1228,10 @@ void drumkv1widget::loadSampleFile ( const QString& sFilename )
 	if (iCurrentNote < 0)
 		return;
 
-	if (pDrumkUi->element(iCurrentNote) == nullptr)
-		return;
+	if (pDrumkUi->element(iCurrentNote) == nullptr) {
+		pDrumkUi->addElement(iCurrentNote);
+		pDrumkUi->setCurrentElementEx(iCurrentNote);
+	}
 
 	pDrumkUi->setSampleFile(sFilename.toUtf8().constData());
 	updateSample(pDrumkUi->sample(), true);
@@ -1420,7 +1418,7 @@ void drumkv1widget::clearElements (void)
 
 
 // Element activation.
-void drumkv1widget::activateElement ( bool bOpenSample )
+void drumkv1widget::activateElement (void)
 {
 	const int iCurrentNote = currentNote();
 	m_ui.StatusBar->keybd()->setNoteKey(iCurrentNote);
@@ -1432,26 +1430,8 @@ void drumkv1widget::activateElement ( bool bOpenSample )
 #endif
 
 	drumkv1_ui *pDrumkUi = ui_instance();
-	if (pDrumkUi == nullptr)
-		return;
-
-	drumkv1_element *element = pDrumkUi->element(iCurrentNote);
-	if (element == nullptr && bOpenSample) {
-		element = pDrumkUi->addElement(iCurrentNote);
-		for (uint32_t i = 0; i < drumkv1::NUM_ELEMENT_PARAMS; ++i) {
-			const drumkv1::ParamIndex index = drumkv1::ParamIndex(i);
-			if (index == drumkv1::GEN1_SAMPLE)
-				continue;
-			const float fValue = drumkv1_param::paramDefaultValue(index);
-			element->setParamValue(index, fValue, 0);
-			element->setParamValue(index, fValue);
-		}
-	}
-
-	pDrumkUi->setCurrentElement(iCurrentNote);
-
-	if (bOpenSample)
-		m_ui.Gen1Sample->openSample(completeNoteName(iCurrentNote));
+	if (pDrumkUi)
+		pDrumkUi->setCurrentElement(iCurrentNote);
 }
 
 
