@@ -27,3 +27,14 @@ Description: An old-school drum-kit sampler - LV2 plugin
   An old-school all-digital drum-kit sampler synthesizer with stereo fx.
   .
   This package provides the LV2 plugin (http://drumkv1.sourceforge.net/lv2)
+
+Package: drumkv1-preset
+Architecture: all
+Depends: drumkv1-jack | drumkv1-lv2
+Description: An old-school polyphonic subtractive synthesizer - LV2 plugin
+  An old-school all-digital 4-oscillator subtractive polyphonic synthesizer
+  with stereo fx.
+  .
+  This package provides the factory/community presets from
+    https://github.com//rncbc/drumkv1-preset
+  
