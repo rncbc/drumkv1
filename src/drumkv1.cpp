@@ -1,7 +1,7 @@
 ﻿// drumkv1.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2025, rncbc aka Rui Nuno Capela. All rights reserved.
+   Copyright (C) 2012-2026, rncbc aka Rui Nuno Capela. All rights reserved.
 
    This program is free software; you can redistribute it and/or
    modify it under the terms of the GNU General Public License
@@ -838,7 +838,7 @@ public:
 
 	drumkv1_ramp1  wid1;
 	drumkv1_bal2   pan1;
-	drumkv1_ramp3  vol1;
+	drumkv1_ramp2  vol1;
 
 	float params[3][drumkv1::NUM_ELEMENT_PARAMS];
 
@@ -1683,7 +1683,6 @@ void drumkv1_impl::setParamPort ( drumkv1::ParamIndex index, float *pfParam )
 		case drumkv1::OUT1_VOLUME:
 			m_elem->vol1.reset(
 				m_elem->out1.volume.value_ptr(),
-				m_elem->dca1.volume.value_ptr(),
 				&m_ctl.volume);
 			break;
 		case drumkv1::OUT1_WIDTH:
@@ -2110,7 +2109,6 @@ void drumkv1_impl::resetElement ( drumkv1_elem *elem )
 {
 	elem->vol1.reset(
 		elem->out1.volume.value_ptr(),
-		elem->dca1.volume.value_ptr(),
 		&m_ctl.volume);
 	elem->pan1.reset(
 		elem->out1.panning.value_ptr(),
@@ -2368,6 +2366,7 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 			? m_ctl.modwheel + PITCH_SCALE * *elem->lfo1.pitch : 0.0f);
 
 		const bool dcf1_enabled = (*elem->dcf1.enabled > 0.0f);
+		const bool dca1_enabled = (*elem->dca1.enabled > 0.0f);
 
 		const float fxsend1	= *elem->out1.fxsend * *elem->out1.fxsend;
 
@@ -2455,12 +2454,15 @@ void drumkv1_impl::process ( float **ins, float **outs, uint32_t nframes )
 
 				// volumes
 
+				const float dca1 = (dca1_enabled
+					? elem->dca1.volume.value() * pv->dca1_env.tick()
+					: 1.0f);
+
 				const float wid1 = elem->wid1.value(j);
 				const float mid1 = 0.5f * (gen1 + gen2);
 				const float sid1 = 0.5f * (gen1 - gen2);
 				const float vol1 = vel1 * elem->vol1.value(j)
-					* pv->dca1_env.tick()
-					* pv->out1_vol.value(j);
+					* dca1 * pv->out1_vol.value(j);
 
 				// outputs
 
