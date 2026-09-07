@@ -232,12 +232,20 @@ void drumkv1_param::loadElements (
 			s_hash.insert(drumkv1_params[i].name, drumkv1::ParamIndex(i));
 	}
 
+	float ratio = 1.0f;
+
 	for (QDomNode nElement = eElements.firstChild();
 			!nElement.isNull();
 				nElement = nElement.nextSibling()) {
 		QDomElement eElement = nElement.toElement();
 		if (eElement.isNull())
 			continue;
+		if (eElement.tagName() == "sample-rate") {
+			const float srate = eElement.text().toFloat();
+			if (srate > 0.1f)
+				ratio = pDrumk->sampleRate() / srate;
+		}
+		else
 		if (eElement.tagName() == "element") {
 			const int note = eElement.attribute("index").toInt();
 			drumkv1_element *element = pDrumk->addElement(note);
@@ -265,7 +273,9 @@ void drumkv1_param::loadElements (
 						= mapPath.absolutePath(
 							drumkv1_param::loadFilename(sSampleFile)).toUtf8();
 					element->setSampleFile(aSampleFile.constData());
-					element->setOffsetRange(iOffsetStart, iOffsetEnd);
+					element->setOffsetRange(
+						::lrintf(ratio * float(iOffsetStart)),
+						::lrintf(ratio * float(iOffsetEnd)));
 				}
 				else
 				if (eChild.tagName() == "params") {
@@ -323,6 +333,13 @@ void drumkv1_param::saveElements (
 {
 	if (pDrumk == nullptr)
 		return;
+
+	const float srate = pDrumk->sampleRate();
+	if (srate > 0.0f) {
+		QDomElement eSampleRate = doc.createElement("sample-rate");
+		eSampleRate.appendChild(doc.createTextNode(QString::number(srate)));
+		eElements.appendChild(eSampleRate);
+	}
 
 	for (int note = 0; note < 128; ++note) {
 		drumkv1_element *element = pDrumk->element(note);
