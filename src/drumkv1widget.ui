@@ -135,205 +135,217 @@
        <string>Drum Kit</string>
       </property>
       <layout class="QGridLayout">
-       <item row="0" column="0" colspan="4">
-        <widget class="drumkv1widget_elements" name="Elements">
+       <item row="0" column="0" colspan="13">
+        <widget class="QSplitter" name="Gen1Splitter">
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="handleWidth">
+          <number>4</number>
+         </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
            <horstretch>0</horstretch>
            <verstretch>0</verstretch>
           </sizepolicy>
          </property>
-        </widget>
-       </item>
-       <item row="0" column="4" colspan="9">
-        <widget class="QGroupBox" name="Gen1GroupBox">
-         <property name="title">
-          <string>GEN</string>
-         </property>
-         <property name="sizePolicy">
-          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-           <horstretch>1</horstretch>
-           <verstretch>0</verstretch>
-          </sizepolicy>
-         </property>
-         <layout class="QGridLayout">
-          <item row="0" column="0" rowspan="2">
-           <widget class="drumkv1widget_sample" name="Gen1Sample">
-            <property name="sizePolicy">
-             <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
-              <horstretch>0</horstretch>
-              <verstretch>0</verstretch>
-             </sizepolicy>
-            </property>
-            <property name="toolTip">
-             <string>GEN Sample</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="1">
-           <layout class="QGridLayout">
-            <property name="margin">
-             <number>4</number>
-            </property>
-            <property name="spacing">
-             <number>2</number>
-            </property>
-            <item row="0" column="0">
-             <widget class="drumkv1widget_check" name="Gen1OffsetKnob">
-              <property name="toolTip">
-               <string>GEN Offset</string>
-              </property>
-              <property name="text">
-               <string>Offset</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignLeft|Qt::AlignBottom</set>
-              </property>
-             </widget>
-            </item>
-            <item row="0" column="1">
-             <widget class="QLabel" name="Gen1OffsetRangeLabel">
-              <property name="text">
-               <string>Start / End </string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignBottom</set>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0" colspan="2">
-             <widget class="drumkv1widget_spinbox" name="Gen1OffsetStartSpinBox">
-              <property name="minimumSize">
-               <size>
-                <width>110</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignVCenter</set>
-              </property>
-              <property name="toolTip">
-               <string>GEN Offset Start</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="0" colspan="2">
-             <widget class="drumkv1widget_spinbox" name="Gen1OffsetEndSpinBox">
-              <property name="minimumSize">
-               <size>
-                <width>110</width>
-                <height>16</height>
-               </size>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight|Qt::AlignVCenter</set>
-              </property>
-              <property name="toolTip">
-               <string>GEN Offset End</string>
-              </property>
-             </widget>
-            </item>
-            <item row="3" column="0" colspan="2">
-             <widget class="drumkv1widget_check" name="Gen1ReverseKnob">
-              <property name="toolTip">
-               <string>GEN Reverse</string>
-              </property>
-              <property name="text">
-               <string>Reverse</string>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-          <item row="0" column="2">
-           <widget class="drumkv1widget_spin" name="Gen1GroupKnob">
-            <property name="toolTip">
-             <string>GEN Group</string>
-            </property>
-            <property name="text">
-             <string>Group</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3">
-           <spacer>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint">
-             <size>
-              <width>8</width>
-              <height>8</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="0" column="4">
-           <widget class="drumkv1widget_spin" name="Gen1CoarseKnob">
-            <property name="toolTip">
-             <string>GEN Coarse</string>
-            </property>
-            <property name="text">
-             <string>Coarse</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="5">
-           <widget class="drumkv1widget_spin" name="Gen1FineKnob">
-            <property name="toolTip">
-             <string>GEN Fine</string>
-            </property>
-            <property name="text">
-             <string>Fine</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="6">
-           <spacer>
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint">
-             <size>
-              <width>8</width>
-              <height>8</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-          <item row="0" column="7">
-           <widget class="drumkv1widget_spin" name="Gen1EnvTimeKnob">
-            <property name="toolTip">
-             <string>GEN Env.Time</string>
-            </property>
-            <property name="text">
-             <string>Env.Time</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0" colspan="7">
-           <spacer>
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::MinimumExpanding</enum>
-            </property>
-            <property name="sizeHint">
-             <size>
-              <width>20</width>
-              <height>0</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-         </layout>
+         <widget class="drumkv1widget_elements" name="Elements">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+         </widget>
+         <widget class="QGroupBox" name="Gen1GroupBox">
+          <property name="title">
+           <string>GEN</string>
+          </property>
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+            <horstretch>1</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <layout class="QGridLayout">
+           <item row="0" column="0" rowspan="2">
+            <widget class="drumkv1widget_sample" name="Gen1Sample">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>GEN Sample</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <layout class="QGridLayout">
+             <property name="margin">
+              <number>4</number>
+             </property>
+             <property name="spacing">
+              <number>2</number>
+             </property>
+             <item row="0" column="0">
+              <widget class="drumkv1widget_check" name="Gen1OffsetKnob">
+               <property name="toolTip">
+                <string>GEN Offset</string>
+               </property>
+               <property name="text">
+                <string>Offset</string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignLeft|Qt::AlignBottom</set>
+               </property>
+              </widget>
+             </item>
+             <item row="0" column="1">
+              <widget class="QLabel" name="Gen1OffsetRangeLabel">
+               <property name="text">
+                <string>Start / End </string>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignBottom</set>
+               </property>
+              </widget>
+             </item>
+             <item row="1" column="0" colspan="2">
+              <widget class="drumkv1widget_spinbox" name="Gen1OffsetStartSpinBox">
+               <property name="minimumSize">
+                <size>
+                 <width>110</width>
+                 <height>16</height>
+                </size>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignVCenter</set>
+               </property>
+               <property name="toolTip">
+                <string>GEN Offset Start</string>
+               </property>
+              </widget>
+             </item>
+             <item row="2" column="0" colspan="2">
+              <widget class="drumkv1widget_spinbox" name="Gen1OffsetEndSpinBox">
+               <property name="minimumSize">
+                <size>
+                 <width>110</width>
+                 <height>16</height>
+                </size>
+               </property>
+               <property name="alignment">
+                <set>Qt::AlignRight|Qt::AlignVCenter</set>
+               </property>
+               <property name="toolTip">
+                <string>GEN Offset End</string>
+               </property>
+              </widget>
+             </item>
+             <item row="3" column="0" colspan="2">
+              <widget class="drumkv1widget_check" name="Gen1ReverseKnob">
+               <property name="toolTip">
+                <string>GEN Reverse</string>
+               </property>
+               <property name="text">
+                <string>Reverse</string>
+               </property>
+              </widget>
+             </item>
+            </layout>
+           </item>
+           <item row="0" column="2">
+            <widget class="drumkv1widget_spin" name="Gen1GroupKnob">
+             <property name="toolTip">
+              <string>GEN Group</string>
+             </property>
+             <property name="text">
+              <string>Group</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="3">
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint">
+              <size>
+               <width>8</width>
+               <height>8</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="4">
+            <widget class="drumkv1widget_spin" name="Gen1CoarseKnob">
+             <property name="toolTip">
+              <string>GEN Coarse</string>
+             </property>
+             <property name="text">
+              <string>Coarse</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="5">
+            <widget class="drumkv1widget_spin" name="Gen1FineKnob">
+             <property name="toolTip">
+              <string>GEN Fine</string>
+             </property>
+             <property name="text">
+              <string>Fine</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="6">
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Horizontal</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::Fixed</enum>
+             </property>
+             <property name="sizeHint">
+              <size>
+               <width>8</width>
+               <height>8</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+           <item row="0" column="7">
+            <widget class="drumkv1widget_spin" name="Gen1EnvTimeKnob">
+             <property name="toolTip">
+              <string>GEN Env.Time</string>
+             </property>
+             <property name="text">
+              <string>Env.Time</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0" colspan="7">
+            <spacer>
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+             <property name="sizeType">
+              <enum>QSizePolicy::MinimumExpanding</enum>
+             </property>
+             <property name="sizeHint">
+              <size>
+               <width>20</width>
+               <height>0</height>
+              </size>
+             </property>
+            </spacer>
+           </item>
+          </layout>
+         </widget>
         </widget>
        </item>
        <item row="1" column="0" rowspan="2" colspan="5">
