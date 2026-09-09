@@ -141,7 +141,7 @@
           <enum>Qt::Horizontal</enum>
          </property>
          <property name="handleWidth">
-          <number>4</number>
+          <number>8</number>
          </property>
          <property name="sizePolicy">
           <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
