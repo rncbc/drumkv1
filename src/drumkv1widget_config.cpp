@@ -75,7 +75,11 @@ drumkv1widget_config::drumkv1widget_config (
 	m_ui.TuningTabBar->addTab(tr("&Global"));
 	m_ui.TuningTabBar->addTab(tr("&Instance"));
 
+	// Custom style theme.
+	m_pStyle = nullptr;
+
 	// Dialog dirty flags.
+	m_iDirtyCustom   = 0;
 	m_iDirtyTuning   = 0;
 	m_iDirtyControls = 0;
 	m_iDirtyPrograms = 0;
@@ -104,6 +108,15 @@ drumkv1widget_config::drumkv1widget_config (
 		m_ui.CustomStyleThemeComboBox->setEnabled(!bPlugin);
 		resetCustomColorThemes(pConfig->sCustomColorTheme);
 		resetCustomStyleThemes(pConfig->sCustomStyleTheme);
+		// Custom color theme is somewath special...
+		const QString& sCustomColorTheme = pConfig->sCustomColorTheme;
+		if (!pConfig->sCustomColorTheme.isEmpty()) {
+			QPalette pal;
+			if (drumkv1widget_palette::namedPalette(
+					pConfig, pConfig->sCustomColorTheme, pal)) {
+				m_ui.CustomPreviewFrame->setPalette(pal);
+			}
+		}
 		// Load presets database...
 		drumkv1_presets *pPresets = &(pConfig->presets);
 		m_bPresets = !pPresets->isEmpty();
@@ -261,6 +274,17 @@ drumkv1widget_config::drumkv1widget_config (
 		SIGNAL(activated(int)),
 		SLOT(tuningChanged()));
 
+	// Custom themes slots...
+	QObject::connect(m_ui.CustomColorThemeComboBox,
+		SIGNAL(activated(int)),
+		SLOT(customColorThemeChanged(int)));
+	QObject::connect(m_ui.CustomColorThemeToolButton,
+		SIGNAL(clicked()),
+		SLOT(editCustomColorThemes()));
+	QObject::connect(m_ui.CustomStyleThemeComboBox,
+		SIGNAL(activated(int)),
+		SLOT(customStyleThemeChanged(int)));
+
 	// Options slots...
 	QObject::connect(m_ui.PresetsPreviewCheckBox,
 		SIGNAL(toggled(bool)),
@@ -275,15 +299,6 @@ drumkv1widget_config::drumkv1widget_config (
 		SIGNAL(activated(int)),
 		SLOT(optionsChanged()));
 	QObject::connect(m_ui.KnobEditModeComboBox,
-		SIGNAL(activated(int)),
-		SLOT(optionsChanged()));
-	QObject::connect(m_ui.CustomColorThemeComboBox,
-		SIGNAL(activated(int)),
-		SLOT(optionsChanged()));
-	QObject::connect(m_ui.CustomColorThemeToolButton,
-		SIGNAL(clicked()),
-		SLOT(editCustomColorThemes()));
-	QObject::connect(m_ui.CustomStyleThemeComboBox,
 		SIGNAL(activated(int)),
 		SLOT(optionsChanged()));
 	QObject::connect(m_ui.FrameTimeFormatComboBox,
@@ -312,6 +327,8 @@ drumkv1widget_config::drumkv1widget_config (
 // dtor.
 drumkv1widget_config::~drumkv1widget_config (void)
 {
+	if (m_pStyle) delete m_pStyle;
+
 	delete p_ui;
 }
 
@@ -904,6 +921,14 @@ void drumkv1widget_config::tuningChanged (void)
 }
 
 
+void drumkv1widget_config::customChanged (void)
+{
+	++m_iDirtyCustom;
+
+	stabilize();
+}
+
+
 // options slot.
 void drumkv1widget_config::optionsChanged (void)
 {
@@ -956,7 +981,8 @@ void drumkv1widget_config::stabilize (void)
 	m_ui.TuningKeyMapFileToolButton->setEnabled(bEnabled);
 
 	const bool bValid
-		= (m_iDirtyTuning   > 0
+		= (m_iDirtyCustom   > 0
+		|| m_iDirtyTuning   > 0
 		|| m_iDirtyControls > 0
 		|| m_iDirtyPrograms > 0
 		|| m_iDirtyPresets  > 0
@@ -1049,22 +1075,9 @@ void drumkv1widget_config::accept (void)
 		}
 	}
 
-	if (m_iDirtyOptions > 0) {
-		// Save options...
-		pConfig->bPresetsPreview = m_ui.PresetsPreviewCheckBox->isChecked();
-		pConfig->bProgramsPreview = m_ui.ProgramsPreviewCheckBox->isChecked();
-		pConfig->bUseNativeDialogs = m_ui.UseNativeDialogsCheckBox->isChecked();
-		pConfig->bDontUseNativeDialogs = !pConfig->bUseNativeDialogs;
-		pConfig->fRandomizePercent = float(m_ui.RandomizePercentSpinBox->value());
-		const int iOldKnobDialMode = pConfig->iKnobDialMode;
-		const int iOldKnobEditMode = pConfig->iKnobEditMode;
-		const int iOldFrameTimeFormat = pConfig->iFrameTimeFormat;
-		const bool bOldUseGMDrumNames = pConfig->bUseGMDrumNames;
-		pConfig->iKnobDialMode = m_ui.KnobDialModeComboBox->currentIndex();
-		pConfig->iKnobEditMode = m_ui.KnobEditModeComboBox->currentIndex();
-		pConfig->iFrameTimeFormat = m_ui.FrameTimeFormatComboBox->currentIndex();
-		pConfig->bUseGMDrumNames = m_ui.UseGMDrumNamesCheckBox->isChecked();
-		int iNeedRestart = 0;
+	int iNeedRestart = 0;
+
+	if (m_iDirtyCustom > 0) {
 		if (!m_pDrumkUi->isPlugin()) {
 			const QString sOldCustomStyleTheme = pConfig->sCustomStyleTheme;
 			if (m_ui.CustomStyleThemeComboBox->currentIndex() > 0)
@@ -1095,22 +1108,39 @@ void drumkv1widget_config::accept (void)
 					pParentWidget->setPalette(pal);
 			}
 		}
-		if (pConfig->iKnobDialMode != iOldKnobDialMode ||
-			pConfig->iKnobEditMode != iOldKnobEditMode ||
-			pConfig->iFrameTimeFormat != iOldFrameTimeFormat ||
-			(!pConfig->bUseGMDrumNames &&  bOldUseGMDrumNames) ||
+		// Reset dirty flag.
+		m_iDirtyCustom = 0;
+	}
+
+	if (m_iDirtyOptions > 0) {
+		// Save options...
+		pConfig->bPresetsPreview = m_ui.PresetsPreviewCheckBox->isChecked();
+		pConfig->bProgramsPreview = m_ui.ProgramsPreviewCheckBox->isChecked();
+		pConfig->bUseNativeDialogs = m_ui.UseNativeDialogsCheckBox->isChecked();
+		pConfig->bDontUseNativeDialogs = !pConfig->bUseNativeDialogs;
+		pConfig->fRandomizePercent = float(m_ui.RandomizePercentSpinBox->value());
+		const int iOldKnobDialMode = pConfig->iKnobDialMode;
+		const int iOldKnobEditMode = pConfig->iKnobEditMode;
+		const int iOldFrameTimeFormat = pConfig->iFrameTimeFormat;
+		const bool bOldUseGMDrumNames = pConfig->bUseGMDrumNames;
+		pConfig->iKnobDialMode = m_ui.KnobDialModeComboBox->currentIndex();
+		pConfig->iKnobEditMode = m_ui.KnobEditModeComboBox->currentIndex();
+		pConfig->iFrameTimeFormat = m_ui.FrameTimeFormatComboBox->currentIndex();
+		pConfig->bUseGMDrumNames = m_ui.UseGMDrumNamesCheckBox->isChecked();
+		if ((!pConfig->bUseGMDrumNames &&  bOldUseGMDrumNames) ||
 			( pConfig->bUseGMDrumNames && !bOldUseGMDrumNames)) {
 			pParentWidget->updateConfig();
 		}
-		// Show restart message if needed...
- 		if (iNeedRestart > 0) {
-			QMessageBox::information(this,
-				tr("Information"),
-				tr("Some settings may be only effective\n"
-				"next time you start this application."));
-		}
 		// Reset dirty flag.
 		m_iDirtyOptions = 0;
+	}
+
+	// Show restart message if needed...
+	if (iNeedRestart > 0) {
+		QMessageBox::information(this,
+			tr("Information"),
+			tr("Some settings may be only effective\n"
+			"next time you start this application."));
 	}
 
 	// Just go with dialog acceptance.
@@ -1123,7 +1153,8 @@ void drumkv1widget_config::reject (void)
 	bool bReject = true;
 
 	// Check if there's any pending changes...
-	if (m_iDirtyTuning   > 0 ||
+	if (m_iDirtyCustom   > 0 ||
+		m_iDirtyTuning   > 0 ||
 		m_iDirtyControls > 0 ||
 		m_iDirtyPrograms > 0 ||
 		m_iDirtyPresets  > 0 ||
@@ -1184,8 +1215,60 @@ void drumkv1widget_config::editCustomColorThemes (void)
 
 	if (iDirtyCustomColorTheme > 0 || form.isDirty()) {
 		resetCustomColorThemes(sCustomColorTheme);
-		optionsChanged();
+		if (!sCustomColorTheme.isEmpty()) {
+			customColorThemeChanged(
+				m_ui.CustomColorThemeComboBox->findText(sCustomColorTheme));
+		}
 	}
+}
+
+
+void drumkv1widget_config::customColorThemeChanged ( int iCustomColorIndex )
+{
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
+	if (pConfig == nullptr)
+		return;
+
+	QString sCustomColorTheme;
+	if (iCustomColorIndex > 0)
+		sCustomColorTheme = m_ui.CustomColorThemeComboBox->currentText();
+	else
+		sCustomColorTheme = pConfig->sCustomColorTheme;
+	if (!sCustomColorTheme.isEmpty()) {
+		QPalette pal;
+		if (drumkv1widget_palette::namedPalette(
+				pConfig, sCustomColorTheme, pal)) {
+			m_ui.CustomPreviewFrame->setPalette(pal);
+		}
+	}
+
+	customChanged();
+}
+
+
+void drumkv1widget_config::customStyleThemeChanged ( int iCustomStyleIndex )
+{
+	drumkv1_config *pConfig = drumkv1_config::getInstance();
+	if (pConfig == nullptr)
+		return;
+
+	QString sCustomStyleTheme;
+	if (iCustomStyleIndex > 0)
+		sCustomStyleTheme = m_ui.CustomStyleThemeComboBox->currentText();
+	else
+		sCustomStyleTheme = pConfig->sCustomStyleTheme;
+	if (!sCustomStyleTheme.isEmpty()) {
+		if (m_pStyle)
+			delete m_pStyle;
+		m_pStyle = QStyleFactory::create(sCustomStyleTheme);
+		m_ui.CustomPreviewWidget->setStyle(m_pStyle);
+		const QList<QWidget *>& widgets
+			= m_ui.CustomPreviewWidget->findChildren<QWidget *>();
+		foreach (QWidget *widget, widgets)
+			widget->setStyle(m_pStyle);
+	}
+
+	customChanged();
 }
 
 
