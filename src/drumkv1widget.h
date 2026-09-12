@@ -162,6 +162,9 @@ protected slots:
 	// MIDI In LED timeout.
 	void midiInLedTimeout();
 
+	// MIDI In element select timeout (debounce).
+	void midiInSelectTimeout();
+
 	// Param knob context menu.
 	void paramContextMenu(const QPoint& pos);
 
@@ -244,6 +247,9 @@ private:
 	float m_params_ab[drumkv1::NUM_PARAMS];
 
 	int m_iUpdate;
+
+	QTimer *m_midiInSelectTimer;
+	int     m_iMidiInSelectKey;
 };
 
 

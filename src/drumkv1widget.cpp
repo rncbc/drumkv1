@@ -95,6 +95,14 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 	// Init sched notifier.
 	m_sched_notifier = nullptr;
 
+	// Init MIDI In element select debounce timer.
+	m_midiInSelectTimer = new QTimer(this);
+	m_midiInSelectTimer->setSingleShot(true);
+	QObject::connect(m_midiInSelectTimer,
+		SIGNAL(timeout()),
+		SLOT(midiInSelectTimeout()));
+	m_iMidiInSelectKey = -1;
+
 	// Init swapable params A/B to default.
 	for (uint32_t i = 0; i < drumkv1::NUM_PARAMS; ++i)
 		m_params_ab[i] = drumkv1_param::paramDefaultValue(drumkv1::ParamIndex(i));
@@ -1756,6 +1764,10 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 			const int vel = (sid >> 7) & 0x7f;
 			m_ui.Elements->midiInLedNote(key, vel);
 			m_ui.StatusBar->midiInNote(key, vel);
+			if (vel > 0) {
+				m_iMidiInSelectKey = key;
+				m_midiInSelectTimer->start(1000);
+			}
 		}
 		else
 		if (pDrumkUi->midiInCount() > 0) {
@@ -1817,6 +1829,19 @@ void drumkv1widget::directNoteOn ( int iNote, int iVelocity )
 void drumkv1widget::midiInLedTimeout (void)
 {
 	m_ui.StatusBar->midiInLed(false);
+}
+
+
+// MIDI In element select debounce timeout.
+void drumkv1widget::midiInSelectTimeout (void)
+{
+	if (m_iMidiInSelectKey >= 0) {
+		drumkv1_ui *pDrumkUi = ui_instance();
+		if (pDrumkUi)
+			pDrumkUi->setCurrentElementEx(m_iMidiInSelectKey);
+		m_iMidiInSelectKey = -1;
+		activateElement();
+	}
 }
 
 
