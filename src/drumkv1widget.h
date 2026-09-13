@@ -90,6 +90,10 @@ public:
 	void loadPresets();
 	void savePresets();
 
+	// MIDI In element select debounce option.
+	void setMidiInSelect(bool bMidiInSelect);
+	bool isMidiInSelect() const;
+
 public slots:
 
 	// Preset file I/O.
@@ -248,7 +252,7 @@ private:
 
 	int m_iUpdate;
 
-	QTimer *m_midiInSelectTimer;
+	QTimer *m_pMidiInSelectTimer;
 	int     m_iMidiInSelectKey;
 };
 

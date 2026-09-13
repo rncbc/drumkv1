@@ -96,11 +96,7 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 	m_sched_notifier = nullptr;
 
 	// Init MIDI In element select debounce timer.
-	m_midiInSelectTimer = new QTimer(this);
-	m_midiInSelectTimer->setSingleShot(true);
-	QObject::connect(m_midiInSelectTimer,
-		SIGNAL(timeout()),
-		SLOT(midiInSelectTimeout()));
+	m_pMidiInSelectTimer = nullptr;
 	m_iMidiInSelectKey = -1;
 
 	// Init swapable params A/B to default.
@@ -590,6 +586,13 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 	// Epilog.
 	// QWidget::adjustSize();
 
+	// TODO: The MIDI In element select debouncer should be
+	// disabled/off at start-up... formally it should bind
+	// to an UI tool-button or check-box and/or a checkable
+	// context-menu action; it's enabled/on here for testing
+	// and demo purposes only!
+	setMidiInSelect(true);
+
 	m_ui.StatusBar->showMessage(tr("Ready"), 5000);
 	m_ui.StatusBar->modified(false);
 	m_ui.Preset->setDirtyPreset(false);
@@ -600,6 +603,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 drumkv1widget::~drumkv1widget (void)
 {
 	savePresets();
+
+	setMidiInSelect(false);
 
 	if (m_sched_notifier)
 		delete m_sched_notifier;
@@ -1764,9 +1769,9 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 			const int vel = (sid >> 7) & 0x7f;
 			m_ui.Elements->midiInLedNote(key, vel);
 			m_ui.StatusBar->midiInNote(key, vel);
-			if (vel > 0) {
+			if (m_pMidiInSelectTimer && vel > 0) {
 				m_iMidiInSelectKey = key;
-				m_midiInSelectTimer->start(200);
+				m_pMidiInSelectTimer->start(200);
 			}
 		}
 		else
@@ -1829,6 +1834,32 @@ void drumkv1widget::directNoteOn ( int iNote, int iVelocity )
 void drumkv1widget::midiInLedTimeout (void)
 {
 	m_ui.StatusBar->midiInLed(false);
+}
+
+
+// MIDI In element select debounce option.
+void drumkv1widget::setMidiInSelect ( bool bMidiInSelect )
+{
+	if (bMidiInSelect && m_pMidiInSelectTimer == nullptr) {
+		m_pMidiInSelectTimer = new QTimer(this);
+		m_pMidiInSelectTimer->setSingleShot(true);
+		QObject::connect(m_pMidiInSelectTimer,
+			SIGNAL(timeout()),
+			SLOT(midiInSelectTimeout()));
+	}
+	else
+	if (!bMidiInSelect && m_pMidiInSelectTimer) {
+		delete m_pMidiInSelectTimer;
+		m_pMidiInSelectTimer = nullptr;
+	}
+
+	m_iMidiInSelectKey = -1;
+}
+
+
+bool drumkv1widget::isMidiInSelect (void) const
+{
+	return (m_pMidiInSelectTimer != nullptr);
 }
 
 
