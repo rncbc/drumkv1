@@ -1766,7 +1766,7 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 			m_ui.StatusBar->midiInNote(key, vel);
 			if (vel > 0) {
 				m_iMidiInSelectKey = key;
-				m_midiInSelectTimer->start(1000);
+				m_midiInSelectTimer->start(200);
 			}
 		}
 		else
@@ -1838,9 +1838,8 @@ void drumkv1widget::midiInSelectTimeout (void)
 	if (m_iMidiInSelectKey >= 0) {
 		drumkv1_ui *pDrumkUi = ui_instance();
 		if (pDrumkUi)
-			pDrumkUi->setCurrentElementEx(m_iMidiInSelectKey);
+			pDrumkUi->setCurrentElement(m_iMidiInSelectKey);
 		m_iMidiInSelectKey = -1;
-		activateElement();
 	}
 }
 
