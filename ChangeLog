@@ -4,11 +4,11 @@ drumkv1 - an old-school drum-kit sampler
 ChangeLog
 
 
-GIT HEAD
+1.5.0  2026-09-15  An End-of-Summer'26 Release.
 
 - MIDI-in element selection on note-on events option added as a
   toggle to elements list and sample waveform widget's context-
-  -menu as "Auto select elements". (EXPERIMENTAL)
+  -menu as "Auto select elements".
 - Introducing factory/community presets install package.
 - Color theme (with palette editor) and (widget) Style theme
   options moved to Help/Configure.../Custom tab (with preview).
