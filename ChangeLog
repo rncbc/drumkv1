@@ -8,7 +8,7 @@ GIT HEAD
 
 - MIDI-in element selection on note-on events option added as a
   toggle to elements list and sample waveform widget's context-
-  -menu as "Auto select element". (EXPERIMENTAL)
+  -menu as "Auto select elements". (EXPERIMENTAL)
 - Introducing factory/community presets install package.
 - Color theme (with palette editor) and (widget) Style theme
   options moved to Help/Configure.../Custom tab (with preview).

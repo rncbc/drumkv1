@@ -1707,7 +1707,7 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 	pAction->setEnabled(element != nullptr);
 	menu.addSeparator();
 	pAction = menu.addAction(
-		tr("Auto select element"), this, SLOT(midiInSelectElement()));
+		tr("Auto select elements"), this, SLOT(midiInSelectElement()));
 	pAction->setCheckable(true);
 	pAction->setChecked(isMidiInSelect());
 
@@ -1769,7 +1769,7 @@ void drumkv1widget::updateSchedNotify ( int stype, int sid )
 			m_ui.StatusBar->midiInNote(key, vel);
 			if (m_pMidiInSelectTimer && vel > 0) {
 				m_iMidiInSelectKey = key;
-				m_pMidiInSelectTimer->start(200);
+				m_pMidiInSelectTimer->start(150);
 			}
 		}
 		else
