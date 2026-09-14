@@ -169,6 +169,9 @@ protected slots:
 	// MIDI In element select timeout (debounce).
 	void midiInSelectTimeout();
 
+	// Toggle MIDI In auto-select element.
+	void midiInSelectElement();
+
 	// Param knob context menu.
 	void paramContextMenu(const QPoint& pos);
 

@@ -586,13 +586,6 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 	// Epilog.
 	// QWidget::adjustSize();
 
-	// TODO: The MIDI In element select debouncer should be
-	// disabled/off at start-up... formally it should bind
-	// to an UI tool-button or check-box and/or a checkable
-	// context-menu action; it's enabled/on here for testing
-	// and demo purposes only!
-	setMidiInSelect(true);
-
 	m_ui.StatusBar->showMessage(tr("Ready"), 5000);
 	m_ui.StatusBar->modified(false);
 	m_ui.Preset->setDirtyPreset(false);
@@ -1712,6 +1705,11 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 	pAction = menu.addAction(
 		tr("Reset"), this, SLOT(resetElement()));
 	pAction->setEnabled(element != nullptr);
+	menu.addSeparator();
+	pAction = menu.addAction(
+		tr("Auto select element"), this, SLOT(midiInSelectElement()));
+	pAction->setCheckable(true);
+	pAction->setChecked(isMidiInSelect());
 
 	QAbstractScrollArea *pAbstractScrollArea
 		= qobject_cast<QAbstractScrollArea *> (pSender);
@@ -1870,8 +1868,16 @@ void drumkv1widget::midiInSelectTimeout (void)
 		drumkv1_ui *pDrumkUi = ui_instance();
 		if (pDrumkUi)
 			pDrumkUi->setCurrentElement(m_iMidiInSelectKey);
+		m_ui.StatusBar->keybd()->setNoteKey(m_iMidiInSelectKey);
 		m_iMidiInSelectKey = -1;
 	}
+}
+
+
+// Toggle MIDI In auto-select element.
+void drumkv1widget::midiInSelectElement (void)
+{
+	setMidiInSelect(!isMidiInSelect());
 }
 
 
