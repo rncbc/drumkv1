@@ -271,7 +271,9 @@ void drumkv1widget_preset::openPreset (void)
 				++m_iInitPreset;
 				emit loadPresetFile(sPreset, sPresetFile);
 				pConfig->sPreset = sPreset;
-				pConfig->sPresetDir = fi.absolutePath();
+				const QString& sPresetDir = fi.absolutePath();
+				if (QFileInfo(sPresetDir).permission(QFile::WriteUser))
+					pConfig->sPresetDir = sPresetDir;
 			}
 			sAfterPreset = sPreset;
 		}
