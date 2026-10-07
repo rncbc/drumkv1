@@ -1,21 +1,21 @@
 // drumkv1widget_sample.cpp
 //
 /****************************************************************************
-   Copyright (C) 2012-2026, rncbc aka Rui Nuno Capela. All rights reserved.
+ C opyright (C) 2012-2026, rncbc *aka Rui Nuno Capela. All rights reserved.
 
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public License
-   as published by the Free Software Foundation; either version 2
-   of the License, or (at your option) any later version.
+ This program is free software; you can redistribute it and/or
+ modify it under the terms of the GNU General Public License
+ as published by the Free Software Foundation; either version 2
+ of the License, or (at your option) any later version.
 
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-   GNU General Public License for more details.
+ This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
 
-   You should have received a copy of the GNU General Public License along
-   with this program; if not, write to the Free Software Foundation, Inc.,
-   51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
+You should have received a copy of the GNU General Public License along
+with this program; if not, write to the Free Software Foundation, Inc.,
+51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA.
 
 *****************************************************************************/
 
@@ -52,7 +52,7 @@
 
 // Constructor.
 drumkv1widget_sample::drumkv1widget_sample ( QWidget *pParent )
-	: QFrame(pParent), m_pSample(nullptr), m_iChannels(0), m_ppPolyg(nullptr)
+: QFrame(pParent), m_pSample(nullptr), m_iChannels(0), m_ppPolyg(nullptr)
 {
 	QFrame::setMouseTracking(true);
 	QFrame::setFocusPolicy(Qt::ClickFocus);
@@ -103,8 +103,8 @@ void drumkv1widget_sample::setSample ( drumkv1_sample *pSample )
 
 	m_pSample = pSample;
 
-//	m_bOffset = 0;
-//	m_iOffsetStart = m_iOffsetEnd = 0;
+	//	m_bOffset = 0;
+	//	m_iOffsetStart = m_iOffsetEnd = 0;
 
 	m_pDragSample = nullptr;
 
@@ -282,113 +282,113 @@ void drumkv1widget_sample::mouseMoveEvent ( QMouseEvent *pMouseEvent )
 	const int x = pMouseEvent->pos().x();
 
 	switch (m_dragState) {
-	case DragNone:
-		if (m_pSample) {
-			const int dx = QApplication::startDragDistance();
-			if (m_bOffset) {
-				int x0 = pixelFromFrames(m_iOffsetEnd);
-				if (qAbs(x0 - x) < dx) {
-					m_dragCursor = DragOffsetEnd;
-					QFrame::setCursor(QCursor(Qt::SizeHorCursor));
-					QToolTip::showText(
-						QCursor::pos(),
-						tr("Offset end: %1")
-							.arg(textFromValue(m_iOffsetEnd)), this);
-					break;
+		case DragNone:
+			if (m_pSample) {
+				const int dx = QApplication::startDragDistance();
+				if (m_bOffset) {
+					int x0 = pixelFromFrames(m_iOffsetEnd);
+					if (qAbs(x0 - x) < dx) {
+						m_dragCursor = DragOffsetEnd;
+						QFrame::setCursor(QCursor(Qt::SizeHorCursor));
+						QToolTip::showText(
+							QCursor::pos(),
+										   tr("Offset end: %1")
+										   .arg(textFromValue(m_iOffsetEnd)), this);
+						break;
+					}
+					x0 = pixelFromFrames(m_iOffsetStart);
+					if (qAbs(x0 - x) < dx) {
+						m_dragCursor = DragOffsetStart;
+						QFrame::setCursor(QCursor(Qt::SizeHorCursor));
+						QToolTip::showText(
+							QCursor::pos(),
+										   tr("Offset start: %1")
+										   .arg(textFromValue(m_iOffsetStart)), this);
+						break;
+					}
 				}
-				x0 = pixelFromFrames(m_iOffsetStart);
-				if (qAbs(x0 - x) < dx) {
-					m_dragCursor = DragOffsetStart;
-					QFrame::setCursor(QCursor(Qt::SizeHorCursor));
-					QToolTip::showText(
-						QCursor::pos(),
-						tr("Offset start: %1")
-							.arg(textFromValue(m_iOffsetStart)), this);
-					break;
+				if (m_dragCursor != DragNone) {
+					m_dragCursor  = DragNone;
+					QFrame::unsetCursor();
 				}
 			}
-			if (m_dragCursor != DragNone) {
-				m_dragCursor  = DragNone;
-				QFrame::unsetCursor();
+			break;
+		case DragOffsetStart:
+			if (m_pSample) {
+				m_iDragOffsetStartX = safeX(x);
+				if (m_iDragOffsetStartX > m_iDragOffsetEndX)
+					m_iDragOffsetStartX = m_iDragOffsetEndX;
+				update();
+				const uint32_t iOffsetStart
+				= framesFromPixel(m_iDragOffsetStartX);
+				QToolTip::showText(
+					QCursor::pos(),
+								   tr("Offset start: %1")
+								   .arg(textFromValue(iOffsetStart)), this);
 			}
-		}
-		break;
-	case DragOffsetStart:
-		if (m_pSample) {
-			m_iDragOffsetStartX = safeX(x);
-			if (m_iDragOffsetStartX > m_iDragOffsetEndX)
-				m_iDragOffsetStartX = m_iDragOffsetEndX;
-			update();
-			const uint32_t iOffsetStart
-				= framesFromPixel(m_iDragOffsetStartX);
-			QToolTip::showText(
-				QCursor::pos(),
-				tr("Offset start: %1")
-					.arg(textFromValue(iOffsetStart)), this);
-		}
-		break;
-	case DragOffsetEnd:
-		if (m_pSample) {
-			m_iDragOffsetEndX = safeX(x);
-			if (m_iDragOffsetEndX < m_iDragOffsetStartX)
-				m_iDragOffsetEndX = m_iDragOffsetStartX;
-			update();
-			const uint32_t iOffsetEnd
+			break;
+		case DragOffsetEnd:
+			if (m_pSample) {
+				m_iDragOffsetEndX = safeX(x);
+				if (m_iDragOffsetEndX < m_iDragOffsetStartX)
+					m_iDragOffsetEndX = m_iDragOffsetStartX;
+				update();
+				const uint32_t iOffsetEnd
 				= framesFromPixel(m_iDragOffsetEndX);
-			QToolTip::showText(
-				QCursor::pos(),
-				tr("Offset end: %1")
-					.arg(textFromValue(iOffsetEnd)), this);
-		}
-		break;
-	case DragOffsetRange:
-		// Rubber-band offset selection...
-		if (m_pSample) {
-			const QRect& rect = QRect(m_posDrag, pMouseEvent->pos()).normalized();
-			m_iDragOffsetStartX = safeX(rect.left());
-			m_iDragOffsetEndX   = safeX(rect.right());
-			update();
-			const uint32_t iOffsetStart
+				QToolTip::showText(
+					QCursor::pos(),
+								   tr("Offset end: %1")
+								   .arg(textFromValue(iOffsetEnd)), this);
+			}
+			break;
+		case DragOffsetRange:
+			// Rubber-band offset selection...
+			if (m_pSample) {
+				const QRect& rect = QRect(m_posDrag, pMouseEvent->pos()).normalized();
+				m_iDragOffsetStartX = safeX(rect.left());
+				m_iDragOffsetEndX   = safeX(rect.right());
+				update();
+				const uint32_t iOffsetStart
 				= framesFromPixel(m_iDragOffsetStartX);
-			const uint32_t iOffsetEnd
+				const uint32_t iOffsetEnd
 				= framesFromPixel(m_iDragOffsetEndX);
-			QToolTip::showText(
-				QCursor::pos(),
-				tr("Offset start: %1, end: %2")
-					.arg(textFromValue(iOffsetStart))
-					.arg(textFromValue(iOffsetEnd)), this);
-		}
-		break;
-	case DragStart:
-		// Rubber-band starting...
-		if ((m_posDrag - pMouseEvent->pos()).manhattanLength()
-			> QApplication::startDragDistance()) {
-			// Start dragging alright...
-			if (m_dragCursor != DragNone)
-				m_dragState = m_dragCursor;
-			else
-			if (m_bOffset && (pMouseEvent->modifiers()
-				& (Qt::ShiftModifier | Qt::ControlModifier))) {
-				m_dragState = m_dragCursor = DragOffsetRange;
-				m_iDragOffsetStartX = m_iDragOffsetEndX = m_posDrag.x();
+				QToolTip::showText(
+					QCursor::pos(),
+								   tr("Offset start: %1, end: %2")
+								   .arg(textFromValue(iOffsetStart))
+								   .arg(textFromValue(iOffsetEnd)), this);
+			}
+			break;
+		case DragStart:
+			// Rubber-band starting...
+			if ((m_posDrag - pMouseEvent->pos()).manhattanLength()
+				> QApplication::startDragDistance()) {
+				// Start dragging alright...
+				if (m_dragCursor != DragNone)
+					m_dragState = m_dragCursor;
+				else
+					if (m_bOffset && (pMouseEvent->modifiers()
+						& (Qt::ShiftModifier | Qt::ControlModifier))) {
+						m_dragState = m_dragCursor = DragOffsetRange;
+					m_iDragOffsetStartX = m_iDragOffsetEndX = m_posDrag.x();
 				QFrame::setCursor(QCursor(Qt::SizeHorCursor));
-			}
-			else
-			if (m_pSample && m_pSample->filename()) {
-				QList<QUrl> urls;
-				m_pDragSample = m_pSample;
-				urls.append(QUrl::fromLocalFile(m_pDragSample->filename()));
-				QMimeData *pMimeData = new QMimeData();
-				pMimeData->setUrls(urls);;
-				QDrag *pDrag = new QDrag(this);
-				pDrag->setMimeData(pMimeData);
-				pDrag->exec(Qt::CopyAction);
-				resetDragState();
-			}
-		}
-		// Fall thru...
-	default:
-		break;
+						}
+						else
+							if (m_pSample && m_pSample->filename()) {
+								QList<QUrl> urls;
+								m_pDragSample = m_pSample;
+								urls.append(QUrl::fromLocalFile(m_pDragSample->filename()));
+								QMimeData *pMimeData = new QMimeData();
+								pMimeData->setUrls(urls);;
+								QDrag *pDrag = new QDrag(this);
+								pDrag->setMimeData(pMimeData);
+								pDrag->exec(Qt::CopyAction);
+								resetDragState();
+							}
+				}
+				// Fall thru...
+		default:
+			break;
 	}
 
 	QFrame::mouseMoveEvent(pMouseEvent);
@@ -400,27 +400,27 @@ void drumkv1widget_sample::mouseReleaseEvent ( QMouseEvent *pMouseEvent )
 	QFrame::mouseReleaseEvent(pMouseEvent);
 
 	switch (m_dragState) {
-	case DragOffsetStart:
-		if (m_pSample && m_iDragOffsetStartX < m_iDragOffsetEndX) {
-			m_iOffsetStart = framesFromPixel(m_iDragOffsetStartX);
-			emit offsetRangeChanged();
-		}
-		break;
-	case DragOffsetEnd:
-		if (m_pSample && m_iDragOffsetStartX < m_iDragOffsetEndX) {
-			m_iOffsetEnd = framesFromPixel(m_iDragOffsetEndX);
-			emit offsetRangeChanged();
-		}
-		break;
-	case DragOffsetRange:
-		if (m_pSample && m_iDragOffsetStartX < m_iDragOffsetEndX) {
-			m_iOffsetStart = framesFromPixel(m_iDragOffsetStartX);
-			m_iOffsetEnd   = framesFromPixel(m_iDragOffsetEndX);
-			emit offsetRangeChanged();
-		}
-		// Fall thru...
-	default:
-		break;
+		case DragOffsetStart:
+			if (m_pSample && m_iDragOffsetStartX < m_iDragOffsetEndX) {
+				m_iOffsetStart = framesFromPixel(m_iDragOffsetStartX);
+				emit offsetRangeChanged();
+			}
+			break;
+		case DragOffsetEnd:
+			if (m_pSample && m_iDragOffsetStartX < m_iDragOffsetEndX) {
+				m_iOffsetEnd = framesFromPixel(m_iDragOffsetEndX);
+				emit offsetRangeChanged();
+			}
+			break;
+		case DragOffsetRange:
+			if (m_pSample && m_iDragOffsetStartX < m_iDragOffsetEndX) {
+				m_iOffsetStart = framesFromPixel(m_iDragOffsetStartX);
+				m_iOffsetEnd   = framesFromPixel(m_iDragOffsetEndX);
+				emit offsetRangeChanged();
+			}
+			// Fall thru...
+		default:
+			break;
 	}
 
 	m_pDragSample = nullptr;
@@ -441,14 +441,14 @@ void drumkv1widget_sample::mouseDoubleClickEvent ( QMouseEvent */*pMouseEvent*/ 
 void drumkv1widget_sample::keyPressEvent ( QKeyEvent *pKeyEvent )
 {
 	switch (pKeyEvent->key()) {
-	case Qt::Key_Escape:
-		m_pDragSample = nullptr;
-		resetDragState();
-		update();
-		break;
-	default:
-		QFrame::keyPressEvent(pKeyEvent);
-		break;
+		case Qt::Key_Escape:
+			m_pDragSample = nullptr;
+			resetDragState();
+			update();
+			break;
+		default:
+			QFrame::keyPressEvent(pKeyEvent);
+			break;
 	}
 }
 
@@ -473,7 +473,7 @@ void drumkv1widget_sample::dropEvent ( QDropEvent *pDropEvent )
 	const QMimeData *pMimeData = pDropEvent->mimeData();
 	if (pMimeData->hasUrls()) {
 		const QString& sFilename
-			= QListIterator<QUrl>(pMimeData->urls()).peekNext().toLocalFile();
+		= QListIterator<QUrl>(pMimeData->urls()).peekNext().toLocalFile();
 		if (!sFilename.isEmpty())
 			emit loadSampleFile(sFilename);
 	}
@@ -574,15 +574,23 @@ void drumkv1widget_sample::drawEnvelope(
 		);
 	};
 
-	const QColor envBase   = lightenRgb(rgbDark, 10);
-	const QColor envAttack = lightenRgb(rgbDark, 15);
-	const QColor envD1     = lightenRgb(rgbDark, static_cast<int>(m_fDca1Level2 * 100.0f) / 4 );
-	const QColor envD2R    = lightenRgb(rgbDark, 8);
+	const QColor colorEnvTime        = lightenRgb(rgbDark, 10);
+
+	const QColor colorEnvAttackStart = rgbDark.darker(180);
+	const QColor colorEnvAttackEnd   = lightenRgb(rgbDark, 15);
+
+	const QColor colorEnvD1Start     = lightenRgb(rgbDark, 25);
+	const QColor colorEnvD1End       = lightenRgb(rgbDark, static_cast<int>(m_fDca1Level2 * 100.0f) / 4 );
+
+	const QColor colorEnvD2Start     = colorEnvD1End;
+	const QColor colorEnvD2End       = lightenRgb(rgbDark, 8);
+
+	const QColor colorPhaseSeparator = lightenRgb(rgbDark, 10);
 
 
 	// ENV base
 	if (xEnd > xStart)
-		painter.fillRect(xStart, 0, xEnd - xStart, h, envBase);
+		painter.fillRect(xStart, 0, xEnd - xStart, h, colorEnvTime);
 
 	painter.save();
 	QFont font = painter.font();
@@ -599,13 +607,13 @@ void drumkv1widget_sample::drawEnvelope(
 								 rect.right(), 0
 		);
 
-		gradient.setColorAt(0.0, rgbDark.darker(180));
-		gradient.setColorAt(1.0, envAttack);
+		gradient.setColorAt(0.0, colorEnvAttackStart);
+		gradient.setColorAt(1.0, colorEnvAttackEnd);
 		painter.fillRect(rect, gradient);
 
 		painter.fillRect(QRect(xAttackEnd - 2, 0, 2, h), rgbDark.darker(110));
 
-		painter.setPen(lightenRgb(envAttack, 25));
+		painter.setPen(lightenRgb(colorEnvAttackEnd, 25));
 		painter.drawText(rect, Qt::AlignHCenter | Qt::AlignBottom, "A");
 	}
 
@@ -615,16 +623,16 @@ void drumkv1widget_sample::drawEnvelope(
 
 		QLinearGradient gradient(
 			rect.left(), 0,
-								 rect.right(), 0
+			rect.right(), 0
 		);
 
-		gradient.setColorAt(0.0, lightenRgb(rgbDark, 25));
-		gradient.setColorAt(1.0, envD1);
+		gradient.setColorAt(0.0, colorEnvD1Start);
+		gradient.setColorAt(1.0, colorEnvD1End);
 		painter.fillRect(rect, gradient);
 
 		painter.fillRect(QRect(xDecay1End - 2, 0, 2, h), rgbDark.darker(110));
 
-		painter.setPen(lightenRgb(envD1, 25));
+		painter.setPen(lightenRgb(colorEnvD1End, 25));
 		painter.drawText(rect, Qt::AlignHCenter | Qt::AlignBottom,"D1");
 	}
 
@@ -635,16 +643,16 @@ void drumkv1widget_sample::drawEnvelope(
 
 		QLinearGradient gradient(
 			rect.left(), 0,
-								 rect.right(), 0
+			rect.right(), 0
 		);
 
-		gradient.setColorAt(0.0, envD1);
-		gradient.setColorAt(1.0, envD2R);
+		gradient.setColorAt(0.0, colorEnvD2Start);
+		gradient.setColorAt(1.0, colorEnvD2End);
 		painter.fillRect(rect, gradient);
 
 		painter.fillRect(QRect(xDecay2End - 2, 0, 2, h), rgbDark.darker(110));
 
-		painter.setPen(lightenRgb(envD1, 25));
+		painter.setPen(lightenRgb(colorEnvD2Start, 25));
 		painter.drawText(rect, Qt::AlignHCenter | Qt::AlignBottom, "D2");
 	}
 
@@ -704,34 +712,34 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 				m_dragState == DragOffsetEnd   ||
 				m_dragState == DragOffsetRange) {
 				x1 = m_iDragOffsetStartX;
-				x2 = m_iDragOffsetEndX;
-			} else {
-				x1 = pixelFromFrames(m_iOffsetStart);
-				x2 = pixelFromFrames(m_iOffsetEnd);
-			}
-			QColor rgbOver(rgbDark.darker(220));
-			rgbOver.setAlpha(120);
-			painter.setPen(rgbLite1.darker(160));
-			painter.setBrush(rgbLite1.darker());
-			QPolygon polyg(3);
-		//	polyg.putPoints(0, 3, x1 + 8, 0, x1, 8, x1, 0);
-		//	painter.drawPolygon(polyg);
-			polyg.putPoints(0, 3, x1 + 8, h, x1, h - 8, x1, h);
-			painter.drawPolygon(polyg);
-			painter.fillRect(0, 0, x1, h, rgbOver);
-			painter.drawLine(x1, 0, x1, h - 8);
-			painter.drawLine(x2, 8, x2, h);
-			polyg.putPoints(0, 3, x2 - 8, 0, x2, 8, x2, 0);
-			painter.drawPolygon(polyg);
-		//	polyg.putPoints(0, 3, x2 - 8, h, x2, h - 8, x2, h);
-		//	painter.drawPolygon(polyg);
-			painter.fillRect(x2, 0, w, h, rgbOver);
+			x2 = m_iDragOffsetEndX;
+				} else {
+					x1 = pixelFromFrames(m_iOffsetStart);
+					x2 = pixelFromFrames(m_iOffsetEnd);
+				}
+				QColor rgbOver(rgbDark.darker(220));
+				rgbOver.setAlpha(120);
+				painter.setPen(rgbLite1.darker(160));
+				painter.setBrush(rgbLite1.darker());
+				QPolygon polyg(3);
+				//	polyg.putPoints(0, 3, x1 + 8, 0, x1, 8, x1, 0);
+				//	painter.drawPolygon(polyg);
+				polyg.putPoints(0, 3, x1 + 8, h, x1, h - 8, x1, h);
+				painter.drawPolygon(polyg);
+				painter.fillRect(0, 0, x1, h, rgbOver);
+				painter.drawLine(x1, 0, x1, h - 8);
+				painter.drawLine(x2, 8, x2, h);
+				polyg.putPoints(0, 3, x2 - 8, 0, x2, 8, x2, 0);
+				painter.drawPolygon(polyg);
+				//	polyg.putPoints(0, 3, x2 - 8, h, x2, h - 8, x2, h);
+				//	painter.drawPolygon(polyg);
+				painter.fillRect(x2, 0, w, h, rgbOver);
 		}
 		painter.setRenderHint(QPainter::Antialiasing, false);
 	} else {
 		painter.setPen(pal.midlight().color());
 		painter.drawText(rect, Qt::AlignCenter,
-			tr("(double-click or drop to load new sample...)"));
+						 tr("(double-click or drop to load new sample...)"));
 	}
 
 	QString sTitle = m_sName;
@@ -789,31 +797,31 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 			sffinfo.format = i;
 			::sf_command(nullptr, SFC_GET_FORMAT_MAJOR, &sffinfo, sizeof(sffinfo));
 			const QString sFilterName = QString(sffinfo.name)
-				.replace('/', '-') // Replace some illegal characters.
-				.remove('(').remove(')');
+			.replace('/', '-') // Replace some illegal characters.
+			.remove('(').remove(')');
 			const QString sExtension(sffinfo.extension);
 			QString sExt = sExtMask.arg(sExtension);
 			QString sExts = sExt;
 			if (!exts.contains(sExt)
 				&& s_extensions.contains(sExtension)) {
 				exts.append(sExt);
-			}
-			if (sExtension.length() > 3) {
-				sExt = sExtMask.arg(sExtension.left(3));
-				sExts += ' ' + sExt;
-				if (!exts.contains(sExt)
-					&& s_extensions.contains(sExtension)) {
-					exts.append(sExt);
 				}
-			}
-			if (sExtension == "oga") {
-				sExt = sExtMask.arg("ogg");
-				if (!exts.contains(sExt)) {
+				if (sExtension.length() > 3) {
+					sExt = sExtMask.arg(sExtension.left(3));
 					sExts += ' ' + sExt;
-					exts.append(sExt);
+					if (!exts.contains(sExt)
+						&& s_extensions.contains(sExtension)) {
+						exts.append(sExt);
+						}
 				}
-			}
-			s_filters.append(sFilterMask.arg(sFilterName).arg(sExts));
+				if (sExtension == "oga") {
+					sExt = sExtMask.arg("ogg");
+					if (!exts.contains(sExt)) {
+						sExts += ' ' + sExt;
+						exts.append(sExt);
+					}
+				}
+				s_filters.append(sFilterMask.arg(sFilterName).arg(sExts));
 		}
 		s_filters.prepend(sFilterMask.arg(tr("Audio files")).arg(exts.join(" ")));
 		s_filters.append(sFilterMask.arg(tr("All files")).arg("*.*"));
@@ -827,10 +835,10 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 		options |= QFileDialog::DontUseNativeDialog;
 		pParentWidget = QWidget::window();
 	}
-#if 1//QT_VERSION < QT_VERSION_CHECK(4, 4, 0)
+	#if 1//QT_VERSION < QT_VERSION_CHECK(4, 4, 0)
 	sFilename = QFileDialog::getOpenFileName(pParentWidget,
-		sTitle, sFilename, sFilter, nullptr, options);
-#else
+											 sTitle, sFilename, sFilter, nullptr, options);
+	#else
 	QFileDialog fileDialog(pParentWidget, sTitle, sFilename, sFilter);
 	fileDialog.setAcceptMode(QFileDialog::AcceptOpen);
 	fileDialog.setFileMode(QFileDialog::ExistingFile);
@@ -840,7 +848,7 @@ void drumkv1widget_sample::openSample ( const QString& sName )
 	fileDialog.setOptions(options);
 	if (fileDialog.exec())
 		sFilename = fileDialog.selectedFiles().first();
-#endif
+	#endif
 	if (!sFilename.isEmpty()) {
 		pConfig->sSampleDir = QFileInfo(sFilename).absolutePath();
 		emit loadSampleFile(sFilename);
@@ -897,17 +905,17 @@ void drumkv1widget_sample::updateToolTip (void)
 		if (format == drumkv1widget_spinbox::Frames)
 			suffix = tr(" frames");
 		sToolTip += tr("%1\n%2%3, %4 channels, %5 Hz")
-			.arg(QFileInfo(pszSampleFile).completeBaseName())
-			.arg(m_pSample->length()).arg(suffix)
-			.arg(m_pSample->channels())
-			.arg(m_pSample->rate());
+		.arg(QFileInfo(pszSampleFile).completeBaseName())
+		.arg(m_pSample->length()).arg(suffix)
+		.arg(m_pSample->channels())
+		.arg(m_pSample->rate());
 	}
 
 	if (m_bOffset && m_iOffsetStart < m_iOffsetEnd) {
 		if (!sToolTip.isEmpty()) sToolTip += '\n';
 		sToolTip += tr("Offset start: %1, end: %2")
-			.arg(textFromValue(m_iOffsetStart))
-			.arg(textFromValue(m_iOffsetEnd));
+		.arg(textFromValue(m_iOffsetStart))
+		.arg(textFromValue(m_iOffsetEnd));
 	}
 
 	setToolTip(sToolTip);
