@@ -72,6 +72,13 @@ drumkv1widget_sample::drumkv1widget_sample ( QWidget *pParent )
 	m_dragCursor  = DragNone;
 	m_pDragSample = nullptr;
 
+	// g3n {
+	m_fEnvTime = 0.0f;
+	m_fDca1Attack = 0.0f;
+	m_fDca1Decay1 = 0.0f;
+	m_fDca1Decay2 = 0.0f;
+	// g3n }
+
 	resetDragState();
 }
 
@@ -484,6 +491,169 @@ void drumkv1widget_sample::resetDragState (void)
 	m_dragState = m_dragCursor = DragNone;
 }
 
+// g3n {
+void drumkv1widget_sample::setEnvTime(float fEnvTime)
+{
+	m_fEnvTime = qBound(0.0f, fEnvTime, 1.0f);
+	update();
+}
+
+void drumkv1widget_sample::setDca1Envelope(
+	float fAttack, float fDecay1, float fLevel2, float fDecay2)
+{
+	m_fDca1Attack = fAttack;
+	m_fDca1Decay1 = fDecay1;
+	m_fDca1Level2 = fLevel2;
+	m_fDca1Decay2 = fDecay2;
+	update();
+}
+
+void drumkv1widget_sample::drawEnvelope(
+	QPainter &painter, const QRect &rect, const QColor &rgbDark)
+{
+	// Background: GEN envelope time + DCA
+	// Draw an approximate visual guide for the GEN1 envelope time.
+	// In Auto mode, show roughly 1/16 of the active sample range.
+	// This is visual only and does not affect audio processing.
+	// ENV time range...
+	const int h = rect.height();
+
+
+	const uint32_t totalFrames = m_pSample->length();
+	const uint32_t startFrame = m_bOffset
+	? qMin(m_iOffsetStart, totalFrames)
+	: 0;
+
+	const uint32_t rangeEnd = m_bOffset
+	? qMin(m_iOffsetEnd, totalFrames)
+	: totalFrames;
+
+	const uint32_t rangeFrames = rangeEnd > startFrame
+	? rangeEnd - startFrame
+	: 0;
+
+	const uint32_t envFrames = (m_fEnvTime < 0.00005f)
+	? uint32_t(rangeFrames >> 4)
+	: uint32_t(double(totalFrames) * double(m_fEnvTime));
+
+
+	// Cap the envelope range at the active sample range.
+	const uint32_t endFrame = uint32_t(qMin<uint64_t>(
+		rangeEnd, uint64_t(startFrame) + envFrames));
+
+	// Each stage can occupy up to one third of the ENV time.
+	const double maxStageFrames = double(envFrames) / 3.0;
+
+	const uint32_t attackFrames = uint32_t(
+		maxStageFrames * qBound(0.0, double(m_fDca1Attack), 1.0));
+	const uint32_t decay1Frames = uint32_t(
+		maxStageFrames * qBound(0.0, double(m_fDca1Decay1), 1.0));
+	const uint32_t decay2Frames = uint32_t(
+		maxStageFrames * qBound(0.0, double(m_fDca1Decay2), 1.0));
+
+	const uint32_t attackEndFrame = qMin(
+		endFrame, startFrame + attackFrames);
+
+	const uint32_t decay1EndFrame = qMin(
+		endFrame, attackEndFrame + decay1Frames);
+
+	const uint32_t decay2EndFrame = qMin(
+		endFrame, decay1EndFrame + decay2Frames);
+
+	const int xStart = pixelFromFrames(startFrame);
+	const int xEnd = pixelFromFrames(endFrame);
+	const int xAttackEnd = pixelFromFrames(attackEndFrame);
+	const int xDecay1End = pixelFromFrames(decay1EndFrame);
+	const int xDecay2End = pixelFromFrames(decay2EndFrame);
+
+	auto lightenRgb = [](const QColor& bg, int amount) {
+		return QColor(
+			qMin(220, bg.red()   + amount),
+					  qMin(220, bg.green() + amount),
+					  qMin(220, bg.blue()  + amount)
+		);
+	};
+
+	const QColor envBase   = lightenRgb(rgbDark, 10);
+	const QColor envAttack = lightenRgb(rgbDark, 15);
+	const QColor envD1     = lightenRgb(rgbDark, static_cast<int>(m_fDca1Level2 * 100.0f) / 4 );
+	const QColor envD2R    = lightenRgb(rgbDark, 8);
+
+
+	// ENV base
+	if (xEnd > xStart)
+		painter.fillRect(xStart, 0, xEnd - xStart, h, envBase);
+
+	painter.save();
+	QFont font = painter.font();
+	font.setBold(true);
+	painter.setFont(font);
+
+	// Attack phase
+	if (xAttackEnd > xStart) {
+
+		QRect rect(xStart, 0, xAttackEnd - xStart , h);
+
+		QLinearGradient gradient(
+			rect.left(), 0,
+								 rect.right(), 0
+		);
+
+		gradient.setColorAt(0.0, rgbDark.darker(180));
+		gradient.setColorAt(1.0, envAttack);
+		painter.fillRect(rect, gradient);
+
+		painter.fillRect(QRect(xAttackEnd - 2, 0, 2, h), rgbDark.darker(110));
+
+		painter.setPen(lightenRgb(envAttack, 25));
+		painter.drawText(rect, Qt::AlignHCenter | Qt::AlignBottom, "A");
+	}
+
+	// Decay 1 phase
+	if (xDecay1End > xAttackEnd) {
+		QRect rect(xAttackEnd, 0, xDecay1End - xAttackEnd -2 , h);
+
+		QLinearGradient gradient(
+			rect.left(), 0,
+								 rect.right(), 0
+		);
+
+		gradient.setColorAt(0.0, lightenRgb(rgbDark, 25));
+		gradient.setColorAt(1.0, envD1);
+		painter.fillRect(rect, gradient);
+
+		painter.fillRect(QRect(xDecay1End - 2, 0, 2, h), rgbDark.darker(110));
+
+		painter.setPen(lightenRgb(envD1, 25));
+		painter.drawText(rect, Qt::AlignHCenter | Qt::AlignBottom,"D1");
+	}
+
+
+	// Decay 2 / Release  phase
+	if (xDecay2End > xDecay1End) {
+		QRect rect(xDecay1End, 0, xDecay2End - xDecay1End, h);
+
+		QLinearGradient gradient(
+			rect.left(), 0,
+								 rect.right(), 0
+		);
+
+		gradient.setColorAt(0.0, envD1);
+		gradient.setColorAt(1.0, envD2R);
+		painter.fillRect(rect, gradient);
+
+		painter.fillRect(QRect(xDecay2End - 2, 0, 2, h), rgbDark.darker(110));
+
+		painter.setPen(lightenRgb(envD1, 25));
+		painter.drawText(rect, Qt::AlignHCenter | Qt::AlignBottom, "D2");
+	}
+
+	painter.restore();
+
+
+}
+// g3n }
+
 
 // Draw curve.
 void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
@@ -509,14 +679,24 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		rgbDrop1.setAlpha(80);
 		const int w2 = (w << 1);
 		painter.setRenderHint(QPainter::Antialiasing, true);
+
+
+
 		// Sample waveform...
 		QLinearGradient grad(0, 0, w2, h);
 		painter.setPen(rgbLite1.darker(160));
 		grad.setColorAt(0.0f, rgbLite1);
 		grad.setColorAt(1.0f, rgbDrop1);
 		painter.setBrush(grad);
+
+		// g3n {
+		drawEnvelope(painter, rect, rgbDark);
+		// g3n }
+
 		for (unsigned short k = 0; k < m_iChannels; ++k)
 			painter.drawPolygon(*m_ppPolyg[k]);
+
+
 		// Offset line...
 		if (m_bOffset && bEnabled) {
 			int x1 = 0, x2 = 0;
