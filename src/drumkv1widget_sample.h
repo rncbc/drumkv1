@@ -130,6 +130,10 @@ protected:
 	// Default size hint.
 	QSize sizeHint() const;
 
+	// g3n {
+	void drawDca1Envelope(QPainter& painter, const QRect& rect, const QColor& rgbDark);
+	// g3n }
+
 private:
 
 	// Instance state.
@@ -157,14 +161,12 @@ private:
 	uint32_t m_iOffsetStart;
 	uint32_t m_iOffsetEnd;
 
-	// g3n { Normalized GEN1 envelope time (0.0 = Auto, 0.0–1.0).
+	// g3n { Normalized GEN1 envelope time (0.0 = Auto).
 	float m_fEnvTime;
 	float m_fDca1Attack;
 	float m_fDca1Decay1;
 	float m_fDca1Level2;
 	float m_fDca1Decay2;
-
-	void drawEnvelope(QPainter &painter, const QRect &rect, const QColor &rgbDark);
 	// g3n }
 };
 
