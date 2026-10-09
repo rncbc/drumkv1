@@ -563,8 +563,10 @@ void drumkv1widget_sample::drawDca1Envelope (
 
 	const QColor rgbAttackStart = rgbDark;
 	const QColor rgbAttackEnd   = lighten_rgb(rgbDark, 25);
+
 	const QColor rgbDelay1Start = rgbAttackEnd;
 	const QColor rgbDelay1End   = lighten_rgb(rgbDark, int(25.0f * m_fDca1Level2));
+
 	const QColor rgbDelay2Start = rgbDelay1End;
 	const QColor rgbDelay2End   = rgbDark;
 
@@ -576,6 +578,8 @@ void drumkv1widget_sample::drawDca1Envelope (
 
 	const QColor& rgbText
 		= lighten_rgb(rgbDark, 60);
+	const QColor rgbStageSep
+		= lighten_rgb(rgbDark, 30);
 
 	// Attack phase
 	if (x_attack > x_start) {
@@ -585,7 +589,6 @@ void drumkv1widget_sample::drawDca1Envelope (
 		grad.setColorAt(1.0, rgbAttackEnd);
 		painter.fillRect(rect, grad);
 		painter.setPen(rgbText);
-	//	painter.drawLine(rect.left(), 0, rect.left(), h);
 		painter.drawText(rect.adjusted(+2, 0, 0, -2),
 			Qt::AlignLeft | Qt::AlignBottom, tr("Attack"));
 	}
@@ -598,9 +601,10 @@ void drumkv1widget_sample::drawDca1Envelope (
 		grad.setColorAt(1.0, rgbDelay1End);
 		painter.fillRect(rect, grad);
 		painter.setPen(rgbText);
-		painter.drawLine(rect.left(), 0, rect.left(), h);
 		painter.drawText(rect.adjusted(+2, 0, 0, -2),
 			Qt::AlignLeft | Qt::AlignBottom, tr("Decay 1"));
+		painter.setPen(rgbStageSep);
+		painter.drawLine(rect.left(), 0, rect.left(), h);
 	}
 
 	// Decay 2 / Release  phase
@@ -611,9 +615,12 @@ void drumkv1widget_sample::drawDca1Envelope (
 		grad.setColorAt(1.0, rgbDelay2End);
 		painter.fillRect(rect, grad);
 		painter.setPen(rgbText);
-		painter.drawLine(rect.left(), 0, rect.left(), h);
 		painter.drawText(rect.adjusted(+2, 0, 0, -2),
 			Qt::AlignLeft | Qt::AlignBottom, tr("Decay 2"));
+		painter.setPen(rgbStageSep);
+		painter.drawLine(rect.left(), 0, rect.left(), h);
+		painter.setPen(rgbDelay2Start);
+		painter.drawLine(rect.right(), 0, rect.right(), h);
 	}
 
 	painter.restore();
