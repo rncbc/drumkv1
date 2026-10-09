@@ -271,9 +271,8 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 	setParamKnob(drumkv1::GEN1_FINE,    m_ui.Gen1FineKnob);
 	setParamKnob(drumkv1::GEN1_ENVTIME, m_ui.Gen1EnvTimeKnob);
 
-	// g3n {
 	m_ui.Gen1Sample->setEnvTime(m_ui.Gen1EnvTimeKnob->value());
-	// g3n }
+
 
 	// DCF1
 	setParamKnob(drumkv1::DCF1_ENABLED,  m_ui.Dcf1GroupBox->param());
@@ -402,13 +401,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 	setParamKnob(drumkv1::DCA1_LEVEL2,  m_ui.Dca1Level2Knob);
 	setParamKnob(drumkv1::DCA1_DECAY2,  m_ui.Dca1Decay2Knob);
 
-	// g3n {
 	m_ui.Gen1Sample->setDca1Envelope(
 		m_ui.Dca1AttackKnob->value(),
 		m_ui.Dca1Decay1Knob->value(),
 		m_ui.Dca1Level2Knob->value(),
 		m_ui.Dca1Decay2Knob->value());
-	// g3n }
 
 	QObject::connect(
 		m_ui.Dca1Env, SIGNAL(attackChanged(float)),
@@ -801,7 +798,6 @@ void drumkv1widget::updateParamEx (
 		m_ui.StatusBar->keybd()->setVelocity(vel);
 		break;
 	}
-	// g3n {
 	case drumkv1::GEN1_ENVTIME:
 		m_ui.Gen1Sample->setEnvTime(fValue);
 		break;
@@ -816,7 +812,6 @@ void drumkv1widget::updateParamEx (
 			m_ui.Dca1Decay2Knob->value()
 		);
 		break;
-	// g3n }
 	default:
 		break;
 	}
