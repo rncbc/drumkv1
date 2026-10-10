@@ -130,8 +130,8 @@ protected:
 	// Default size hint.
 	QSize sizeHint() const;
 
-	void drawDca1Envelope(QPainter& painter, const QRect& rect, const QColor& rgbDark);
-
+	void drawDca1Envelope(QPainter& painter,
+		const QRect& rect, const QColor& rgbDca1);
 
 private:
 
