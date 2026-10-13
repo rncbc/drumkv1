@@ -24,8 +24,6 @@
 #include "drumkv1_config.h"
 #include "drumkv1_sample.h"
 
-#include "drumkv1_ui.h"
-
 #include "drumkv1widget_spinbox.h"
 
 #include <sndfile.h>
@@ -71,6 +69,11 @@ drumkv1widget_sample::drumkv1widget_sample ( QWidget *pParent )
 
 	m_dragCursor  = DragNone;
 	m_pDragSample = nullptr;
+
+	m_fEnvTime = 0.0f;
+	m_fDca1Attack = 0.0f;
+	m_fDca1Decay1 = 0.0f;
+	m_fDca1Decay2 = 0.0f;
 
 	resetDragState();
 }
@@ -485,6 +488,164 @@ void drumkv1widget_sample::resetDragState (void)
 }
 
 
+void drumkv1widget_sample::setEnvTime ( float fEnvTime )
+{
+	m_fEnvTime = qBound(0.0f, fEnvTime, 1.0f);
+
+	update();
+}
+
+
+void drumkv1widget_sample::setDca1Envelope(
+	float fAttack, float fDecay1, float fLevel2, float fDecay2 )
+{
+	m_fDca1Attack = qBound(0.0f, fAttack, 1.0f);
+	m_fDca1Decay1 = qBound(0.0f, fDecay1, 1.0f);
+	m_fDca1Level2 = qBound(0.0f, fLevel2, 1.0f);
+	m_fDca1Decay2 = qBound(0.0f, fDecay2, 1.0f);
+
+	update();
+}
+
+
+void drumkv1widget_sample::drawDca1Envelope (
+	QPainter& painter, const QRect& rect, const QColor& rgbDca1 )
+{
+	// Background: GEN envelope time + DCA
+	// Draw an visual guide for the GEN1 envelope time.
+	// This is visual only and does not affect audio processing.
+
+	// ENV time range...
+	const int h = rect.height();
+
+	const float fSampleRateMs
+		= 0.001f * m_pSample->sampleRate();
+	const uint32_t iSampleLength
+		= m_pSample->length();
+	const uint32_t iFrameStart
+		= (m_bOffset ? qMin(m_iOffsetStart, iSampleLength) : 0);
+	const uint32_t iFrameEnd
+		= (m_bOffset ? qMin(m_iOffsetEnd, iSampleLength) : iSampleLength);
+	const uint32_t iFrameLength
+		= (iFrameEnd > iFrameStart ? iFrameEnd - iFrameStart : 0);
+
+	// Cap the envelope range at the active sample range.
+	const float fMaxFrames
+		= (m_fEnvTime < 0.005f
+		? float(iFrameLength >> 1)
+		: (10000.0f * fSampleRateMs * m_fEnvTime));
+
+	const uint32_t iAttackLength
+		= ::lrintf(fMaxFrames * m_fDca1Attack * m_fDca1Attack);
+	const uint32_t iDecay1Length
+		= ::lrintf(fMaxFrames * m_fDca1Decay1 * m_fDca1Decay1);
+	const uint32_t iDecay2Length
+		= ::lrintf(fMaxFrames * m_fDca1Decay2 * m_fDca1Decay2);
+
+	const uint32_t iAttackFrameEnd
+		= qMin(iFrameEnd, iFrameStart + iAttackLength);
+	const uint32_t iDecay1FrameEnd
+		= qMin(iFrameEnd, iAttackFrameEnd + iDecay1Length);
+	const uint32_t iDecay2FrameEnd
+		= qMin(iFrameEnd, iDecay1FrameEnd + iDecay2Length);
+
+	const int x_start  = pixelFromFrames(iFrameStart);
+	const int x_attack = pixelFromFrames(iAttackFrameEnd);
+	const int x_decay1 = pixelFromFrames(iDecay1FrameEnd);
+	const int x_decay2 = pixelFromFrames(iDecay2FrameEnd);
+
+	auto lighten_rgb = [](const QColor& rgb, int amount) {
+		return QColor(
+			qMin(220, rgb.red()   + amount),
+			qMin(220, rgb.green() + amount),
+			qMin(220, rgb.blue()  + amount),
+			rgb.alpha()
+		);
+	};
+
+	const bool dca1IsVeryLow = m_fDca1Level2 < 0.01f;
+
+	const QColor rgbAttackStart = lighten_rgb(rgbDca1, 0);
+	const QColor rgbAttackEnd   = lighten_rgb(rgbDca1, 25);
+
+	const QColor rgbDelay1Start = lighten_rgb(rgbDca1, 30);
+	const QColor rgbDelay1End   = dca1IsVeryLow
+		? rgbAttackStart
+		: lighten_rgb(rgbDca1, int(30.0f * m_fDca1Level2));
+
+	const QColor rgbDelay2Start = dca1IsVeryLow
+		? lighten_rgb(rgbDca1, 10)
+		: lighten_rgb(
+			rgbDca1,
+			// A - 15% of rgbDelay1End
+			int(30.0f * m_fDca1Level2 * (1.0f - 15.0f / 100.0f)));
+	const QColor rgbDelay2End = rgbAttackStart;
+
+	const QColor rgbSilenceZone = lighten_rgb(rgbDca1, 20);
+
+
+	painter.save();
+
+	QFont font = painter.font();
+	font.setPointSize(font.pointSize() - 3);
+	painter.setFont(font);
+
+	const QColor& rgbText
+		= lighten_rgb(rgbDca1, 100);
+
+	// Attack phase
+	if (x_attack > x_start) {
+		const QRect rect(x_start, 0, x_attack - x_start - 1, h);
+		QLinearGradient grad(rect.left(), 0, rect.right(), 0);
+		grad.setColorAt(0.0, rgbAttackStart);
+		grad.setColorAt(1.0, rgbAttackEnd);
+		painter.fillRect(rect, grad);
+		painter.setPen(rgbText);
+	//	painter.drawLine(rect.left(), 0, rect.left(), h);
+		painter.drawText(rect.adjusted(+2, 0, 0, -2),
+			Qt::AlignLeft | Qt::AlignBottom, tr("Attack"));
+	}
+
+	// Decay 1 phase
+	if (x_decay1 > x_attack) {
+		const QRect rect(x_attack, 0, x_decay1 - x_attack - 1, h);
+		QLinearGradient grad(rect.left(), 0, rect.right(), 0);
+		grad.setColorAt(0.0, rgbDelay1Start);
+		grad.setColorAt(1.0, rgbDelay1End);
+		painter.fillRect(rect, grad);
+		painter.setPen(rgbText);
+	//	painter.drawLine(rect.left(), 0, rect.left(), h);
+		painter.drawText(rect.adjusted(+2, 0, 0, -2),
+			Qt::AlignLeft | Qt::AlignBottom, tr("Decay 1"));
+	}
+
+	// Decay 2 / Release  phase
+	if (x_decay2 > x_decay1) {
+		const QRect rect(x_decay1, 0, x_decay2 - x_decay1 - 1, h);
+		QLinearGradient grad(rect.left(), 0, rect.right(), 0);
+		grad.setColorAt(0.0, rgbDelay2Start);
+		grad.setColorAt(1.0, rgbDelay2End);
+		painter.fillRect(rect, grad);
+		painter.setPen(rgbText);
+	// painter.drawLine(rect.left(), 0, rect.left(), h);
+		painter.drawText(rect.adjusted(+2, 0, 0, -2),
+			Qt::AlignLeft | Qt::AlignBottom, tr("Decay 2"));
+	}
+
+	// Silence Zone
+	if (iFrameEnd > x_decay2) {
+		const QRect rect(x_decay2, 0, iFrameEnd - x_decay2, h);
+		painter.fillRect(rect, rgbDca1);
+		painter.fillRect(rect, QBrush(rgbSilenceZone, Qt::BDiagPattern));
+		painter.setPen(rgbText);
+		painter.drawText(rect.adjusted(+2, 0, 0, -2),
+			Qt::AlignLeft | Qt::AlignBottom, tr("Silence Zone"));
+	}
+
+	painter.restore();
+}
+
+
 // Draw curve.
 void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 {
@@ -505,10 +666,13 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		const bool bEnabled = isEnabled();
 		QColor rgbLite1(rgbLite);
 		QColor rgbDrop1(Qt::black);
+		QColor rgbDca1(rgbDark);
 		rgbLite1.setAlpha(bDark ? 120 : 160);
 		rgbDrop1.setAlpha(80);
 		const int w2 = (w << 1);
 		painter.setRenderHint(QPainter::Antialiasing, true);
+		// DCA1 EG...
+		drawDca1Envelope(painter, rect, rgbDca1);
 		// Sample waveform...
 		QLinearGradient grad(0, 0, w2, h);
 		painter.setPen(rgbLite1.darker(160));

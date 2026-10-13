@@ -67,6 +67,11 @@ public:
 	uint32_t valueFromText (const QString& text) const;
 	QString textFromValue (uint32_t value) const;
 
+	// Sets the normalized GEN1 envelope time (0.0 = Auto).
+	void setEnvTime(float fEnvTime);
+	void setDca1Envelope(float fAttack, float fDecay1, float fLevel2, float fDecay2);
+
+
 signals:
 
 	// Load new sample file.
@@ -125,6 +130,9 @@ protected:
 	// Default size hint.
 	QSize sizeHint() const;
 
+	void drawDca1Envelope(QPainter& painter,
+		const QRect& rect, const QColor& rgbDca1);
+
 private:
 
 	// Instance state.
@@ -151,6 +159,14 @@ private:
 	bool     m_bOffset;
 	uint32_t m_iOffsetStart;
 	uint32_t m_iOffsetEnd;
+
+	// Normalized GEN1 envelope time (0.0 = Auto).
+	float m_fEnvTime;
+	float m_fDca1Attack;
+	float m_fDca1Decay1;
+	float m_fDca1Level2;
+	float m_fDca1Decay2;
+
 };
 
 #endif	// __drumkv1widget_sample_h
