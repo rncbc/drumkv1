@@ -246,6 +246,11 @@ private:
 	Ui::drumkv1widget *p_ui;
 	Ui::drumkv1widget& m_ui;
 
+	// Crop {
+	bool m_isCropped = false;
+	bool m_hasEffectiveOffset = false;
+	// }
+
 	drumkv1widget_sched *m_sched_notifier;
 
 	QHash<drumkv1::ParamIndex, drumkv1widget_param *> m_paramKnobs;

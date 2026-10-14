@@ -1641,6 +1641,12 @@ void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
 		const uint32_t iOffsetEnd = pSample->offsetEnd();
 		const uint32_t nframes    = pSample->length();
 		const float srate = pSample->sampleRate();
+
+		// Crop {
+		m_hasEffectiveOffset =
+			bOffset && (iOffsetStart != 0 || iOffsetEnd != nframes);
+		// }
+
 		m_ui.Gen1OffsetRangeLabel->setEnabled(bOffset);
 		m_ui.Gen1OffsetStartSpinBox->setSampleRate(srate);
 		m_ui.Gen1OffsetStartSpinBox->setEnabled(bOffset);
@@ -1684,6 +1690,12 @@ void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
 		m_ui.Gen1Sample->setOffsetEnd(0);
 		m_ui.Gen1Sample->setOffset(false);
 	}
+	// Crop {
+	if (m_isCropped && !m_hasEffectiveOffset) {
+		m_ui.Gen1Sample->resetView();
+		m_isCropped = false;
+	}
+	// }
 }
 
 
@@ -1740,6 +1752,42 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 		QIcon(":/images/playSample.png"),
 		tr("Play"), this, SLOT(playSample()));
 	pAction->setEnabled(element != nullptr);
+
+	// Crop {
+	if (pSender == m_ui.Gen1Sample) {
+		menu.addSeparator();
+
+		QAction *pCropAction = menu.addAction(
+			QIcon(":/images/cropView.png"),
+			tr("Crop View"),
+			m_ui.Gen1Sample,
+			SLOT(setViewFromOffsets()));
+
+		QAction *pUncropAction = menu.addAction(
+			QIcon(":/images/uncropView.png"),
+			tr("Uncrop View"),
+			m_ui.Gen1Sample,
+			SLOT(resetView()));
+
+		const bool bHasEffectiveOffset =
+			m_ui.Gen1Sample->isOffset()
+			&& (m_ui.Gen1OffsetStartSpinBox->value() > 0
+				|| m_ui.Gen1OffsetEndSpinBox->value()
+					< m_ui.Gen1OffsetEndSpinBox->maximum());
+
+		pCropAction->setEnabled(bHasEffectiveOffset);
+		pUncropAction->setEnabled(m_isCropped);
+
+		connect(pCropAction, &QAction::triggered, this, [this]() {
+			m_isCropped = true;
+		});
+
+		connect(pUncropAction, &QAction::triggered, this, [this]() {
+			m_isCropped = false;
+		});
+	}
+	// }
+
 	menu.addSeparator();
 	pAction = menu.addAction(
 		tr("Reset"), this, SLOT(resetElement()));
