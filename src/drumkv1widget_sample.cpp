@@ -66,16 +66,22 @@ drumkv1widget_sample::drumkv1widget_sample ( QWidget *pParent )
 
 	m_bOffset = false;
 	m_iOffsetStart = m_iOffsetEnd = 0;
-	// Crop: Initialize the visual sample range.
+	// g3n: Initialize the visual sample range.
 	m_iViewStart = m_iViewEnd = 0;
+
 
 	m_dragCursor  = DragNone;
 	m_pDragSample = nullptr;
+
+
+	m_iViewStart= 0;
+	m_iViewEnd= 0;
 
 	m_fEnvTime = 0.0f;
 	m_fDca1Attack = 0.0f;
 	m_fDca1Decay1 = 0.0f;
 	m_fDca1Decay2 = 0.0f;
+
 
 	resetDragState();
 }
@@ -87,10 +93,7 @@ drumkv1widget_sample::~drumkv1widget_sample (void)
 	setSample(nullptr);
 }
 
-
-// Parameter accessors.
-
-// Crop {
+// g3n: Rebuild the waveform using the current visual range.
 void drumkv1widget_sample::rebuildWaveform (void)
 {
 	if (m_ppPolyg) {
@@ -160,10 +163,11 @@ void drumkv1widget_sample::rebuildWaveform (void)
 		y0 += h0;
 	}
 }
-// }
+
+// Parameter accessors.
 void drumkv1widget_sample::setSample ( drumkv1_sample *pSample )
 {
-// Crop {
+	// g3n: Reset the visual range only when loading a different sample.
 	if (m_pSample != pSample) {
 		m_pSample = pSample;
 		m_iViewStart = 0;
@@ -172,8 +176,9 @@ void drumkv1widget_sample::setSample ( drumkv1_sample *pSample )
 
 	m_pDragSample = nullptr;
 
+	// g3n: Rebuild also on resize; the current visual range is preserved.
 	rebuildWaveform();
-// }
+
 	updateToolTip();
 	update();
 }
@@ -240,7 +245,7 @@ uint32_t drumkv1widget_sample::offsetEnd (void) const
 	return m_iOffsetEnd;
 }
 
-// Crop {
+// g3n: Set the visual range from the current playback offsets.
 void drumkv1widget_sample::setViewFromOffsets (void)
 {
 	if (m_pSample == nullptr)
@@ -249,6 +254,8 @@ void drumkv1widget_sample::setViewFromOffsets (void)
 	setViewRange(m_iOffsetStart, m_iOffsetEnd);
 }
 
+
+// g3n: Restore the full-sample visual range.
 void drumkv1widget_sample::resetView (void)
 {
 	if (m_pSample == nullptr)
@@ -257,6 +264,8 @@ void drumkv1widget_sample::resetView (void)
 	setViewRange(0, m_pSample->length());
 }
 
+
+// g3n: Store the visual range independently of the playback offsets.
 void drumkv1widget_sample::setViewRange (
 	uint32_t iViewStart, uint32_t iViewEnd)
 {
@@ -279,27 +288,24 @@ void drumkv1widget_sample::setViewRange (
 	rebuildWaveform();
 	update();
 }
-// }
+
+
 
 // Sanitizer helper.
 int drumkv1widget_sample::safeX ( int x ) const
 {
 	const int w = QFrame::width();
-	// Crop {
 	if (x < 0)
 		return 0;
 	if (x > w)
 		return w;
 	return x;
-	// }
-
 }
 
 
 // Sanitized converters.
 int drumkv1widget_sample::pixelFromFrames ( uint32_t n ) const
 {
-// Crop {
 	if (m_pSample == nullptr)
 		return 0;
 
@@ -327,13 +333,11 @@ int drumkv1widget_sample::pixelFromFrames ( uint32_t n ) const
 	const uint32_t npos = n - iViewStart;
 
 	return int((uint64_t(w) * uint64_t(npos)) / uint64_t(nview));
-// }
 }
 
 
 uint32_t drumkv1widget_sample::framesFromPixel ( int x ) const
 {
-// Crop {
 	if (m_pSample == nullptr)
 		return 0;
 
@@ -357,7 +361,6 @@ uint32_t drumkv1widget_sample::framesFromPixel ( int x ) const
 	const uint32_t nview = iViewEnd - iViewStart;
 	return iViewStart
 		+ uint32_t((uint64_t(x) * uint64_t(nview)) / uint64_t(w));
-// }
 }
 
 
@@ -612,12 +615,12 @@ void drumkv1widget_sample::setEnvTime ( float fEnvTime )
 
 
 void drumkv1widget_sample::setDca1Envelope(
-	float fAttack, float fDecay1, float fLevel2, float fDecay2 )
+	float fAttack, float fDecay1, float fLevel2, float fDecay2)
 {
-	m_fDca1Attack = qBound(0.0f, fAttack, 1.0f);
-	m_fDca1Decay1 = qBound(0.0f, fDecay1, 1.0f);
-	m_fDca1Level2 = qBound(0.0f, fLevel2, 1.0f);
-	m_fDca1Decay2 = qBound(0.0f, fDecay2, 1.0f);
+	m_fDca1Attack = fAttack;
+	m_fDca1Decay1 = fDecay1;
+	m_fDca1Level2 = fLevel2;
+	m_fDca1Decay2 = fDecay2;
 
 	update();
 }
@@ -651,11 +654,11 @@ void drumkv1widget_sample::drawDca1Envelope (
 		: (10000.0f * fSampleRateMs * m_fEnvTime));
 
 	const uint32_t iAttackLength
-		= ::lrintf(fMaxFrames * m_fDca1Attack * m_fDca1Attack);
+		= ::lrintf(fMaxFrames * qBound(0.0f, m_fDca1Attack, 1.0f) * m_fDca1Attack);
 	const uint32_t iDecay1Length
-		= ::lrintf(fMaxFrames * m_fDca1Decay1 * m_fDca1Decay1);
+		= ::lrintf(fMaxFrames * qBound(0.0f, m_fDca1Decay1, 1.0f) * m_fDca1Decay1);
 	const uint32_t iDecay2Length
-		= ::lrintf(fMaxFrames * m_fDca1Decay2 * m_fDca1Decay2);
+		= ::lrintf(fMaxFrames * qBound(0.0f, m_fDca1Decay2, 1.0f) * m_fDca1Decay2);
 
 	const uint32_t iAttackFrameEnd
 		= qMin(iFrameEnd, iFrameStart + iAttackLength);
@@ -781,21 +784,45 @@ void drumkv1widget_sample::paintEvent ( QPaintEvent *pPaintEvent )
 		const bool bEnabled = isEnabled();
 		QColor rgbLite1(rgbLite);
 		QColor rgbDrop1(Qt::black);
+
 		QColor rgbDca1(rgbDark);
+
 		rgbLite1.setAlpha(bDark ? 120 : 160);
 		rgbDrop1.setAlpha(80);
 		const int w2 = (w << 1);
 		painter.setRenderHint(QPainter::Antialiasing, true);
-		// DCA1 EG...
-		drawDca1Envelope(painter, rect, rgbDca1);
+
+
+
 		// Sample waveform...
 		QLinearGradient grad(0, 0, w2, h);
 		painter.setPen(rgbLite1.darker(160));
 		grad.setColorAt(0.0f, rgbLite1);
 		grad.setColorAt(1.0f, rgbDrop1);
 		painter.setBrush(grad);
+
+		drawDca1Envelope(painter, rect, rgbDca1);
+
+		// Línea de cero, por encima del envelope y detrás de la forma de onda.
+		painter.save();
+
+		QPen zeroLine(rgbDark.darker(105));
+		// zeroPen.setStyle(Qt::SolidLine);
+		painter.setPen(zeroLine);
+		// painter.setBrush(Qt::NoBrush);
+
+		const int h0 = h / m_iChannels;
+		for (unsigned short k = 0; k < m_iChannels; ++k) {
+			const int yZero = rect.top() + (h0 >> 1) + k * h0;
+			painter.drawLine(rect.left(), yZero, rect.right(), yZero);
+		}
+
+		painter.restore();
+
 		for (unsigned short k = 0; k < m_iChannels; ++k)
 			painter.drawPolygon(*m_ppPolyg[k]);
+
+
 		// Offset line...
 		if (m_bOffset && bEnabled) {
 			int x1 = 0, x2 = 0;
