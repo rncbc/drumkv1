@@ -108,6 +108,11 @@ drumkv1widget::drumkv1widget ( QWidget *pParent )
 	// Start clean.
 	m_iUpdate = 0;
 
+	// Crop {
+	m_bCropped = false;
+	m_bEffectiveOffset = false;
+	// }
+
 	// Replicate the stacked/pages
 	for (int iTab = 0; iTab < m_ui.StackedWidget->count(); ++iTab)
 		m_ui.TabBar->addTab(m_ui.StackedWidget->widget(iTab)->windowTitle());
@@ -1641,6 +1646,10 @@ void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
 		const uint32_t iOffsetEnd = pSample->offsetEnd();
 		const uint32_t nframes    = pSample->length();
 		const float srate = pSample->sampleRate();
+		// Crop {
+		m_bEffectiveOffset = bOffset
+			&& (iOffsetStart > 0 || iOffsetEnd < nframes);
+		// }
 		m_ui.Gen1OffsetRangeLabel->setEnabled(bOffset);
 		m_ui.Gen1OffsetStartSpinBox->setSampleRate(srate);
 		m_ui.Gen1OffsetStartSpinBox->setEnabled(bOffset);
@@ -1684,6 +1693,12 @@ void drumkv1widget::updateOffset ( drumkv1_sample *pSample, bool bDirty )
 		m_ui.Gen1Sample->setOffsetEnd(0);
 		m_ui.Gen1Sample->setOffset(false);
 	}
+	// Crop {
+	if (m_bCropped && !m_bEffectiveOffset) {
+		m_ui.Gen1Sample->uncropView();
+		m_bCropped = false;
+	}
+	// }
 }
 
 
@@ -1740,6 +1755,38 @@ void drumkv1widget::contextMenuRequest ( const QPoint& pos )
 		QIcon(":/images/playSample.png"),
 		tr("Play"), this, SLOT(playSample()));
 	pAction->setEnabled(element != nullptr);
+
+	// Crop {
+	if (pSender == m_ui.Gen1Sample) {
+
+		menu.addSeparator();
+
+		const bool bEffectiveOffset =
+			m_ui.Gen1Sample->isOffset()
+			&& (m_ui.Gen1OffsetStartSpinBox->value() > 0
+				|| m_ui.Gen1OffsetEndSpinBox->value()
+					< m_ui.Gen1OffsetEndSpinBox->maximum());
+
+		pAction = menu.addAction(
+			QIcon(":/images/cropView.png"),
+			tr("Crop View"),
+			m_ui.Gen1Sample,
+			SLOT(cropView()));
+		pAction->setEnabled(bEffectiveOffset);
+		QObject::connect(pAction, &QAction::triggered, this,
+			[this]() { m_bCropped = true; });
+
+		pAction = menu.addAction(
+			QIcon(":/images/uncropView.png"),
+			tr("Uncrop View"),
+			m_ui.Gen1Sample,
+			SLOT(uncropView()));
+		pAction->setEnabled(m_bCropped);
+		QObject::connect(pAction, &QAction::triggered, this,
+			[this]() { m_bCropped = false; });
+	}
+	// }
+
 	menu.addSeparator();
 	pAction = menu.addAction(
 		tr("Reset"), this, SLOT(resetElement()));

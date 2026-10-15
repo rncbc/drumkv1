@@ -92,6 +92,11 @@ public slots:
 	void setOffsetStart(uint32_t iOffsetStart);
 	void setOffsetEnd(uint32_t iOffsetEnd);
 
+	// Crop {
+	void cropView();
+	void uncropView();
+	// }
+
 protected:
 
 	// Sanitizer helper.
@@ -123,6 +128,11 @@ protected:
 
 	// Reset drag/select state.
 	void resetDragState();
+
+	// Crop {
+	void setViewRange(uint32_t iViewStart, uint32_t iViewEnd);
+	void updateView();
+	// }
 
 	// Update tool-tip.
 	void updateToolTip();
@@ -159,6 +169,10 @@ private:
 	bool     m_bOffset;
 	uint32_t m_iOffsetStart;
 	uint32_t m_iOffsetEnd;
+
+	// Crop: Visual sample range, independent of playback offsets.
+	uint32_t m_iViewStart;
+	uint32_t m_iViewEnd;
 
 	// Normalized GEN1 envelope time (0.0 = Auto).
 	float m_fEnvTime;
