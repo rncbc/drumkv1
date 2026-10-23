@@ -668,6 +668,7 @@ void drumkv1widget_sample::drawDca1Envelope (
 	const int x_attack = pixelFromFrames(iAttackFrameEnd);
 	const int x_decay1 = pixelFromFrames(iDecay1FrameEnd);
 	const int x_decay2 = pixelFromFrames(iDecay2FrameEnd);
+	const int x_end    = pixelFromFrames(iFrameEnd);
 
 	auto lighten_rgb = [](const QColor& rgb, int amount) {
 		return QColor(
@@ -748,8 +749,8 @@ void drumkv1widget_sample::drawDca1Envelope (
 	}
 
 	// Silence Zone
-	if (iFrameEnd > x_decay2) {
-		const QRect rect(x_decay2, 0, iFrameEnd - x_decay2, h);
+	if (x_end > x_decay2) {
+		const QRect rect(x_decay2, 0, x_end - x_decay2, h);
 		painter.fillRect(rect, rgbDca1);
 		painter.fillRect(rect, QBrush(rgbSilenceZone, Qt::BDiagPattern));
 		painter.setPen(rgbText);
