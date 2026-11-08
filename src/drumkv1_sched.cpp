@@ -51,6 +51,10 @@ public:
 	// clear all pending runs immediately.
 	void sync_reset();
 
+	// cancel pending runs of an instance or a schedule, immediately.
+	void sync_cancel(drumkv1 *pDrumk);
+	void sync_cancel(drumkv1_sched *sched);
+
 protected:
 
 	// main thread executive.
@@ -111,8 +115,8 @@ drumkv1_sched_thread::drumkv1_sched_thread ( uint32_t nsize ) : QThread()
 // dtor.
 drumkv1_sched_thread::~drumkv1_sched_thread (void)
 {
-	// fake sync and wait
-	if (m_running && isRunning()) do {
+	// fake sync and wait (even if not yet running)
+	if (isRunning()) do {
 		if (m_mutex.tryLock()) {
 			m_running = false;
 			m_cond.wakeAll();
@@ -157,6 +161,32 @@ void drumkv1_sched_thread::sync_reset (void)
 	QMutexLocker locker(&m_mutex);
 
 	clear();
+}
+
+
+// cancel pending runs of an instance, immediately;
+// waits for the one in progress, as run_process() holds the lock.
+void drumkv1_sched_thread::sync_cancel ( drumkv1 *pDrumk )
+{
+	QMutexLocker locker(&m_mutex);
+
+	for (uint32_t i = 0; i < m_nsize; ++i) {
+		drumkv1_sched *sched = m_items[i];
+		if (sched && sched->instance() == pDrumk)
+			m_items[i] = nullptr;
+	}
+}
+
+
+// cancel pending runs of a schedule, immediately.
+void drumkv1_sched_thread::sync_cancel ( drumkv1_sched *sched )
+{
+	QMutexLocker locker(&m_mutex);
+
+	for (uint32_t i = 0; i < m_nsize; ++i) {
+		if (m_items[i] == sched)
+			m_items[i] = nullptr;
+	}
 }
 
 
@@ -231,6 +261,9 @@ drumkv1_sched::drumkv1_sched ( drumkv1 *pDrumk, Type stype, uint32_t nsize )
 // dtor (virtual).
 drumkv1_sched::~drumkv1_sched (void)
 {
+	if (g_sched_thread)
+		g_sched_thread->sync_cancel(this);
+
 	delete [] m_items;
 
 	if (--g_sched_refcount == 0) {
@@ -311,6 +344,14 @@ void drumkv1_sched::sync_pending (void)
 {
 	if (g_sched_thread)
 		g_sched_thread->sync_pending();
+}
+
+
+// cancel pending schedules of an instance, immediately. (static)
+void drumkv1_sched::sync_cancel ( drumkv1 *pDrumk )
+{
+	if (g_sched_thread)
+		g_sched_thread->sync_cancel(pDrumk);
 }
 
 

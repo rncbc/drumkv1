@@ -2640,6 +2640,9 @@ drumkv1::drumkv1 ( uint16_t nchannels, float srate, uint32_t nsize )
 
 drumkv1::~drumkv1 (void)
 {
+	// no scheduled run may reach a half-destroyed instance.
+	drumkv1_sched::sync_cancel(this);
+
 	delete m_pImpl;
 }
 
